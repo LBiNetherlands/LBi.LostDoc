@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<doc>
+  <namespace name="Company">
+    This is some general information about the root namespace.
+  </namespace>
+
+  <namespace name="Company.Project">
+    This is some general information about the project namespace.
+  </namespace>
+
+  <namespace name="Company.Project.Library">
+    This library provides several classes
+    <see cref="T:Company.Project.Library.RegularClass" />
+    and some other ones.
+  </namespace>
+</doc>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+  <namespace name="Company">
+    This is some general information about the root namespace.
+  </namespace>
+
+  <namespace name="Company.Project">
+    This is some general information about the project namespace.
+  </namespace>
+
+  <namespace name="Company.Project.AnotherLibrary">
+    This library provides a single class <c cref="T:Company.Project.AnotherLibrary.SpecialClass"/> and some other ones.
+  </namespace>
+</doc>

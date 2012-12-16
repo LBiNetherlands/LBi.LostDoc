@@ -1,0 +1,39 @@
+TODO
+
+// * Make sure resources are fetched using the IFileProvider
+// * Add support for page-sections (add parsing and processing to Template class, and support in the FileResolver)
+// * Make sure nested types are properly supported, maybe xpath extension to do aggregations, 
+//   otherwise the "output" attribute isn't enough
+// * add assembly page as entry point for specific assembly and namespace navigation views
+// * improve multiple-assembly navigation, add "Library" and make merged namespace view the default
+// * Add icons from VS folder to namespace and type view
+// * fix /verbose switch
+// * Rename to LBi.LostDoc
+// * set up build server project for LBi.LostDoc
+// * Enable 'export-template' command
+// * add support for Operators
+// * fix attribute/code syntax gen, forgot to copy over elements from tmp element
+//   span "clas" attr should be "class"
+// * nested classes accessors are notworking, need IsNestedPublic etc.
+// * Indexer property can have overloads! this is not handled
+// * check for DefaultPropertyAttribute for cs-syntax
+// * Maybe change how the Operators are generated into the LDOC file
+// * add support for Explicit/Implicit casts (XSLT-only)
+// * add Support for Extension methods
+// * cleanup Template.Generate(), it is fairly hacked up with all the variable support.
+//   and make it multi-threaded
+// * add support for explicit interface implementation
+//   M:Company.Project.Library.ACustomAttribute.System#Runtime#InteropServices#_Attribute#GetTypeInfoCount(System.UInt32) - Filtered by LBi.LostDoc.Core.Filters.LogicalMemberInfoVisibilityFilter
+
+
+* rework xsl:sort in navigation2.xslt
+  1. Generate unsorted output
+  2. capture output in node-set
+  3. Sort node-set on li/a/@title
+
+* replace psargs with something not so hacked up
+* method/types with generics need constraints in the C# syntax!
+* sort out messed up Lostdoc URN Namespacing
+* add command to generate a template NSdoc file (also with assembly level comment)
+* create service template
+
