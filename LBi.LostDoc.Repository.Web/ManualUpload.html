@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Sample File Upload Form</title>
+</head>
+<body>
+    <h1>
+        Sample File Upload Form</h1>
+    <p>
+        <b>NOTE: This script is <i>not</i> operative on this server. You must install it on
+            your own server in order to see it operate.</b>
+    </p>
+    <p>
+        This page allows you to upload a file. Note that the script will limit the size
+        of the file to around 50k (so that the server doesn't get swamped with data).
+    </p>
+    <p>
+        The file upload form looks just like any other form except that:
+        <ol>
+            <li>the form tag must specify the <em>POST</em> method</li>
+            <li>the form tag must specify an enctype of <em>multipart/form-data</em></li>
+            <li>the form must contain an <em>&lt;input type=file&gt;</em> element.</li>
+        </ol>
+    </p>
+    <p>
+        The processing of a file upload is exactly like that of ordinary data; just make
+        a call to <b><tt>ReadParse</b></tt> and the data will either be put in <tt>%in</tt>
+        or some other variable that you specify. If you want to write files to disk (rather
+        than store the data in memory), then you also need to set the variable <tt>$cgi_lib'writefiles</tt>
+        to indicate the directory where the data should be written. Other variables allow
+        you to further customize the file upload.
+    </p>
+    <hr>
+    <h2>
+        Please fill in the file-upload form below</h2>
+    <form method="POST" enctype='multipart/form-data' action='/site/repository/'>
+        File to upload:
+        <input type="file" name="upfile" /><br />
+        <br />
+        <input type="submit" value="Press" />
+        to upload the file!
+    </form>
+    
+    <form method="POST" action='/site/rebuild'>
+        <input type="submit" value="Rebuild" />
+    </form>
+</body>
+</html>

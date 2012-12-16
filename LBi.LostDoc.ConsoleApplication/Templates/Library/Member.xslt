@@ -24,11 +24,11 @@
 
   <xsl:template name="title">
     <xsl:choose>
-      <xsl:when test="self::operator">
+      <xsl:when test="/bundle/assembly/namespace//operator[@assetId = $assetId]">
         <xsl:apply-templates select="/bundle/assembly/namespace//*[*/@assetId = $assetId]" mode="displayText"/>
         <xsl:text> </xsl:text>        
       </xsl:when>
-      <xsl:when test="not(self::constructor)">
+      <xsl:when test="/bundle/assembly/namespace//*[@assetId = $assetId and not(self::constructor)]">
         <xsl:apply-templates select="/bundle/assembly/namespace//*[*/@assetId = $assetId]" mode="displayText"/>
         <xsl:text>.</xsl:text>
       </xsl:when>

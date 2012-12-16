@@ -1,7 +1,4 @@
 <configuration>
-    <connectionStrings>
-        <add name="DefaultConnection" connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=aspnetdb;Integrated Security=True" providerName="System.Data.SqlClient"/>
-    </connectionStrings>
     <system.web>
       <profile defaultProvider="DefaultProfileProvider" >
         <providers>
@@ -29,7 +26,7 @@
       -->
       <sessionState mode="InProc" customProvider="DefaultSessionProvider">
         <providers>
-          <add name="DefaultSessionProvider" type="System.Web.Providers.DefaultSessionStateProvider, System.Web.Providers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" connectionStringName="DefaultConnection" applicationName="/"/>
+          <add name="DefaultSessionProvider" type="System.Web.Providers.DefaultSessionStateProvider, System.Web.Providers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" connectionStringName="DefaultConnection" />
         </providers>
       </sessionState>
     </system.web>

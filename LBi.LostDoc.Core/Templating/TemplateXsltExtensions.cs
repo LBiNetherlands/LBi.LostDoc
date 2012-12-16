@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,13 +31,12 @@ namespace LBi.LostDoc.Core.Templating
         private readonly Dictionary<AssetIdentifier, string> _resolveCache;
         private readonly ITemplatingContext _context;
         private readonly Uri _currentUri;
-        private readonly IAssetUriResolver[] _resolvers;
 
-        public TemplateXsltExtensions(ITemplatingContext context, Uri currentUri, IAssetUriResolver[] resolvers)
+        public TemplateXsltExtensions(ITemplatingContext context, Uri currentUri)
         {
             this._context = context;
             this._currentUri = currentUri;
-            this._resolvers = resolvers;
+
             this._aidCache = new Dictionary<string, AssetIdentifier>();
             this._resolveCache = new Dictionary<AssetIdentifier, string>();
         }
@@ -56,11 +71,11 @@ namespace LBi.LostDoc.Core.Templating
             {
                 aid = new AssetIdentifier(assetId, Version.Parse(version));
                 AssetIdentifier targetAid;
-                if (this._context.AssetRedirects.TryGet(aid, out targetAid))
+                if (this._context.TemplateData.AssetRedirects.TryGet(aid, out targetAid))
                 {
                     assetId = targetAid.AssetId;
                     version = targetAid.Version.ToString();
-                    TraceSources.AssetResolveSource.TraceVerbose("Redirected assetd {0} => {1}", aid, targetAid);
+                    TraceSources.AssetResolverSource.TraceVerbose("Redirected assetd {0} => {1}", aid, targetAid);
                 }
             }
 
@@ -70,12 +85,12 @@ namespace LBi.LostDoc.Core.Templating
             // TODO this doesn't seem very threadsafe, use concurrent dictionary?
             if (!_resolveCache.TryGetValue(aid, out ret))
             {
-                for (int i = 0; i < this._resolvers.Length; i++)
+                for (int i = 0; i < this._context.AssetUriResolvers.Length; i++)
                 {
-                    Uri target = this._resolvers[i].ResolveAssetId(assetId,
-                                                                   string.IsNullOrEmpty(version)
-                                                                       ? null
-                                                                       : new Version(version));
+                    Uri target = this._context.AssetUriResolvers[i].ResolveAssetId(assetId,
+                                                                                   string.IsNullOrEmpty(version)
+                                                                                       ? null
+                                                                                       : new Version(version));
                     if (target != null)
                     {
                         if (!target.IsAbsoluteUri)
@@ -91,10 +106,10 @@ namespace LBi.LostDoc.Core.Templating
             if (ret == null)
             {
                 ret = "urn:asset-not-found:" + assetId + "," + version;
-                TraceSources.AssetResolveSource.TraceWarning("{0}, {1} => {2}", assetId, version, ret);
+                TraceSources.AssetResolverSource.TraceWarning("{0}, {1} => {2}", assetId, version, ret);
             }
             else
-                TraceSources.AssetResolveSource.TraceVerbose("{0}, {1} => {2}", assetId, version, ret);
+                TraceSources.AssetResolverSource.TraceVerbose("{0}, {1} => {2}", assetId, version, ret);
 
 
             return ret;
@@ -123,8 +138,8 @@ namespace LBi.LostDoc.Core.Templating
         {
             AssetIdentifier qn = this.Parse(fqn);
 
-            if (this._context.IgnoredVersionComponent.HasValue)
-                return qn.Version.ToString((int)this._context.IgnoredVersionComponent.Value);
+            if (this._context.TemplateData.IgnoredVersionComponent.HasValue)
+                return qn.Version.ToString((int)this._context.TemplateData.IgnoredVersionComponent.Value);
 
             return qn.Version.ToString();
         }

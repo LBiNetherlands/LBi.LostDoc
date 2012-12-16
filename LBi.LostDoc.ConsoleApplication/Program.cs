@@ -1,11 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
+﻿/*
+ * Copyright 2012 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+using System;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using PSArgs;
+using LBi.Cli.Arguments;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
@@ -19,6 +33,8 @@ namespace LBi.LostDoc.ConsoleApplication
         /// </param>
         private static void Main(string[] args)
         {
+            WriteSignature();
+
             using (AggregateCatalog aggregateCatalog = new AggregateCatalog())
             {
                 foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
@@ -33,60 +49,14 @@ namespace LBi.LostDoc.ConsoleApplication
 
                 using (CompositionContainer container = new CompositionContainer(aggregateCatalog))
                 {
-                    ICommand[] commands = container.GetExports<ICommand>().Select(l => l.Value).ToArray();
-                    if (args.Length > 0)
-                    {
-                        ICommand[] filteredCommands =
-                            commands.Where(
-                                           c =>
-                                           c.Name.Any(n => n.StartsWith(args[0], StringComparison.OrdinalIgnoreCase)))
-                                .ToArray();
+                    ICommandProvider[] providers = container.GetExports<ICommandProvider>().Select(l => l.Value).ToArray();
+                    var commands = providers.SelectMany(p => p.GetCommands()).ToArray();
 
-                        if (filteredCommands.Length == 1)
-                        {
-                            ICommand command = filteredCommands[0];
-                            ArgsSetter argParser = new ArgsSetter(args.Skip(1).ToArray());
-                            argParser.SetParameters(command);
-                            if (argParser.Errors.Any())
-                            {
-                                WriteSignature();
-                                Console.WriteLine("Command: " +
-                                                  AttributedModelServices.GetContractName(command.GetType()));
-                                command.Usage(Console.Out);
-                                Console.WriteLine();
-                            }
-                            else
-                                command.Invoke();
-                        }
-                        else if (filteredCommands.Length > 1)
-                        {
-                            IEnumerable<string> matchingCommands =
-                                filteredCommands.SelectMany(c => c.Name)
-                                    .Where(n => n.StartsWith(args[0], StringComparison.OrdinalIgnoreCase));
-                            WriteSignature();
-                            Console.WriteLine("Ambiguous command: " + string.Join(", ", matchingCommands));
-                        }
-                        else
-                        {
-                            WriteSignature();
-                            Console.WriteLine("Unknown command!");
-                            foreach (ICommand cmd in commands)
-                            {
-                                Console.WriteLine("Command: " + cmd.Name.First());
-                                cmd.Usage(Console.Out);
-                                Console.WriteLine();
-                            }
-                        }
-                    }
-                    else
+                    ArgumentParser<ICommand> argumentParser = new ArgumentParser<ICommand>(commands);
+                    ICommand command;
+                    if (argumentParser.TryParse(args, out command))
                     {
-                        WriteSignature();
-                        foreach (ICommand cmd in commands)
-                        {
-                            Console.WriteLine("Command: " + cmd.Name.First());
-                            cmd.Usage(Console.Out);
-                            Console.WriteLine();
-                        }
+                        command.Invoke();
                     }
                 }
             }
@@ -94,8 +64,10 @@ namespace LBi.LostDoc.ConsoleApplication
 
         private static void WriteSignature()
         {
-            Console.WriteLine("LBi LostDoc (Version: " + Assembly.GetExecutingAssembly().GetName().Version + ")");
-            Console.WriteLine("Usage: lostdoc.exe [command] [args]");
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            var prodAttr = executingAssembly.GetCustomAttribute<AssemblyProductAttribute>();
+            Console.WriteLine("{0} (Version: {1})", prodAttr.Product, executingAssembly.GetName().Version);
+            Console.WriteLine();
         }
     }
 }

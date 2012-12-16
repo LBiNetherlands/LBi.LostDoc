@@ -25,15 +25,19 @@ TODO
 // * add support for explicit interface implementation
 //   M:Company.Project.Library.ACustomAttribute.System#Runtime#InteropServices#_Attribute#GetTypeInfoCount(System.UInt32) - Filtered by LBi.LostDoc.Core.Filters.LogicalMemberInfoVisibilityFilter
 
-
 * rework xsl:sort in navigation2.xslt
   1. Generate unsorted output
   2. capture output in node-set
   3. Sort node-set on li/a/@title
 
 * replace psargs with something not so hacked up
+
 * method/types with generics need constraints in the C# syntax!
+
 * sort out messed up Lostdoc URN Namespacing
+  should be: urn:schemas-lbi-nl:lostdoc:template
+
 * add command to generate a template NSdoc file (also with assembly level comment)
+
 * create service template
 

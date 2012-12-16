@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LBi.LostDoc.ConsoleApplication</RootNamespace>
     <AssemblyName>lostdoc</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -49,6 +49,7 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>TRACE</DefineConstants>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Extract Library|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -56,6 +57,7 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Template Library|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -63,16 +65,20 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <OutputPath>bin\Debug\</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PSArgs">
-      <HintPath>..\3rdParty\PSArgs.dll</HintPath>
+    <Reference Include="LBi.Cli.Arguments">
+      <HintPath>..\3rdParty\LBi.Cli.Arguments.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -82,9 +88,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsolidatedConsoleTraceListener.cs" />
-    <Compile Include="DirectoryFileProvider.cs" />
+    <Compile Include="DefaultCommandProvider.cs" />
     <Compile Include="ExtractCommand.cs" />
     <Compile Include="ICommand.cs" />
+    <Compile Include="ICommandProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceFileProvider.cs" />
@@ -94,7 +101,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LBi.LostDoc.Core\LBi.LostDoc.Core.csproj">
       <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
-      <Name>LostDoc.Core</Name>
+      <Name>LBi.LostDoc.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +171,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\Library\IndexInjector.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

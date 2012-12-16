@@ -260,7 +260,7 @@
               </a>
               <ul>
                 <!-- list members -->
-                <xsl:apply-templates select="*[@assetId and @phase = '0' and (self::method | self::property | self::field | self::event | self::constructor | self::operator) and (not(parent::enum) or not(self::field))]" mode="xnav-item">
+                <xsl:apply-templates select="*[@assetId and @phase = '0' and (self::method | self::property | self::field | self::event | self::constructor | self::operator)]" mode="xnav-item">
                   <xsl:with-param name="current" select="@assetId"/>
                   <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                 </xsl:apply-templates>
@@ -383,6 +383,7 @@
                   <ul>
                     <!-- list members -->
                     <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@phase = '0' and ld:nover(@assetId) = ld:nover(current()/parent::*/@assetId)]/*[@assetId and @phase = '0']" mode="xnav-item">-->
+                    
                     <xsl:apply-templates select="parent::*/*[(self::method | self::property | self::field | self::event | self::constructor | self::operator) and @assetId and @phase = '0']" mode="xnav-item">
                       <xsl:with-param name="current" select="@assetId"/>
                       <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>

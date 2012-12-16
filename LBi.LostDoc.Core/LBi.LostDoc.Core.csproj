@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LBi.LostDoc.Core</RootNamespace>
     <AssemblyName>LBi.LostDoc.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -30,6 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DebugSymbols>true</DebugSymbols>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LBi.Diagnostics">
@@ -77,9 +80,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Templating\AliasRegistration.cs" />
+    <Compile Include="Templating\AssetSection.cs" />
+    <Compile Include="Templating\DirectoryFileProvider.cs" />
     <Compile Include="Templating\AssetResolvers\FileResolver.cs" />
     <Compile Include="Templating\AssetResolvers\MsdnResolver.cs" />
+    <Compile Include="Templating\ParsedTemplate.cs" />
+    <Compile Include="Templating\Resource.cs" />
+    <Compile Include="Templating\ResourceDeployment.cs" />
+    <Compile Include="Templating\SectionRegistration.cs" />
+    <Compile Include="Templating\Stylesheet.cs" />
+    <Compile Include="Templating\StylesheetApplication.cs" />
     <Compile Include="Templating\TemplateData.cs" />
+    <Compile Include="Templating\TemplateOutput.cs" />
+    <Compile Include="Templating\UnitOfWork.cs" />
+    <Compile Include="Templating\WorkUnitResult.cs" />
+    <Compile Include="Templating\XPathVariable.cs" />
     <Compile Include="Templating\XPath\CustomXsltContext.cs" />
     <Compile Include="Templating\IFileProvider.cs" />
     <Compile Include="Templating\ITemplatingContext.cs" />
@@ -88,7 +104,7 @@
     <Compile Include="Templating\TemplatingContext.cs" />
     <Compile Include="Templating\IAssetUriResolver.cs" />
     <Compile Include="ProcessingContext.cs" />
-    <Compile Include="Templating\VersionComponent.cs" />
+    <Compile Include="VersionComponent.cs" />
     <Compile Include="Templating\XmlFileProviderResolver.cs" />
     <Compile Include="Templating\XPath\XsltContextAssetIdGetter.cs" />
     <Compile Include="Templating\XPath\XsltContextAssetVersionGetter.cs" />

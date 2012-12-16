@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+ * Copyright 2012 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,7 +57,7 @@ namespace LBi.LostDoc.Core
             assetRedirects = new AssetRedirectCollection();
             if (this._ignoreVersionComponent.HasValue)
             {
-                TraceSources.TemplateSource.TraceInformation("Merging assembly sections with version mask: {0}",
+                TraceSources.BundleSource.TraceInformation("Merging assembly sections with version mask: {0}",
                                                              this._ignoreVersionComponent.Value.ToString());
 
                 keySelector =
@@ -77,12 +93,12 @@ namespace LBi.LostDoc.Core
                         assetAttrs.Select(a => AssetIdentifier.Parse(a.Value)).ToDictionary(a => a.AssetId);
 
 
-                    TraceSources.TemplateSource.TraceInformation("Primary assembly: " +
+                    TraceSources.BundleSource.TraceInformation("Primary assembly: " +
                                                                  primary.Attribute("assetId").Value);
 
                     foreach (XElement secondary in rest)
                     {
-                        TraceSources.TemplateSource.TraceInformation("Shadowed assembly: " +
+                        TraceSources.BundleSource.TraceInformation("Shadowed assembly: " +
                                                                      secondary.Attribute("assetId").Value);
                         secondary.Remove();
                         IEnumerable<XAttribute> secondaryAssetAttrs =
@@ -100,17 +116,17 @@ namespace LBi.LostDoc.Core
                             else
                             {
                                 // warnings, we merged and lost an asset!
-                                TraceSources.TemplateSource.TraceWarning(
-                                                                         "Failed to redirect asset {0}, no matching asset found in assembly {1}",
-                                                                         asset.ToString(),
-                                                                         primary.Attribute("assetId"));
+                                TraceSources.BundleSource.TraceWarning(
+                                                                       "Failed to redirect asset {0}, no matching asset found in assembly {1}",
+                                                                       asset.ToString(),
+                                                                       primary.Attribute("assetId"));
                             }
                         }
                     }
                 }
             }
 
-            TraceSources.TemplateSource.TraceInformation("Sorting assemblies by version.");
+            TraceSources.BundleSource.TraceInformation("Sorting assemblies by version.");
             XElement[] asmElements =
                 this._bundle.Root.Elements().OrderByDescending(
                                                                e =>

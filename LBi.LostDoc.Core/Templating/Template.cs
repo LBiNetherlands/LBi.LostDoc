@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+ * Copyright 2012 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -17,14 +33,18 @@ using LBi.LostDoc.Core.Templating.XPath;
 
 namespace LBi.LostDoc.Core.Templating
 {
-    public class Template
+    public interface ITemplate
+    {
+        
+    }
+    public class Template : ITemplate
     {
         private readonly IFileProvider _fileProvider;
         private string _basePath;
         private FileResolver _fileResolver;
         private List<IAssetUriResolver> _resolvers;
-        private string[] _resources;
-        private Stylesheet[] _stylesheets;
+
+        private XDocument _templateDefinition;
 
         public Template(IFileProvider fileProvider)
         {
@@ -35,159 +55,16 @@ namespace LBi.LostDoc.Core.Templating
             this._resolvers.Add(new MsdnResolver());
         }
 
-        #region Internal representation
-
-        #region Nested type: AliasRegistration
-
-        protected class AliasRegistration
-        {
-            public XPathVariable[] Variables { get; set; }
-            public string SelectExpression { get; set; }
-            public string AssetIdExpression { get; set; }
-            public string VersionExpression { get; set; }
-        }
-
-        #endregion
-
-        #region Nested type: ProcessingStatistics
-
-        protected class ProcessingStatistics
-        {
-            public string StylesheetName { get; set; }
-
-            public string SavedAs { get; set; }
-
-            /// <summary>
-            ///   Micro seconds.
-            /// </summary>
-            public long Duration { get; set; }
-        }
-
-        #endregion
-
-        #region Nested type: SectionRegistration
-
-        protected class SectionRegistration : AliasRegistration
-        {
-            public string NameExpression { get; set; }
-        }
-
-        #endregion
-
-        #region Nested type: Stylesheet
-
-        protected class Stylesheet
-        {
-            public string VersionExpression { get; set; }
-            public XslCompiledTransform Transform { get; set; }
-            public string Name { get; set; }
-            public string SelectExpression { get; set; }
-            public string AssetIdExpression { get; set; }
-            public string OutputExpression { get; set; }
-            public StylesheetParam[] XsltParams { get; set; }
-            public XPathVariable[] Variables { get; set; }
-            public SectionRegistration[] Sections { get; set; }
-            public AliasRegistration[] AssetAliases { get; set; }
-        }
-
-        #endregion
-
-        #region Nested type: StylesheetParam
-
-        protected class StylesheetParam
-        {
-            public string Name { get; set; }
-            public string ValueExpression { get; set; }
-        }
-
-        #endregion
-
-        #region Nested type: UnitOfWork
-
-        protected class UnitOfWork
-        {
-            public XslCompiledTransform Transform { get; set; }
-            public IEnumerable<KeyValuePair<string, object>> XsltParams { get; set; }
-            public string SaveAs { get; set; }
-
-            public XElement InputElement { get; set; }
-
-            public AssetIdentifier Asset { get; set; }
-
-            public string StylesheetName { get; set; }
-        }
-
-        #endregion
-
-        #region Nested type: XPathVariable
-
-        protected class XPathVariable
-        {
-            public string Name { get; set; }
-            public string ValueExpression { get; set; }
-        }
-
-        #endregion
-
-        #endregion
-
         #region Load Template
 
-        public void Load(string path)
+        public virtual void Load(string path)
         {
-            XDocument doc;
-
             using (Stream str = this._fileProvider.OpenFile(path))
-                doc = XDocument.Load(str);
+                _templateDefinition = XDocument.Load(str);
 
-            List<Stylesheet> stylesheets = new List<Stylesheet>();
             this._basePath = Path.GetDirectoryName(path);
-
-            List<string> resources = new List<string>();
-            foreach (XElement elem in doc.Root.Elements())
-            {
-                if (elem.Name.LocalName == "apply-stylesheet")
-                {
-                    stylesheets.Add(new Stylesheet
-                                        {
-                                            Transform = this.LoadStylesheet(elem.Attribute("stylesheet").Value),
-                                            SelectExpression = elem.Attribute("select").Value,
-                                            AssetIdExpression = elem.Attribute("assetId").Value,
-                                            OutputExpression = elem.Attribute("output").Value,
-                                            VersionExpression = elem.Attribute("version").Value,
-                                            XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
-                                            Variables =
-                                                this.ParseVariables(
-                                                                    elem.Attributes().Where(
-                                                                                            a =>
-                                                                                            a.Name.NamespaceName ==
-                                                                                            "urn:lost-doc:template.variable"))
-                                                .ToArray(),
-                                            Name = elem.Attribute("name") == null
-                                                       ? Path.GetFileNameWithoutExtension(
-                                                                                          elem.Attribute("stylesheet").
-                                                                                              Value)
-                                                       : elem.Attribute("name").Value,
-                                            Sections =
-                                                this.ParseSectionRegistration(elem.Elements("register-section")).ToArray
-                                                (),
-                                            AssetAliases =
-                                                this.ParseAliasRegistration(elem.Elements("register-alias")).ToArray()
-                                        });
-                }
-                else if (elem.Name.LocalName == "include-resource")
-                {
-                    resources.Add(elem.Attribute("path").Value);
-                }
-                else
-                {
-                    throw new Exception("Unknown element: " + elem.Name.LocalName);
-                }
-            }
-
-            this._stylesheets = stylesheets.ToArray();
-            this._resources = resources.ToArray();
         }
+
 
         private IEnumerable<AliasRegistration> ParseAliasRegistration(IEnumerable<XElement> elements)
         {
@@ -220,6 +97,7 @@ namespace LBi.LostDoc.Core.Templating
                             NameExpression = elem.Attribute("name").Value,
                             AssetIdExpression = elem.Attribute("assetId").Value,
                             VersionExpression = elem.Attribute("version").Value,
+                            ConditionExpression = GetAttributeValueOrDefault(elem, "condition"),
                             Variables =
                                 this.ParseVariables(
                                                     elem.Attributes().Where(
@@ -242,13 +120,13 @@ namespace LBi.LostDoc.Core.Templating
                                        });
         }
 
-        private IEnumerable<StylesheetParam> ParseParams(IEnumerable<XElement> elements)
+        private IEnumerable<XPathVariable> ParseParams(IEnumerable<XElement> elements)
         {
             foreach (XElement elem in elements)
             {
                 if (elem.Name.LocalName == "with-param")
                 {
-                    yield return new StylesheetParam
+                    yield return new XPathVariable
                                      {
                                          Name = elem.Attribute("name").Value,
                                          ValueExpression = elem.Attribute("select").Value
@@ -297,7 +175,7 @@ namespace LBi.LostDoc.Core.Templating
             {
                 // create resolver
                 // ReSharper disable AccessToModifiedClosure
-                Func<string, object> ssResolver = v => EvalStylesheetVariable(stylesheet, xpathContext, inputElement, v);
+                Func<string, object> ssResolver = v => EvalVariable(stylesheet.Variables, xpathContext, inputElement, v);
                 // ReSharper restore AccessToModifiedClosure
 
                 // attach resolver
@@ -306,6 +184,17 @@ namespace LBi.LostDoc.Core.Templating
                 string saveAs = ResultToString(inputElement.XPathEvaluate(stylesheet.OutputExpression, xpathContext));
                 string version = ResultToString(inputElement.XPathEvaluate(stylesheet.VersionExpression, xpathContext));
                 string assetId = ResultToString(inputElement.XPathEvaluate(stylesheet.AssetIdExpression, xpathContext));
+                List<AssetIdentifier> aliases = new List<AssetIdentifier>();
+                List<AssetSection> sections = new List<AssetSection>();
+
+                // eval condition, shortcut and log instead of wrapping entire loop in if
+                if (!EvalCondition(xpathContext, inputElement, stylesheet.ConditionExpression))
+                {
+                    TraceSources.TemplateSource.TraceVerbose("{0}, {1} => Condition not met", assetId, version);
+                    //detach resolver
+                    xpathContext.OnResolveVariable -= ssResolver;
+                    continue;
+                }
 
                 Uri newUri = new Uri(saveAs, UriKind.RelativeOrAbsolute);
                 TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}", assetId, version, saveAs);
@@ -331,9 +220,9 @@ namespace LBi.LostDoc.Core.Templating
                             v =>
                             {
                                 if (HasVariable(alias, v))
-                                    return EvalVariable(alias, xpathContext, aliasInputElement, v);
+                                    return EvalVariable(alias.Variables, xpathContext, aliasInputElement, v);
 
-                                return EvalStylesheetVariable(stylesheet, xpathContext, inputElement, v);
+                                return EvalVariable(stylesheet.Variables, xpathContext, inputElement, v);
                             };
                         // ReSharper restore AccessToModifiedClosure
 
@@ -344,11 +233,23 @@ namespace LBi.LostDoc.Core.Templating
                         string aliasAssetId =
                             ResultToString(aliasInputElement.XPathEvaluate(alias.AssetIdExpression, xpathContext));
 
-                        xpathContext.OnResolveVariable -= aliasResolver;
+                        // eval condition
+                        if (EvalCondition(xpathContext, aliasInputElement, alias.ConditionExpression))
+                        {
+                            this._fileResolver.Add(aliasAssetId, new Version(aliasVersion), newUri);
+                            aliases.Add(AssetIdentifier.Parse(aliasAssetId));
+                            TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => {2}", aliasAssetId,
+                                                                     aliasVersion,
+                                                                     saveAs);
+                        }
+                        else
+                        {
+                            TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => Condition not met",
+                                                                     assetId,
+                                                                     version);
+                        }
 
-                        this._fileResolver.Add(aliasAssetId, new Version(aliasVersion), newUri);
-                        TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => {2}", aliasAssetId, aliasVersion,
-                                                                 saveAs);
+                        xpathContext.OnResolveVariable -= aliasResolver;
                     }
                 }
 
@@ -356,8 +257,7 @@ namespace LBi.LostDoc.Core.Templating
                 foreach (SectionRegistration section in stylesheet.Sections)
                 {
                     xpathContext.OnResolveVariable += ssResolver;
-                    XElement[] sectionInputElements =
-                        inputElement.XPathSelectElements(section.SelectExpression, xpathContext).ToArray();
+                    XElement[] sectionInputElements = inputElement.XPathSelectElements(section.SelectExpression, xpathContext).ToArray();
                     xpathContext.OnResolveVariable -= ssResolver;
 
                     foreach (XElement sectionInputElement in sectionInputElements)
@@ -367,9 +267,9 @@ namespace LBi.LostDoc.Core.Templating
                             v =>
                             {
                                 if (HasVariable(section, v))
-                                    return EvalVariable(section, xpathContext, sectionInputElement, v);
+                                    return EvalVariable(section.Variables, xpathContext, sectionInputElement, v);
 
-                                return EvalStylesheetVariable(stylesheet, xpathContext, inputElement, v);
+                                return EvalVariable(stylesheet.Variables, xpathContext, inputElement, v);
                             };
                         // ReSharper enable AccessToModifiedClosure
 
@@ -382,53 +282,42 @@ namespace LBi.LostDoc.Core.Templating
                         string sectionAssetId =
                             ResultToString(sectionInputElement.XPathEvaluate(section.AssetIdExpression, xpathContext));
 
+                        // eval condition
+                        if (EvalCondition(xpathContext, sectionInputElement, section.ConditionExpression))
+                        {
+                            Uri sectionUri = new Uri(newUri + "#" + sectionName, UriKind.Relative);
+                            this._fileResolver.Add(sectionAssetId, new Version(sectionVersion), sectionUri);
+                            TraceSources.TemplateSource.TraceVerbose("{0}, {1}, (Section: {2}) => {3}",
+                                                                     sectionAssetId,
+                                                                     sectionVersion,
+                                                                     sectionName,
+                                                                     saveAs);
+
+                            sections.Add(new AssetSection(AssetIdentifier.Parse(sectionAssetId), sectionName, sectionUri));
+                        } else
+                        {
+                            TraceSources.TemplateSource.TraceVerbose("{0}, {1}, (Section: {2}) => Condition not met",
+                                                                       sectionAssetId,
+                                                                       sectionVersion,
+                                                                       sectionName);
+                        }
+
                         xpathContext.OnResolveVariable -= sectionResolver;
 
-
-                        this._fileResolver.Add(sectionAssetId, new Version(sectionVersion),
-                                               new Uri(newUri + "#" + sectionName, UriKind.Relative));
-                        TraceSources.TemplateSource.TraceVerbose("{0}, {1}, (Section: {2}) => {3}",
-                                                                 sectionAssetId,
-                                                                 sectionVersion,
-                                                                 sectionName,
-                                                                 saveAs);
                     }
                 }
 
 
-                List<KeyValuePair<string, object>> xsltParams = new List<KeyValuePair<string, object>>();
                 xpathContext.OnResolveVariable += ssResolver;
-                foreach (StylesheetParam param in stylesheet.XsltParams)
-                {
-                    object val = inputElement.XPathEvaluate(param.ValueExpression);
-                    if (!(val is string) && val is IEnumerable)
-                    {
-                        object[] data = ((IEnumerable)val).Cast<object>().ToArray();
-
-                        if (data.Length == 1)
-                        {
-                            if (data[0] is XAttribute)
-                                val = ((XAttribute)data[0]).Value;
-                            else if (data[0] is XText)
-                                val = ((XText)data[0]).Value;
-                            else if (data[0] is XCData)
-                                val = ((XCData)data[0]).Value;
-                            else if (data[0] is XNode)
-                                val = ((XNode)data[0]).CreateNavigator();
-                        }
-                        else
-                            val = data.Cast<XNode>().Select(n => n.CreateNavigator()).ToArray();
-                    }
-
-                    xsltParams.Add(new KeyValuePair<string, object>(param.Name, val));
-                }
-
+                var xsltParams = ResolveXsltParams(stylesheet.Variables, inputElement).ToArray();
                 xpathContext.OnResolveVariable -= ssResolver;
 
-                yield return new UnitOfWork
+                yield return new StylesheetApplication
                                  {
                                      StylesheetName = stylesheet.Name,
                                      Asset = new AssetIdentifier(assetId, new Version(version)),
+                                     Aliases = aliases, /* list of AssetIdentifiers */
+                                     Sections = sections, /* list of AssetSection */
                                      SaveAs = saveAs,
                                      Transform = stylesheet.Transform,
                                      InputElement = inputElement,
@@ -437,24 +326,241 @@ namespace LBi.LostDoc.Core.Templating
             }
         }
 
+        private static IEnumerable<KeyValuePair<string, object>> ResolveXsltParams(IEnumerable<XPathVariable> xsltParams , XElement contextElement)
+        {
+            foreach (var param in xsltParams)
+            {
+                object val = contextElement.XPathEvaluate(param.ValueExpression);
+                if (!(val is string) && val is IEnumerable)
+                {
+                    object[] data = ((IEnumerable)val).Cast<object>().ToArray();
+
+                    if (data.Length == 1)
+                    {
+                        if (data[0] is XAttribute)
+                            val = ((XAttribute)data[0]).Value;
+                        else if (data[0] is XText)
+                            val = ((XText)data[0]).Value;
+                        else if (data[0] is XCData)
+                            val = ((XCData)data[0]).Value;
+                        else if (data[0] is XNode)
+                            val = ((XNode)data[0]).CreateNavigator();
+                    }
+                    else
+                        val = data.Cast<XNode>().Select(n => n.CreateNavigator()).ToArray();
+                }
+
+                yield return new KeyValuePair<string, object>(param.Name, val);
+            }
+        }
+
         private static bool HasVariable(AliasRegistration alias, string variable)
         {
             return alias.Variables.SingleOrDefault(v => v.Name.Equals(variable, StringComparison.Ordinal)) != null;
         }
 
-        private static object EvalVariable(AliasRegistration alias, CustomXsltContext xpathContext,
+        private static object EvalVariable(IEnumerable<XPathVariable> variables, CustomXsltContext xpathContext,
                                            XElement inputElement, string variable)
         {
-            XPathVariable xpathVar = alias.Variables.Single(v => v.Name.Equals(variable, StringComparison.Ordinal));
+            XPathVariable xpathVar = variables.Single(v => v.Name.Equals(variable, StringComparison.Ordinal));
             return inputElement.XPathEvaluate(xpathVar.ValueExpression, xpathContext);
         }
 
-        private static object EvalStylesheetVariable(Stylesheet stylesheet, CustomXsltContext xpathContext,
-                                                     XElement inputElement, string variable)
+
+        protected virtual ParsedTemplate PrepareTemplate(TemplateData templateData)
         {
-            XPathVariable xpathVar = stylesheet.Variables.Single(v => v.Name.Equals(variable, StringComparison.Ordinal));
-            return inputElement.XPathEvaluate(xpathVar.ValueExpression, xpathContext);
+            // clone orig doc
+            XDocument workingDoc = new XDocument(_templateDefinition);
+
+            // start by loading any parameters as they are needed for meta-template evaluation
+
+            Dictionary<string, XPathVariable> globalParams = new Dictionary<string, XPathVariable>();
+
+            var paramNodes = workingDoc.Root.Elements("parameter");
+            foreach (XElement paramNode in paramNodes)
+            {
+                var tmplVar = new XPathVariable
+                                  {
+                                      Name = paramNode.Attribute("name").Value,
+                                      ValueExpression =
+                                          paramNode.Attribute("name") == null ? null : paramNode.Attribute("name").Value,
+                                  };
+
+                globalParams.Add(tmplVar.Name, tmplVar);
+            }
+
+            CustomXsltContext customContext = new CustomXsltContext();
+            Func<string, object> onFailedResolve = s =>
+                                                       {
+                                                           throw new InvalidOperationException(
+                                                               String.Format("Parameter '{0}' could not be resolved.",
+                                                                             s));
+                                                       };
+
+            customContext.OnResolveVariable += s =>
+                                                   {
+                                                       XPathVariable var;
+                                                       if (globalParams.TryGetValue(s, out var))
+                                                       {
+                                                           object value;
+                                                           if (templateData.Arguments.TryGetValue(s, out value))
+                                                               return value;
+
+                                                           if (!String.IsNullOrWhiteSpace(var.ValueExpression))
+                                                               return workingDoc.XPathEvaluate(var.ValueExpression,
+                                                                                                customContext);
+                                                       }
+
+                                                       return onFailedResolve(s);
+                                                   };
+
+            // check for meta-template directives and expand
+            XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
+
+            // we're going to need this later
+            XmlFileProviderResolver fileResolver = new XmlFileProviderResolver(this._fileProvider, this._basePath);
+
+            while (metaNode != null)
+            {
+                // remove it so we don't process it again
+                metaNode.Remove();
+
+                if (EvalCondition(customContext, metaNode, this.GetAttributeValueOrDefault(metaNode, "condition")))
+                {
+                    #region Debug conditional
+
+#if DEBUG
+                    const bool debugEnabled = true;
+#else
+                    const bool debugEnabled = false;
+#endif
+
+                    #endregion
+
+                    XslCompiledTransform metaTransform = new XslCompiledTransform(debugEnabled);
+                    using (Stream str = this._fileProvider.OpenFile(metaNode.Attribute("stylesheet").Value))
+                    using (XmlReader reader = XmlReader.Create(str, new XmlReaderSettings()))
+                    {
+                        metaTransform.Load(reader,
+                                           new XsltSettings { EnableScript = true },
+                                           fileResolver);
+                    }
+
+                    XsltArgumentList xsltArgList = new XsltArgumentList();
+
+                    var metaParamNodes = metaNode.Elements("with-param");
+
+
+                    foreach (XElement paramNode in metaParamNodes)
+                    {
+                        string pName = paramNode.Attribute("name").Value;
+                        string pExpr = paramNode.Attribute("select").Value;
+
+                        xsltArgList.AddParam(pName,
+                                             string.Empty,
+                                             workingDoc.XPathEvaluate(pExpr, customContext));
+                    }
+
+                    XDocument outputDoc = new XDocument();
+                    using (XmlWriter outputWriter = outputDoc.CreateWriter())
+                        metaTransform.Transform(workingDoc.CreateNavigator(),
+                                                xsltArgList,
+                                                outputWriter,
+                                                fileResolver);
+
+                    TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
+                                                             metaNode.Attribute("stylesheet").Value);
+
+                    TraceSources.TemplateSource.TraceData(TraceEventType.Verbose, 1, outputDoc.CreateNavigator());
+
+                    workingDoc = outputDoc;
+                }
+
+
+                // select next template
+                metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
+            }
+
+            // loading template
+            List<Stylesheet> stylesheets = new List<Stylesheet>();
+            List<Resource> resources = new List<Resource>();
+            foreach (XElement elem in workingDoc.Root.Elements())
+            {
+                if (elem.Name.LocalName == "apply-stylesheet")
+                {
+                    stylesheets.Add(this.ParseStylesheet(elem));
+                }
+                else if (elem.Name.LocalName == "include-resource")
+                {
+                    resources.Add(new Resource
+                                      {
+                                          Path = elem.Attribute("path").Value,
+                                          ConditionExpression = this.GetAttributeValueOrDefault(elem, "condition")
+                                      });
+                }
+                else
+                {
+                    throw new Exception("Unknown element: " + elem.Name.LocalName);
+                }
+            }
+
+            return new ParsedTemplate
+                       {
+                           Resources = resources.ToArray(),
+                           Stylesheets = stylesheets.ToArray()
+                       };
         }
+
+        private static bool EvalCondition(CustomXsltContext customContext, XNode contextNode, string condition)
+        {
+            bool shouldApply;
+            if (string.IsNullOrWhiteSpace(condition))
+                shouldApply = true;
+            else
+            {
+                object value = contextNode.XPathEvaluate(condition, customContext);
+                shouldApply = ResultToBool(value);
+            }
+            return shouldApply;
+        }
+
+        private Stylesheet ParseStylesheet(XElement elem)
+        {
+            IEnumerable<XAttribute> variableAttrs = Enumerable.Where(elem.Attributes(),
+                                                                     a =>
+                                                                     a.Name.NamespaceName == "urn:lost-doc:template.variable");
+
+            string name = elem.Attribute("name") == null
+                              ? Path.GetFileNameWithoutExtension(elem.Attribute("stylesheet").Value)
+                              : elem.Attribute("name").Value;
+
+            return new Stylesheet
+                       {
+                           Transform = this.LoadStylesheet(elem.Attribute("stylesheet").Value),
+                           SelectExpression = elem.Attribute("select").Value,
+                           AssetIdExpression = elem.Attribute("assetId").Value,
+                           OutputExpression = elem.Attribute("output").Value,
+                           VersionExpression = elem.Attribute("version").Value,
+                           XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
+                           Variables = this.ParseVariables(variableAttrs).ToArray(),
+                           Name = name,
+                           Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
+                           AssetAliases = this.ParseAliasRegistration(elem.Elements("register-alias")).ToArray(),
+                           ConditionExpression = GetAttributeValueOrDefault(elem, "condition")
+                       };
+        }
+
+        private string GetAttributeValueOrDefault(XElement elem, string attName, string defaultValue = null)
+        {
+            var attr = elem.Attribute(attName);
+
+            if (attr == null)
+                return defaultValue;
+
+            return attr.Value;
+        }
+
+
 
         /// <summary>
         /// Applies he loaded templates to <paramref name="templateData"/>.
@@ -465,140 +571,94 @@ namespace LBi.LostDoc.Core.Templating
         /// <param name="outputDir">
         /// The output directory, this is created if it doesn't exist. 
         /// </param>
-        public void Generate(TemplateData templateData, string outputDir)
+        public virtual TemplateOutput Generate(TemplateData templateData, string outputDir)
         {
             Stopwatch timer = Stopwatch.StartNew();
 
+            ParsedTemplate tmpl = this.PrepareTemplate(templateData);
+            
+
+            // start template processing
+
+
             List<UnitOfWork> work = new List<UnitOfWork>();
 
+            // include resources
+            work.AddRange(this.DiscoverWork(templateData, tmpl.Resources));
+            
             // collect all work that has to be done
-            foreach (Stylesheet stylesheet in this._stylesheets)
+            foreach (Stylesheet stylesheet in tmpl.Stylesheets)
                 work.AddRange(this.DiscoverWork(templateData, stylesheet));
 
-            string rootPath = Path.GetFullPath(outputDir);
 
-            // copy resources to output dir
-            foreach (string resource in this._resources)
-            {
-                string target = Path.Combine(rootPath, resource);
-                string targetDir = Path.GetDirectoryName(target);
-                TraceSources.TemplateSource.TraceInformation("Copying resource: {0}", resource);
-
-                if (!Directory.Exists(targetDir))
-                    Directory.CreateDirectory(targetDir);
-
-                using (Stream streamSrc = this._fileProvider.OpenFile(Path.Combine(this._basePath, resource)))
-                using (Stream streamDest = File.Create(target))
-                {
-                    streamSrc.CopyTo(streamDest);
-                    streamDest.Close();
-                    streamSrc.Close();
-                }
-            }
 
             TraceSources.TemplateSource.TraceInformation("Generating {0:N0} documents from {1:N0} stylesheets.",
-                                                         work.Count, this._stylesheets.Length);
+                                                         work.Count, tmpl.Stylesheets.Length);
 
-            ConcurrentBag<ProcessingStatistics> statistcs = new ConcurrentBag<ProcessingStatistics>();
-            ConcurrentDictionary<Uri, bool> savedUris = new ConcurrentDictionary<Uri, bool>();
+            ConcurrentBag<WorkUnitResult> results = new ConcurrentBag<WorkUnitResult>();
+
+            // create context
+            ITemplatingContext context = new TemplatingContext(templateData,
+                                                               this._resolvers,
+                                                               this._fileProvider);
 
             // process all units of work
-           Parallel.ForEach(work,
-                             uow =>
-                             {
-                                 Stopwatch localTimer = Stopwatch.StartNew();
+            Parallel.ForEach(work, uow => results.Add(uow.Execute(context)));
+            
+            // stop timing
+            timer.Stop();
 
-                                 string targetPath = Path.Combine(outputDir, uow.SaveAs);
+            // prepare stats
+            Dictionary<Type, WorkUnitResult[]> resultGroups =
+                results.GroupBy(ps => ps.WorkUnit.GetType()).ToDictionary(g => g.Key, g => g.ToArray());
 
-                                 string targetDir = Path.GetDirectoryName(targetPath);
-                                 if (targetDir != null && !Directory.Exists(targetDir))
-                                 {
-                                     TraceSources.TemplateSource.TraceVerbose("Creating directory: {0}", targetDir);
 
-                                     // noop if exists
-                                     Directory.CreateDirectory(targetDir);
-                                 }
 
-                                 ITemplatingContext templatingContext = new TemplatingContext
-                                                                            {
-                                                                                OutputDir = targetPath,
-                                                                                InputDocument =
-                                                                                    templateData.Document,
-                                                                                IgnoredVersionComponent =
-                                                                                    templateData.
-                                                                                    IgnoredVersionComponent,
-                                                                                AssetRedirects =
-                                                                                    templateData.AssetRedirects
-                                                                            };
+            var stylesheetStats =
+                resultGroups[typeof(StylesheetApplication)]
+                .GroupBy(r => ((StylesheetApplication)r.WorkUnit).StylesheetName);
 
-                                 Uri newUri = new Uri(uow.SaveAs, UriKind.RelativeOrAbsolute);
-
-                                 if (savedUris.TryAdd(newUri, true))
-                                 {
-                                     // register xslt params
-                                     XsltArgumentList argList = new XsltArgumentList();
-                                     foreach (KeyValuePair<string, object> kvp in uow.XsltParams)
-                                         argList.AddParam(kvp.Key, string.Empty, kvp.Value);
-
-                                     // and custom extensions
-                                     argList.AddExtensionObject("urn:lostdoc-core",
-                                                                new TemplateXsltExtensions(templatingContext, newUri,
-                                                                                           this._resolvers.ToArray()));
-
-                                     using (FileStream stream = File.Create(targetPath))
-                                     using (
-                                         XmlWriter xmlWriter = XmlWriter.Create(stream,
-                                                                                new XmlWriterSettings
-                                                                                    {
-                                                                                        CloseOutput = true,
-                                                                                        Indent = true
-                                                                                    }))
-                                     {
-                                         TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}",
-                                                                                  uow.Asset.AssetId,
-                                                                                  uow.Asset.Version, uow.SaveAs);
-                                         uow.Transform.Transform(templateData.Document.CreateNavigator(), argList,
-                                                                 xmlWriter);
-                                         xmlWriter.Close();
-                                     }
-                                 }
-                                 else
-                                 {
-                                     TraceSources.TemplateSource.TraceWarning(
-                                                                              "{0}, {1} => Skipped, already generated ({2})",
-                                                                              uow.Asset.AssetId, uow.Asset.Version,
-                                                                              newUri);
-                                 }
-
-                                 localTimer.Stop();
-                                 statistcs.Add(new ProcessingStatistics
-                                                   {
-                                                       StylesheetName = uow.StylesheetName,
-                                                       SavedAs = uow.SaveAs,
-                                                       Duration =
-                                                           (long)
-                                                           Math.Round(localTimer.ElapsedTicks /
-                                                                      (double)Stopwatch.Frequency * 1000000)
-                                                   });
-                             });
-
-            IEnumerable<IGrouping<string, ProcessingStatistics>> statGroups = statistcs.GroupBy(ps => ps.StylesheetName);
-            foreach (IGrouping<string, ProcessingStatistics> statGroup in statGroups)
+            foreach (var statGroup in stylesheetStats)
             {
-                TraceSources.TemplateSource.TraceInformation("Applied stylesheet '{0}' {1:N0} times in {2:N0} ms (min: {3:N0}, max {4:N0}, avg: {5:N0})",
+                TraceSources.TemplateSource.TraceInformation("Applied stylesheet '{0}' {1:N0} times in {2:N0} ms (min: {3:N0}, mean {4:N0}, max {5:N0}, avg: {6:N0})",
                                                              statGroup.Key,
                                                              statGroup.Count(),
                                                              statGroup.Sum(ps => ps.Duration) / 1000.0,
                                                              statGroup.Min(ps => ps.Duration) / 1000.0,
+                                                             statGroup.Skip(statGroup.Count() / 2).Take(1).Single().Duration / 1000.0,
                                                              statGroup.Max(ps => ps.Duration) / 1000.0,
                                                              statGroup.Average(ps => ps.Duration) / 1000.0);
             }
 
-            timer.Stop();
+            var resourceStats = resultGroups[typeof(ResourceDeployment)];
+
+            foreach (var statGroup in resourceStats)
+            {
+                TraceSources.TemplateSource.TraceInformation("Deployed resource '{0}' in {2:N0} ms",
+                                                             ((ResourceDeployment)statGroup.WorkUnit).ResourcePath,
+                                                             statGroup.Duration);
+            }
+
+
             TraceSources.TemplateSource.TraceInformation("Documentation generated in {0:N1} seconds (processing time: {1:N1} seconds)",
                                                          timer.Elapsed.TotalSeconds,
-                                                         statistcs.Sum(ps => ps.Duration) / 1000000.0);
+                                                         results.Sum(ps => ps.Duration) / 1000000.0);
+
+
+            return new TemplateOutput(results.ToArray());
         }
+
+        private IEnumerable<UnitOfWork> DiscoverWork(TemplateData templateData, Resource[] resources)
+        {
+            for (int i = 0; i < resources.Length; i++)
+            {
+                CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
+                if (EvalCondition(xpathContext, templateData.Document.Root, resources[i].ConditionExpression))
+                    yield return new ResourceDeployment(resources[i].Path);
+            }
+            
+        }
+
 
         private static CustomXsltContext CreateCustomXsltContext(VersionComponent? ignoredVersionComponent)
         {
@@ -633,6 +693,39 @@ namespace LBi.LostDoc.Core.Templating
                     }
                 }
             }
+
+            return ret;
+        }
+
+
+        /*
+         * a number is true if and only if it is neither positive or negative zero nor NaN
+         * a node-set is true if and only if it is non-empty
+         * a string is true if and only if its length is non-zero
+         * an object of a type other than the four basic types is converted to a boolean in a way that is dependent on that type
+         */
+        private static bool ResultToBool(object res)
+        {
+            bool ret;
+            if (res == null)
+                ret = false;
+            else if (res is string)
+                ret = ((string)res).Length > 0;
+            else if (res is bool)
+                ret = (bool)res;
+            else if (res is double)
+            {
+                double d = (double)res;
+                ret = (d > 0.0 || d < 0.0) && !double.IsNaN(d);
+            }
+            else if (res is IEnumerable)
+            {
+                object first = ((IEnumerable)res).Cast<object>().FirstOrDefault();
+                ret = ResultToBool(first);
+            }
+            else
+                ret = false;
+
 
             return ret;
         }

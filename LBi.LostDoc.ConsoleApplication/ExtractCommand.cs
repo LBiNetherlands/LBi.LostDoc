@@ -1,48 +1,63 @@
+/*
+ * Copyright 2012 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Xml.Linq;
+using LBi.Cli.Arguments;
 using LBi.LostDoc.Core;
 using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Enrichers;
 using LBi.LostDoc.Core.Filters;
-using PSArgs;
+
 
 namespace LBi.LostDoc.ConsoleApplication
 {
-    [Export(typeof(ICommand))]
+    [ParameterSet("Extract", Command = "Extract", HelpMessage = "Extracts metadata from an assembly to create a ldoc file.")]
     public class ExtractCommand : ICommand
     {
-        [Parameter]
-        public bool? Verbose { get; set; }
+        [Parameter(HelpMessage = "Include verbose output.")]
+        public LBi.Cli.Arguments.Switch Verbose { get; set; }
 
-        [Parameter]
-        public bool? IncludeNonPublic { get; set; }
+        [Parameter (HelpMessage = "Include non-public members.")]
+        public LBi.Cli.Arguments.Switch IncludeNonPublic { get; set; }
 
-        [Parameter]
-        public bool? IncludeBclDocComments { get; set; }
+        [Parameter(HelpMessage = "Includes doc comments from the BCL for referenced types.")]
+        public LBi.Cli.Arguments.Switch IncludeBclDocComments { get; set; }
 
-        [Parameter(Mandatory = true)]
+        [Parameter(HelpMessage = "Path to assembly to extract."), Required]
+        [ExampleValue("With filter", "\"c:\\projects\\Company.Library.Project.dll\"")]
         public string Path { get; set; }
 
-        [Parameter]
+        [Parameter(HelpMessage = "Path to xml containing additional comments for Assembly and Namespaces.")]
         public string NamespaceDocPath { get; set; }
 
-        [Parameter]
+        [Parameter(HelpMessage = "Type name filter (Compared against the type's FullName, including Namespace).")]
+        [ExampleValue("With filter", "Company.Library.Project.*")]
         public string Filter { get; set; }
 
-        [Parameter]
+        [Parameter(HelpMessage = "Output path.")]
         public string Output { get; set; }
 
         #region ICommand Members
-
-        public string[] Name
-        {
-            get { return new[] {"Extract"}; }
-        }
 
         public void Invoke()
         {
@@ -53,13 +68,13 @@ namespace LBi.LostDoc.ConsoleApplication
 
             TraceSources.GeneratorSource.Listeners.Add(traceListener);
 
-            if (!this.Verbose.HasValue || !this.Verbose.Value)
+            if (!this.Verbose.IsPresent)
                 TraceSources.GeneratorSource.Switch.Level = SourceLevels.Information | SourceLevels.ActivityTracing;
 
             DocGenerator gen = new DocGenerator();
 
             gen.AssetFilters.Add(new CompilerGeneratedFilter());
-            if (!this.IncludeNonPublic.HasValue || !this.IncludeNonPublic.Value)
+            if (!this.IncludeNonPublic.IsPresent)
                 gen.AssetFilters.Add(new PublicTypeFilter());
 
             gen.AssetFilters.Add(new CompilerGeneratedFilter());
@@ -96,7 +111,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 return;
             }
 
-            if (this.IncludeBclDocComments.HasValue && this.IncludeBclDocComments.Value)
+            if (this.IncludeBclDocComments.IsPresent)
             {
                 string winPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
                 string bclDocPath = System.IO.Path.Combine(winPath, @"microsoft.net\framework\",
@@ -133,21 +148,6 @@ namespace LBi.LostDoc.ConsoleApplication
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fileName));
 
             rawDoc.Save(fileName);
-        }
-
-        public void Usage(TextWriter output)
-        {
-            output.WriteLine(
-                             @"Parameters:
-Path                    Path to assembly to extract.
-Output                  Output path.
-IncludeNonPublic        Includes non public types.
-Filter                  Type name filter (Compared against the type's FullName, including Namespace).
-                        Example: -Filter Company.Library.Project.*
-IncludeBclDocComments   Includes doc comments from the BCL for referenced types.
-NamespaceDocPath        Path to xml containing additional comments for Assembly and Namespaces.
-Verbose                 Enable verbose output.
-");
         }
 
         #endregion

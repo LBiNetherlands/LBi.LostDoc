@@ -7,3 +7,7 @@ TestResults
 *.suo
 *.*~
 *.user
+
+App_Data
+/Output
+LBi.LostDoc.Core.Test\Data
