@@ -73,8 +73,9 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LBi.Cli.Arguments">
-      <HintPath>..\3rdParty\LBi.Cli.Arguments.dll</HintPath>
+    <Reference Include="LBi.Cli.Arguments, Version=0.0.2.103, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\LBi.Cli.Arguments.0.0.2.103-dev\lib\net45\LBi.Cli.Arguments.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -177,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
