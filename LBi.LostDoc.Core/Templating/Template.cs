@@ -400,12 +400,16 @@ namespace LBi.LostDoc.Core.Templating
             customContext.OnResolveVariable += s =>
                                                    {
                                                        XPathVariable var;
+
+                                                       // if it's defined
                                                        if (globalParams.TryGetValue(s, out var))
                                                        {
+                                                           // see if the user provided a value
                                                            object value;
                                                            if (templateData.Arguments.TryGetValue(s, out value))
                                                                return value;
 
+                                                           // evaluate default value
                                                            if (!String.IsNullOrWhiteSpace(var.ValueExpression))
                                                                return workingDoc.XPathEvaluate(var.ValueExpression,
                                                                                                 customContext);

@@ -73,9 +73,9 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LBi.Cli.Arguments, Version=0.0.2.103, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="LBi.Cli.Arguments, Version=0.0.2.107, Culture=neutral, PublicKeyToken=a6442c589e275a88, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\LBi.Cli.Arguments.0.0.2.103-dev\lib\net45\LBi.Cli.Arguments.dll</HintPath>
+      <HintPath>..\packages\LBi.Cli.Arguments.0.0.2.107-dev\lib\net45\LBi.Cli.Arguments.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />

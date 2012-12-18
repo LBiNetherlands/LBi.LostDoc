@@ -47,25 +47,29 @@ namespace LBi.LostDoc.ConsoleApplication
         [Parameter(HelpMessage = "Which version components to ignore for deduplication.")]
         public VersionComponent? IgnoreVersionComponent { get; set; }
 
+        [Parameter(HelpMessage = "Optional template arguments.")]
+        public Dictionary<string, object> Arguments { get; set; }
+
         #region ICommand Members
 
         public void Invoke()
         {
-            var traceListener = new ConsolidatedConsoleTraceListener(new Dictionary<string, string>
-                                                                         {
-                                                                             {
-                                                                                 "LostDoc.Core.Template",
-                                                                                 "Template"
-                                                                                 },
-                                                                             {
-                                                                                 "LostDoc.Core.Bundle",
-                                                                                 "Bundle"
-                                                                                 },
-                                                                             {
-                                                                                 "LostDoc.Core.Template.AssetResolver",
-                                                                                 "Resolve"
-                                                                                 }
-                                                                         });
+            var traceListener = new ConsolidatedConsoleTraceListener(
+                new Dictionary<string, string>
+                    {
+                        {
+                            "LostDoc.Core.Template",
+                            "Template"
+                        },
+                        {
+                            "LostDoc.Core.Bundle",
+                            "Bundle"
+                        },
+                        {
+                            "LostDoc.Core.Template.AssetResolver",
+                            "Resolve"
+                        }
+                    });
 
             TraceSources.TemplateSource.Listeners.Add(traceListener);
             TraceSources.AssetResolverSource.Listeners.Add(traceListener);
@@ -82,9 +86,11 @@ namespace LBi.LostDoc.ConsoleApplication
             if (File.Exists(this.Path))
                 includedFiles.AddLast(new FileInfo(this.Path));
             else if (Directory.Exists(this.Path))
+            {
                 Directory.GetFiles(this.Path, "*.ldoc", SearchOption.AllDirectories)
-                    .Aggregate(includedFiles,
-                               (l, f) => l.AddLast(new FileInfo(f)).List);
+                         .Aggregate(includedFiles,
+                                    (l, f) => l.AddLast(new FileInfo(f)).List);
+            }
             else
                 throw new FileNotFoundException(System.IO.Path.GetFullPath(this.Path));
 
@@ -164,8 +170,10 @@ namespace LBi.LostDoc.ConsoleApplication
                                    {
                                        AssetRedirects = assetRedirects,
                                        Document = mergedDoc,
-                                       IgnoredVersionComponent = this.IgnoreVersionComponent
+                                       IgnoredVersionComponent = this.IgnoreVersionComponent,
+                                       Arguments = this.Arguments
                                    };
+
             template.Generate(templateData, outputDir);
         }
 
