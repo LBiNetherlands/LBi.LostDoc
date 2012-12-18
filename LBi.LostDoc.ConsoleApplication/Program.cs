@@ -23,7 +23,7 @@ using LBi.Cli.Arguments;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
-    internal class Program
+    public class Program
     {
         /// <summary>
         /// Mains the specified args.
@@ -31,7 +31,7 @@ namespace LBi.LostDoc.ConsoleApplication
         /// <param name="args">
         /// The args. 
         /// </param>
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             WriteSignature();
 

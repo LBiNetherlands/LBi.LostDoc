@@ -282,7 +282,10 @@ namespace LBi.LostDoc.Core
         {
             Type[] candidates =
                 this._assemblies.Select(a => a.GetType(typeName, false, false)).Where(t => t != null).ToArray();
-            type = candidates.Distinct().SingleOrDefault(t => t != null);
+            type = candidates.Distinct().FirstOrDefault(t => t != null);
+            // this used to be here, but SingleOrDefault fails if the type name is defined in multiple assemblies
+            // like __DynamicallyInvokable
+            ////type = candidates.Distinct().SingleOrDefault(t => t != null);
             return type != null;
         }
 

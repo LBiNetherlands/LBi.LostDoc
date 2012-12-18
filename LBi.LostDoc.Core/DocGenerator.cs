@@ -1115,15 +1115,11 @@ namespace LBi.LostDoc.Core
                     foreach (string asmPath in probePaths)
                     {
                         IEnumerable<string> allFiles =
-                            Directory.EnumerateFiles(asmPath, "*.dll").Concat(
-                                                                              this._assemblyPaths.SelectMany(
-                                                                                                             ap =>
-                                                                                                             Directory.
-                                                                                                                 EnumerateFiles
-                                                                                                                 (Path.
-                                                                                                                      GetDirectoryName
-                                                                                                                      (ap),
-                                                                                                                  "*.dll")));
+                            Directory.EnumerateFiles(asmPath, "*.dll")
+                                     .Concat(
+                                         this._assemblyPaths.SelectMany(
+                                             ap => Directory.EnumerateFiles(Path.GetDirectoryName(ap),
+                                                                            "*.dll")));
 
 
                         foreach (string fileName in allFiles)

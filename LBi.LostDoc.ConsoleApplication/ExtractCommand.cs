@@ -107,7 +107,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
             if (!File.Exists(this.Path))
             {
-                Console.WriteLine("Path not found: '{0}'", this.Path);
+                Console.WriteLine("File not found: '{0}'", this.Path);
                 return;
             }
 
