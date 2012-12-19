@@ -1,5 +1,29 @@
 LBi.LostDoc
 ===========
+LostDoc is a .Net documentation generator based on XML Documentation Comments, written in C# & XSLT. 
+
+Usage
+-----
+
+To show help
+```
+lostdoc.exe -Help
+```
+
+To extract ldoc files from a .net assembly:
+```
+lostdoc.exe Extract -Path path\to\assembly.dll -Output .\tmp
+```
+
+To template a collection of ldoc files:
+```
+lostdoc.exe Template -Path .\tmp -Template Library -Verbose -Force -Output .\out
+```
+
+Known issues
+------------
+There is currently no support for async/await and dynamic.
+See todo.txt for more details and information.
 
 Debugging Console Application
 -----------------------------
