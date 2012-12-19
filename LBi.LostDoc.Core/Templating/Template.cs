@@ -429,9 +429,6 @@ namespace LBi.LostDoc.Core.Templating
 
             while (metaNode != null)
             {
-                // remove it so we don't process it again
-                metaNode.Remove();
-
                 if (EvalCondition(customContext, metaNode, this.GetAttributeValueOrDefault(metaNode, "condition")))
                 {
                     #region Debug conditional
@@ -446,18 +443,12 @@ namespace LBi.LostDoc.Core.Templating
 
                     XslCompiledTransform metaTransform = this.LoadStylesheet(metaNode.Attribute("stylesheet").Value);
 
-                    //using (Stream str = this._fileProvider.OpenFile(metaNode.Attribute("stylesheet").Value))
-                    //using (XmlReader reader = XmlReader.Create(str, new XmlReaderSettings()))
-                    //{
-                    //    metaTransform.Load(reader,
-                    //                       new XsltSettings { EnableScript = true },
-                    //                       fileResolver);
-                    //}
-
                     XsltArgumentList xsltArgList = new XsltArgumentList();
 
-                    var metaParamNodes = metaNode.Elements("with-param");
+                    // TODO this is a quick fix/hack
+                    xsltArgList.AddExtensionObject("urn:lostdoc-core", new TemplateXsltExtensions(null, null));
 
+                    var metaParamNodes = metaNode.Elements("with-param");
 
                     foreach (XElement paramNode in metaParamNodes)
                     {

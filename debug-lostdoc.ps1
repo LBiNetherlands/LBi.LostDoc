@@ -22,6 +22,10 @@ $choices = @(
                                         A = @("Template -Path .\Tmp -Template Library -Verbose -Force -Output .\Html")
                                     }),
     (New-Object -TypeName PSObject @{
+                                        C = "Template Both Libraries with Search"; 
+                                        A = @("Template -Path .\Tmp -Template Library -Verbose -Force -Output .\Html -Arguments @{SearchUri = '/search/'}")
+                                    }),
+    (New-Object -TypeName PSObject @{
                                         C = "Help"; 
                                         A = @("-Help -Full")
                                     })

@@ -37,17 +37,17 @@
     <xsl:if test="$targets">
       <xsl:variable name="next" select="substring-after($targets, ',')"/>
       <xsl:variable name="first" select="normalize-space(substring-before($targets, ','))"/>
-      <xsl:apply-templates select="template/apply-template[@stylesheet = $first]" mode="inject"/>
+      <xsl:apply-templates select="/template/apply-stylesheet[@stylesheet = $first]" mode="inject"/>
       <xsl:if test="$next">
         <!-- if there is more data, inject own processing instructions -->
         <meta-template stylesheet="IndexInjector.xslt">
-          <with-param name="targets" select="$next" />
+          <with-param name="targets" select="'{normalize-space($next)}'" />
         </meta-template>
       </xsl:if>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="apply-template" mode="inject">
+  <xsl:template match="apply-stylesheet" mode="inject">
     <xsl:copy />
     <apply-template name="{concat('Index for: ', ld:coalesce(@name, substring-before(@stylesheet, '.')))}"
                     stylesheet="CreateIndex.xslt">
