@@ -24,8 +24,6 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc hrc ld">
 
-  <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
-
   <xsl:include href="Layout.xslt"/>
   <xsl:include href="Naming.xslt"/>
   <xsl:include href="Common.xslt"/>

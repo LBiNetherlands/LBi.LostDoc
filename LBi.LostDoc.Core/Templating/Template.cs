@@ -310,7 +310,7 @@ namespace LBi.LostDoc.Core.Templating
 
 
                 xpathContext.OnResolveVariable += ssResolver;
-                var xsltParams = ResolveXsltParams(stylesheet.Variables, inputElement, xpathContext).ToArray();
+                var xsltParams = ResolveXsltParams(stylesheet.XsltParams, inputElement, xpathContext).ToArray();
                 xpathContext.OnResolveVariable -= ssResolver;
 
                 yield return new StylesheetApplication
@@ -500,7 +500,7 @@ namespace LBi.LostDoc.Core.Templating
 
                 if (elem.Name.LocalName == "apply-stylesheet")
                 {
-                    stylesheets.Add(this.ParseStylesheet(elem));
+                    stylesheets.Add(this.ParseStylesheet(stylesheets, elem));
                 }
                 else if (elem.Name.LocalName == "include-resource")
                 {
@@ -536,19 +536,35 @@ namespace LBi.LostDoc.Core.Templating
             return shouldApply;
         }
 
-        private Stylesheet ParseStylesheet(XElement elem)
+        private Stylesheet ParseStylesheet(IEnumerable<Stylesheet> stylesheets, XElement elem)
         {
-            IEnumerable<XAttribute> variableAttrs = Enumerable.Where(elem.Attributes(),
-                                                                     a =>
-                                                                     a.Name.NamespaceName == "urn:lost-doc:template.variable");
+            
+            IEnumerable<XAttribute> variableAttrs =
+                elem.Attributes()
+                    .Where(a => a.Name.NamespaceName == "urn:lost-doc:template.variable");
 
             string name = elem.Attribute("name") == null
                               ? Path.GetFileNameWithoutExtension(elem.Attribute("stylesheet").Value)
                               : elem.Attribute("name").Value;
+            if (elem.Attribute("name") != null)
+                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0} ({1})", name, elem.Attribute("stylesheet").Value);
+            else
+                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0}", name);
+            
+            string src = elem.Attribute("stylesheet").Value;
+            XslCompiledTransform transform;
+
+            Stylesheet match = stylesheets.FirstOrDefault(s => String.Equals(s.Source, src, StringComparison.Ordinal));
+            if (match != null)
+                transform = match.Transform;
+            else
+                transform = this.LoadStylesheet(src);
+            
 
             return new Stylesheet
                        {
-                           Transform = this.LoadStylesheet(elem.Attribute("stylesheet").Value),
+                           Source = src,
+                           Transform = transform,
                            SelectExpression = elem.Attribute("select").Value,
                            AssetIdExpression = elem.Attribute("assetId").Value,
                            OutputExpression = elem.Attribute("output").Value,
@@ -607,7 +623,8 @@ namespace LBi.LostDoc.Core.Templating
             ConcurrentBag<WorkUnitResult> results = new ConcurrentBag<WorkUnitResult>();
 
             // create context
-            ITemplatingContext context = new TemplatingContext(templateData,
+            ITemplatingContext context = new TemplatingContext(this._basePath,
+                                                               templateData,
                                                                this._resolvers,
                                                                this._fileProvider);
 
@@ -663,7 +680,7 @@ namespace LBi.LostDoc.Core.Templating
             {
                 CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
                 if (EvalCondition(xpathContext, templateData.Document.Root, resources[i].ConditionExpression))
-                    yield return new ResourceDeployment(Path.Combine(this._basePath, resources[i].Path));
+                    yield return new ResourceDeployment(resources[i].Path);
             }
 
         }

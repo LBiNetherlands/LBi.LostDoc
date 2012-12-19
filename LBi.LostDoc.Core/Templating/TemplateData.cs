@@ -30,5 +30,6 @@ namespace LBi.LostDoc.Core.Templating
         public XDocument Document { get; set; }
         public Dictionary<string, object> Arguments { get; set; }
         public string TargetDirectory { get; set; }
+        public bool OverwriteExistingFiles { get; set; }
     }
 }

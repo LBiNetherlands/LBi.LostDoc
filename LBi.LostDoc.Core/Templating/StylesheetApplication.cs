@@ -55,12 +55,16 @@ namespace LBi.LostDoc.Core.Templating
 
             Uri newUri = new Uri(this.SaveAs, UriKind.RelativeOrAbsolute);
 
-            if (!File.Exists(targetPath))
+            bool exists;
+            if (!(exists = File.Exists(targetPath)) || context.TemplateData.OverwriteExistingFiles)
             {
                 // register xslt params
                 XsltArgumentList argList = new XsltArgumentList();
                 foreach (KeyValuePair<string, object> kvp in this.XsltParams)
                     argList.AddParam(kvp.Key, string.Empty, kvp.Value);
+
+                argList.XsltMessageEncountered +=
+                    (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
 
                 // and custom extensions
                 argList.AddExtensionObject("urn:lostdoc-core", new TemplateXsltExtensions(context, newUri));
@@ -73,9 +77,18 @@ namespace LBi.LostDoc.Core.Templating
                                                                   Indent = true
                                                               }))
                 {
-                    TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}",
+                    if (exists)
+                    {
+                        TraceSources.TemplateSource.TraceWarning("{0}, {1} => Replacing {2}",
+                                                                 this.Asset.AssetId,
+                                                                 this.Asset.Version, this.SaveAs);
+                    }
+                    else
+                    {
+                        TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}",
                                                              this.Asset.AssetId,
                                                              this.Asset.Version, this.SaveAs);
+                    }
 
                     this.Transform.Transform(context.TemplateData.Document.CreateNavigator(),
                                              argList,

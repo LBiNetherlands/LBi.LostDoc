@@ -24,7 +24,6 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc hrc ld">
 
-  <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
   <xsl:param name="type"/>
   <xsl:param name="name"/>
   <xsl:param name="memberType" select="method"/>

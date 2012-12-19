@@ -36,6 +36,9 @@ namespace LBi.LostDoc.ConsoleApplication
         [Parameter(HelpMessage = "Include verbose output.")]
         public LBi.Cli.Arguments.Switch Verbose { get; set; }
 
+        [Parameter(HelpMessage = "Overwrites existing files.")]
+        public LBi.Cli.Arguments.Switch Force { get; set; }
+
         [Parameter(HelpMessage = "Path to ldoc file (or folder containing multiple ldoc files)."), Required]
         public string Path { get; set; }
 
@@ -172,6 +175,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
                 var templateData = new TemplateData
                                        {
+                                           OverwriteExistingFiles = this.Force.IsPresent,
                                            AssetRedirects = assetRedirects,
                                            Document = mergedDoc,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,

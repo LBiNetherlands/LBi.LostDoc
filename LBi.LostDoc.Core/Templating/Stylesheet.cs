@@ -31,5 +31,6 @@ namespace LBi.LostDoc.Core.Templating
         public XPathVariable[] Variables { get; set; }
         public SectionRegistration[] Sections { get; set; }
         public AliasRegistration[] AssetAliases { get; set; }
+        public string Source { get; set; }
     }
 }

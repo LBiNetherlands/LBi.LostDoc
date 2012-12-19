@@ -22,15 +22,17 @@ namespace LBi.LostDoc.Core.Templating
 {
     public class TemplatingContext : ITemplatingContext
     {
-
-        public TemplatingContext(TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IFileProvider fileProvider)
+        public TemplatingContext(string basePath, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IFileProvider fileProvider)
         {
+            this.BasePath = basePath;
             this.TemplateData = data;
             this.AssetUriResolvers = resolvers.ToArray();
             this.FileProvider = fileProvider;
         }
 
         #region ITemplatingContext Members
+
+        public string BasePath { get; protected set; }
 
         public TemplateData TemplateData { get; protected set; }
 

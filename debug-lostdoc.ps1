@@ -19,7 +19,7 @@ $choices = @(
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Template Both Libraries"; 
-                                        A = @("Template -Path .\Tmp -Template Library -Verbose -Output .\Html")
+                                        A = @("Template -Path .\Tmp -Template Library -Verbose -Force -Output .\Html")
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Help"; 

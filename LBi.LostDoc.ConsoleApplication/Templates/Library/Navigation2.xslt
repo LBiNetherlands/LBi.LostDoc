@@ -22,8 +22,6 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl">
 
-  <xsl:output method="xml" indent="yes"/>
-
   <!-- ancestry -->
 
   <xsl:template match="/bundle" mode="xnav-ancestor">

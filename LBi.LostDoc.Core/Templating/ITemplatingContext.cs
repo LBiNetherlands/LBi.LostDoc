@@ -20,6 +20,7 @@ namespace LBi.LostDoc.Core.Templating
 {
     public interface ITemplatingContext : IContextBase
     {
+        string BasePath { get; }
         TemplateData TemplateData { get; }
         IAssetUriResolver[] AssetUriResolvers { get; }
         IFileProvider FileProvider { get; }

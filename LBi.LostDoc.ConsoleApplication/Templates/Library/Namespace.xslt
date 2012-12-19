@@ -24,7 +24,6 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc hrc ld">
 
-  <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
   <xsl:param name="namespace"/>
   <xsl:param name="assetId"/>
 
@@ -35,6 +34,9 @@
   <xsl:include href="DocComments.xslt"/>
 
   <xsl:template name="title">
+    <xsl:if test="not($namespace)">
+      <xsl:message terminate="yes">$namespace is empty!</xsl:message>
+    </xsl:if>
     <xsl:text>Namespace </xsl:text>
     <xsl:value-of select="$namespace"/>
   </xsl:template>

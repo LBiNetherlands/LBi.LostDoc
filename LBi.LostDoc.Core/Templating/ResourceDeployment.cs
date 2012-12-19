@@ -45,7 +45,7 @@ namespace LBi.LostDoc.Core.Templating
             if (!Directory.Exists(targetDir))
                 Directory.CreateDirectory(targetDir);
 
-            using (Stream streamSrc = context.FileProvider.OpenFile(this.ResourcePath))
+            using (Stream streamSrc = context.FileProvider.OpenFile(Path.Combine(context.BasePath, this.ResourcePath)))
             using (Stream streamDest = File.Create(target))
             {
                 streamSrc.CopyTo(streamDest);
