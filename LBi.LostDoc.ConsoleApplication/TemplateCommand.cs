@@ -15,6 +15,7 @@
  */
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -48,6 +49,7 @@ namespace LBi.LostDoc.ConsoleApplication
         public VersionComponent? IgnoreVersionComponent { get; set; }
 
         [Parameter(HelpMessage = "Optional template arguments.")]
+        [DefaultValue("@{}")]
         public Dictionary<string, object> Arguments { get; set; }
 
         #region ICommand Members
@@ -73,69 +75,63 @@ namespace LBi.LostDoc.ConsoleApplication
 
             TraceSources.TemplateSource.Listeners.Add(traceListener);
             TraceSources.AssetResolverSource.Listeners.Add(traceListener);
-
-            if (!this.Verbose.IsPresent)
+            try
             {
-                TraceSources.TemplateSource.Switch.Level = SourceLevels.Information | SourceLevels.ActivityTracing;
-                TraceSources.AssetResolverSource.Switch.Level = SourceLevels.Information | SourceLevels.ActivityTracing;
-            }
-
-
-            LinkedList<FileInfo> includedFiles = new LinkedList<FileInfo>();
-
-            if (File.Exists(this.Path))
-                includedFiles.AddLast(new FileInfo(this.Path));
-            else if (Directory.Exists(this.Path))
-            {
-                Directory.GetFiles(this.Path, "*.ldoc", SearchOption.AllDirectories)
-                         .Aggregate(includedFiles,
-                                    (l, f) => l.AddLast(new FileInfo(f)).List);
-            }
-            else
-                throw new FileNotFoundException(System.IO.Path.GetFullPath(this.Path));
-
-
-            Bundle bundle = new Bundle(this.IgnoreVersionComponent);
-
-            TraceSources.TemplateSource.TraceInformation("Merging LostDoc files into bundle.");
-
-            foreach (FileInfo file in includedFiles)
-            {
-                TraceSources.TemplateSource.TraceEvent(TraceEventType.Information, 0, "Path: {0}", file.Name);
-                XDocument fileDoc = XDocument.Load(file.FullName);
-
-                bundle.Add(fileDoc);
-            }
-
-
-            // find template
-            string appDir = Assembly.GetExecutingAssembly().Location;
-            string cwDir = Directory.GetCurrentDirectory();
-
-
-            IFileProvider fsProvider = new DirectoryFileProvider();
-            IFileProvider resourceProvider = new ResourceFileProvider("LBi.LostDoc.ConsoleApplication.Templates");
-
-            IFileProvider selectedFileProvider = null;
-            string templatePath = null;
-
-            if (System.IO.Path.IsPathRooted(this.Template) &&
-                fsProvider.FileExists(System.IO.Path.Combine(this.Template, "template.xml")))
-            {
-                selectedFileProvider = fsProvider;
-                templatePath = this.Template;
-            }
-            else if (!System.IO.Path.IsPathRooted(this.Template))
-            {
-                string tmp = System.IO.Path.Combine(cwDir, this.Template, "template.xml");
-                if (fsProvider.FileExists(tmp))
+                if (!this.Verbose.IsPresent)
                 {
-                    selectedFileProvider = fsProvider;
-                    templatePath = tmp;
+                    TraceSources.TemplateSource.Switch.Level = SourceLevels.Information | SourceLevels.ActivityTracing;
+                    TraceSources.AssetResolverSource.Switch.Level = SourceLevels.Information |
+                                                                    SourceLevels.ActivityTracing;
+                }
+
+
+                LinkedList<FileInfo> includedFiles = new LinkedList<FileInfo>();
+
+                if (File.Exists(this.Path))
+                    includedFiles.AddLast(new FileInfo(this.Path));
+                else if (Directory.Exists(this.Path))
+                {
+                    Directory.GetFiles(this.Path, "*.ldoc", SearchOption.AllDirectories)
+                             .Aggregate(includedFiles,
+                                        (l, f) => l.AddLast(new FileInfo(f)).List);
                 }
                 else
+                    throw new FileNotFoundException(System.IO.Path.GetFullPath(this.Path));
+
+
+                Bundle bundle = new Bundle(this.IgnoreVersionComponent);
+
+                TraceSources.TemplateSource.TraceInformation("Merging LostDoc files into bundle.");
+
+                foreach (FileInfo file in includedFiles)
                 {
-                    tmp = System.IO.Path.Combine(appDir, this.Template, "template.xml");
+                    TraceSources.TemplateSource.TraceEvent(TraceEventType.Information, 0, "Path: {0}", file.Name);
+                    XDocument fileDoc = XDocument.Load(file.FullName);
+
+                    bundle.Add(fileDoc);
+                }
+
+
+                // find template
+                string appDir = Assembly.GetExecutingAssembly().Location;
+                string cwDir = Directory.GetCurrentDirectory();
+
+
+                IFileProvider fsProvider = new DirectoryFileProvider();
+                IFileProvider resourceProvider = new ResourceFileProvider("LBi.LostDoc.ConsoleApplication.Templates");
+
+                IFileProvider selectedFileProvider = null;
+                string templatePath = null;
+
+                if (System.IO.Path.IsPathRooted(this.Template) &&
+                    fsProvider.FileExists(System.IO.Path.Combine(this.Template, "template.xml")))
+                {
+                    selectedFileProvider = fsProvider;
+                    templatePath = this.Template;
+                }
+                else if (!System.IO.Path.IsPathRooted(this.Template))
+                {
+                    string tmp = System.IO.Path.Combine(cwDir, this.Template, "template.xml");
                     if (fsProvider.FileExists(tmp))
                     {
                         selectedFileProvider = fsProvider;
@@ -143,38 +139,53 @@ namespace LBi.LostDoc.ConsoleApplication
                     }
                     else
                     {
-                        tmp = System.IO.Path.Combine(this.Template, "template.xml");
-                        if (resourceProvider.FileExists(tmp))
+                        tmp = System.IO.Path.Combine(appDir, this.Template, "template.xml");
+                        if (fsProvider.FileExists(tmp))
                         {
-                            selectedFileProvider = resourceProvider;
+                            selectedFileProvider = fsProvider;
                             templatePath = tmp;
+                        }
+                        else
+                        {
+                            tmp = System.IO.Path.Combine(this.Template, "template.xml");
+                            if (resourceProvider.FileExists(tmp))
+                            {
+                                selectedFileProvider = resourceProvider;
+                                templatePath = tmp;
+                            }
                         }
                     }
                 }
+
+                if (templatePath == null)
+                    throw new FileNotFoundException(this.Template);
+
+                string outputDir = this.Output
+                                   ?? (Directory.Exists(this.Path)
+                                           ? this.Path
+                                           : System.IO.Path.GetDirectoryName(this.Path));
+
+                Template template = new Template(selectedFileProvider);
+
+                template.Load(templatePath);
+                AssetRedirectCollection assetRedirects;
+                XDocument mergedDoc = bundle.Merge(out assetRedirects);
+                var templateData = new TemplateData
+                                       {
+                                           AssetRedirects = assetRedirects,
+                                           Document = mergedDoc,
+                                           IgnoredVersionComponent = this.IgnoreVersionComponent,
+                                           Arguments = this.Arguments,
+                                           TargetDirectory = outputDir
+                                       };
+
+                template.Generate(templateData);
             }
-
-            if (templatePath == null)
-                throw new FileNotFoundException(this.Template);
-
-            string outputDir = this.Output
-                               ?? (Directory.Exists(this.Path)
-                                       ? this.Path
-                                       : System.IO.Path.GetDirectoryName(this.Path));
-
-            Template template = new Template(selectedFileProvider);
-
-            template.Load(templatePath);
-            AssetRedirectCollection assetRedirects;
-            XDocument mergedDoc = bundle.Merge(out assetRedirects);
-            var templateData = new TemplateData
-                                   {
-                                       AssetRedirects = assetRedirects,
-                                       Document = mergedDoc,
-                                       IgnoredVersionComponent = this.IgnoreVersionComponent,
-                                       Arguments = this.Arguments
-                                   };
-
-            template.Generate(templateData, outputDir);
+            finally
+            {
+                TraceSources.TemplateSource.Listeners.Remove(traceListener);
+                TraceSources.AssetResolverSource.Listeners.Remove(traceListener);
+            }
         }
 
 

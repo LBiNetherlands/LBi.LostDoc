@@ -100,7 +100,7 @@ namespace LBi.LostDoc.Core
 
             XDocument ret = new XDocument();
 
-            this._assemblies = this._assemblyPaths.Select(Assembly.ReflectionOnlyLoadFrom).ToArray();
+            this._assemblies = this._assemblyPaths.Select(this.LoadReflectionOnly).ToArray();
 
             XNamespace defaultNs = string.Empty;
             IAssetResolver assetResolver = new AssetResolver(this.EnumerateAssemblies().ToArray());
@@ -158,6 +158,24 @@ namespace LBi.LostDoc.Core
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Generating document");
             return ret;
+        }
+
+        private Assembly LoadReflectionOnly(string path)
+        {
+            Assembly assembly;
+            try
+            {
+                assembly = Assembly.ReflectionOnlyLoadFrom(path);
+            }
+            catch (FileLoadException)
+            {
+                var assemblyName = AssemblyName.GetAssemblyName(path);
+                var fullName = assemblyName.FullName;
+                var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
+                assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
+            }
+
+            return assembly;
         }
 
         private IEnumerable<Assembly> EnumerateAssemblies()

@@ -109,11 +109,12 @@ namespace LBi.LostDoc.Repository
                                    {
                                        AssetRedirects = assetRedirects,
                                        Document = mergedDoc,
-                                       IgnoredVersionComponent = this.IgnoreVersionComponent
+                                       IgnoredVersionComponent = this.IgnoreVersionComponent,
+                                       TargetDirectory = htmlDir.FullName
                                    };
 
             this.OnStateChanged(State.Templating);
-            TemplateOutput templateOutput = this.Template.Generate(templateData, htmlDir.FullName);
+            TemplateOutput templateOutput = this.Template.Generate(templateData);
 
 
             this.OnStateChanged(State.Indexing);

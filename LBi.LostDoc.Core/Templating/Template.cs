@@ -35,7 +35,7 @@ namespace LBi.LostDoc.Core.Templating
 {
     public interface ITemplate
     {
-        
+
     }
     public class Template : ITemplate
     {
@@ -294,7 +294,8 @@ namespace LBi.LostDoc.Core.Templating
                                                                      saveAs);
 
                             sections.Add(new AssetSection(AssetIdentifier.Parse(sectionAssetId), sectionName, sectionUri));
-                        } else
+                        }
+                        else
                         {
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1}, (Section: {2}) => Condition not met",
                                                                        sectionAssetId,
@@ -309,7 +310,7 @@ namespace LBi.LostDoc.Core.Templating
 
 
                 xpathContext.OnResolveVariable += ssResolver;
-                var xsltParams = ResolveXsltParams(stylesheet.Variables, inputElement).ToArray();
+                var xsltParams = ResolveXsltParams(stylesheet.Variables, inputElement, xpathContext).ToArray();
                 xpathContext.OnResolveVariable -= ssResolver;
 
                 yield return new StylesheetApplication
@@ -326,11 +327,11 @@ namespace LBi.LostDoc.Core.Templating
             }
         }
 
-        private static IEnumerable<KeyValuePair<string, object>> ResolveXsltParams(IEnumerable<XPathVariable> xsltParams , XElement contextElement)
+        private static IEnumerable<KeyValuePair<string, object>> ResolveXsltParams(IEnumerable<XPathVariable> xsltParams, XElement contextElement, XsltContext xpathContext)
         {
             foreach (var param in xsltParams)
             {
-                object val = contextElement.XPathEvaluate(param.ValueExpression);
+                object val = contextElement.XPathEvaluate(param.ValueExpression, xpathContext);
                 if (!(val is string) && val is IEnumerable)
                 {
                     object[] data = ((IEnumerable)val).Cast<object>().ToArray();
@@ -376,18 +377,20 @@ namespace LBi.LostDoc.Core.Templating
 
             Dictionary<string, XPathVariable> globalParams = new Dictionary<string, XPathVariable>();
 
-            var paramNodes = workingDoc.Root.Elements("parameter");
+            XElement[] paramNodes = workingDoc.Root.Elements("parameter").ToArray();
             foreach (XElement paramNode in paramNodes)
             {
                 var tmplVar = new XPathVariable
                                   {
                                       Name = paramNode.Attribute("name").Value,
                                       ValueExpression =
-                                          paramNode.Attribute("name") == null ? null : paramNode.Attribute("name").Value,
+                                          paramNode.Attribute("select") == null
+                                              ? null
+                                              : paramNode.Attribute("select").Value,
                                   };
-
                 globalParams.Add(tmplVar.Name, tmplVar);
             }
+
 
             CustomXsltContext customContext = new CustomXsltContext();
             Func<string, object> onFailedResolve = s =>
@@ -441,14 +444,15 @@ namespace LBi.LostDoc.Core.Templating
 
                     #endregion
 
-                    XslCompiledTransform metaTransform = new XslCompiledTransform(debugEnabled);
-                    using (Stream str = this._fileProvider.OpenFile(metaNode.Attribute("stylesheet").Value))
-                    using (XmlReader reader = XmlReader.Create(str, new XmlReaderSettings()))
-                    {
-                        metaTransform.Load(reader,
-                                           new XsltSettings { EnableScript = true },
-                                           fileResolver);
-                    }
+                    XslCompiledTransform metaTransform = this.LoadStylesheet(metaNode.Attribute("stylesheet").Value);
+
+                    //using (Stream str = this._fileProvider.OpenFile(metaNode.Attribute("stylesheet").Value))
+                    //using (XmlReader reader = XmlReader.Create(str, new XmlReaderSettings()))
+                    //{
+                    //    metaTransform.Load(reader,
+                    //                       new XsltSettings { EnableScript = true },
+                    //                       fileResolver);
+                    //}
 
                     XsltArgumentList xsltArgList = new XsltArgumentList();
 
@@ -490,6 +494,10 @@ namespace LBi.LostDoc.Core.Templating
             List<Resource> resources = new List<Resource>();
             foreach (XElement elem in workingDoc.Root.Elements())
             {
+                // we alread proessed the parameters
+                if (elem.Name.LocalName == "parameter")
+                    continue;
+
                 if (elem.Name.LocalName == "apply-stylesheet")
                 {
                     stylesheets.Add(this.ParseStylesheet(elem));
@@ -567,20 +575,17 @@ namespace LBi.LostDoc.Core.Templating
 
 
         /// <summary>
-        /// Applies he loaded templates to <paramref name="templateData"/>.
+        /// Applies the loaded templates to <paramref name="templateData"/>.
         /// </summary>
         /// <param name="templateData">
         /// Instance of <see cref="TemplateData"/> containing the various input data needed. 
         /// </param>
-        /// <param name="outputDir">
-        /// The output directory, this is created if it doesn't exist. 
-        /// </param>
-        public virtual TemplateOutput Generate(TemplateData templateData, string outputDir)
+        public virtual TemplateOutput Generate(TemplateData templateData)
         {
             Stopwatch timer = Stopwatch.StartNew();
 
             ParsedTemplate tmpl = this.PrepareTemplate(templateData);
-            
+
 
             // start template processing
 
@@ -589,7 +594,7 @@ namespace LBi.LostDoc.Core.Templating
 
             // include resources
             work.AddRange(this.DiscoverWork(templateData, tmpl.Resources));
-            
+
             // collect all work that has to be done
             foreach (Stylesheet stylesheet in tmpl.Stylesheets)
                 work.AddRange(this.DiscoverWork(templateData, stylesheet));
@@ -608,7 +613,7 @@ namespace LBi.LostDoc.Core.Templating
 
             // process all units of work
             Parallel.ForEach(work, uow => results.Add(uow.Execute(context)));
-            
+
             // stop timing
             timer.Stop();
 
@@ -638,7 +643,7 @@ namespace LBi.LostDoc.Core.Templating
 
             foreach (var statGroup in resourceStats)
             {
-                TraceSources.TemplateSource.TraceInformation("Deployed resource '{0}' in {2:N0} ms",
+                TraceSources.TemplateSource.TraceInformation("Deployed resource '{0}' in {1:N0} ms",
                                                              ((ResourceDeployment)statGroup.WorkUnit).ResourcePath,
                                                              statGroup.Duration);
             }
@@ -658,9 +663,9 @@ namespace LBi.LostDoc.Core.Templating
             {
                 CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
                 if (EvalCondition(xpathContext, templateData.Document.Root, resources[i].ConditionExpression))
-                    yield return new ResourceDeployment(resources[i].Path);
+                    yield return new ResourceDeployment(Path.Combine(this._basePath, resources[i].Path));
             }
-            
+
         }
 
 

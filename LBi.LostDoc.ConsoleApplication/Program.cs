@@ -42,7 +42,7 @@ namespace LBi.LostDoc.ConsoleApplication
                     aggregateCatalog.Catalogs.Add(new AssemblyCatalog(asm));
                 }
 
-                string appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+                string appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string pluginPath = Path.Combine(appPath, "plugins");
                 if (Directory.Exists(pluginPath))
                     aggregateCatalog.Catalogs.Add(new DirectoryCatalog(pluginPath));

@@ -49,7 +49,10 @@ namespace LBi.LostDoc.ConsoleApplication
 
         public Stream OpenFile(string path)
         {
-            return this._asm.GetManifestResourceStream(this.ConvertPath(path));
+            var ret = this._asm.GetManifestResourceStream(this.ConvertPath(path));
+            if (ret == null)
+                throw new FileNotFoundException(string.Format("Resource not found: {0} (Was: {1})", this.ConvertPath(path), path), path);
+            return ret;
         }
 
         public Stream CreateFile(string path)

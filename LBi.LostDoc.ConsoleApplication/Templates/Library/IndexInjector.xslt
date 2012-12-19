@@ -49,7 +49,6 @@
 
   <xsl:template match="apply-template" mode="inject">
     <xsl:copy />
-
     <apply-template name="{concat('Index for: ', ld:coalesce(@name, substring-before(@stylesheet, '.')))}"
                     stylesheet="CreateIndex.xslt">
       <xsl:copy-of select="@*[local-name() != 'name' and local-name() != 'stylesheet']"/>

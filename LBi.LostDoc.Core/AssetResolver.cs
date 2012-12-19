@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using LBi.Diagnostics;
+using LBi.LostDoc.Core.Diagnostics;
 
 namespace LBi.LostDoc.Core
 {
@@ -44,6 +46,15 @@ namespace LBi.LostDoc.Core
             return ret;
         }
 
+        public object Resolve(AssetIdentifier assetIdentifier, AssetIdentifier assemblyHint)
+        {
+            object ret;
+            if (!this._cache.TryGetValue(assetIdentifier, out ret))
+                this._cache.Add(assetIdentifier, ret = this.ResolveInternal(assetIdentifier, (Assembly)this.ResolveInternal(assemblyHint)));
+
+            return ret;
+        }
+
         public IEnumerable<AssetIdentifier> GetAssetHierarchy(AssetIdentifier assetId)
         {
             yield return assetId;
@@ -53,39 +64,24 @@ namespace LBi.LostDoc.Core
                 case AssetType.Namespace:
                     string ns = (string)this.Resolve(assetId);
                     Assembly[] matchingAssemblies =
-                        this._assemblies.Where(a => a.GetName().Version == assetId.Version).Where(
-                                                                                                  a =>
-                                                                                                  a.GetTypes().Any(
-                                                                                                                   t1 =>
-                                                                                                                   t1.
-                                                                                                                       Namespace !=
-                                                                                                                   null &&
-                                                                                                                   (StringComparer
-                                                                                                                        .
-                                                                                                                        Ordinal
-                                                                                                                        .
-                                                                                                                        Equals
-                                                                                                                        (t1
-                                                                                                                             .
-                                                                                                                             Namespace,
-                                                                                                                         ns) ||
-                                                                                                                    t1.
-                                                                                                                        Namespace
-                                                                                                                        .
-                                                                                                                        StartsWith
-                                                                                                                        (ns +
-                                                                                                                         ".",
-                                                                                                                         StringComparison
-                                                                                                                             .
-                                                                                                                             Ordinal))))
+                        this._assemblies.Where(a => a.GetName().Version == assetId.Version)
+                            .Where(a => a.GetTypes().Any(
+                                t1 =>
+                                t1.Namespace != null && 
+                                (StringComparer.Ordinal.Equals(t1.Namespace,ns) ||
+                                t1.Namespace.StartsWith(ns +".",StringComparison.Ordinal))))
                             .ToArray();
 
                     if (matchingAssemblies.Length == 0)
                         throw new InvalidOperationException("Found no assembly containing namespace: " + ns);
 
-
-// if (matchingAssemblies.Length > 1)
-                    // throw new AmbiguousMatchException("Found more than one assembly containing namespace: " + ns);
+                    if (matchingAssemblies.Length > 1)
+                    {
+                        TraceSources.AssetResolverSource.TraceWarning(
+                            "Namespace {0} found in more than one assembly: {1}",
+                            ns,
+                            string.Join(", ", matchingAssemblies.Select(a => a.GetName().Name)));
+                    }
                     yield return AssetIdentifier.FromAssembly(matchingAssemblies[0]);
                     break;
                 case AssetType.Type:
@@ -129,7 +125,7 @@ namespace LBi.LostDoc.Core
 
         #endregion
 
-        private object ResolveInternal(AssetIdentifier assetIdentifier)
+        private object ResolveInternal(AssetIdentifier assetIdentifier, Assembly assemblyHint = null)
         {
             switch (assetIdentifier.Type)
             {
@@ -282,10 +278,22 @@ namespace LBi.LostDoc.Core
         {
             Type[] candidates =
                 this._assemblies.Select(a => a.GetType(typeName, false, false)).Where(t => t != null).ToArray();
-            type = candidates.Distinct().FirstOrDefault(t => t != null);
-            // this used to be here, but SingleOrDefault fails if the type name is defined in multiple assemblies
-            // like __DynamicallyInvokable
-            ////type = candidates.Distinct().SingleOrDefault(t => t != null);
+            candidates = candidates.Distinct().ToArray();
+            if (candidates.Length == 1)
+                type = candidates[0];
+            else if (candidates.Length > 1)
+            {
+                type = candidates[0];
+                TraceSources.AssetResolverSource.TraceWarning(
+                    "Type name '{0}' resolved to multiple types from the following assemblies: {1}.",
+                    typeName,
+                    string.Join(", ", candidates.Select(c => c.Assembly.GetName().Name)));
+            }
+            else
+            {
+                type = null;
+            }
+
             return type != null;
         }
 
