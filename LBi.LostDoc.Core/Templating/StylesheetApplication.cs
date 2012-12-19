@@ -58,6 +58,9 @@ namespace LBi.LostDoc.Core.Templating
             bool exists;
             if (!(exists = File.Exists(targetPath)) || context.TemplateData.OverwriteExistingFiles)
             {
+                if (exists)
+                    File.Delete(targetPath);
+
                 // register xslt params
                 XsltArgumentList argList = new XsltArgumentList();
                 foreach (KeyValuePair<string, object> kvp in this.XsltParams)

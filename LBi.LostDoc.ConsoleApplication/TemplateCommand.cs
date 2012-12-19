@@ -76,17 +76,24 @@ namespace LBi.LostDoc.ConsoleApplication
                         }
                     });
 
+            
             TraceSources.TemplateSource.Listeners.Add(traceListener);
             TraceSources.AssetResolverSource.Listeners.Add(traceListener);
             try
             {
-                if (!this.Verbose.IsPresent)
+                if (this.Verbose.IsPresent)
                 {
-                    TraceSources.TemplateSource.Switch.Level = SourceLevels.Information | SourceLevels.ActivityTracing;
-                    TraceSources.AssetResolverSource.Switch.Level = SourceLevels.Information |
-                                                                    SourceLevels.ActivityTracing;
+                    const SourceLevels verboseLevel = SourceLevels.All;
+                    TraceSources.TemplateSource.Switch.Level = verboseLevel;
+                    TraceSources.AssetResolverSource.Switch.Level = verboseLevel;
+                    TraceSources.BundleSource.Listeners.Add(traceListener);
                 }
-
+                else
+                {
+                    const SourceLevels normalLevel = SourceLevels.Information | SourceLevels.Warning | SourceLevels.Error | SourceLevels.ActivityTracing;
+                    TraceSources.TemplateSource.Switch.Level = normalLevel;
+                    TraceSources.AssetResolverSource.Switch.Level = normalLevel;
+                }
 
                 LinkedList<FileInfo> includedFiles = new LinkedList<FileInfo>();
 

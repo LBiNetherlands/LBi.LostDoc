@@ -162,7 +162,7 @@ namespace LBi.LostDoc.Core.Templating
 
         #endregion
 
-        protected virtual IEnumerable<UnitOfWork> DiscoverWork(TemplateData templateData, Stylesheet stylesheet)
+        protected virtual IEnumerable<StylesheetApplication> DiscoverWork(TemplateData templateData, Stylesheet stylesheet)
         {
             TraceSources.TemplateSource.TraceInformation("Processing stylesheet instructions: {0}",
                                                          (object)stylesheet.Name);
@@ -262,16 +262,20 @@ namespace LBi.LostDoc.Core.Templating
 
                     foreach (XElement sectionInputElement in sectionInputElements)
                     {
+                        // ReSharper disable AccessToForEachVariableInClosure
                         // ReSharper disable AccessToModifiedClosure
                         Func<string, object> sectionResolver =
                             v =>
                             {
+
                                 if (HasVariable(section, v))
+
                                     return EvalVariable(section.Variables, xpathContext, sectionInputElement, v);
 
                                 return EvalVariable(stylesheet.Variables, xpathContext, inputElement, v);
                             };
                         // ReSharper enable AccessToModifiedClosure
+                        // ReSharper restore AccessToForEachVariableInClosure
 
                         xpathContext.OnResolveVariable += sectionResolver;
 
@@ -371,7 +375,7 @@ namespace LBi.LostDoc.Core.Templating
         protected virtual ParsedTemplate PrepareTemplate(TemplateData templateData)
         {
             // clone orig doc
-            XDocument workingDoc = new XDocument(_templateDefinition);
+            XDocument workingDoc = new XDocument(this._templateDefinition);
 
             // start by loading any parameters as they are needed for meta-template evaluation
 
@@ -462,10 +466,12 @@ namespace LBi.LostDoc.Core.Templating
 
                     XDocument outputDoc = new XDocument();
                     using (XmlWriter outputWriter = outputDoc.CreateWriter())
+                    {
                         metaTransform.Transform(workingDoc.CreateNavigator(),
                                                 xsltArgList,
                                                 outputWriter,
                                                 fileResolver);
+                    }
 
                     TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
                                                              metaNode.Attribute("stylesheet").Value);
@@ -473,6 +479,11 @@ namespace LBi.LostDoc.Core.Templating
                     TraceSources.TemplateSource.TraceData(TraceEventType.Verbose, 1, outputDoc.CreateNavigator());
 
                     workingDoc = outputDoc;
+                }
+                else
+                {
+                    // didn't process, so remove it
+                    metaNode.Remove();
                 }
 
 
@@ -529,7 +540,7 @@ namespace LBi.LostDoc.Core.Templating
 
         private Stylesheet ParseStylesheet(IEnumerable<Stylesheet> stylesheets, XElement elem)
         {
-            
+
             IEnumerable<XAttribute> variableAttrs =
                 elem.Attributes()
                     .Where(a => a.Name.NamespaceName == "urn:lost-doc:template.variable");
@@ -541,7 +552,7 @@ namespace LBi.LostDoc.Core.Templating
                 TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0} ({1})", name, elem.Attribute("stylesheet").Value);
             else
                 TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0}", name);
-            
+
             string src = elem.Attribute("stylesheet").Value;
             XslCompiledTransform transform;
 
@@ -550,7 +561,7 @@ namespace LBi.LostDoc.Core.Templating
                 transform = match.Transform;
             else
                 transform = this.LoadStylesheet(src);
-            
+
 
             return new Stylesheet
                        {
@@ -593,20 +604,38 @@ namespace LBi.LostDoc.Core.Templating
 
             ParsedTemplate tmpl = this.PrepareTemplate(templateData);
 
-
-            // start template processing
-
-
+            // collect all work that has to be done
             List<UnitOfWork> work = new List<UnitOfWork>();
 
-            // include resources
+            // resource work units
             work.AddRange(this.DiscoverWork(templateData, tmpl.Resources));
 
-            // collect all work that has to be done
-            foreach (Stylesheet stylesheet in tmpl.Stylesheets)
-                work.AddRange(this.DiscoverWork(templateData, stylesheet));
+            // stylesheet work units
+            {
+                List<StylesheetApplication> stylesheetApplications = new List<StylesheetApplication>();
+                foreach (Stylesheet stylesheet in tmpl.Stylesheets)
+                {
+                    stylesheetApplications.AddRange(this.DiscoverWork(templateData, stylesheet));
+                }
 
+                var duplicates =
+                    stylesheetApplications.GroupBy(sa => sa.SaveAs, StringComparer.OrdinalIgnoreCase)
+                                          .Where(g => g.Count() > 1);
 
+                foreach (var group in duplicates)
+                {
+                    TraceSources.TemplateSource.TraceCritical("Duplicate work unit target ({0}) generated from: {1}",
+                                                              group.Key,
+                                                              string.Join(", ",
+                                                                          group.Select(
+                                                                              sa => '\'' + sa.StylesheetName + '\'')));
+
+                    // TODO replace this with something more specific
+                    throw new Exception("Critical error, continuing is not safe.");
+                }
+
+                work.AddRange(stylesheetApplications);
+            }
 
             TraceSources.TemplateSource.TraceInformation("Generating {0:N0} documents from {1:N0} stylesheets.",
                                                          work.Count, tmpl.Stylesheets.Length);

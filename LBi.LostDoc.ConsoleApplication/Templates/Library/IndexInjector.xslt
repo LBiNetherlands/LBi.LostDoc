@@ -27,7 +27,8 @@
   <xsl:param name="targets"/>
 
   <!-- by default just copy everything through -->
-  <xsl:template match="@* | node()" priority="-1">
+  <xsl:template match="@* | node()"
+                priority="-1">
     <xsl:copy>
       <xsl:apply-templates select="@* | node()"/>
     </xsl:copy>
@@ -41,17 +42,20 @@
       <xsl:if test="$next">
         <!-- if there is more data, inject own processing instructions -->
         <meta-template stylesheet="IndexInjector.xslt">
-          <with-param name="targets" select="'{normalize-space($next)}'" />
+          <with-param name="targets"
+                      select="'{normalize-space($next)}'" />
         </meta-template>
       </xsl:if>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="apply-stylesheet" mode="inject">
-    <xsl:copy />
-    <apply-template name="{concat('Index for: ', ld:coalesce(@name, substring-before(@stylesheet, '.')))}"
-                    stylesheet="CreateIndex.xslt">
-      <xsl:copy-of select="@*[local-name() != 'name' and local-name() != 'stylesheet']"/>
-    </apply-template>
+  <xsl:template match="apply-stylesheet"
+                mode="inject">
+    <apply-stylesheet name="{concat('Index for: ', ld:coalesce(@name, substring-before(@stylesheet, '.')))}"
+                      stylesheet="CreateIndex.xslt"
+                      assetId="concat(({@assetId}), '-index')"
+                      output="concat(substring-before(({@output}), '.html'), '.index')">
+      <xsl:copy-of select="@*[local-name() != 'name' and local-name() != 'stylesheet' and local-name() != 'output' and local-name() != 'assetId']"/>
+    </apply-stylesheet>
   </xsl:template>
 </xsl:stylesheet>

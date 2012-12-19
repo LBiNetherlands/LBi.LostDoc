@@ -17,6 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
@@ -43,11 +45,36 @@ namespace LBi.LostDoc.ConsoleApplication
         public override void TraceData(TraceEventCache eventCache, string source, TraceEventType eventType, int id,
                                        object data)
         {
+            this.TraceData(eventCache, source, eventType, id, new[] { data });
         }
 
         public override void TraceData(TraceEventCache eventCache, string source, TraceEventType eventType, int id,
                                        params object[] data)
         {
+            if (this.Filter != null &&
+                !this.Filter.ShouldTrace(eventCache, source, eventType, id, string.Empty, null, null, null))
+                return;
+
+            foreach (object obj in data)
+            {
+                if (obj is XPathNavigator)
+                {
+                    using (var reader = ((XPathNavigator)obj).ReadSubtree())
+                    {
+                        reader.MoveToContent();
+                        if (reader.IsStartElement())
+                            Console.WriteLine(XElement.ReadFrom(reader).ToString(SaveOptions.OmitDuplicateNamespaces));
+                        else
+                        {
+                            Console.WriteLine("Unable to write Xml data.");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(obj.ToString());
+                }
+            }
         }
 
         public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id)
@@ -86,10 +113,10 @@ namespace LBi.LostDoc.ConsoleApplication
             switch (eventType)
             {
                 case TraceEventType.Critical:
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     break;
                 case TraceEventType.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     break;
                 case TraceEventType.Warning:
                     Console.ForegroundColor = ConsoleColor.Yellow;

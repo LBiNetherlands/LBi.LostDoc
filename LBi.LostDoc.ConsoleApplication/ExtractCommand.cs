@@ -72,8 +72,16 @@ namespace LBi.LostDoc.ConsoleApplication
             try
             {
 
-                if (!this.Verbose.IsPresent)
-                    TraceSources.GeneratorSource.Switch.Level = SourceLevels.Information | SourceLevels.ActivityTracing;
+                if (this.Verbose.IsPresent)
+                {
+                    const SourceLevels verboseLevel = SourceLevels.All;
+                    TraceSources.GeneratorSource.Switch.Level = verboseLevel;
+                }
+                else
+                {
+                    const SourceLevels normalLevel = SourceLevels.Information | SourceLevels.Warning | SourceLevels.Error | SourceLevels.ActivityTracing;
+                    TraceSources.GeneratorSource.Switch.Level = normalLevel;
+                }
 
                 DocGenerator gen = new DocGenerator();
 

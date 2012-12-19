@@ -1142,7 +1142,6 @@ namespace LBi.LostDoc.Core
 
                         foreach (string fileName in allFiles)
                         {
-                            // Assembly potentialMatch = Assembly.ReflectionOnlyLoadFrom(fileName);
                             if (AssemblyName.GetAssemblyName(fileName).FullName == fullName)
                             {
                                 ret = Assembly.ReflectionOnlyLoadFrom(fileName);

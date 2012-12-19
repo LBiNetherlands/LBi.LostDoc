@@ -3,56 +3,93 @@ trap {
     Write-Error $_
     Read-Host
 }
+
+[void][System.Reflection.Assembly]::LoadFrom($ldPath);
+[bool]$script:verbose = $false;
 $choices = @( 
     (New-Object -TypeName PSObject @{
                                         C = "Extract Company.Project.Library"; 
-                                        A = @("Extract -Path ..\..\..\Company.Project.Library\bin\Debug\Company.Project.Library.dll -Verbose -Output .\tmp\")
+                                        A = @("Extract -Path ..\..\..\Company.Project.Library\bin\Debug\Company.Project.Library.dll -Output .\tmp\")
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Extract Company.Project.AnotherLibrary";
-                                        A = @("Extract -Path ..\..\..\Company.Project.AnotherLibrary\bin\Debug\Company.Project.AnotherLibrary.dll -Verbose -Output .\tmp\")
+                                        A = @("Extract -Path ..\..\..\Company.Project.AnotherLibrary\bin\Debug\Company.Project.AnotherLibrary.dll -Output .\tmp\")
                                     }),
     (New-Object -TypeName PSObject @{
-                                        C = "Extract Company.Project.Library and Extract Company.Project.AnotherLibrary"; 
-                                        A = @("Extract -Path ..\..\..\Company.Project.AnotherLibrary\bin\Debug\Company.Project.AnotherLibrary.dll -Verbose  -Output .\tmp\", 
-                                              "Extract -Path ..\..\..\Company.Project.Library\bin\Debug\Company.Project.Library.dll -Verbose  -Output .\tmp\")
+                                        C = "Extract All"; 
+                                        A = @("Extract -Path ..\..\..\Company.Project.AnotherLibrary\bin\Debug\Company.Project.AnotherLibrary.dll  -Output .\tmp\", 
+                                              "Extract -Path ..\..\..\Company.Project.Library\bin\Debug\Company.Project.Library.dll  -Output .\tmp\")
                                     }),
     (New-Object -TypeName PSObject @{
-                                        C = "Template Both Libraries"; 
-                                        A = @("Template -Path .\Tmp -Template Library -Verbose -Force -Output .\Html")
+                                        C = "Template"; 
+                                        A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html")
                                     }),
     (New-Object -TypeName PSObject @{
-                                        C = "Template Both Libraries with Search"; 
-                                        A = @("Template -Path .\Tmp -Template Library -Verbose -Force -Output .\Html -Arguments @{SearchUri = '/search/'}")
+                                        C = "Template with Search"; 
+                                        A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html -Arguments @{SearchUri = '/search/'}")
+                                    }),
+    (New-Object -TypeName PSObject @{
+                                        C = "Open output"; 
+                                        A ={
+                                            Invoke-Item -Path .\Html\Library.html
+                                        }
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Help"; 
                                         A = @("-Help -Full")
+                                    }),
+    (New-Object -TypeName PSObject @{
+                                        C = "Clear output"; 
+                                        A ={
+                                            if (Test-Path -Path .\tmp -PathType Container) {
+                                                Remove-Item -Path .\tmp -Recurse
+                                            }
+                                            if (Test-Path -Path .\Html -PathType Container) {
+                                                Remove-Item -Path .\Html -Recurse
+                                            }
+                                        }
+                                    }), 
+    (New-Object -TypeName PSObject @{
+                                        C = "Toggle verbose"; 
+                                        A ={
+                                            $script:verbose = -not $script:verbose; 
+                                            Write-Host "Verbose: $verbose"
+                                        }
+                                    }),
+    (New-Object -TypeName PSObject @{
+                                        C = "Exit"; 
+                                        A ={ exit 0;}
                                     })
 );
 
-[int]$i = 1;
-Write-Host
-$map = @{};
-foreach ($kvp in $choices) {
-    $map.Add($i, $kvp.A);
-    "  [{0}] {1}" -f $i++,$kvp.C
+
+while ($true) {
+    [int]$i = 1;
+    $map = @{};
+    Write-Host
+    foreach ($kvp in $choices) {
+        $map.Add($i, $kvp.A);
+        "  [{0}] {1}" -f $i++,$kvp.C
+    }
+    Write-Host
+    $choice = Read-Host -Prompt "Choice"
+    Write-Host
+    $args = $map[[int]$choice];
+
+    if ($args -is [ScriptBlock]) {
+        & $args;
+    } else {
+        foreach ($arg in $args) {
+            if ($arg -is [ScriptBlock]) {
+                & $arg;
+            } else {
+                "Launching with arguments: " + $arg;
+                if ($script:verbose) {
+                    $arg += ' -Verbose';
+                }
+                [LBi.LostDoc.ConsoleApplication.Program]::Main($arg);
+            }
+        }
+    }
 }
-Write-Host
-$choice = Read-Host -Prompt "Choice"
 
-$args = $map[[int]$choice];
-
-[void][System.Reflection.Assembly]::LoadFrom($ldPath);
-
-foreach ($arg in $args) {
-    Write-Host
-    Write-Host
-    "Launching with arguments: " + $arg;
-    Write-Host
-    [LBi.LostDoc.ConsoleApplication.Program]::Main($arg);
-    
-    Write-Host "================================================="
-}
-
-Read-Host
