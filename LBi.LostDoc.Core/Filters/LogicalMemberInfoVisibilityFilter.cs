@@ -37,7 +37,7 @@ namespace LBi.LostDoc.Core.Filters
                     break;
                 case MemberTypes.Event:
                     EventInfo eInfo = (EventInfo)m;
-                    MethodInfo emInfo = eInfo.GetAddMethod();
+                    MethodInfo emInfo = eInfo.GetAddMethod(nonPublic: true);
                     isPublic = emInfo.IsPublic;
                     isProtected = emInfo.IsFamily;
                     break;
