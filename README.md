@@ -30,6 +30,22 @@ Known issues
 There is currently no support for async/await and dynamic.
 See todo.txt for more details and information.
 
+Contribute
+----------
+All pull requests must now include the following line in the pull request comments (using your full name and email address), which indicates your contribution complies to the LostDoc Developer's Certificate of Origin v1.1:
+
+```LostDoc-DCO-1.0-Signed-off-by: Joe Smith <joe@example.com>```
+
+Below is a layman's description of the five points in the LostDoc DCO (be sure to read and agree to the full text in ```lostdoc-dco-v1.0.txt```):
+
+* I created this contribution/change and have the right to submit it to the Project; or
+* I created this contribution/change based on a previous work with a compatible open source license; or
+* This contribution/change has been provided to me by someone who did (a) or (b) and I am submitting the contribution unchanged.
+* I understand this contribution is public and may be redistributed as open source software.
+* I understand that I retain copyright ownership in this contribution and I am granting the Project a copyright license to use, modify and distribute my contribution. The Project may relicense my contribution under other OSI-approved licenses.
+The LostDoc DCO and signoff process was heavily influenced by the EnyoJS contribution process.
+
+
 Debugging Console Application
 -----------------------------
 The source tree contains a "debug-lostdoc.ps1" file that can be used
