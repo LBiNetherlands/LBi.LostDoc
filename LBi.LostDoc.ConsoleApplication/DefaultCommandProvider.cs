@@ -24,7 +24,13 @@ namespace LBi.LostDoc.ConsoleApplication
     {
         public Type[] GetCommands()
         {
-            return new[] {typeof (ExtractCommand), typeof (TemplateCommand), typeof (SaveTemplateCommand)};
+            return new[]
+                       {
+                           typeof(ExtractAndTemplateCommand),
+                           typeof(ExtractCommand),
+                           typeof(TemplateCommand),
+                           typeof(SaveTemplateCommand)
+                       };
         }
     }
 }

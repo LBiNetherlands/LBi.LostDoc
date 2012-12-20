@@ -5,10 +5,10 @@ using System.IO;
 using LBi.Cli.Arguments;
 using LBi.LostDoc.Core;
 
-namespace LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase
+namespace LBi.LostDoc.ConsoleApplication
 {
     [ParameterSet("Extract & Template", HelpMessage = "Generates documentation for a set of assemblies.")]
-    public class SinglePhaseCommand : ICommand
+    public class ExtractAndTemplateCommand : ICommand
     {
         [Parameter(HelpMessage = "Template name"), Required]
         public string Template { get; set; }
@@ -16,7 +16,7 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase
         [Parameter(HelpMessage = "Assemblies"), Required]
         public string[] Path { get; set; }
 
-        [Parameter(HelpMessage = "Output directory"), Required]
+        [Parameter(HelpMessage = "Output directory")]
         public string Output{ get; set; }
 
         [Parameter(HelpMessage = "Optional template arguments.")]

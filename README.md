@@ -10,6 +10,11 @@ To show help
 lostdoc.exe -Help
 ```
 
+To create help from one or more .net assemblies:
+```
+lostdoc.exe -Path "a.dll","b.dll","c.dll" -Template Library -IgnoreVersionComponent Patch -IncludeBclDocComments
+```
+
 To extract ldoc files from a .net assembly:
 ```
 lostdoc.exe Extract -Path path\to\assembly.dll -Output .\tmp

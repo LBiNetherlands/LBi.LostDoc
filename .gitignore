@@ -11,3 +11,5 @@ TestResults
 App_Data
 /Output
 /LBi.LostDoc.Core.Test/Data
+_TeamCity.*
+_ReSharper.*

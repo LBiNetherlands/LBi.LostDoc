@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase")]
+[assembly: AssemblyTitle("LBi.LostDoc.ConsoleApplication.Plugin.Repository")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase")]
+[assembly: AssemblyProduct("LBi.LostDoc.ConsoleApplication.Plugin.Repository")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6b047702-b449-4cd5-a70f-84a9a807611f")]
+[assembly: Guid("3a4980e0-0940-4e9b-9c5e-3634a4a51c89")]
 
 // Version information for an assembly consists of the following four values:
 //

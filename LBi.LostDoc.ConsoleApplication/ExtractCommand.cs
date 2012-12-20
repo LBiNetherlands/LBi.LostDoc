@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
@@ -28,7 +27,6 @@ using LBi.LostDoc.Core;
 using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Enrichers;
 using LBi.LostDoc.Core.Filters;
-
 
 namespace LBi.LostDoc.ConsoleApplication
 {
