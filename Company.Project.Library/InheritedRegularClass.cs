@@ -41,5 +41,14 @@ namespace Company.Project.Library
         {
             return base.ToString();
         }
+
+        /// <summary>
+        /// I'm a "new virtual"
+        /// </summary>
+        /// <param name="test"></param>
+        public new virtual void WithOut(out int test)
+        {
+            test = 4;
+        }
     }
 }
