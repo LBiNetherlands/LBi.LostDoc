@@ -43,6 +43,7 @@ Below is a layman's description of the five points in the LostDoc DCO (be sure t
 * This contribution/change has been provided to me by someone who did (a) or (b) and I am submitting the contribution unchanged.
 * I understand this contribution is public and may be redistributed as open source software.
 * I understand that I retain copyright ownership in this contribution and I am granting the Project a copyright license to use, modify and distribute my contribution. The Project may relicense my contribution under other OSI-approved licenses.
+
 The LostDoc DCO and signoff process was heavily influenced by the EnyoJS contribution process.
 
 
