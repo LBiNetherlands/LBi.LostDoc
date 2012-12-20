@@ -30,8 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LBi.Cli.Arguments">
-      <HintPath>..\LBi.LostDoc.ConsoleApplication\bin\Debug\LBi.Cli.Arguments.dll</HintPath>
+    <Reference Include="LBi.Cli.Arguments, Version=0.0.2.112, Culture=neutral, PublicKeyToken=a6442c589e275a88, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\LBi.Cli.Arguments.0.0.2.112-dev\lib\net45\LBi.Cli.Arguments.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -53,6 +54,9 @@
       <Project>{9AA8D187-75E5-4472-81BA-5BE5CFCCECC5}</Project>
       <Name>LBi.LostDoc.ConsoleApplication</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
