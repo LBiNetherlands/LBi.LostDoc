@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using LBi.Cli.Arguments;
+using LBi.LostDoc.Core;
 
 namespace LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase
 {
-    [ParameterSet("Single phase", Command = "Template", HelpMessage = "Creates ldoc file and applies template")]
+    [ParameterSet("Extract & Template", HelpMessage = "Generates documentation for a set of assemblies.")]
     public class SinglePhaseCommand : ICommand
     {
         [Parameter(HelpMessage = "Template name"), Required]
@@ -18,6 +20,7 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase
         public string Output{ get; set; }
 
         [Parameter(HelpMessage = "Optional template arguments.")]
+        [DefaultValue("@{}")]
         public Dictionary<string, object> Arguments { get; set; }
 
         [Parameter(HelpMessage = "Include non-public members.")]
@@ -25,6 +28,9 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase
 
         [Parameter(HelpMessage = "Includes doc comments from the BCL for referenced types.")]
         public LBi.Cli.Arguments.Switch IncludeBclDocComments { get; set; }
+
+        [Parameter(HelpMessage = "Which version components to ignore for deduplication.")]
+        public VersionComponent? IgnoreVersionComponent { get; set; }
 
         [Parameter(HelpMessage = "Path to xml containing additional comments for Assembly and Namespaces.")]
         public string NamespaceDocPath { get; set; }
@@ -37,7 +43,7 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase
 
         public void Invoke()
         {
-            
+            // this is very quick & dirty
             List<string> ldocFiles = new List<string>();
 
             foreach (var path in this.Path)
@@ -54,20 +60,28 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.SinglePhase
 
             string tempFolder = System.IO.Path.GetTempPath();
             tempFolder = System.IO.Path.Combine(tempFolder, "ldoc_{yyyyMMddHHmmss}");
-            Directory.CreateDirectory(tempFolder);
-            foreach (var ldocFile in ldocFiles)
+            var tempDir = Directory.CreateDirectory(tempFolder);
+            try
             {
-                File.Copy(ldocFile, System.IO.Path.Combine(tempFolder, System.IO.Path.GetFileName(ldocFile)));
-            }
+                foreach (var ldocFile in ldocFiles)
+                {
+                    File.Copy(ldocFile, System.IO.Path.Combine(tempFolder, System.IO.Path.GetFileName(ldocFile)));
+                }
 
-            TemplateCommand template = new TemplateCommand();
-            template.Path = tempFolder;
-            template.Arguments = this.Arguments;
-            template.IgnoreVersionComponent = null;
-            template.Output = this.Output;
-            template.Template = this.Template;
-            template.Verbose = this.Verbose;
-            template.Invoke();
+                TemplateCommand template = new TemplateCommand();
+                template.Path = tempFolder;
+                template.Arguments = this.Arguments;
+                template.IgnoreVersionComponent = this.IgnoreVersionComponent;
+                template.Output = this.Output;
+                template.Template = this.Template;
+                template.Verbose = this.Verbose;
+                template.Invoke();
+            }
+            finally
+            {
+                // cleanup
+                tempDir.Delete(true);
+            }
         }
     }
 }

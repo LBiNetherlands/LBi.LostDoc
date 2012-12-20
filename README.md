@@ -35,4 +35,20 @@ Since these project settings are per-user, it will require a few manual steps to
 1. In the "Debug" tab of the "LBi.LostDoc.ConsoleApplication" project properties, set the "Start external program" value to: ```C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe```
 2. In the same screen, set "Command line arguments" to ```-File ..\..\..\debug-lostdoc.ps1 -ldPath .\lostdoc.exe```
 
+When you debug "LBi.LostDoc.ConsoleApplication" you will now greeted by this prompt:
+```
 
+  [1] Extract Company.Project.Library
+  [2] Extract Company.Project.AnotherLibrary
+  [3] Extract All
+  [4] Extract with multiple versions
+  [5] Template
+  [6] Template with Search
+  [7] Open output
+  [8] Help
+  [9] Clear output
+  [10] Toggle verbose
+  [11] Exit
+
+Choice:
+```

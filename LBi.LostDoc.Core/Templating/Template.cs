@@ -397,33 +397,34 @@ namespace LBi.LostDoc.Core.Templating
 
 
             CustomXsltContext customContext = new CustomXsltContext();
-            Func<string, object> onFailedResolve = s =>
-                                                       {
-                                                           throw new InvalidOperationException(
-                                                               String.Format("Parameter '{0}' could not be resolved.",
-                                                                             s));
-                                                       };
+            Func<string, object> onFailedResolve =
+                s =>
+                    {
+                        throw new InvalidOperationException(
+                            String.Format("Parameter '{0}' could not be resolved.", s));
+                    };
 
-            customContext.OnResolveVariable += s =>
-                                                   {
-                                                       XPathVariable var;
+            customContext.OnResolveVariable +=
+                s =>
+                    {
+                        XPathVariable var;
 
-                                                       // if it's defined
-                                                       if (globalParams.TryGetValue(s, out var))
-                                                       {
-                                                           // see if the user provided a value
-                                                           object value;
-                                                           if (templateData.Arguments.TryGetValue(s, out value))
-                                                               return value;
+                        // if it's defined
+                        if (globalParams.TryGetValue(s, out var))
+                        {
+                            // see if the user provided a value
+                            object value;
+                            if (templateData.Arguments.TryGetValue(s, out value))
+                                return value;
 
-                                                           // evaluate default value
-                                                           if (!String.IsNullOrWhiteSpace(var.ValueExpression))
-                                                               return workingDoc.XPathEvaluate(var.ValueExpression,
-                                                                                                customContext);
-                                                       }
+                            // evaluate default value
+                            if (!String.IsNullOrWhiteSpace(var.ValueExpression))
+                                return workingDoc.XPathEvaluate(var.ValueExpression,
+                                                                customContext);
+                        }
 
-                                                       return onFailedResolve(s);
-                                                   };
+                        return onFailedResolve(s);
+                    };
 
             // check for meta-template directives and expand
             XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();

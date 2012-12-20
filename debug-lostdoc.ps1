@@ -1,8 +1,4 @@
 ﻿param($ldPath = $(throw "ldpath required"));
-trap {
-    Write-Error $_
-    Read-Host
-}
 
 [void][System.Reflection.Assembly]::LoadFrom($ldPath);
 [bool]$script:verbose = $false;
@@ -21,6 +17,16 @@ $choices = @(
                                               "Extract -Path ..\..\..\Company.Project.Library\bin\Debug\Company.Project.Library.dll  -Output .\tmp\")
                                     }),
     (New-Object -TypeName PSObject @{
+                                        C = "Extract with multiple versions"; 
+                                        A = @(
+                                                { ..\..\..\build-test-dlls.ps1 },
+                                                "Extract -Path .\tmp\v1\Company.Project.AnotherLibrary.dll  -Output .\tmp\", 
+                                                "Extract -Path .\tmp\v1\Company.Project.Library.dll  -Output .\tmp\", 
+                                                "Extract -Path .\tmp\v2\Company.Project.AnotherLibrary.dll  -Output .\tmp\", 
+                                                "Extract -Path .\tmp\v2\Company.Project.Library.dll  -Output .\tmp\"
+                                              )
+                                    }),
+    (New-Object -TypeName PSObject @{
                                         C = "Template"; 
                                         A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html")
                                     }),
@@ -30,7 +36,7 @@ $choices = @(
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Open output"; 
-                                        A ={
+                                        A = {
                                             Invoke-Item -Path .\Html\Library.html
                                         }
                                     }),
@@ -42,10 +48,10 @@ $choices = @(
                                         C = "Clear output"; 
                                         A ={
                                             if (Test-Path -Path .\tmp -PathType Container) {
-                                                Remove-Item -Path .\tmp -Recurse
+                                                Remove-Item -Path .\tmp -Recurse -Force
                                             }
                                             if (Test-Path -Path .\Html -PathType Container) {
-                                                Remove-Item -Path .\Html -Recurse
+                                                Remove-Item -Path .\Html -Recurse -Force
                                             }
                                         }
                                     }), 
@@ -62,6 +68,7 @@ $choices = @(
                                     })
 );
 
+$ErrorActionPreference = "Continue"
 
 while ($true) {
     [int]$i = 1;
