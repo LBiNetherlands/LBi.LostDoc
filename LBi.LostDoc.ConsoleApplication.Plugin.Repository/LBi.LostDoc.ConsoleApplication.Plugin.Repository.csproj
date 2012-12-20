@@ -12,6 +12,9 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
+  <PropertyGroup>
+    <AlternateReferenceLocation></AlternateReferenceLocation>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -49,12 +52,25 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushCommand.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LBi.LostDoc.ConsoleApplication\LBi.LostDoc.ConsoleApplication.csproj">
-      <Project>{9AA8D187-75E5-4472-81BA-5BE5CFCCECC5}</Project>
-      <Name>LBi.LostDoc.ConsoleApplication</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <!--  manual edit, the build server needs to reference a dll rather than a project -->
+  <Choose>
+    <When Condition=" '$(AlternateReferenceLocation)' != '' ">
+      <ItemGroup>
+        <Reference Include="LBi.LostDoc.ConsoleApplication">
+          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.ConsoleApplication.exe</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <ProjectReference Include="..\LBi.LostDoc.ConsoleApplication\LBi.LostDoc.ConsoleApplication.csproj">
+          <Project>{9AA8D187-75E5-4472-81BA-5BE5CFCCECC5}</Project>
+          <Name>LBi.LostDoc.ConsoleApplication</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>  
+
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

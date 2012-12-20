@@ -15,6 +15,9 @@
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
+  <PropertyGroup>
+    <AlternateReferenceLocation></AlternateReferenceLocation>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
@@ -100,12 +103,26 @@
     <Compile Include="ExtractAndTemplateCommand.cs" />
     <Compile Include="TemplateCommand.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LBi.LostDoc.Core\LBi.LostDoc.Core.csproj">
-      <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
-      <Name>LBi.LostDoc.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
+
+  <!--  manual edit, the build server needs to reference a dll rather than a project -->
+  <Choose>
+    <When Condition=" '$(AlternateReferenceLocation)' != '' ">
+      <ItemGroup>
+        <Reference Include="LBi.LostDoc.Core">
+          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.Core.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <ProjectReference Include="..\LBi.LostDoc.Core\LBi.LostDoc.Core.csproj">
+          <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
+          <Name>LBi.LostDoc.Core</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  
   <ItemGroup>
     <Folder Include="Templates\Service\" />
   </ItemGroup>
