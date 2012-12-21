@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using LBi.Diagnostics;
 using LBi.LostDoc.Core.Diagnostics;
 
 namespace LBi.LostDoc.Core

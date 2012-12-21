@@ -26,7 +26,6 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
-using LBi.Diagnostics;
 using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Templating.AssetResolvers;
 using LBi.LostDoc.Core.Templating.XPath;

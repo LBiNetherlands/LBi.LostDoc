@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.XPath;
-using LBi.Diagnostics;
 using LBi.LostDoc.Core.Diagnostics;
 
 namespace LBi.LostDoc.Core.Templating

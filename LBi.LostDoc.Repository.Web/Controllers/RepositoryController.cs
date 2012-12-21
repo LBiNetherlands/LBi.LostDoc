@@ -23,7 +23,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using LBi.Diagnostics;
+using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Repository.Web.Models;
 
 namespace LBi.LostDoc.Repository.Web.Controllers
