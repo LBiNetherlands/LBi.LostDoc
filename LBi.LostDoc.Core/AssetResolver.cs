@@ -222,25 +222,30 @@ namespace LBi.LostDoc.Core
             int startIndex = 0;
             Type type = this.GetDeclaringType(asset, ref startIndex);
 
-            MethodBase[] allMethods =
-                type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
-                                BindingFlags.Instance).Concat<MethodBase>(
-                                                                          type.GetConstructors(BindingFlags.Public |
-                                                                                               BindingFlags.NonPublic |
-                                                                                               BindingFlags.Static |
-                                                                                               BindingFlags.Instance)).
-                    ToArray();
+            const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+            var allMethods =
+                type.GetMethods(bindingFlags)
+                    .Concat<MethodBase>(type.GetConstructors(bindingFlags));
 
-            MethodBase method =
-                allMethods.SingleOrDefault(
-                                           m =>
-                                           (m is ConstructorInfo &&
-                                            assetId.Equals(Naming.GetAssetId((ConstructorInfo)m),
-                                                           StringComparison.Ordinal)) ||
-                                           (m is MethodInfo &&
-                                            assetId.Equals(Naming.GetAssetId((MethodInfo)m), StringComparison.Ordinal)));
+            MethodBase[] methods =
+                allMethods.Where(
+                    m =>
+                    (m is ConstructorInfo &&
+                     assetId.Equals(Naming.GetAssetId((ConstructorInfo) m),
+                                    StringComparison.Ordinal)) ||
+                    (m is MethodInfo &&
+                     assetId.Equals(Naming.GetAssetId((MethodInfo) m), StringComparison.Ordinal)))
+                          .ToArray();
 
-            return method;
+
+            // if there is a "new" method on the type we'll find both it and the method it hides.
+            if (methods.Length == 2 && methods[1].DeclaringType == type)
+                return methods[1];
+
+            Debug.Assert(methods.Length == 1 || methods.Length == 2,
+             string.Format("Found {0} methods, expected 1 or 2.", methods.Length));
+
+            return methods[0];
         }
 
         // private ConstructorInfo ResolveConstructor(AssetIdentifier assetId)
@@ -269,9 +274,19 @@ namespace LBi.LostDoc.Core
             PropertyInfo[] allProps =
                 type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
                                    BindingFlags.Instance);
-            PropertyInfo method =
-                allProps.Single(p => assetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal));
-            return method;
+            PropertyInfo[] properties =
+                allProps
+                    .Where(p => assetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal))
+                    .ToArray();
+
+            // if there is a "new" property on the type we'll find both it and the property it hides.
+            if (properties.Length == 2 && properties[1].DeclaringType == type)
+                return properties[1];
+
+            Debug.Assert(properties.Length == 1 || properties.Length == 2,
+                         string.Format("Found {0} properties, expected 1 or 2.", properties.Length));
+
+            return properties[0];
         }
 
         private bool TryGetType(string typeName, out Type type)

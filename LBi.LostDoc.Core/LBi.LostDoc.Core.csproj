@@ -60,7 +60,9 @@
     <Compile Include="Enrichers\XmlDocEnricher.cs" />
     <Compile Include="FilterContext.cs" />
     <Compile Include="Filters\CompilerGeneratedFilter.cs" />
+    <Compile Include="Filters\DynamicallyInvokableAttributeFilter.cs" />
     <Compile Include="Filters\EnumMetadataFilter.cs" />
+    <Compile Include="Filters\PrivateImplementationDetailsFilter.cs" />
     <Compile Include="IAssetResolver.cs" />
     <Compile Include="IContextBase.cs" />
     <Compile Include="IFilterContext.cs" />

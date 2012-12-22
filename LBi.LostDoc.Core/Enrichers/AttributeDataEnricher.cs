@@ -94,15 +94,16 @@ namespace LBi.LostDoc.Core.Enrichers
         {
             foreach (CustomAttributeData custAttr in attrData)
             {
+                AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(custAttr.Constructor.ReflectedType ?? custAttr.Constructor.DeclaringType);
+
+                if (context.IsFiltered(typeAssetId))
+                    continue;
+
                 context.AddReference(AssetIdentifier.FromMemberInfo(custAttr.Constructor));
 
                 var attrElem = new XElement("attribute",
                                             new XAttribute("type",
-                                                           AssetIdentifier.FromMemberInfo(
-                                                                                          custAttr.Constructor.
-                                                                                              ReflectedType ??
-                                                                                          custAttr.Constructor.
-                                                                                              DeclaringType)),
+                                                           typeAssetId),
                                             new XAttribute("constructor",
                                                            AssetIdentifier.FromMemberInfo(custAttr.Constructor)));
 

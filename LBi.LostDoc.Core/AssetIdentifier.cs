@@ -126,10 +126,7 @@ namespace LBi.LostDoc.Core
             Debug.WriteLine("               " + new string(' ', startIndex) + "^");
 #endif
 
-
-// trim leading whitespace
-            while (char.IsWhiteSpace(assetId[startIndex]))
-                ++startIndex;
+            SkipWhitespace(assetId, ref startIndex);
 
             if (assetId[startIndex] == '{')
                 return ParseComplex(assetId, ref startIndex);
@@ -146,19 +143,29 @@ namespace LBi.LostDoc.Core
 #endif
             string retAssetId;
             int origStartIx = startIndex;
+
+            // Skip an explicit name, which is of the form <explicit interface>.<method name> where the explicit
+            // interface name has . replaced by #, , by @ etc.
+            // Note we assume that these are never nested in asset ids, and only occur once.
+            int explicitEnd = assetId.LastIndexOf('#', assetId.Length - 1, assetId.Length - startIndex);
+            if (explicitEnd > startIndex)
+                startIndex = explicitEnd + 1;
+            
             int endOfAsset = assetId.IndexOfAny(new[] {',', ' ', ')', '}'}, startIndex);
 
             int typeArgStart = assetId.IndexOf('{', startIndex);
             int paramStart = assetId.IndexOf('(', startIndex);
-
+            
             if (typeArgStart != -1 && (typeArgStart < paramStart || paramStart == -1) &&
                 (typeArgStart < endOfAsset || endOfAsset == -1))
             {
                 ParseTypeArgs(assetId, ref typeArgStart);
 
-
-// retAssetId = assetId.Substring(startIndex, typeArgStart - startIndex);
                 startIndex = typeArgStart;
+
+                // If a ref parameter there is a @ suffix.
+                if (assetId[startIndex] == '@')
+                    ++startIndex;
             }
             else if (endOfAsset == -1)
             {
@@ -236,17 +243,13 @@ namespace LBi.LostDoc.Core
                 if (assetId[startIndex] == ',')
                     ++startIndex;
 
-                // trim leading whitespace
-                while (char.IsWhiteSpace(assetId[startIndex]))
-                    ++startIndex;
+                SkipWhitespace(assetId, ref startIndex);
 
                 ret.AddLast(ParseInternal(assetId, ref startIndex));
 
-                // trim leading whitespace
-                while (char.IsWhiteSpace(assetId[startIndex]))
-                    ++startIndex;
+                SkipWhitespace(assetId, ref startIndex);
             }
- while (assetId[startIndex] == ',');
+            while (assetId[startIndex] == ',');
 
             // skip closing }
             Debug.Assert(assetId[startIndex] == '}');
@@ -265,9 +268,7 @@ namespace LBi.LostDoc.Core
 
             Version version = null;
 
-            // trim leading whitespace
-            while (char.IsWhiteSpace(assetId[startIndex]))
-                ++startIndex;
+            SkipWhitespace(assetId, ref startIndex);
 
             if (assetId[startIndex] != '{')
                 throw new ArgumentException("First char must be '{'", "assetId");
@@ -276,35 +277,25 @@ namespace LBi.LostDoc.Core
 // skip opening {
             ++startIndex;
 
-            // trim leading whitespace
-            while (char.IsWhiteSpace(assetId[startIndex]))
-                ++startIndex;
+            SkipWhitespace(assetId, ref startIndex);
 
             ret = ParseInternal(assetId, ref startIndex);
 
-            // trim leading whitespace
-            while (char.IsWhiteSpace(assetId[startIndex]))
-                ++startIndex;
+            SkipWhitespace(assetId, ref startIndex);
 
             if (assetId[startIndex] == ',')
             {
                 // skip comma
                 ++startIndex;
 
-
-// trim leading whitespace
-                while (char.IsWhiteSpace(assetId[startIndex]))
-                    ++startIndex;
+                SkipWhitespace(assetId, ref startIndex);
 
                 if (assetId[startIndex] == 'V' && assetId[startIndex + 1] == ':')
                 {
                     // skip marker
                     startIndex += 2;
 
-
-// trim leading whitespace
-                    while (char.IsWhiteSpace(assetId[startIndex]))
-                        ++startIndex;
+                    SkipWhitespace(assetId, ref startIndex);
 
                     int endIndex = startIndex;
                     while (char.IsNumber(assetId[endIndex]) || assetId[endIndex] == '.')
@@ -315,14 +306,19 @@ namespace LBi.LostDoc.Core
                 }
             }
 
-            // trim leading whitspace
-            while (char.IsWhiteSpace(assetId[startIndex]))
-                ++startIndex;
+            SkipWhitespace(assetId, ref startIndex);
 
             // skip closing }
             Debug.Assert(assetId[startIndex] == '}');
             ++startIndex;
             return new AssetIdentifier(ret.AssetId, version);
+        }
+
+        private static void SkipWhitespace(string assetId, ref int startIndex)
+        {
+            // trim leading whitespace
+            while (char.IsWhiteSpace(assetId[startIndex]))
+                ++startIndex;
         }
 
         private static IEnumerable<AssetIdentifier> ParseParams(string assetId, ref int startIndex)
@@ -341,13 +337,11 @@ namespace LBi.LostDoc.Core
                 // skip opening ( and ,
                 startIndex++;
 
-                // trim leading whitespace
-                while (char.IsWhiteSpace(assetId[startIndex]))
-                    ++startIndex;
+                SkipWhitespace(assetId, ref startIndex);
 
                 ret.AddLast(ParseInternal(assetId, ref startIndex));
             }
- while (assetId[startIndex] == ',');
+            while (assetId[startIndex] == ',');
 
             // skip closing )
             Debug.Assert(assetId[startIndex] == ')');

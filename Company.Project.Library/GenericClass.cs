@@ -97,6 +97,25 @@ namespace Company.Project.Library
         }
 
         /// <summary>
+        /// Method with ref parameter.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public Boolean TryRefMethod(ref String str) { return false; }
+
+
+
+        /// <summary>
+        /// Generic method with ref param.
+        /// </summary>
+        /// <typeparam name="M">The generic</typeparam>
+        /// <param name="n">The param</param>
+        /// <returns></returns>
+        public Boolean TryRefMethodGeneric<M>(ref NestedGeneric<M> n) { return false; }
+
+
+
+        /// <summary>
         /// Consumes the generic (XPA).
         /// </summary>
         /// <param name="input">

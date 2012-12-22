@@ -87,6 +87,8 @@ namespace LBi.LostDoc.ConsoleApplication
                 if (!this.IncludeNonPublic.IsPresent)
                     gen.AssetFilters.Add(new PublicTypeFilter());
 
+                gen.AssetFilters.Add(new PrivateImplementationDetailsFilter());
+                gen.AssetFilters.Add(new DynamicallyInvokableAttributeFilter());
                 gen.AssetFilters.Add(new CompilerGeneratedFilter());
                 gen.AssetFilters.Add(new LogicalMemberInfoVisibilityFilter());
                 gen.AssetFilters.Add(new SpecialNameMemberInfoFilter());

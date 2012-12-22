@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Company.Project.Library;
 using Xunit;
 
@@ -58,6 +59,37 @@ namespace LBi.LostDoc.Core.Test
             Assert.Equal("T:System.Collections.Generic.List`1.Enumerator", aid.AssetId);
             Assert.Null(aid.Version);
             Assert.False(aid.HasVersion);
+        }
+
+        [Fact]
+
+        public void ParseMethodsWithRefParams()
+        {
+            var aid = AssetIdentifier.FromMemberInfo(typeof(GenericClass<>).GetMethod("TryRefMethod"));
+            // Ensure we can parse this.
+            var id = AssetIdentifier.Parse(aid.AssetId);
+            aid = AssetIdentifier.FromMemberInfo(typeof(GenericClass<>).GetMethod("TryRefMethodGeneric"));
+
+            Assert.Equal(
+                "M:Company.Project.Library.GenericClass`1.TryRefMethodGeneric``1(Company.Project.Library.GenericClass{`0}.NestedGeneric{``0}@)",
+                aid.AssetId);
+
+            // Ensure we can parse this.
+            id = AssetIdentifier.Parse(aid.AssetId);
+        }
+
+        [Fact]
+        public void ParseExplicitInterfaceImpl()
+        {
+            var dict = typeof(Dictionary<String, String>);
+
+            var icol = dict.GetInterfaceMap(typeof(ICollection<KeyValuePair<String,String>>));
+
+            var addMethod = icol.TargetMethods.Single(m => m.IsPrivate && m.Name.EndsWith(".Add"));
+
+            var aid = AssetIdentifier.FromMemberInfo(addMethod);
+
+            var id = AssetIdentifier.Parse(aid.AssetId);
         }
 
         [Fact]

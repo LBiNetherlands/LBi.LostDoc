@@ -22,6 +22,16 @@ namespace Company.Project.Library
     public class InheritedRegularClass : RegularClass
     {
         /// <summary>
+        /// Inherits parent class.
+        /// </summary>
+        public class NestedClassThatInheritsParent : InheritedRegularClass 
+        {
+            public new virtual void Without(out int test)
+            {
+                test = 5;
+            }
+        }
+        /// <summary>
         /// Overridden foo
         /// </summary>
         public override void Foo()
@@ -43,10 +53,10 @@ namespace Company.Project.Library
         }
 
         /// <summary>
-        /// I'm a "new virtual"
+        /// I'm a "new"
         /// </summary>
         /// <param name="test"></param>
-        public new virtual void WithOut(out int test)
+        public new void WithOut(out int test)
         {
             test = 4;
         }
