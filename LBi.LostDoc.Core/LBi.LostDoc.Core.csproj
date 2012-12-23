@@ -35,9 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LBi.Diagnostics">
-      <HintPath>..\packages\LBi.Diagnostics.1.0.0.3\lib\net40\LBi.Diagnostics.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -53,6 +50,8 @@
     <Compile Include="AssetResolver.cs" />
     <Compile Include="AssetType.cs" />
     <Compile Include="Bundle.cs" />
+    <Compile Include="Diagnostics\TraceActivity.cs" />
+    <Compile Include="Diagnostics\TraceExtensions.cs" />
     <Compile Include="Diagnostics\TraceSources.cs" />
     <Compile Include="Enrichers\AssetVersionResolver.cs" />
     <Compile Include="Enrichers\AttributeDataEnricher.cs" />

@@ -35,6 +35,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <PublishDatabases>false</PublishDatabases>
+    <DesktopBuildPackageLocation>Output\LBi.LostDoc.Repository.Web.zip</DesktopBuildPackageLocation>
+    <DeployIisAppPath>LBi.LostDoc.Repository.Web</DeployIisAppPath>
+    <PrecompileBeforePublish>true</PrecompileBeforePublish>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,9 +48,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DesktopBuildPackageLocation>Output\LBi.LostDoc.Repository.Web.zip</DesktopBuildPackageLocation>
+    <DeployIisAppPath>LBi.LostDoc.Repository.Web</DeployIisAppPath>
+    <PublishDatabases>false</PublishDatabases>
+    <ExcludeGeneratedDebugSymbol>false</ExcludeGeneratedDebugSymbol>
+    <PrecompileBeforePublish>true</PrecompileBeforePublish>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LBi.Diagnostics, Version=1.0.0.3, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Web.Administration, Version=7.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -178,16 +186,31 @@
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LBi.LostDoc.Core\LBi.LostDoc.Core.csproj">
-      <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
-      <Name>LBi.LostDoc.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LBi.LostDoc.Repository\LBi.LostDoc.Repository.csproj">
-      <Project>{94D3A3E9-16A3-4E15-8CFE-24AF01FB1114}</Project>
-      <Name>LBi.LostDoc.Repository</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <!--  manual edit, the build server needs to reference a dll rather than a project -->
+  <Choose>
+    <When Condition=" '$(AlternateReferenceLocation)' != '' ">
+      <ItemGroup>
+        <Reference Include="LBi.LostDoc.Core">
+          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="LBi.LostDoc.Repository">
+          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.Repository.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <ProjectReference Include="..\LBi.LostDoc.Core\LBi.LostDoc.Core.csproj">
+          <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
+          <Name>LBi.LostDoc.Core</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\LBi.LostDoc.Repository\LBi.LostDoc.Repository.csproj">
+          <Project>{94D3A3E9-16A3-4E15-8CFE-24AF01FB1114}</Project>
+          <Name>LBi.LostDoc.Repository</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <Content Include="repository.config" />
   </ItemGroup>

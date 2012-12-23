@@ -14,6 +14,9 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
+  <PropertyGroup>
+    <AlternateReferenceLocation></AlternateReferenceLocation>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -101,12 +104,26 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LBi.LostDoc.Core\LBi.LostDoc.Core.csproj">
-      <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
-      <Name>LBi.LostDoc.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
+  
+  <!--  manual edit, the build server needs to reference a dll rather than a project -->
+  <Choose>
+    <When Condition=" '$(AlternateReferenceLocation)' != '' ">
+      <ItemGroup>
+        <Reference Include="LBi.LostDoc.Core">
+          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.Core.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <ProjectReference Include="..\LBi.LostDoc.Core\LBi.LostDoc.Core.csproj">
+          <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
+          <Name>LBi.LostDoc.Core</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -16,13 +16,11 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LBi.Diagnostics;
 using LBi.LostDoc.Core;
+using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Templating;
 
 namespace LBi.LostDoc.Repository
