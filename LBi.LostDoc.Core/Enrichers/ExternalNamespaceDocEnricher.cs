@@ -110,7 +110,7 @@ namespace LBi.LostDoc.Core.Enrichers
             XmlWriter nodeWriter = ret.CreateWriter();
 
             XsltArgumentList argList = new XsltArgumentList();
-            argList.AddExtensionObject("urn:lostdoc-core", new AssetVersionResolver(context));
+            argList.AddExtensionObject("urn:lostdoc-core", new AssetVersionResolver(context, null));
             this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
             nodeWriter.Close();
             return ret.Root;

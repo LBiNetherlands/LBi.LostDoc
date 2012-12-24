@@ -32,14 +32,11 @@ namespace LBi.LostDoc.Core
             this._doc = XDocument.Load(reader, LoadOptions.None);
         }
 
-
         public XElement GetDocComments(MethodInfo methodInfo)
         {
             string sig = Naming.GetAssetId(methodInfo);
-            Debug.WriteLine(sig);
             return this.GetMemberElement(sig);
         }
-
 
         public XElement GetDocComments(Type type)
         {
@@ -49,7 +46,6 @@ namespace LBi.LostDoc.Core
         public XElement GetDocComments(ConstructorInfo ctor)
         {
             string sig = Naming.GetAssetId(ctor);
-            Debug.WriteLine(sig);
             return this.GetMemberElement(sig);
         }
 
@@ -63,7 +59,6 @@ namespace LBi.LostDoc.Core
             else
                 sig = Naming.GetAssetId((MethodInfo)parameter.Member);
 
-            Debug.WriteLine(sig);
             XElement elem = this.GetMemberElement(sig);
             if (elem != null)
                 return elem.XPathSelectElement(string.Format("param[@name='{0}']", parameter.Name));
@@ -74,7 +69,6 @@ namespace LBi.LostDoc.Core
         {
             string sig = Naming.GetAssetId((MethodInfo)parameter.Member);
 
-            Debug.WriteLine(sig);
             XElement elem = this.GetMemberElement(sig);
             if (elem != null)
                 return elem.XPathSelectElement("returns");
@@ -84,7 +78,6 @@ namespace LBi.LostDoc.Core
         internal XElement GetDocComments(FieldInfo fieldInfo)
         {
             string sig = Naming.GetAssetId(fieldInfo);
-            Debug.WriteLine(sig);
             return this.GetMemberElement(sig);
         }
 
@@ -92,7 +85,6 @@ namespace LBi.LostDoc.Core
         {
             string sig = Naming.GetAssetId(type);
 
-            Debug.WriteLine(sig);
             XElement elem = this.GetMemberElement(sig);
             if (elem != null)
                 return elem.XPathSelectElement(string.Format("typeparam[@name='{0}']", typeParameter.Name));
@@ -103,7 +95,6 @@ namespace LBi.LostDoc.Core
         {
             string sig = Naming.GetAssetId(methodInfo);
 
-            Debug.WriteLine(sig);
             XElement elem = this.GetMemberElement(sig);
             if (elem != null)
                 return elem.XPathSelectElement(string.Format("typeparam[@name='{0}']", typeParameter.Name));
@@ -118,7 +109,12 @@ namespace LBi.LostDoc.Core
         public XElement GetDocComments(PropertyInfo propertyInfo)
         {
             string sig = Naming.GetAssetId(propertyInfo);
-            Debug.WriteLine(sig);
+            return this.GetMemberElement(sig);
+        }
+
+        public XElement GetDocComments(EventInfo eventInfo)
+        {
+            string sig = Naming.GetAssetId(eventInfo);
             return this.GetMemberElement(sig);
         }
     }

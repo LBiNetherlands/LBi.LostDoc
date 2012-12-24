@@ -75,7 +75,6 @@
     <Compile Include="Filters\SpecialNameMemberInfoFilter.cs" />
     <Compile Include="Naming.cs" />
     <Compile Include="ProcessingContextExtensions.cs" />
-    <Compile Include="QualifiedName.cs" />
     <Compile Include="Service References\MsdnContentService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -190,6 +189,9 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Reflection\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

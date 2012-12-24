@@ -103,7 +103,8 @@ namespace LBi.LostDoc.Core
             this._assemblies = this._assemblyPaths.Select(this.LoadReflectionOnly).ToArray();
 
             XNamespace defaultNs = string.Empty;
-            IAssetResolver assetResolver = new AssetResolver(this.EnumerateAssemblies().ToArray());
+            var sourceAssemblies = this.EnumerateAssemblies().ToArray();
+            IAssetResolver assetResolver = new AssetResolver(sourceAssemblies);
 
             // collect phase zero assets
             List<AssetIdentifier> assets = this.DiscoverAssets(assetResolver, this._assemblies).ToList();
@@ -194,6 +195,8 @@ namespace LBi.LostDoc.Core
                 {
                     Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
                                                                 Path.GetDirectoryName(asm.Location));
+
+                    TraceSources.GeneratorSource.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
 
                     Debug.Assert(refAsm != null);
 

@@ -23,27 +23,32 @@ namespace LBi.LostDoc.Core.Enrichers
     internal class AssetVersionResolver
     {
         private readonly IProcessingContext _context;
-        private readonly Assembly _assemblyHint;
+        private readonly Assembly _hintAssembly;
 
-        public AssetVersionResolver(IProcessingContext context, Assembly assemblyHint)
+        public AssetVersionResolver(IProcessingContext context, Assembly hintAssembly)
         {
             this._context = context;
-            this._assemblyHint = assemblyHint;
+            this._hintAssembly = hintAssembly;
         }
 
         public string getVersionedId(string assetId)
         {
             AssetIdentifier aid = AssetIdentifier.Parse(assetId);
+            AssetIdentifier hintAsmAid = null;
+            
+            if (this._hintAssembly != null)
+                hintAsmAid = AssetIdentifier.FromAssembly(this._hintAssembly);
+
             if (aid.Type == AssetType.Assembly)
             {
-                Assembly asm = (Assembly)this._context.AssetResolver.Resolve(aid);
+                Assembly asm = (Assembly)this._context.AssetResolver.Resolve(aid, hintAsmAid);
                 aid = AssetIdentifier.FromAssembly(asm);
             }
             else if (aid.Type == AssetType.Namespace)
             {
                 string ns = aid.AssetId.Substring(aid.TypeMarker.Length + 1);
 
-                var version = this.GetNamespaceVersion(this._assemblyHint, ns);
+                var version = this.GetNamespaceVersion(this._hintAssembly, ns);
 
                 if (version == null)
                     throw new Exception("Version not found for asset: " + assetId);
@@ -52,17 +57,13 @@ namespace LBi.LostDoc.Core.Enrichers
             }
             else
             {
-                object obj = this._context.AssetResolver.Resolve(aid);
+                object obj = this._context.AssetResolver.Resolve(aid, hintAsmAid);
                 if (aid.Type == AssetType.Unknown)
                 {
                     MethodInfo[] arr = obj as MethodInfo[];
-                    arr.
                     if (arr != null)
                     {
                         // TODO this isn't very nice but it should do the trick for now
-                        // FIX this guy needs more context in order to correctly resolve an asset without version
-                        // maybe the originating assembly
-
                         var dummyAid = AssetIdentifier.FromMemberInfo(arr[0]);
                         aid = new AssetIdentifier(aid.AssetId, dummyAid.Version);
                     }
@@ -90,18 +91,18 @@ namespace LBi.LostDoc.Core.Enrichers
                      types[typeNum].Namespace.StartsWith(ns) &&
                      types[typeNum].Namespace[ns.Length] == '.'))
                 {
-                    version = this._assemblyHint.GetName().Version;
+                    version = this._hintAssembly.GetName().Version;
                     break;
                 }
             }
 
             if (version == null)
             {
-                AssemblyName[] referencedAssemblies = this._assemblyHint.GetReferencedAssemblies();
+                AssemblyName[] referencedAssemblies = this._hintAssembly.GetReferencedAssemblies();
 
                 for (int refNum = 0; refNum < referencedAssemblies.Length; refNum++)
                 {
-                    Assembly asm = this._context.AssetResolver.Context.Single(a => a.GetName() == referencedAssemblies[refNum]);
+                    Assembly asm = this._context.AssetResolver.Context.Single(a => a.GetName().FullName.Equals(referencedAssemblies[refNum].FullName, StringComparison.Ordinal));
                     version = this.GetNamespaceVersion(asm, ns);
                     if (version != null)
                         break;

@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,28 +26,9 @@ using Xunit.Extensions;
 
 namespace LBi.LostDoc.Core.Test
 {
-    public class AssetResolverTests
+    public class AssetResolverTests : IUseFixture<AssemblyFixture>
     {
         private AssetResolver _resolver;
-
-        public AssetResolverTests()
-        {
-            List<Assembly> assemblies = new List<Assembly>();
-            assemblies.Add(Assembly.GetExecutingAssembly());
-            AssemblyName[] names = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
-            assemblies.AddRange(names.Select(
-                an =>
-                    {
-                        Assembly asm =
-                            AppDomain.CurrentDomain
-                                     .GetAssemblies()
-                                     .SingleOrDefault(a => a.GetName().FullName == an.FullName);
-
-                        return asm ?? Assembly.Load(an);
-                    }));
-
-            this._resolver = new AssetResolver(assemblies);
-        }
 
         [Theory]
         [InlineData("T:Company.Project.Library.GenericClass`1.NestedGeneric`1.ConsumeU``1(``0)+U", typeof(GenericClass<>.NestedGeneric<>))]
@@ -59,7 +41,24 @@ namespace LBi.LostDoc.Core.Test
             AssetIdentifier aid = AssetIdentifier.Parse(assetId);
             int pos = 0;
             Type resolvedType = this._resolver.GetDeclaringType(aid.AssetId.Substring(aid.TypeMarker.Length + 1),
-                                                                ref pos);
+                                                                ref pos,
+                                                                null);
+            Assert.Equal(resolvedType, declaringType);
+        }
+
+        [Theory]
+        [InlineData("T:Company.Project.Library.GenericClass`1.NestedGeneric`1.ConsumeU``1(``0)+U", typeof(GenericClass<>.NestedGeneric<>))]
+        [InlineData("T:System.Collections.Generic.List`1.Enumerator", typeof(List<>.Enumerator))]
+        [InlineData("M:System.Collections.Generic.List`1.GetEnumerator", typeof(List<>))]
+        [InlineData("M:System.Collections.Generic.List`1+T", typeof(List<>))]
+        [InlineData("P:System.Collections.Generic.List`1.Length", typeof(List<>))]
+        public void GetDeclaringType_WithHintAssembly(string assetId, Type declaringType)
+        {
+            AssetIdentifier aid = AssetIdentifier.Parse(assetId);
+            int pos = 0;
+            Type resolvedType = this._resolver.GetDeclaringType(aid.AssetId.Substring(aid.TypeMarker.Length + 1),
+                                                                ref pos,
+                                                                declaringType.Assembly);
             Assert.Equal(resolvedType, declaringType);
         }
 
@@ -151,6 +150,58 @@ namespace LBi.LostDoc.Core.Test
             MemberInfo obj = (MemberInfo)this._resolver.Resolve(aid);
             Assert.NotNull(obj);
             Assert.Equal(assetId, AssetIdentifier.FromMemberInfo(obj).AssetId);
+        }
+
+        public void SetFixture(AssemblyFixture data)
+        {
+            this._resolver = new AssetResolver(data);
+        }
+    }
+
+    public class AssemblyFixture : IEnumerable<Assembly>
+    {
+        private HashSet<Assembly> _assemblies;
+
+        public AssemblyFixture()
+        {
+            _assemblies = new HashSet<Assembly>();
+
+            DiscoverAllAssemblies(_assemblies, Assembly.GetExecutingAssembly());
+        }
+
+        private static void DiscoverAllAssemblies(HashSet<Assembly> assemblies, Assembly assembly)
+        {
+            if (!assemblies.Add(assembly))
+                return;
+
+            AssemblyName[] names = assembly.GetReferencedAssemblies();
+            
+            var refs = names.Select(
+                an =>
+                    {
+                        Assembly asm =
+                            AppDomain.CurrentDomain
+                                     .GetAssemblies()
+                                     .SingleOrDefault(a => a.GetName().FullName == an.FullName);
+
+                        return asm ?? Assembly.Load(an);
+                    }).ToArray();
+
+
+            foreach (Assembly @ref in refs)
+            {
+                DiscoverAllAssemblies(assemblies, @ref);
+            }
+        }
+
+        public IEnumerator<Assembly> GetEnumerator()
+        {
+            return this._assemblies.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }
