@@ -94,7 +94,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 gen.AssetFilters.Add(new SpecialNameMemberInfoFilter());
 
                 if (!string.IsNullOrWhiteSpace(this.Filter))
-                    gen.AssetFilters.Add(new TypeNameGlobFilter {Include = this.Filter});
+                    gen.AssetFilters.Add(new AssetGlobFilter {Include = this.Filter});
 
                 XmlDocEnricher docEnricher = new XmlDocEnricher();
                 gen.Enrichers.Add(docEnricher);

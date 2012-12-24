@@ -15,7 +15,7 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using LBi.LostDoc.Core.MsdnContentService;
@@ -26,8 +26,16 @@ namespace LBi.LostDoc.Core.Templating.AssetResolvers
     {
         private const string UrlFormat = "http://msdn2.microsoft.com/{0}/library/{1}";
 
-        private readonly Dictionary<string, string> _cachedMsdnUrls = new Dictionary<string, string>();
+        private readonly ConcurrentDictionary<string, string> _cachedMsdnUrls = new ConcurrentDictionary<string, string>();
         private string _locale = "en-us";
+        private BasicHttpBinding _msdnBinding;
+        private EndpointAddress _msdnEndpoint;
+
+        public MsdnResolver()
+        {
+            _msdnBinding = new BasicHttpBinding(BasicHttpSecurityMode.None);
+            _msdnEndpoint = new EndpointAddress("http://services.msdn.microsoft.com/ContentServices/ContentService.asmx");
+        }
 
         public string Locale
         {
@@ -39,8 +47,23 @@ namespace LBi.LostDoc.Core.Templating.AssetResolvers
 
         public Uri ResolveAssetId(string assetId, Version version)
         {
-            if (this._cachedMsdnUrls.ContainsKey(assetId) && this._cachedMsdnUrls[assetId] != null)
-                return new Uri(string.Format(UrlFormat, this._locale, this._cachedMsdnUrls[assetId]));
+            string ret;
+            if (this._cachedMsdnUrls.TryGetValue(assetId, out ret))
+            {
+                if (ret != null)
+                    return new Uri(string.Format(UrlFormat, this._locale, ret));
+
+                return null;
+            }
+
+            // filter out non-MS namespaces
+            string name = assetId.Substring(2);
+            if (!name.StartsWith("System", StringComparison.OrdinalIgnoreCase) &&
+                !name.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase) &&
+                !name.StartsWith("Accessibility", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
 
             getContentRequest msdnRequest = new getContentRequest();
             msdnRequest.contentIdentifier = "AssetId:" + assetId;
@@ -48,11 +71,7 @@ namespace LBi.LostDoc.Core.Templating.AssetResolvers
 
             string endpoint = null;
 
-            Binding msdnBinding = new BasicHttpBinding(BasicHttpSecurityMode.None);
-            EndpointAddress msdnEndpoint =
-                new EndpointAddress("http://services.msdn.microsoft.com/ContentServices/ContentService.asmx");
-            ContentServicePortTypeClient client =
-                new ContentServicePortTypeClient(msdnBinding, msdnEndpoint);
+            ContentServicePortTypeClient client = new ContentServicePortTypeClient(_msdnBinding, _msdnEndpoint);
             try
             {
                 getContentResponse msdnResponse =
@@ -72,21 +91,16 @@ namespace LBi.LostDoc.Core.Templating.AssetResolvers
                 {
                     client.Abort();
                 }
-
-                if (client is IDisposable)
-                    ((IDisposable)client).Dispose();
+                
+                ((IDisposable)client).Dispose();
             }
 
-            this._cachedMsdnUrls[assetId] = endpoint;
+            this._cachedMsdnUrls.TryAdd(assetId, endpoint);
 
             if (string.IsNullOrEmpty(endpoint))
-            {
                 return null;
-            }
-            else
-            {
-                return new Uri(string.Format(UrlFormat, this._locale, endpoint));
-            }
+            
+            return new Uri(string.Format(UrlFormat, this._locale, endpoint));
         }
 
         #endregion

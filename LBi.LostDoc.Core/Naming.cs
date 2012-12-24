@@ -153,11 +153,7 @@ namespace LBi.LostDoc.Core
                 if (pos >= 0)
                     ret.Append(type.Name.Substring(0, pos));
                 else
-                {
-                    Debug.Fail("Generic type should have a ` in the name.");
-                    // this is prob wrong
-                    ////ret.AppendFormat("{0}.{1}", type.Namespace, type.Name);
-                }
+                    ret.Append(type.Name);
             }
             else if (type.IsGenericParameter)
             {
@@ -220,30 +216,7 @@ namespace LBi.LostDoc.Core
                 if (t.IsByRef)
                     t = t.GetElementType();
 
-                //if (t.IsGenericType)
-                //{
-                //    int pos = t.Name.LastIndexOf('`');
-                //    if (pos >= 0)
-                //        ret.AppendFormat("{0}.{1}", t.Namespace, t.Name.Substring(0, pos));
-                //    else // this is prob wrong
-                //        ret.AppendFormat("{0}.{1}", t.Namespace, t.Name);
-                //}
-                //else if (t.IsGenericParameter)
-                //{
-                //    int ix = -1;
-                //    if (t.DeclaringMethod != null)
-                //        ix = Array.IndexOf(t.DeclaringMethod.GetGenericArguments(), t);
-
-                //    if (ix >= 0)
-                //        ret.Append("``").Append(ix);
-                //    else
-                //        ret.Append('`').Append(Array.IndexOf(t.DeclaringType.GetGenericArguments(), t));
-                //}
-                //else
-                //    ret.Append(t.FullName);
                 ret.Append(CreateParameterTypeSignature(declaringMember, t));
-
-
 
                 if (parameters[i].IsByRef)
                     ret.Append('@');
@@ -273,7 +246,7 @@ namespace LBi.LostDoc.Core
 
         public static string GetAssetId(EventInfo eventInfo)
         {
-            return string.Format("E:{0}.{1}", GetTypeName(eventInfo.DeclaringType), eventInfo.Name);
+            return string.Format("E:{0}.{1}", GetTypeName(eventInfo.ReflectedType), eventInfo.Name);
         }
     }
 }

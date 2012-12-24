@@ -55,9 +55,9 @@ namespace LBi.LostDoc.Core
                     break;
 
 
-// case "C":
-                    // this._type = AssetType.Constructor;
-                    // break;
+                // case "C":
+                // this._type = AssetType.Constructor;
+                // break;
                 case "A":
                     this._type = AssetType.Assembly;
                     break;
@@ -111,8 +111,6 @@ namespace LBi.LostDoc.Core
         {
             int startIndex = 0;
 
-
-// return Parse(assetId, ref startIndex);
             AssetIdentifier ret = ParseInternal(assetId, ref startIndex);
             Debug.Assert(startIndex == assetId.Length);
             return ret;
@@ -150,12 +148,12 @@ namespace LBi.LostDoc.Core
             int explicitEnd = assetId.LastIndexOf('#', assetId.Length - 1, assetId.Length - startIndex);
             if (explicitEnd > startIndex)
                 startIndex = explicitEnd + 1;
-            
-            int endOfAsset = assetId.IndexOfAny(new[] {',', ' ', ')', '}'}, startIndex);
+
+            int endOfAsset = assetId.IndexOfAny(new[] { ',', ' ', ')', '}' }, startIndex);
 
             int typeArgStart = assetId.IndexOf('{', startIndex);
             int paramStart = assetId.IndexOf('(', startIndex);
-            
+
             if (typeArgStart != -1 && (typeArgStart < paramStart || paramStart == -1) &&
                 (typeArgStart < endOfAsset || endOfAsset == -1))
             {
@@ -169,30 +167,17 @@ namespace LBi.LostDoc.Core
             }
             else if (endOfAsset == -1)
             {
-                // retAssetId = assetId.Substring(startIndex);
                 startIndex = assetId.Length;
-
-
-// typeArgs = null;
             }
             else if (paramStart != -1 && paramStart < endOfAsset)
             {
                 ParseParams(assetId, ref paramStart);
 
-
-// retAssetId = assetId.Substring(startIndex, paramStart - startIndex);
                 startIndex = paramStart;
-
-
-// typeArgs = null;
             }
             else
             {
-                // retAssetId = assetId.Substring(startIndex, endOfAsset - startIndex);
                 startIndex = endOfAsset;
-
-
-// typeArgs = null;
             }
 
             if (startIndex < assetId.Length)
@@ -201,9 +186,6 @@ namespace LBi.LostDoc.Core
                 {
                     endOfAsset = startIndex;
                     ParseSimple(assetId, ref endOfAsset);
-
-
-// retAssetId += assetId.Substring(startIndex, endOfAsset - startIndex);
                     startIndex = endOfAsset;
                 }
             }
@@ -233,8 +215,7 @@ namespace LBi.LostDoc.Core
             if (assetId[startIndex] != '{')
                 throw new ArgumentException("First char must be '{'", "assetId");
 
-
-// skip opening {
+            // skip opening {
             ++startIndex;
 
             do
@@ -274,7 +255,7 @@ namespace LBi.LostDoc.Core
                 throw new ArgumentException("First char must be '{'", "assetId");
 
 
-// skip opening {
+            // skip opening {
             ++startIndex;
 
             SkipWhitespace(assetId, ref startIndex);

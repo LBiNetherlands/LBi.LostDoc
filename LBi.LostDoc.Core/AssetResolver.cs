@@ -66,9 +66,9 @@ namespace LBi.LostDoc.Core
                         this._assemblies.Where(a => a.GetName().Version == assetId.Version)
                             .Where(a => a.GetTypes().Any(
                                 t1 =>
-                                t1.Namespace != null && 
-                                (StringComparer.Ordinal.Equals(t1.Namespace,ns) ||
-                                t1.Namespace.StartsWith(ns +".",StringComparison.Ordinal))))
+                                t1.Namespace != null &&
+                                (StringComparer.Ordinal.Equals(t1.Namespace, ns) ||
+                                t1.Namespace.StartsWith(ns + ".", StringComparison.Ordinal))))
                             .ToArray();
 
                     if (matchingAssemblies.Length == 0)
@@ -230,10 +230,10 @@ namespace LBi.LostDoc.Core
                 allMethods.Where(
                     m =>
                     (m is ConstructorInfo &&
-                     assetId.Equals(Naming.GetAssetId((ConstructorInfo) m),
+                     assetId.Equals(Naming.GetAssetId((ConstructorInfo)m),
                                     StringComparison.Ordinal)) ||
                     (m is MethodInfo &&
-                     assetId.Equals(Naming.GetAssetId((MethodInfo) m), StringComparison.Ordinal)))
+                     assetId.Equals(Naming.GetAssetId((MethodInfo)m), StringComparison.Ordinal)))
                           .ToArray();
 
 
@@ -290,18 +290,18 @@ namespace LBi.LostDoc.Core
 
         private bool TryGetType(string typeName, out Type type)
         {
-            Type[] candidates =
-                this._assemblies.Select(a => a.GetType(typeName, false, false)).Where(t => t != null).ToArray();
-            candidates = candidates.Distinct().ToArray();
-            if (candidates.Length == 1)
-                type = candidates[0];
-            else if (candidates.Length > 1)
+            var candidates =
+                this._assemblies.Select(a => a.GetType(typeName, false, false)).Where(t => t != null);
+            Type[] matches = candidates.Distinct().ToArray();
+            if (matches.Length == 1)
+                type = matches[0];
+            else if (matches.Length > 1)
             {
-                type = candidates[0];
+                type = matches[0];
                 TraceSources.AssetResolverSource.TraceWarning(
                     "Type name '{0}' resolved to multiple types from the following assemblies: {1}.",
                     typeName,
-                    string.Join(", ", candidates.Select(c => c.Assembly.GetName().Name)));
+                    string.Join(", ", matches.Select(c => c.Assembly.GetName().Name)));
             }
             else
             {
@@ -327,7 +327,7 @@ namespace LBi.LostDoc.Core
 
             for (int i = 0; i < fragments.Length; i++)
             {
-                int fragmentEndsAt = fragments[i].IndexOfAny(new[] {'{', '+'});
+                int fragmentEndsAt = fragments[i].IndexOfAny(new[] { '{', '+' });
                 string fragment;
 
                 fragment = fragmentEndsAt == -1 ? fragments[i] : fragments[i].Substring(0, fragmentEndsAt);
@@ -343,6 +343,12 @@ namespace LBi.LostDoc.Core
 
                     if (this.TryGetType(possibleTypeName, out ret))
                         startIndex += possibleTypeName.Length;
+                    else if (fragmentEndsAt >= 0 &&
+                             this.TryGetType(possibleTypeName + fragments[i].Substring(fragmentEndsAt), out ret))
+                    {
+                        startIndex += possibleTypeName.Length + (fragments[i].Length - fragmentEndsAt);
+                        fragmentEndsAt = -1;
+                    }
                 }
                 else
                 {
@@ -351,10 +357,8 @@ namespace LBi.LostDoc.Core
                         break;
 
                     ret = nested;
+                    // +1 to account for the seperator that is requried for nested types
                     startIndex += fragment.Length + 1;
-
-
-// +1 to account for the seperator that is requried for nested types
                 }
 
                 if (fragmentEndsAt != -1 && fragments[i][fragmentEndsAt] == '{')

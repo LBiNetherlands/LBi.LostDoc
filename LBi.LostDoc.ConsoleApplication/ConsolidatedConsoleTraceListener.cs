@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml.Linq;
@@ -25,10 +26,12 @@ namespace LBi.LostDoc.ConsoleApplication
     internal class ConsolidatedConsoleTraceListener : TraceListener
     {
         private Dictionary<string, string> _sourceMap;
+        private ConcurrentDictionary<string, long> _startedTasks;
 
         public ConsolidatedConsoleTraceListener(Dictionary<string, string> sourceMap)
         {
             this._sourceMap = sourceMap;
+            this._startedTasks = new ConcurrentDictionary<string, long>();
         }
 
         public override void Write(string message)
@@ -84,7 +87,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 return;
 
             this.WriteLine(source, eventType, string.Empty);
-        }
+        }  
 
         public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id,
                                         string format, params object[] args)
@@ -95,6 +98,8 @@ namespace LBi.LostDoc.ConsoleApplication
 
             this.WriteLine(source, eventType, format, args);
         }
+
+        
 
         private void WriteLine(string source, TraceEventType eventType, string format, object[] args = null)
         {
@@ -129,10 +134,17 @@ namespace LBi.LostDoc.ConsoleApplication
                     break;
                 case TraceEventType.Start:
                     Console.ForegroundColor = ConsoleColor.DarkGray;
+                    this._startedTasks.TryAdd(msg, Stopwatch.GetTimestamp());
                     msg = "Starting: " + msg;
                     break;
                 case TraceEventType.Stop:
                     Console.ForegroundColor = ConsoleColor.DarkGray;
+                    long ts;
+                    if (this._startedTasks.TryRemove(msg, out ts))
+                    {
+                        double seconds = (Stopwatch.GetTimestamp() - ts)/(double) Stopwatch.Frequency;
+                        msg += string.Format(" [{0:N1} seconds]", seconds);
+                    }
                     msg = "Finished: " + msg;
                     break;
                 case TraceEventType.Suspend:

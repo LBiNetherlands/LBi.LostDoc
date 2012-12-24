@@ -21,10 +21,24 @@ using System.Linq;
 
 namespace LBi.LostDoc.Core.Templating.AssetResolvers
 {
-    public class FileResolver : IAssetUriResolver, IEnumerable<KeyValuePair<AssetIdentifier, Uri>>
+    public class FileResolver : IAssetUriResolver, IEnumerable<KeyValuePair<AssetIdentifier, Uri>>, IEqualityComparer<Uri>
     {
-        private Dictionary<string, Dictionary<Version, Uri>> _lookupCache =
-            new Dictionary<string, Dictionary<Version, Uri>>();
+        private Dictionary<string, Dictionary<Version, Uri>> _lookupCache;
+
+        private HashSet<Uri> _seenUris;
+        private StringComparer _comparer;
+
+        public FileResolver()
+            : this(false)
+        {
+        }
+
+        public FileResolver(bool caseSensitiveFs)
+        {
+            _lookupCache = new Dictionary<string, Dictionary<Version, Uri>>();
+            _comparer = caseSensitiveFs ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+            _seenUris = new HashSet<Uri>(this);
+        }
 
         #region IAssetUriResolver Members
 
@@ -42,8 +56,22 @@ namespace LBi.LostDoc.Core.Templating.AssetResolvers
 
         #endregion
 
-        public void Add(string assetId, Version version, Uri uri)
+        public void Add(string assetId, Version version, ref Uri uri)
         {
+            Uri origUri = uri;
+            int i = 0;
+            while (!_seenUris.Add(uri))
+            {
+                string uriStr = origUri .ToString();
+                int ix = uriStr.LastIndexOf('.');
+                if (ix >= 0)
+                {
+                    uriStr = string.Format("{0}-{1}{2}", uriStr.Substring(0, ix), ++i, uriStr.Substring(ix));
+                    uri = new Uri(uriStr, UriKind.RelativeOrAbsolute);
+                }
+                else
+                    throw new Exception("uri doesn't contains a dot: " + uriStr);
+            }
             Dictionary<Version, Uri> innerDict;
             if (!this._lookupCache.TryGetValue(assetId, out innerDict))
                 this._lookupCache.Add(assetId, innerDict = new Dictionary<Version, Uri>());
@@ -64,6 +92,16 @@ namespace LBi.LostDoc.Core.Templating.AssetResolvers
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        bool IEqualityComparer<Uri>.Equals(Uri x, Uri y)
+        {
+            return this._comparer.Equals(x.ToString(), y.ToString());
+        }
+
+        int IEqualityComparer<Uri>.GetHashCode(Uri obj)
+        {
+            return this._comparer.GetHashCode(obj.ToString());
         }
     }
 }

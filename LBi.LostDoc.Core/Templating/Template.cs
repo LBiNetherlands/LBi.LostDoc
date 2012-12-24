@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -34,8 +35,8 @@ namespace LBi.LostDoc.Core.Templating
 {
     public interface ITemplate
     {
-
     }
+
     public class Template : ITemplate
     {
         private readonly IFileProvider _fileProvider;
@@ -44,6 +45,15 @@ namespace LBi.LostDoc.Core.Templating
         private List<IAssetUriResolver> _resolvers;
 
         private XDocument _templateDefinition;
+
+        public event EventHandler<ProgressArgs> Progress;
+
+        protected virtual void OnProgress(int percent)
+        {
+            EventHandler<ProgressArgs> handler = this.Progress;
+            if (handler != null)
+                handler(this, new ProgressArgs(percent));
+        }
 
         public Template(IFileProvider fileProvider)
         {
@@ -196,10 +206,11 @@ namespace LBi.LostDoc.Core.Templating
                 }
 
                 Uri newUri = new Uri(saveAs, UriKind.RelativeOrAbsolute);
-                TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}", assetId, version, saveAs);
 
                 // register url
-                this._fileResolver.Add(assetId, new Version(version), newUri);
+                this._fileResolver.Add(assetId, new Version(version), ref newUri);
+
+                TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}", assetId, version, newUri.ToString());
 
                 // detach resolver
                 xpathContext.OnResolveVariable -= ssResolver;
@@ -235,11 +246,11 @@ namespace LBi.LostDoc.Core.Templating
                         // eval condition
                         if (EvalCondition(xpathContext, aliasInputElement, alias.ConditionExpression))
                         {
-                            this._fileResolver.Add(aliasAssetId, new Version(aliasVersion), newUri);
+                            this._fileResolver.Add(aliasAssetId, new Version(aliasVersion), ref newUri);
                             aliases.Add(AssetIdentifier.Parse(aliasAssetId));
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => {2}", aliasAssetId,
                                                                      aliasVersion,
-                                                                     saveAs);
+                                                                     newUri.ToString());
                         }
                         else
                         {
@@ -289,12 +300,12 @@ namespace LBi.LostDoc.Core.Templating
                         if (EvalCondition(xpathContext, sectionInputElement, section.ConditionExpression))
                         {
                             Uri sectionUri = new Uri(newUri + "#" + sectionName, UriKind.Relative);
-                            this._fileResolver.Add(sectionAssetId, new Version(sectionVersion), sectionUri);
+                            this._fileResolver.Add(sectionAssetId, new Version(sectionVersion), ref sectionUri);
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1}, (Section: {2}) => {3}",
                                                                      sectionAssetId,
                                                                      sectionVersion,
                                                                      sectionName,
-                                                                     saveAs);
+                                                                     sectionUri.ToString());
 
                             sections.Add(new AssetSection(AssetIdentifier.Parse(sectionAssetId), sectionName, sectionUri));
                         }
@@ -322,7 +333,7 @@ namespace LBi.LostDoc.Core.Templating
                                      Asset = new AssetIdentifier(assetId, new Version(version)),
                                      Aliases = aliases, /* list of AssetIdentifiers */
                                      Sections = sections, /* list of AssetSection */
-                                     SaveAs = saveAs,
+                                     SaveAs = newUri.ToString(),
                                      Transform = stylesheet.Transform,
                                      InputElement = inputElement,
                                      XsltParams = xsltParams
@@ -343,10 +354,10 @@ namespace LBi.LostDoc.Core.Templating
                     {
                         if (data[0] is XAttribute)
                             val = ((XAttribute)data[0]).Value;
-                        else if (data[0] is XText)
-                            val = ((XText)data[0]).Value;
                         else if (data[0] is XCData)
                             val = ((XCData)data[0]).Value;
+                        else if (data[0] is XText)
+                            val = ((XText)data[0]).Value;
                         else if (data[0] is XNode)
                             val = ((XNode)data[0]).CreateNavigator();
                     }
@@ -363,8 +374,10 @@ namespace LBi.LostDoc.Core.Templating
             return alias.Variables.SingleOrDefault(v => v.Name.Equals(variable, StringComparison.Ordinal)) != null;
         }
 
-        private static object EvalVariable(IEnumerable<XPathVariable> variables, CustomXsltContext xpathContext,
-                                           XElement inputElement, string variable)
+        private static object EvalVariable(IEnumerable<XPathVariable> variables,
+                                           CustomXsltContext xpathContext,
+                                           XElement inputElement,
+                                           string variable)
         {
             XPathVariable xpathVar = variables.Single(v => v.Name.Equals(variable, StringComparison.Ordinal));
             return inputElement.XPathEvaluate(xpathVar.ValueExpression, xpathContext);
@@ -398,32 +411,32 @@ namespace LBi.LostDoc.Core.Templating
             CustomXsltContext customContext = new CustomXsltContext();
             Func<string, object> onFailedResolve =
                 s =>
-                    {
-                        throw new InvalidOperationException(
-                            String.Format("Parameter '{0}' could not be resolved.", s));
-                    };
+                {
+                    throw new InvalidOperationException(
+                        String.Format("Parameter '{0}' could not be resolved.", s));
+                };
 
             customContext.OnResolveVariable +=
                 s =>
+                {
+                    XPathVariable var;
+
+                    // if it's defined
+                    if (globalParams.TryGetValue(s, out var))
                     {
-                        XPathVariable var;
+                        // see if the user provided a value
+                        object value;
+                        if (templateData.Arguments.TryGetValue(s, out value))
+                            return value;
 
-                        // if it's defined
-                        if (globalParams.TryGetValue(s, out var))
-                        {
-                            // see if the user provided a value
-                            object value;
-                            if (templateData.Arguments.TryGetValue(s, out value))
-                                return value;
+                        // evaluate default value
+                        if (!String.IsNullOrWhiteSpace(var.ValueExpression))
+                            return workingDoc.XPathEvaluate(var.ValueExpression,
+                                                            customContext);
+                    }
 
-                            // evaluate default value
-                            if (!String.IsNullOrWhiteSpace(var.ValueExpression))
-                                return workingDoc.XPathEvaluate(var.ValueExpression,
-                                                                customContext);
-                        }
-
-                        return onFailedResolve(s);
-                    };
+                    return onFailedResolve(s);
+                };
 
             // check for meta-template directives and expand
             XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
@@ -624,14 +637,16 @@ namespace LBi.LostDoc.Core.Templating
 
                 foreach (var group in duplicates)
                 {
-                    TraceSources.TemplateSource.TraceCritical("Duplicate work unit target ({0}) generated from: {1}",
-                                                              group.Key,
-                                                              string.Join(", ",
-                                                                          group.Select(
-                                                                              sa => '\'' + sa.StylesheetName + '\'')));
+                    TraceSources.TemplateSource.TraceError("Duplicate work unit target ({0}) generated from: {1}",
+                                                           group.Key,
+                                                           string.Join(", ",
+                                                                       group.Select(
+                                                                           sa => '\'' + sa.StylesheetName + '\'')));
 
-                    // TODO replace this with something more specific
-                    throw new Exception("Critical error, continuing is not safe.");
+                    foreach (var workunit in group.Skip(1))
+                    {
+                        stylesheetApplications.Remove(workunit);
+                    }
                 }
 
                 work.AddRange(stylesheetApplications);
@@ -648,8 +663,29 @@ namespace LBi.LostDoc.Core.Templating
                                                                this._resolvers,
                                                                this._fileProvider);
 
+            int totalCount = work.Count;
+            long lastProgress = Stopwatch.GetTimestamp();
+            int processed = 0;
             // process all units of work
-            Parallel.ForEach(work, uow => results.Add(uow.Execute(context)));
+            Parallel.ForEach(work, uow =>
+                                       {
+                                           results.Add(uow.Execute(context));
+                                           int c = Interlocked.Increment(ref processed);
+                                           long lp = Interlocked.Read(ref lastProgress);
+                                           if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 1.0)
+                                           {
+                                               if (Interlocked.CompareExchange(ref lastProgress,
+                                                                               Stopwatch.GetTimestamp(),
+                                                                               lp) == lp)
+                                               {
+                                                   TraceSources.TemplateSource.TraceInformation(
+                                                       "Progress: {0:P1} ({1:N0}/{2:N0})",
+                                                       ((int) (c/(double) totalCount)),
+                                                       c,
+                                                       totalCount);
+                                               }
+                                           }
+                                       });
 
             // stop timing
             timer.Stop();

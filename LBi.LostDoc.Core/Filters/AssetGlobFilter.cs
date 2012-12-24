@@ -19,7 +19,7 @@ using System.Text.RegularExpressions;
 
 namespace LBi.LostDoc.Core.Filters
 {
-    public class TypeNameGlobFilter : TypeFilter
+    public class AssetGlobFilter : IAssetFilter
     {
         private string _filter;
         private Regex _regex;
@@ -36,12 +36,9 @@ namespace LBi.LostDoc.Core.Filters
             }
         }
 
-        protected override bool Filter(IFilterContext context, Type type)
+        public bool Filter(IFilterContext context, AssetIdentifier asset)
         {
-            if (type.IsGenericType && !type.IsGenericTypeDefinition)
-                return false;
-
-            return !this._regex.IsMatch(type.FullName);
+            return !this._regex.IsMatch(asset.AssetId.Substring(2));
         }
     }
 }

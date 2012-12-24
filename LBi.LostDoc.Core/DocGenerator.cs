@@ -125,7 +125,7 @@ namespace LBi.LostDoc.Core
             HashSet<AssetIdentifier> referencedAssets = new HashSet<AssetIdentifier>();
 
 
-// main output loop
+            // main output loop
             while (assets.Count > 0)
             {
                 TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Processing phase {0}", phase);
@@ -234,19 +234,8 @@ namespace LBi.LostDoc.Core
 
                     // Debug.Write("Type: " + t.Name);
                     // check if type survives filtering
-                    bool filtered = false;
                     AssetIdentifier typeAsset = AssetIdentifier.FromMemberInfo(t);
-                    foreach (IAssetFilter filter in this.AssetFilters)
-                    {
-                        if (filter.Filter(filterContext, typeAsset))
-                        {
-                            filtered = true;
-                            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "{0} - Filtered by {1}",
-                                                                    typeAsset.AssetId, filter);
-
-                            break;
-                        }
-                    }
+                    bool filtered = this.IsFiltered(filterContext, typeAsset);
 
                     if (!filtered)
                     {
@@ -261,39 +250,19 @@ namespace LBi.LostDoc.Core
                             t.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
                                          BindingFlags.NonPublic);
 
-                        // Debug.Indent();
                         foreach (MemberInfo member in members)
                         {
-                            // Debug.Write("Member: " + member.Name);
-                            filtered = false;
                             AssetIdentifier memberAsset = AssetIdentifier.FromMemberInfo(member);
-                            foreach (IAssetFilter filter in this.AssetFilters)
-                            {
-                                if (filter.Filter(filterContext, memberAsset))
-                                {
-                                    filtered = true;
-                                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0,
-                                                                            "{0} - Filtered by {1}", memberAsset.AssetId,
-                                                                            filter);
-
-
-// Debug.WriteLine(" - Filtered by " + filter.ToString());
-                                    break;
-                                }
-                            }
+                            filtered = this.IsFiltered(filterContext, memberAsset);
 
                             if (!filtered)
                             {
-                                // Debug.WriteLine(" - Added");
                                 TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}",
                                                                         memberAsset.AssetId);
                                 if (distinctSet.Add(memberAsset))
                                     yield return memberAsset;
                             }
                         }
-
-
-// Debug.Unindent();
                     }
                 }
 
@@ -301,6 +270,25 @@ namespace LBi.LostDoc.Core
             }
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Discovering assets");
+        }
+
+        private bool IsFiltered(IFilterContext filterContext, AssetIdentifier typeAsset)
+        {
+            bool filtered = false;
+            foreach (IAssetFilter filter in this.AssetFilters)
+            {
+                if (filter.Filter(filterContext, typeAsset))
+                {
+                    filtered = true;
+                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
+                                                            0,
+                                                            "{0} - Filtered by {1}",
+                                                            typeAsset.AssetId, filter);
+
+                    break;
+                }
+            }
+            return filtered;
         }
 
         private void BuildHierarchy(IAssetResolver assetResolver, XElement parentNode,
@@ -578,7 +566,7 @@ namespace LBi.LostDoc.Core
 
             switch (method.Name)
             {
-                    // unary ops
+                // unary ops
                 case "op_Decrement":
                 case "op_Increment":
                 case "op_UnaryNegation":
@@ -591,11 +579,11 @@ namespace LBi.LostDoc.Core
                 case "op_PointerDereference":
 
 
-// conversion
+                // conversion
                 case "op_Implicit":
                 case "op_Explicit":
 
-                    // binary ops
+                // binary ops
                 case "op_Addition":
                 case "op_Subtraction":
                 case "op_Multiply":
@@ -756,7 +744,7 @@ namespace LBi.LostDoc.Core
                     var targetMethod =
                         ifMap.TargetMethods.SingleOrDefault(mi => mi.MetadataToken == mInfo.MetadataToken &&
                                                                   mi.Module == mInfo.Module);
-                    
+
                     if (targetMethod != null)
                     {
                         int mIx = Array.IndexOf(ifMap.TargetMethods, targetMethod);
