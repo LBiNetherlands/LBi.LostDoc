@@ -98,7 +98,7 @@ namespace LBi.LostDoc.Core.Enrichers
         }
 
 
-        public void EnrichEvent(IProcessingContext clone, EventInfo eventInfo)
+        public void EnrichEvent(IProcessingContext context, EventInfo eventInfo)
         {
         }
 
@@ -106,13 +106,12 @@ namespace LBi.LostDoc.Core.Enrichers
 
         private XElement EnrichXml(IProcessingContext context, XElement nodes)
         {
-            XmlReader nodeReader = nodes.CreateReader();
             XDocument ret = new XDocument();
             XmlWriter nodeWriter = ret.CreateWriter();
 
             XsltArgumentList argList = new XsltArgumentList();
             argList.AddExtensionObject("urn:lostdoc-core", new AssetVersionResolver(context));
-            this._xslTransform.Transform(nodeReader, argList, nodeWriter);
+            this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
             nodeWriter.Close();
             return ret.Root;
         }

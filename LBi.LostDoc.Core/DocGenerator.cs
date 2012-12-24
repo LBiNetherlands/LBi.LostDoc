@@ -291,9 +291,12 @@ namespace LBi.LostDoc.Core
             return filtered;
         }
 
-        private void BuildHierarchy(IAssetResolver assetResolver, XElement parentNode,
-                                    LinkedListNode<AssetIdentifier> hierarchy, AssetIdentifier asset,
-                                    HashSet<AssetIdentifier> references, HashSet<AssetIdentifier> emittedAssets,
+        private void BuildHierarchy(IAssetResolver assetResolver,
+                                    XElement parentNode,
+                                    LinkedListNode<AssetIdentifier> hierarchy,
+                                    AssetIdentifier asset,
+                                    HashSet<AssetIdentifier> references,
+                                    HashSet<AssetIdentifier> emittedAssets,
                                     int phase)
         {
             if (hierarchy == null)

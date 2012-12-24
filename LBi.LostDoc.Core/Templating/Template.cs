@@ -672,7 +672,7 @@ namespace LBi.LostDoc.Core.Templating
                                            results.Add(uow.Execute(context));
                                            int c = Interlocked.Increment(ref processed);
                                            long lp = Interlocked.Read(ref lastProgress);
-                                           if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 1.0)
+                                           if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 5.0)
                                            {
                                                if (Interlocked.CompareExchange(ref lastProgress,
                                                                                Stopwatch.GetTimestamp(),
@@ -680,7 +680,7 @@ namespace LBi.LostDoc.Core.Templating
                                                {
                                                    TraceSources.TemplateSource.TraceInformation(
                                                        "Progress: {0:P1} ({1:N0}/{2:N0})",
-                                                       ((int) (c/(double) totalCount)),
+                                                       c / (double)totalCount,
                                                        c,
                                                        totalCount);
                                                }

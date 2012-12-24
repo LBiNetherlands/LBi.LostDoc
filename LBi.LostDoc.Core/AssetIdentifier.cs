@@ -194,7 +194,7 @@ namespace LBi.LostDoc.Core
 
             int typeMarker = retAssetId.IndexOf(':');
 
-            if (typeMarker == -1 || typeMarker > 2)
+            if (typeMarker == -1)
                 retAssetId = "T:" + retAssetId;
 
             var ret = new AssetIdentifier(retAssetId, null);

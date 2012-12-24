@@ -113,6 +113,16 @@ namespace LBi.LostDoc.Core.Test
             Assert.Equal("M:System.Object.ToString", aid.AssetId);
             Assert.Null(aid.Version);
             Assert.False(aid.HasVersion);
+        } 
+        [Fact]
+        public void ParseSimpleUnknown()
+        {
+            AssetIdentifier aid = AssetIdentifier.Parse("Overload:System.Xml.XmlWriter.Create");
+            Assert.Equal(AssetType.Unknown, aid.Type);
+            Assert.Equal("Overload", aid.TypeMarker);
+            Assert.Equal("Overload:System.Xml.XmlWriter.Create", aid.AssetId);
+            Assert.Null(aid.Version);
+            Assert.False(aid.HasVersion);
         }
 
         [Fact]

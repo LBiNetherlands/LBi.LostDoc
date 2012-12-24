@@ -43,6 +43,6 @@ namespace LBi.LostDoc.Core
 
         void EnrichNamespace(IProcessingContext context, string ns);
 
-        void EnrichEvent(IProcessingContext clone, EventInfo eventInfo);
+        void EnrichEvent(IProcessingContext context, EventInfo eventInfo);
     }
 }

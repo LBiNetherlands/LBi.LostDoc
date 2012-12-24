@@ -22,11 +22,13 @@ namespace LBi.LostDoc.Core.Enrichers
 {
     internal class AssetVersionResolver
     {
-        private IProcessingContext _context;
+        private readonly IProcessingContext _context;
+        private readonly Assembly _assemblyHint;
 
-        public AssetVersionResolver(IProcessingContext context)
+        public AssetVersionResolver(IProcessingContext context, Assembly assemblyHint)
         {
             this._context = context;
+            this._assemblyHint = assemblyHint;
         }
 
         public string getVersionedId(string assetId)
@@ -40,27 +42,72 @@ namespace LBi.LostDoc.Core.Enrichers
             else if (aid.Type == AssetType.Namespace)
             {
                 string ns = aid.AssetId.Substring(aid.TypeMarker.Length + 1);
-                Version[] groups =
-                    this._context.AssetResolver.Context.SelectMany(a => a.GetTypes())
-                        .Where(t => ns.Equals(t.Namespace, StringComparison.Ordinal))
-                        .Select(t => t.Assembly)
-                        .Distinct()
-                        .GroupBy(a => a.GetName().Version, (v, g) => v).ToArray();
 
-                if (groups.Length > 1)
-                    throw new AmbiguousMatchException();
+                var version = this.GetNamespaceVersion(this._assemblyHint, ns);
 
-                aid = AssetIdentifier.FromNamespace(ns, groups[0]);
+                if (version == null)
+                    throw new Exception("Version not found for asset: " + assetId);
+
+                aid = AssetIdentifier.FromNamespace(ns, version);
             }
             else
             {
                 object obj = this._context.AssetResolver.Resolve(aid);
-                aid = AssetIdentifier.FromMemberInfo((MemberInfo)obj);
+                if (aid.Type == AssetType.Unknown)
+                {
+                    MethodInfo[] arr = obj as MethodInfo[];
+                    arr.
+                    if (arr != null)
+                    {
+                        // TODO this isn't very nice but it should do the trick for now
+                        // FIX this guy needs more context in order to correctly resolve an asset without version
+                        // maybe the originating assembly
+
+                        var dummyAid = AssetIdentifier.FromMemberInfo(arr[0]);
+                        aid = new AssetIdentifier(aid.AssetId, dummyAid.Version);
+                    }
+                    else
+                        throw new NotSupportedException("Unknow AssetIdentifier marker: " + aid.TypeMarker);
+                }
+                else
+                    aid = AssetIdentifier.FromMemberInfo((MemberInfo)obj);
             }
 
             this._context.AddReference(aid);
 
             return aid.ToString();
+        }
+
+        private Version GetNamespaceVersion(Assembly assembly, string ns)
+        {
+            // FIX this could throw a TypeLoadException
+            var types = assembly.GetTypes();
+            Version version = null;
+            for (int typeNum = 0; typeNum < types.Length; typeNum++)
+            {
+                if (ns.Equals(types[typeNum].Namespace) ||
+                    (types[typeNum].Namespace != null &&
+                     types[typeNum].Namespace.StartsWith(ns) &&
+                     types[typeNum].Namespace[ns.Length] == '.'))
+                {
+                    version = this._assemblyHint.GetName().Version;
+                    break;
+                }
+            }
+
+            if (version == null)
+            {
+                AssemblyName[] referencedAssemblies = this._assemblyHint.GetReferencedAssemblies();
+
+                for (int refNum = 0; refNum < referencedAssemblies.Length; refNum++)
+                {
+                    Assembly asm = this._context.AssetResolver.Context.Single(a => a.GetName() == referencedAssemblies[refNum]);
+                    version = this.GetNamespaceVersion(asm, ns);
+                    if (version != null)
+                        break;
+                }
+            }
+            return version;
         }
     }
 }

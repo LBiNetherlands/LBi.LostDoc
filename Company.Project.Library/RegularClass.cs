@@ -20,7 +20,7 @@ using System.Collections.Generic;
 namespace Company.Project.Library
 {
     /// <summary>
-    /// A regular class.
+    /// A regular class. With a reference to <see cref="System.Xml.XmlWriter.Create*"/>
     /// </summary>
     public class RegularClass : IDisposable
     {

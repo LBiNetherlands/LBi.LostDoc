@@ -21,6 +21,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using System.Xml.Xsl;
 
 namespace LBi.LostDoc.Core.Enrichers
@@ -162,7 +163,7 @@ namespace LBi.LostDoc.Core.Enrichers
         {
         }
 
-        public void EnrichEvent(IProcessingContext clone, EventInfo eventInfo)
+        public void EnrichEvent(IProcessingContext context, EventInfo eventInfo)
         {
         }
 
@@ -228,12 +229,12 @@ namespace LBi.LostDoc.Core.Enrichers
         {
             XDocument ret = new XDocument();
 
-            using (XmlReader nodeReader = nodes.CreateReader())
             using (XmlWriter nodeWriter = ret.CreateWriter())
             {
                 XsltArgumentList argList = new XsltArgumentList();
                 argList.AddExtensionObject("urn:lostdoc-core", new AssetVersionResolver(context));
-                this._xslTransform.Transform(nodeReader, argList, nodeWriter);
+
+                this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
                 nodeWriter.Close();
             }
 

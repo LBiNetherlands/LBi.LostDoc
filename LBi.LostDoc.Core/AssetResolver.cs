@@ -129,27 +129,49 @@ namespace LBi.LostDoc.Core
             switch (assetIdentifier.Type)
             {
                 case AssetType.Unknown:
-                    throw new ArgumentOutOfRangeException("assetIdentifier", "Cannot resolve asset of unknown type.");
+                    if (StringComparer.Ordinal.Equals("Overload", assetIdentifier.TypeMarker))
+                    {
+                        return this.ResolveOverloads(assetIdentifier, assemblyHint);
+                    }
+                    throw new ArgumentException(string.Format("Type '{0}' not supported.", assetIdentifier.TypeMarker),
+                                                "assetIdentifier");
+
                 case AssetType.Namespace:
                     return assetIdentifier.AssetId.Substring(assetIdentifier.TypeMarker.Length + 1);
                 case AssetType.Type:
-                    return this.ResolveType(assetIdentifier);
+                    return this.ResolveType(assetIdentifier, assemblyHint);
                 case AssetType.Method:
-                    return this.ResolveMethod(assetIdentifier.AssetId);
+                    return this.ResolveMethod(assetIdentifier, assemblyHint);
                 case AssetType.Field:
-                    return this.ResolveField(assetIdentifier);
+                    return this.ResolveField(assetIdentifier, assemblyHint);
                 case AssetType.Event:
-                    return this.ResolveEvent(assetIdentifier);
+                    return this.ResolveEvent(assetIdentifier, assemblyHint);
                 case AssetType.Property:
-                    return this.ResolveProperty(assetIdentifier.AssetId);
+                    return this.ResolveProperty(assetIdentifier, assemblyHint);
                 case AssetType.Assembly:
-                    return this.ResolveAssembly(assetIdentifier);
+                    return this.ResolveAssembly(assetIdentifier, assemblyHint);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private object ResolveField(AssetIdentifier assetIdentifier)
+        private MethodInfo[] ResolveOverloads(AssetIdentifier assetIdentifier, Assembly assemblyHint)
+        {
+            string asset = assetIdentifier.AssetId.Substring(assetIdentifier.TypeMarker.Length + 1);
+
+            int startIndex = 0;
+            Type type = this.GetDeclaringType(asset, ref startIndex, assemblyHint);
+
+            string methodName = asset.Substring(startIndex + 1);
+
+            var allMethods = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+
+            return allMethods
+                .Where(m => m.Name.Equals(methodName, StringComparison.Ordinal))
+                .ToArray();
+        }
+
+        private object ResolveField(AssetIdentifier assetIdentifier, Assembly assemblyHint)
         {
             string asset = assetIdentifier.AssetId.Substring(assetIdentifier.TypeMarker.Length + 1);
 
@@ -181,21 +203,21 @@ namespace LBi.LostDoc.Core
             }
         }
 
-        private EventInfo ResolveEvent(AssetIdentifier assetIdentifier)
+        private EventInfo ResolveEvent(AssetIdentifier assetIdentifier, Assembly assemblyHint)
         {
             string asset = assetIdentifier.AssetId.Substring(assetIdentifier.TypeMarker.Length + 1);
 
             int startIndex = 0;
-            Type type = this.GetDeclaringType(asset, ref startIndex);
+            Type type = this.GetDeclaringType(asset, ref startIndex, assemblyHint);
 
             EventInfo[] allEvents =
                 type.GetEvents(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
                                BindingFlags.Instance);
 
-            return allEvents.Single(e => AssetIdentifier.FromMemberInfo(e).Equals(assetIdentifier));
+            return allEvents.Single(e => Naming.GetAssetId(e).Equals(assetIdentifier.AssetId));
         }
 
-        private object ResolveAssembly(AssetIdentifier assetId)
+        private object ResolveAssembly(AssetIdentifier assetId, Assembly assemblyHint)
         {
             IEnumerable<Assembly> referencedAssemblies =
                 this._assemblies.SelectMany(
@@ -214,12 +236,12 @@ namespace LBi.LostDoc.Core
             return null;
         }
 
-        private MemberInfo ResolveMethod(string assetId)
+        private MemberInfo ResolveMethod(AssetIdentifier assetId, Assembly assemblyHint)
         {
-            string asset = assetId.Substring(2);
+            string asset = assetId.AssetId.Substring(2);
 
             int startIndex = 0;
-            Type type = this.GetDeclaringType(asset, ref startIndex);
+            Type type = this.GetDeclaringType(asset, ref startIndex, assemblyHint);
 
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
             var allMethods =
@@ -230,10 +252,10 @@ namespace LBi.LostDoc.Core
                 allMethods.Where(
                     m =>
                     (m is ConstructorInfo &&
-                     assetId.Equals(Naming.GetAssetId((ConstructorInfo)m),
+                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo)m),
                                     StringComparison.Ordinal)) ||
                     (m is MethodInfo &&
-                     assetId.Equals(Naming.GetAssetId((MethodInfo)m), StringComparison.Ordinal)))
+                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo)m), StringComparison.Ordinal)))
                           .ToArray();
 
 
@@ -247,35 +269,19 @@ namespace LBi.LostDoc.Core
             return methods[0];
         }
 
-        // private ConstructorInfo ResolveConstructor(AssetIdentifier assetId)
-        // {
-
-        // string asset = assetId.AssetId.Substring(assetId.TypeMarker.Length + 1);
-
-        // int startIndex = 0;
-        // Type type = GetDeclaringType(asset, ref startIndex);
-
-        // var allCtors =
-        // type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
-        // BindingFlags.Instance);
-
-
-        // return allCtors.Single(m => assetId.Equals(AssetIdentifier.FromType(m)));
-        // }
-
-        private PropertyInfo ResolveProperty(string assetId)
+        private PropertyInfo ResolveProperty(AssetIdentifier assetId, Assembly assemblyHint)
         {
-            string asset = assetId.Substring(2);
+            string asset = assetId.AssetId.Substring(2);
 
             int startIndex = 0;
-            Type type = this.GetDeclaringType(asset, ref startIndex);
+            Type type = this.GetDeclaringType(asset, ref startIndex, assemblyHint);
 
             PropertyInfo[] allProps =
                 type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
                                    BindingFlags.Instance);
             PropertyInfo[] properties =
                 allProps
-                    .Where(p => assetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal))
+                    .Where(p => assetId.AssetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal))
                     .ToArray();
 
             // if there is a "new" property on the type we'll find both it and the property it hides.
@@ -288,8 +294,11 @@ namespace LBi.LostDoc.Core
             return properties[0];
         }
 
-        private bool TryGetType(string typeName, out Type type)
+        private bool TryGetType(string typeName, Assembly hintAssembly, out Type type)
         {
+
+
+            
             var candidates =
                 this._assemblies.Select(a => a.GetType(typeName, false, false)).Where(t => t != null);
             Type[] matches = candidates.Distinct().ToArray();
@@ -311,15 +320,15 @@ namespace LBi.LostDoc.Core
             return type != null;
         }
 
-        private object ResolveType(AssetIdentifier assetId)
+        private object ResolveType(AssetIdentifier assetId, Assembly assemblyHint)
         {
             string typeName = assetId.AssetId.Substring(assetId.TypeMarker.Length + 1);
             int startIndex = 0;
-            return this.GetDeclaringType(typeName, ref startIndex);
+            return this.GetDeclaringType(typeName, ref startIndex, assemblyHint);
         }
 
 
-        protected internal Type GetDeclaringType(string typeName, ref int startIndex)
+        protected internal Type GetDeclaringType(string typeName, ref int startIndex, Assembly assemblyHint)
         {
             Type ret = null;
 
@@ -368,7 +377,7 @@ namespace LBi.LostDoc.Core
                     Type[] genTypeArgs = new Type[typeArgs.Length];
 
                     for (int j = 0; j < typeArgs.Length; j++)
-                        genTypeArgs[j] = (Type)this.ResolveType(typeArgs[j]);
+                        genTypeArgs[j] = (Type)this.ResolveType(typeArgs[j], assemblyHint);
 
                     ret = ret.MakeGenericType(genTypeArgs);
                     break;
