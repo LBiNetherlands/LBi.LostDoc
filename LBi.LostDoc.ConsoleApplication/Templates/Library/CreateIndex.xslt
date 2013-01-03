@@ -29,8 +29,7 @@
 
   <xsl:template match="/">
     <index>
-      <xsl:apply-templates select="/bundle//*[@assetId = $assetId]"
-                           mode="index"/>
+      <xsl:apply-templates select="//*[@assetId = $assetId]" mode="index"/>
     </index>
   </xsl:template>
 

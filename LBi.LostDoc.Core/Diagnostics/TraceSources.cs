@@ -18,15 +18,24 @@ using System.Diagnostics;
 
 namespace LBi.LostDoc.Core.Diagnostics
 {
+    public static class TraceEvents
+    {
+        public static readonly int CacheHit = 1001;
+        public static readonly int CacheMiss = 1002;
+        public static readonly int CachePenalty = 1003;
+    }
+
     public static class TraceSources
     {
         public static readonly TraceSource TemplateSource;
         public static readonly TraceSource AssetResolverSource;
         public static readonly TraceSource GeneratorSource;
         public static readonly TraceSource BundleSource;
+        public static readonly TraceSource AssemblyLoader;
 
         static TraceSources()
         {
+            AssemblyLoader = new TraceSource("LostDoc.Core.ReflectionOnlyAssemblyLoader", SourceLevels.All);
             TemplateSource = new TraceSource("LostDoc.Core.Template", SourceLevels.All);
             AssetResolverSource = new TraceSource("LostDoc.Core.Template.AssetResolver", SourceLevels.All);
             GeneratorSource = new TraceSource("LostDoc.Core.DocGenerator", SourceLevels.All);

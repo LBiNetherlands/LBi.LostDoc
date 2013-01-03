@@ -138,7 +138,7 @@ namespace LBi.LostDoc.Repository
                         //string absPath = Path.Combine(htmlDir.FullName, result.SavedAs);
 
                         //HtmlDocument htmlDoc = new HtmlDocument();
-                        //htmlDoc.Load(absPath);
+                        //htmlDoc.LoadFrom(absPath);
 
                         //string htmlTitle = string.Empty;
                         //var titleNode = htmlDoc.DocumentNode.SelectSingleNode("/html/head/title");

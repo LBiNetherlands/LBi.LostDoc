@@ -20,12 +20,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Caching;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Enrichers;
 using LBi.LostDoc.Core.Filters;
+using LBi.LostDoc.Core.Reflection;
 
 namespace LBi.LostDoc.Core
 {
@@ -35,6 +37,7 @@ namespace LBi.LostDoc.Core
         private readonly List<IEnricher> _enrichers;
         private readonly List<IAssetFilter> _filters;
         private Assembly[] _assemblies;
+        private ObjectCache _cache;
 
         public DocGenerator()
         {
@@ -43,7 +46,7 @@ namespace LBi.LostDoc.Core
             this._enrichers = new List<IEnricher>();
             this.Enrichers.Add(new AttributeDataEnricher());
             this.AssetFilters.Add(new EnumMetadataFilter());
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += this.LoadAssembly;
+            this._cache = new MemoryCache("DocGeneratorCache");
         }
 
         public List<IAssetFilter> AssetFilters
@@ -100,10 +103,14 @@ namespace LBi.LostDoc.Core
 
             XDocument ret = new XDocument();
 
-            this._assemblies = this._assemblyPaths.Select(this.LoadReflectionOnly).ToArray();
+            IAssemblyLoader assemblyLoader = new ReflectionOnlyAssemblyLoader(
+                this._cache,
+                this._assemblyPaths.Select(Path.GetDirectoryName));
+
+            this._assemblies = this._assemblyPaths.Select(assemblyLoader.LoadFrom).ToArray();
 
             XNamespace defaultNs = string.Empty;
-            var sourceAssemblies = this.EnumerateAssemblies().ToArray();
+            var sourceAssemblies = this._assemblies.SelectMany(assemblyLoader.GetAssemblyChain);
             IAssetResolver assetResolver = new AssetResolver(sourceAssemblies);
 
             // collect phase zero assets
@@ -113,7 +120,14 @@ namespace LBi.LostDoc.Core
             ret.Add(new XElement(defaultNs + "bundle"));
 
 
-            IProcessingContext pctx = new ProcessingContext(this._filters, assetResolver, ret.Root, null, -1);
+            IProcessingContext pctx = new ProcessingContext(this._cache,
+                                                            this._filters,
+                                                            assemblyLoader,
+                                                            assetResolver,
+                                                            ret.Root,
+                                                            null,
+                                                            -1);
+
             foreach (IEnricher enricher in this._enrichers)
                 enricher.RegisterNamespace(pctx);
 
@@ -161,58 +175,13 @@ namespace LBi.LostDoc.Core
             return ret;
         }
 
-        private Assembly LoadReflectionOnly(string path)
-        {
-            Assembly assembly;
-            try
-            {
-                assembly = Assembly.ReflectionOnlyLoadFrom(path);
-            }
-            catch (FileLoadException)
-            {
-                var assemblyName = AssemblyName.GetAssemblyName(path);
-                var fullName = assemblyName.FullName;
-                var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-                assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
-            }
-
-            return assembly;
-        }
-
-        private IEnumerable<Assembly> EnumerateAssemblies()
-        {
-            HashSet<Assembly> seen = new HashSet<Assembly>();
-            return this._assemblies.SelectMany(a => this.GetAssemblyChain(a, seen));
-        }
-
-        private IEnumerable<Assembly> GetAssemblyChain(Assembly asm, HashSet<Assembly> seen)
-        {
-            if (seen.Add(asm))
-            {
-                yield return asm;
-
-                foreach (AssemblyName assemblyName in asm.GetReferencedAssemblies())
-                {
-                    Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
-                                                                Path.GetDirectoryName(asm.Location));
-
-                    TraceSources.GeneratorSource.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
-
-                    Debug.Assert(refAsm != null);
-
-                    foreach (Assembly a in this.GetAssemblyChain(refAsm, seen))
-                        yield return a;
-                }
-            }
-        }
-
 
         private IEnumerable<AssetIdentifier> DiscoverAssets(IAssetResolver assetResolver,
                                                             IEnumerable<Assembly> assemblies)
         {
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
             HashSet<AssetIdentifier> distinctSet = new HashSet<AssetIdentifier>();
-            IFilterContext filterContext = new FilterContext(assetResolver);
+            IFilterContext filterContext = new FilterContext(this._cache, assetResolver);
 
             // find and filter all types from all assemblies 
             foreach (Assembly asm in assemblies)
@@ -305,8 +274,19 @@ namespace LBi.LostDoc.Core
             if (hierarchy == null)
                 return;
 
+            IAssemblyLoader assemblyLoader =
+                new ReflectionOnlyAssemblyLoader(this._cache,
+                                                 this._assemblyPaths.Select(Path.GetDirectoryName));
+
+
             AssetIdentifier aid = hierarchy.Value;
-            IProcessingContext pctx = new ProcessingContext(this._filters, assetResolver, parentNode, references, phase);
+            IProcessingContext pctx = new ProcessingContext(this._cache,
+                                                            this._filters,
+                                                            assemblyLoader,
+                                                            assetResolver,
+                                                            parentNode,
+                                                            references,
+                                                            phase);
 
             XElement newElement;
 
@@ -1106,56 +1086,10 @@ namespace LBi.LostDoc.Core
         {
             if (isDisposing)
             {
-                AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.LoadAssembly;
             }
         }
 
-        private Assembly LoadAssemblyInternal(string fullName, params string[] probePaths)
-        {
-            Assembly[] assemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
 
-            Assembly ret = assemblies.FirstOrDefault(a => a.FullName == fullName);
-
-            if (ret == null)
-            {
-                try
-                {
-                    ret = Assembly.ReflectionOnlyLoad(fullName);
-                }
-                catch (FileNotFoundException)
-                {
-                    foreach (string asmPath in probePaths)
-                    {
-                        IEnumerable<string> allFiles =
-                            Directory.EnumerateFiles(asmPath, "*.dll")
-                                     .Concat(
-                                         this._assemblyPaths.SelectMany(
-                                             ap => Directory.EnumerateFiles(Path.GetDirectoryName(ap),
-                                                                            "*.dll")));
-
-
-                        foreach (string fileName in allFiles)
-                        {
-                            if (AssemblyName.GetAssemblyName(fileName).FullName == fullName)
-                            {
-                                ret = Assembly.ReflectionOnlyLoadFrom(fileName);
-                                break;
-                            }
-                        }
-
-                        if (ret != null)
-                            break;
-                    }
-                }
-            }
-
-            return ret;
-        }
-
-        private Assembly LoadAssembly(object sender, ResolveEventArgs args)
-        {
-            return this.LoadAssemblyInternal(args.Name, Path.GetDirectoryName(args.RequestingAssembly.Location));
-        }
 
         ~DocGenerator()
         {

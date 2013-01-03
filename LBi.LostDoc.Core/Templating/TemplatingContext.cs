@@ -16,18 +16,20 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Xml.Linq;
 
 namespace LBi.LostDoc.Core.Templating
 {
     public class TemplatingContext : ITemplatingContext
     {
-        public TemplatingContext(string basePath, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IFileProvider fileProvider)
+        public TemplatingContext(ObjectCache cache, string basePath, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IFileProvider fileProvider)
         {
             this.BasePath = basePath;
             this.TemplateData = data;
             this.AssetUriResolvers = resolvers.ToArray();
             this.FileProvider = fileProvider;
+            this.Cache = cache;
         }
 
         #region ITemplatingContext Members
@@ -41,5 +43,7 @@ namespace LBi.LostDoc.Core.Templating
         public IFileProvider FileProvider { get; protected set; }
 
         #endregion
+
+        public ObjectCache Cache { get; private set; }
     }
 }

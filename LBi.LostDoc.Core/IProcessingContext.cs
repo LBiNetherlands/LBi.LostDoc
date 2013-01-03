@@ -16,11 +16,13 @@
 
 using System.Collections.Generic;
 using System.Xml.Linq;
+using LBi.LostDoc.Core.Reflection;
 
 namespace LBi.LostDoc.Core
 {
     public interface IProcessingContext : IContextBase
     {
+        IAssemblyLoader AssemblyLoader { get; }
         XElement Element { get; }
         IEnumerable<AssetIdentifier> References { get; }
         IAssetResolver AssetResolver { get; }

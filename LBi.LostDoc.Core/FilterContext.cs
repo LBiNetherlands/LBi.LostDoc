@@ -14,24 +14,24 @@
  * limitations under the License. 
  */
 
+using System.Runtime.Caching;
+
 namespace LBi.LostDoc.Core
 {
     public class FilterContext : IFilterContext
     {
-        private readonly IAssetResolver _assetResolver;
-
-        public FilterContext(IAssetResolver assetResolver)
+        public FilterContext(ObjectCache cache, IAssetResolver assetResolver)
         {
-            this._assetResolver = assetResolver;
+            this.Cache = cache;
+            this.AssetResolver = assetResolver;
         }
 
         #region IFilterContext Members
 
-        public IAssetResolver AssetResolver
-        {
-            get { return this._assetResolver; }
-        }
+        public IAssetResolver AssetResolver { get; private set; }
 
         #endregion
+
+        public ObjectCache Cache { get; private set; }
     }
 }

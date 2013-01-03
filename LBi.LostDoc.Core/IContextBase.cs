@@ -14,9 +14,13 @@
  * limitations under the License. 
  */
 
+using System.Runtime.Caching;
+using LBi.LostDoc.Core.Reflection;
+
 namespace LBi.LostDoc.Core
 {
     public interface IContextBase
     {
+        ObjectCache Cache { get; }
     }
 }

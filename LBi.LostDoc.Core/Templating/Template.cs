@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -40,6 +41,7 @@ namespace LBi.LostDoc.Core.Templating
     public class Template : ITemplate
     {
         private readonly IFileProvider _fileProvider;
+        private readonly ObjectCache _cache;
         private string _basePath;
         private FileResolver _fileResolver;
         private List<IAssetUriResolver> _resolvers;
@@ -57,6 +59,7 @@ namespace LBi.LostDoc.Core.Templating
 
         public Template(IFileProvider fileProvider)
         {
+            this._cache = new MemoryCache("TemplateCache");
             this._fileProvider = fileProvider;
             this._fileResolver = new FileResolver();
             this._resolvers = new List<IAssetUriResolver>();
@@ -64,7 +67,7 @@ namespace LBi.LostDoc.Core.Templating
             this._resolvers.Add(new MsdnResolver());
         }
 
-        #region Load Template
+        #region LoadFrom Template
 
         public virtual void Load(string path)
         {
@@ -658,7 +661,8 @@ namespace LBi.LostDoc.Core.Templating
             ConcurrentBag<WorkUnitResult> results = new ConcurrentBag<WorkUnitResult>();
 
             // create context
-            ITemplatingContext context = new TemplatingContext(this._basePath,
+            ITemplatingContext context = new TemplatingContext(this._cache,
+                                                               this._basePath,
                                                                templateData,
                                                                this._resolvers,
                                                                this._fileProvider);

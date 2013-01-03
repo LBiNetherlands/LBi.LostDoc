@@ -48,6 +48,15 @@ namespace LBi.LostDoc.Core.Diagnostics
             source.TraceEvent(TraceEventType.Critical, 0, message);
         }
 
+        public static void TraceVerbose(this TraceSource source, int eventId, string message, params object[] args)
+        {
+            source.TraceEvent(TraceEventType.Verbose, eventId, message, args);
+        }
+        public static void TraceVerbose(this TraceSource source, int eventId, string message)
+        {
+            source.TraceEvent(TraceEventType.Verbose, eventId, message);
+        }
+
         public static void TraceVerbose(this TraceSource source, string message, params object[] args)
         {
             source.TraceEvent(TraceEventType.Verbose, 0, message, args);
