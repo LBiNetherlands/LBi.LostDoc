@@ -16,11 +16,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml;
 
 namespace Company.Project.Library
 {
     /// <summary>
-    /// A regular class. With a reference to <see cref="System.Xml.XmlWriter.Create*"/>
+    /// A regular class.
     /// </summary>
     public class RegularClass : IDisposable
     {

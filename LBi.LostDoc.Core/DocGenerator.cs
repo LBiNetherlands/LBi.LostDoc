@@ -158,9 +158,16 @@ namespace LBi.LostDoc.Core
                     foreach (AssetIdentifier assetIdentifier in assetResolver.GetAssetHierarchy(asset))
                         hierarchy.AddFirst(assetIdentifier);
 
-
-                    this.BuildHierarchy(assetResolver, ret.Root, hierarchy.First, asset, referencedAssets, emittedAssets,
-                                        phase);
+                    if (hierarchy.First != null)
+                    {
+                        this.BuildHierarchy(assetResolver,
+                                            ret.Root,
+                                            hierarchy.First,
+                                            asset,
+                                            referencedAssets,
+                                            emittedAssets,
+                                            phase);
+                    }
                 }
 
 

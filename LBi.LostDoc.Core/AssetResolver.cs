@@ -57,6 +57,9 @@ namespace LBi.LostDoc.Core
 
         public IEnumerable<AssetIdentifier> GetAssetHierarchy(AssetIdentifier assetId)
         {
+            if (assetId.Type == AssetType.Unknown)
+                yield break;
+
             yield return assetId;
 
             switch (assetId.Type)
@@ -253,10 +256,10 @@ namespace LBi.LostDoc.Core
                 allMethods.Where(
                     m =>
                     (m is ConstructorInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo)m),
-                                    StringComparison.Ordinal)) ||
+                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo) m),
+                                            StringComparison.Ordinal)) ||
                     (m is MethodInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo)m), StringComparison.Ordinal)))
+                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo) m), StringComparison.Ordinal)))
                           .ToArray();
 
 
@@ -265,7 +268,7 @@ namespace LBi.LostDoc.Core
                 return methods[1];
 
             Debug.Assert(methods.Length == 1 || methods.Length == 2,
-             string.Format("Found {0} methods, expected 1 or 2.", methods.Length));
+                         string.Format("Found {0} methods, expected 1 or 2.", methods.Length));
 
             return methods[0];
         }
@@ -298,11 +301,19 @@ namespace LBi.LostDoc.Core
         private bool TryGetType(string typeName, Assembly hintAssembly, out Type type)
         {
             List<Type> allMatches = new List<Type>();
-            foreach (var assembly in this.GetAssemblies(hintAssembly))
+
+            if (hintAssembly != null)
             {
-                type = assembly.GetType(typeName, false, false);
+                type = hintAssembly.GetType(typeName, false, false);
                 if (type != null)
-                    allMatches.Add(type);
+                    return true;
+            }
+
+            foreach (var assembly in this._assemblies)
+            {
+                var tmp = assembly.GetType(typeName, false, false);
+                if (tmp != null)
+                    allMatches.Add(tmp);
             }
 
             if (allMatches.Count > 1)
@@ -321,40 +332,10 @@ namespace LBi.LostDoc.Core
             return type != null;
         }
 
-        private IEnumerable<Assembly> GetAssemblies(Assembly hintAssembly)
-        {
-            if (hintAssembly == null)
-                return this._assemblies;
-
-            // TODO probably cache this
-            return this.GetAssembliesInternal(new HashSet<Assembly>(), hintAssembly);
-        }
 
         private static bool Equals(AssemblyName n1, AssemblyName n2)
         {
             return string.Equals(n1.FullName, n2.FullName, StringComparison.Ordinal);
-        }
-
-        private IEnumerable<Assembly> GetAssembliesInternal(HashSet<Assembly> seen, Assembly assembly)
-        {
-            if (!seen.Add(assembly))
-                yield break;
-
-            yield return assembly;
-
-            var references = assembly.GetReferencedAssemblies();
-
-            foreach (var assemblyName in references)
-            {
-                yield return this._assemblies.Single(a => Equals(a.GetName(), assemblyName));
-            }
-
-            foreach (var assemblyName in references)
-            {
-                var asm = this._assemblies.Single(a => Equals(a.GetName(), assemblyName));
-                foreach (Assembly ret in this.GetAssembliesInternal(seen, asm))
-                    yield return ret;
-            }
         }
 
         private object ResolveType(AssetIdentifier assetId, Assembly hintAssembly)

@@ -27,6 +27,7 @@ using LBi.LostDoc.Core;
 using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Enrichers;
 using LBi.LostDoc.Core.Filters;
+using LBi.LostDoc.Core.Reflection;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
@@ -148,8 +149,8 @@ namespace LBi.LostDoc.ConsoleApplication
 
                 gen.AddAssembly(this.Path);
 
-                Assembly assembly;
 
+                Assembly assembly;
                 try
                 {
                     assembly = Assembly.ReflectionOnlyLoadFrom(this.Path);
@@ -159,8 +160,7 @@ namespace LBi.LostDoc.ConsoleApplication
                     var assemblyName = AssemblyName.GetAssemblyName(this.Path);
                     var fullName = assemblyName.FullName;
                     var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-                    assembly =
-                        loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
+                    assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
                 }
 
                 XDocument rawDoc = gen.Generate();
