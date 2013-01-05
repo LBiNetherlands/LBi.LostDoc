@@ -83,25 +83,30 @@ namespace LBi.LostDoc.Core.Templating
                     {
                         TraceSources.TemplateSource.TraceWarning("{0}, {1} => Replacing {2}",
                                                                  this.Asset.AssetId,
-                                                                 this.Asset.Version, this.SaveAs);
+                                                                 this.Asset.Version,
+                                                                 this.SaveAs);
                     }
                     else
                     {
-                        TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}",
-                                                             this.Asset.AssetId,
-                                                             this.Asset.Version, this.SaveAs);
+                        TraceSources.TemplateSource.TraceInformation("{0}, {1} => {2}",
+                                                                     this.Asset.AssetId,
+                                                                     this.Asset.Version,
+                                                                     this.SaveAs);
                     }
-
-                    this.Transform.Transform(context.TemplateData.Document.CreateNavigator(),
+                    long tickStart = localTimer.ElapsedTicks;
+                    this.Transform.Transform(context.TemplateData.Document,
                                              argList,
                                              xmlWriter);
+                    TraceSources.TemplateSource.TraceInformation("Transform applied in: {0:N0} ms",
+                                             ((localTimer.ElapsedTicks - tickStart) /
+                                              (double)Stopwatch.Frequency) * 1000);
+
                     xmlWriter.Close();
                 }
             }
             else
             {
-                TraceSources.TemplateSource.TraceWarning(
-                                                         "{0}, {1} => Skipped, already generated ({2})",
+                TraceSources.TemplateSource.TraceWarning("{0}, {1} => Skipped, already generated ({2})",
                                                          this.Asset.AssetId, 
                                                          this.Asset.Version,
                                                          newUri);

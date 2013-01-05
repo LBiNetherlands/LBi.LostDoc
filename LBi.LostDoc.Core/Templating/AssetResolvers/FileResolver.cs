@@ -56,6 +56,17 @@ namespace LBi.LostDoc.Core.Templating.AssetResolvers
 
         #endregion
 
+        public void Add(string assetId, Version version, Uri uri)
+        {
+            Dictionary<Version, Uri> innerDict;
+            if (!this._lookupCache.TryGetValue(assetId, out innerDict))
+                this._lookupCache.Add(assetId, innerDict = new Dictionary<Version, Uri>());
+
+            if (!innerDict.ContainsKey(version))
+                innerDict.Add(version, uri);
+        }
+        
+
         public void Add(string assetId, Version version, ref Uri uri)
         {
             Uri origUri = uri;

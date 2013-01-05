@@ -74,8 +74,7 @@ namespace LBi.LostDoc.Core.Templating.AssetResolvers
             ContentServicePortTypeClient client = new ContentServicePortTypeClient(_msdnBinding, _msdnEndpoint);
             try
             {
-                getContentResponse msdnResponse =
-                    client.GetContent(new appId {value = "LostDoc"}, msdnRequest);
+                getContentResponse msdnResponse = client.GetContent(new appId {value = "LostDoc"}, msdnRequest);
                 endpoint = msdnResponse.contentId;
             }
             catch (FaultException<mtpsFaultDetailType>)

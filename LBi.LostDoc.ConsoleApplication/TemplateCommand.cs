@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using LBi.Cli.Arguments;
 using LBi.LostDoc.Core;
 using LBi.LostDoc.Core.Diagnostics;
@@ -180,11 +181,16 @@ namespace LBi.LostDoc.ConsoleApplication
                 template.Load(templatePath);
                 AssetRedirectCollection assetRedirects;
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
+                XPathDocument xpathDoc;
+                using (var reader = mergedDoc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
+                    xpathDoc = new XPathDocument(reader);
+
                 var templateData = new TemplateData
                                        {
                                            OverwriteExistingFiles = this.Force.IsPresent,
                                            AssetRedirects = assetRedirects,
-                                           Document = mergedDoc,
+                                           XDocument = mergedDoc,
+                                           Document = xpathDoc,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            Arguments = this.Arguments,
                                            TargetDirectory = outputDir

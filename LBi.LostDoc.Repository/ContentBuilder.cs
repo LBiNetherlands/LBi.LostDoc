@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using LBi.LostDoc.Core;
 using LBi.LostDoc.Core.Templating;
 using LBi.LostDoc.Repository.Lucene;
@@ -101,11 +102,15 @@ namespace LBi.LostDoc.Repository
             AssetRedirectCollection assetRedirects;
             var mergedDoc = bundle.Merge(out assetRedirects);
 
+            XPathDocument xpathDoc;
+            using (var reader = mergedDoc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
+                xpathDoc = new XPathDocument(reader);
+
             // generate output
             var templateData = new TemplateData
                                    {
                                        AssetRedirects = assetRedirects,
-                                       Document = mergedDoc,
+                                       Document = xpathDoc,
                                        IgnoredVersionComponent = this.IgnoreVersionComponent,
                                        TargetDirectory = htmlDir.FullName
                                    };

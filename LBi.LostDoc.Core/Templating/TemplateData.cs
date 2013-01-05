@@ -15,7 +15,10 @@
  */
 
 using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
+using LBi.LostDoc.Core.Templating.XPath;
 
 namespace LBi.LostDoc.Core.Templating
 {
@@ -27,7 +30,8 @@ namespace LBi.LostDoc.Core.Templating
         }
         public VersionComponent? IgnoredVersionComponent { get; set; }
         public AssetRedirectCollection AssetRedirects { get; set; }
-        public XDocument Document { get; set; }
+        public XPathDocument Document { get; set; }
+        public XDocument XDocument { get; set; }
         public Dictionary<string, object> Arguments { get; set; }
         public string TargetDirectory { get; set; }
         public bool OverwriteExistingFiles { get; set; }

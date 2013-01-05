@@ -180,8 +180,9 @@ namespace LBi.LostDoc.Core.Templating
                                                          (object)stylesheet.Name);
 
             CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
+            
             XElement[] inputElements =
-                templateData.Document.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
+                templateData.XDocument.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
 
             foreach (XElement inputElement in inputElements)
             {
@@ -249,7 +250,7 @@ namespace LBi.LostDoc.Core.Templating
                         // eval condition
                         if (EvalCondition(xpathContext, aliasInputElement, alias.ConditionExpression))
                         {
-                            this._fileResolver.Add(aliasAssetId, new Version(aliasVersion), ref newUri);
+                            this._fileResolver.Add(aliasAssetId, new Version(aliasVersion), newUri);
                             aliases.Add(AssetIdentifier.Parse(aliasAssetId));
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => {2}", aliasAssetId,
                                                                      aliasVersion,
@@ -303,7 +304,7 @@ namespace LBi.LostDoc.Core.Templating
                         if (EvalCondition(xpathContext, sectionInputElement, section.ConditionExpression))
                         {
                             Uri sectionUri = new Uri(newUri + "#" + sectionName, UriKind.Relative);
-                            this._fileResolver.Add(sectionAssetId, new Version(sectionVersion), ref sectionUri);
+                            this._fileResolver.Add(sectionAssetId, new Version(sectionVersion), sectionUri);
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1}, (Section: {2}) => {3}",
                                                                      sectionAssetId,
                                                                      sectionVersion,
@@ -643,8 +644,7 @@ namespace LBi.LostDoc.Core.Templating
                     TraceSources.TemplateSource.TraceError("Duplicate work unit target ({0}) generated from: {1}",
                                                            group.Key,
                                                            string.Join(", ",
-                                                                       group.Select(
-                                                                           sa => '\'' + sa.StylesheetName + '\'')));
+                                                                       group.Select(sa => '\'' + sa.StylesheetName + '\'')));
 
                     foreach (var workunit in group.Skip(1))
                     {
@@ -671,25 +671,31 @@ namespace LBi.LostDoc.Core.Templating
             long lastProgress = Stopwatch.GetTimestamp();
             int processed = 0;
             // process all units of work
-            Parallel.ForEach(work, uow =>
-                                       {
-                                           results.Add(uow.Execute(context));
-                                           int c = Interlocked.Increment(ref processed);
-                                           long lp = Interlocked.Read(ref lastProgress);
-                                           if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 5.0)
-                                           {
-                                               if (Interlocked.CompareExchange(ref lastProgress,
-                                                                               Stopwatch.GetTimestamp(),
-                                                                               lp) == lp)
-                                               {
-                                                   TraceSources.TemplateSource.TraceInformation(
-                                                       "Progress: {0:P1} ({1:N0}/{2:N0})",
-                                                       c / (double)totalCount,
-                                                       c,
-                                                       totalCount);
-                                               }
-                                           }
-                                       });
+            ParallelOptions parallelOptions = new ParallelOptions
+                                                  {
+                                                      MaxDegreeOfParallelism = 1
+                                                  };
+            Parallel.ForEach(work,
+                             parallelOptions,
+                             uow =>
+                                 {
+                                     results.Add(uow.Execute(context));
+                                     int c = Interlocked.Increment(ref processed);
+                                     long lp = Interlocked.Read(ref lastProgress);
+                                     if ((Stopwatch.GetTimestamp() - lp)/(double) Stopwatch.Frequency > 5.0)
+                                     {
+                                         if (Interlocked.CompareExchange(ref lastProgress,
+                                                                         Stopwatch.GetTimestamp(),
+                                                                         lp) == lp)
+                                         {
+                                             TraceSources.TemplateSource.TraceInformation(
+                                                 "Progress: {0:P1} ({1:N0}/{2:N0})",
+                                                 c/(double) totalCount,
+                                                 c,
+                                                 totalCount);
+                                         }
+                                     }
+                                 });
 
             // stop timing
             timer.Stop();
@@ -739,7 +745,7 @@ namespace LBi.LostDoc.Core.Templating
             for (int i = 0; i < resources.Length; i++)
             {
                 CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
-                if (EvalCondition(xpathContext, templateData.Document.Root, resources[i].ConditionExpression))
+                if (EvalCondition(xpathContext, templateData.XDocument.Root, resources[i].ConditionExpression))
                     yield return new ResourceDeployment(resources[i].Path);
             }
 
