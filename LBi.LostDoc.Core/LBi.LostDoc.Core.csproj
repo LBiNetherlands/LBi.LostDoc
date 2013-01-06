@@ -100,6 +100,7 @@
     <Compile Include="Templating\UnitOfWork.cs" />
     <Compile Include="Templating\WorkUnitResult.cs" />
     <Compile Include="Templating\XPathVariable.cs" />
+    <Compile Include="Templating\XPath\XPathNavigatorIterator.cs" />
     <Compile Include="Templating\XPath\CustomXsltContext.cs" />
     <Compile Include="Templating\IFileProvider.cs" />
     <Compile Include="Templating\ITemplatingContext.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Templating\TemplatingContext.cs" />
     <Compile Include="Templating\IAssetUriResolver.cs" />
     <Compile Include="ProcessingContext.cs" />
+    <Compile Include="Templating\XPath\IndexingXPathNavigator.cs" />
     <Compile Include="VersionComponent.cs" />
     <Compile Include="Templating\XmlFileProviderResolver.cs" />
     <Compile Include="Templating\XPath\XsltContextAssetIdGetter.cs" />
