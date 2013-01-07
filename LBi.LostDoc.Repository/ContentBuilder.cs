@@ -24,6 +24,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using LBi.LostDoc.Core;
 using LBi.LostDoc.Core.Templating;
+using LBi.LostDoc.Core.Templating.XPath;
 using LBi.LostDoc.Repository.Lucene;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
@@ -106,11 +107,17 @@ namespace LBi.LostDoc.Repository
             using (var reader = mergedDoc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
                 xpathDoc = new XPathDocument(reader);
 
+            IndexingXPathNavigator indexedNavigator = new IndexingXPathNavigator(xpathDoc.CreateNavigator());
+            indexedNavigator.AddKey("aid", "*[@assetId]", "@assetId");
+            indexedNavigator.AddKey("aidNoVer", "*[@assetId]", "ld:nover(@assetId)");
+            indexedNavigator.BuildIndexes();
+
             // generate output
             var templateData = new TemplateData
                                    {
                                        AssetRedirects = assetRedirects,
-                                       Document = xpathDoc,
+                                       Document = indexedNavigator,
+                                       XDocument = mergedDoc,
                                        IgnoredVersionComponent = this.IgnoreVersionComponent,
                                        TargetDirectory = htmlDir.FullName
                                    };

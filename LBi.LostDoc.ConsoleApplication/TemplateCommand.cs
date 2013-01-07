@@ -28,6 +28,7 @@ using LBi.Cli.Arguments;
 using LBi.LostDoc.Core;
 using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Templating;
+using LBi.LostDoc.Core.Templating.XPath;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
@@ -185,12 +186,17 @@ namespace LBi.LostDoc.ConsoleApplication
                 using (var reader = mergedDoc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
                     xpathDoc = new XPathDocument(reader);
 
+                IndexingXPathNavigator indexedNavigator = new IndexingXPathNavigator(xpathDoc.CreateNavigator());
+                indexedNavigator.AddKey("aid", "*[@assetId]", "@assetId");
+                indexedNavigator.AddKey("aidNoVer", "*[@assetId]", "ld:nover(@assetId)");
+                indexedNavigator.BuildIndexes();
+
                 var templateData = new TemplateData
                                        {
                                            OverwriteExistingFiles = this.Force.IsPresent,
                                            AssetRedirects = assetRedirects,
                                            XDocument = mergedDoc,
-                                           Document = xpathDoc,
+                                           Document = indexedNavigator,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            Arguments = this.Arguments,
                                            TargetDirectory = outputDir

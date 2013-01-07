@@ -30,7 +30,7 @@ namespace LBi.LostDoc.Core.Templating
         }
         public VersionComponent? IgnoredVersionComponent { get; set; }
         public AssetRedirectCollection AssetRedirects { get; set; }
-        public XPathDocument Document { get; set; }
+        public XPathNavigator Document { get; set; }
         public XDocument XDocument { get; set; }
         public Dictionary<string, object> Arguments { get; set; }
         public string TargetDirectory { get; set; }
