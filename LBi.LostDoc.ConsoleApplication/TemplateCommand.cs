@@ -185,10 +185,12 @@ namespace LBi.LostDoc.ConsoleApplication
                 XPathDocument xpathDoc;
                 using (var reader = mergedDoc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
                     xpathDoc = new XPathDocument(reader);
-
+                
+                CustomXsltContext customXsltContext = new CustomXsltContext();
+                customXsltContext.RegisterFunction(string.Empty, "get-id", new XsltContextAssetIdGetter());
                 IndexingXPathNavigator indexedNavigator = new IndexingXPathNavigator(xpathDoc.CreateNavigator());
                 indexedNavigator.AddKey("aid", "*[@assetId]", "@assetId");
-                indexedNavigator.AddKey("aidNoVer", "*[@assetId]", "ld:nover(@assetId)");
+                indexedNavigator.AddKey("aidNoVer", "*[@assetId]", "get-id(@assetId)", customXsltContext);
                 indexedNavigator.BuildIndexes();
 
                 var templateData = new TemplateData
