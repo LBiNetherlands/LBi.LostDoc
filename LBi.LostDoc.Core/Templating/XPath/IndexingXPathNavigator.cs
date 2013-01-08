@@ -104,6 +104,11 @@ namespace LBi.LostDoc.Core.Templating.XPath
             manager.AddKey(nav, keyName, key);
         }
 
+        public XPathNodeIterator Get(string keyName, object value)
+        {
+            return this.manager.GetNodes(keyName, value);
+        }
+
         #endregion Public Methods
 
         #region Important Overrides

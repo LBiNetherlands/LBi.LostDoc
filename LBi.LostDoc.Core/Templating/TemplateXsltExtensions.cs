@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.XPath;
 using LBi.LostDoc.Core.Diagnostics;
+using LBi.LostDoc.Core.Templating.XPath;
 
 namespace LBi.LostDoc.Core.Templating
 {
@@ -161,6 +162,11 @@ namespace LBi.LostDoc.Core.Templating
         {
             Uri targetUri = new Uri(resourceUri, UriKind.RelativeOrAbsolute);
             return this.MakeRelative(targetUri).ToString();
+        }
+        
+        public XPathNodeIterator key(string keyName, object value)
+        {
+            return ((IndexingXPathNavigator) this._context.TemplateData.Document).Get(keyName, value);
         }
 
         public bool cmpnover(string aid1, string aid2)

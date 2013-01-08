@@ -229,7 +229,7 @@ namespace LBi.LostDoc.Core.Templating
 
                     foreach (XElement aliasInputElement in aliasInputElements)
                     {
-                        // ReSharper disable AccessToModifiedClosure
+                        // ReSharper disable AccessToForEachVariableInClosure
                         Func<string, object> aliasResolver =
                             v =>
                             {
@@ -238,7 +238,7 @@ namespace LBi.LostDoc.Core.Templating
 
                                 return EvalVariable(stylesheet.Variables, xpathContext, inputElement, v);
                             };
-                        // ReSharper restore AccessToModifiedClosure
+                        // ReSharper restore AccessToForEachVariableInClosure
 
                         xpathContext.OnResolveVariable += aliasResolver;
 
