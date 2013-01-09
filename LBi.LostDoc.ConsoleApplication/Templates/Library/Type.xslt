@@ -67,9 +67,11 @@
                     <span class="current">
                       <xsl:apply-templates select="." mode="displayText"/>
                     </span>
-                    <xsl:if test="/bundle/assembly/namespace//*[inherits/@type = current()/@assetId]">
+                    
+                    <!--<xsl:if test="/bundle/assembly/namespace//*[inherits/@type = current()/@assetId]">-->
+                    <xsl:if test="ld:key('aidInherits', current()/@assetId)">
                       <ul class="descendants">
-                        <xsl:apply-templates select="/bundle/assembly/namespace//*[inherits/@type = current()/@assetId]" mode="inheritance-descendants"/>
+                        <xsl:apply-templates select="ld:key('aidInherits', current()/@assetId)" mode="inheritance-descendants"/>
                       </ul>
                     </xsl:if>
                   </xsl:otherwise>
@@ -96,9 +98,9 @@
     <xsl:if test="@assetId = ld:key('aidNoVer', ld:asset(current()/@assetId))[1]/@assetId">
       <li>
         <xsl:apply-templates select="." mode="link"/>
-        <xsl:if test="/bundle/assembly/namespace//*[inherits/@type = current()/@assetId]">
+        <xsl:if test="ld:key('aidInherits', current()/@assetId)">
           <ul>
-            <xsl:apply-templates select="/bundle/assembly/namespace//*[inherits/@type = current()/@assetId]" mode="inheritance-descendants">
+            <xsl:apply-templates select="ld:key('aidInherits', current()/@assetId)" mode="inheritance-descendants">
               <xsl:sort select="ld:join((ancestor::*[ancestor::namespace] | self::*)/@name, '.')"/>
             </xsl:apply-templates>
           </ul>

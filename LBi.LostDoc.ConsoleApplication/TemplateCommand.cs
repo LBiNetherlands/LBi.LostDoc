@@ -192,6 +192,8 @@ namespace LBi.LostDoc.ConsoleApplication
                 XPathNavigatorIndex indexedNavigator = new XPathNavigatorIndex(navigator.Clone());
                 indexedNavigator.AddKey("aid", "*[@assetId]", "@assetId");
                 indexedNavigator.AddKey("aidNoVer", "*[@assetId]", "get-id(@assetId)", customXsltContext);
+                indexedNavigator.AddKey("aidInherits", "*[@assetId and inherits/@type]", "inherits/@type", customXsltContext);
+                
                 indexedNavigator.BuildIndexes();
 
                 var templateData = new TemplateData
@@ -200,7 +202,7 @@ namespace LBi.LostDoc.ConsoleApplication
                                            AssetRedirects = assetRedirects,
                                            XDocument = mergedDoc,
                                            DocumentIndex =  indexedNavigator,
-                                           Document = navigator, //xpathDoc.CreateNavigator(), // should be XPathNavigatorIndex
+                                           Document = navigator, 
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            Arguments = this.Arguments,
                                            TargetDirectory = outputDir
