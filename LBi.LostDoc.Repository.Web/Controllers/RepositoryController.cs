@@ -83,7 +83,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 
                         File.Copy(
                             fi.FullName,
-                            Path.Combine(AppConfig.RepositoryPath, fi.Name));
+                            Path.Combine(AppConfig.RepositoryPath, fileName.Headers.ContentDisposition.FileName.Trim('"')));
 
                         ret.Add(fd);
                     }
@@ -142,7 +142,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
         }
 
 
-
+        [HttpGet]
         public string State()
         {
             return ContentManager.Instance.CurrentState.ToString();

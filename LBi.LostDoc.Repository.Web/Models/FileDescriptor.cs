@@ -42,7 +42,7 @@ namespace LBi.LostDoc.Repository.Web.Models
 
             FileDescriptor ret = null;
 
-            using (FileStream stream = fileInfo.OpenRead())
+            using (FileStream stream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (XmlReader reader = XmlReader.Create(stream))
             {
                 reader.MoveToContent();

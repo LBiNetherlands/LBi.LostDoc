@@ -23,11 +23,13 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using LBi.LostDoc.Core;
+using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Templating;
 using LBi.LostDoc.Core.Templating.XPath;
 using LBi.LostDoc.Repository.Lucene;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Directory = System.IO.Directory;
@@ -108,7 +110,8 @@ namespace LBi.LostDoc.Repository
                                    {
                                        AssetRedirects = assetRedirects,
                                        IgnoredVersionComponent = this.IgnoreVersionComponent,
-                                       TargetDirectory = htmlDir.FullName
+                                       TargetDirectory = htmlDir.FullName,
+                                       Arguments = new Dictionary<string, object> {{"SearchUri", "/search/"}}
                                    };
 
             this.OnStateChanged(State.Templating);
@@ -136,63 +139,49 @@ namespace LBi.LostDoc.Repository
                 {
                     foreach (WorkUnitResult result in templateOutput.Results)
                     {
-                        //string absPath = Path.Combine(htmlDir.FullName, result.SavedAs);
 
-                        //HtmlDocument htmlDoc = new HtmlDocument();
-                        //htmlDoc.LoadFrom(absPath);
+                        StylesheetApplication ssApplication = result.WorkUnit as StylesheetApplication;
 
-                        //string htmlTitle = string.Empty;
-                        //var titleNode = htmlDoc.DocumentNode.SelectSingleNode("/html/head/title");
+                        if (ssApplication != null)
+                        {
+                            if (Path.GetExtension(ssApplication.SaveAs) == ".index")
+                            {
+                                string absPath = Path.Combine(htmlDir.FullName, ssApplication.SaveAs);
 
-                        //if (titleNode != null)
-                        //    htmlTitle = HtmlEntity.DeEntitize(titleNode.InnerText);
-                        //        //.Replace('.', ' ')
-                        //        //.Replace('<', ' ')
-                        //        //.Replace('>', ' ')
-                        //        //.Replace('[', ' ')
-                        //        //.Replace(']', ' ')
-                        //        //.Replace('(', ' ')
-                        //        //.Replace(')', ' ');
+                                XDocument indexDoc = XDocument.Load(absPath);
 
-                        //HtmlNode contentNode = htmlDoc.GetElementbyId("content");
+                                string title = indexDoc.Root.Element("title").Value;
+                                string summary = indexDoc.Root.Element("summary").Value;
+                                string text = indexDoc.Root.Element("text").Value;
 
-                        //HtmlNode summaryNode = contentNode.SelectSingleNode(".//p[@class='summary']");
+                                var doc = new Document();
 
-                        //string summary = string.Empty;
+                                doc.Add(new Field("uri", new Uri(ssApplication.SaveAs, UriKind.Relative).ToString(), Field.Store.YES, Field.Index.NO));
+                                doc.Add(new Field("aid", ssApplication.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                                foreach (AssetIdentifier aid in ssApplication.Aliases)
+                                    doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
 
-                        //if (summaryNode != null && summaryNode.SelectSingleNode("span[@class='error']") == null)
-                        //    summary = HtmlEntity.DeEntitize(summaryNode.InnerText);
+                                foreach (var section in ssApplication.Sections)
+                                {
+                                    doc.Add(new Field("section", section.AssetIdentifier,
+                                                      Field.Store.NO,
+                                                      Field.Index.NOT_ANALYZED));
+                                }
 
-                        //string body = HtmlEntity.DeEntitize(contentNode.InnerText);
-
-                        //var doc = new Document();
-
-                        //doc.Add(new Field("uri", new Uri(result.SavedAs, UriKind.Relative).ToString(), Field.Store.YES, Field.Index.NO));
-                        //doc.Add(new Field("aid", result.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                        //foreach (AssetIdentifier aid in result.Aliases)
-                        //    doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
-
-                        //foreach (var section in result.Sections)
-                        //{
-                        //    doc.Add(new Field("section", section.AssetIdentifier,
-                        //                      Field.Store.NO,
-                        //                      Field.Index.NOT_ANALYZED));
-                        //}
-
-                        //doc.Add(new Field("title", htmlTitle, Field.Store.YES, Field.Index.ANALYZED));
-                        //doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED));
-                        //doc.Add(new Field("content", body, Field.Store.YES, Field.Index.ANALYZED));
-                        //TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
-                        //writer.AddDocument(doc);
+                                doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED));
+                                doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED));
+                                doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED));
+                                TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
+                                writer.AddDocument(doc);
+                            }
+                        }
                     }
 
                     writer.Optimize();
                     writer.Commit();
-                    writer.Close();
                 }
                 analyzerWrapper.Close();
                 analyzer.Close();
-                directory.Close();
             }
             this.OnStateChanged(State.Finalizing);
 

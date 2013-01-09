@@ -40,10 +40,19 @@
       <xsl:apply-templates select="ld:key('aid', @assetId)" mode="title"/>
     </title>
     <summary>
-     <xsl:apply-templates select="doc:summary" mode="doc"/>
+      <xsl:variable name="resultSet">
+        <xsl:apply-templates select="doc:summary" mode="doc"/>
+      </xsl:variable>
+
+      <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
     </summary>
+    
     <text>
-      <xsl:apply-templates select=".//doc:*/text()" />
+      <xsl:variable name="resultSet"> 
+        <xsl:apply-templates select=".//doc:*" mode="doc" />
+      </xsl:variable>
+
+      <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
     </text>
   </xsl:template>
 </xsl:stylesheet>
