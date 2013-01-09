@@ -188,7 +188,8 @@ namespace LBi.LostDoc.ConsoleApplication
                 
                 CustomXsltContext customXsltContext = new CustomXsltContext();
                 customXsltContext.RegisterFunction(string.Empty, "get-id", new XsltContextAssetIdGetter());
-                IndexingXPathNavigator indexedNavigator = new IndexingXPathNavigator(xpathDoc.CreateNavigator());
+                var navigator = xpathDoc.CreateNavigator();
+                XPathNavigatorIndex indexedNavigator = new XPathNavigatorIndex(navigator.Clone());
                 indexedNavigator.AddKey("aid", "*[@assetId]", "@assetId");
                 indexedNavigator.AddKey("aidNoVer", "*[@assetId]", "get-id(@assetId)", customXsltContext);
                 indexedNavigator.BuildIndexes();
@@ -198,7 +199,8 @@ namespace LBi.LostDoc.ConsoleApplication
                                            OverwriteExistingFiles = this.Force.IsPresent,
                                            AssetRedirects = assetRedirects,
                                            XDocument = mergedDoc,
-                                           Document = indexedNavigator,
+                                           DocumentIndex =  indexedNavigator,
+                                           Document = navigator, //xpathDoc.CreateNavigator(), // should be XPathNavigatorIndex
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            Arguments = this.Arguments,
                                            TargetDirectory = outputDir

@@ -133,13 +133,14 @@
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="parent::*/with">
-            <xsl:value-of select="substring-before(/bundle/assembly/namespace//*[@assetId = current()]/@name, '`')"/>
+            <xsl:value-of select="substring-before(ld:key('aid', current())/@name, '`')"/>
             <xsl:text>&lt;</xsl:text>
             <xsl:apply-templates select="parent::*/with" mode="syntax-cs-naming"/>
             <xsl:text>&gt;</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates select="//*[@assetId = current()]" mode="syntax-cs-naming"/>
+            <!--<xsl:apply-templates select="//*[@assetId = current()]" mode="syntax-cs-naming"/>-->
+            <xsl:apply-templates select="ld:key('aid', current())" mode="syntax-cs-naming"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
@@ -249,12 +250,14 @@
       <xsl:if test="inherits and ld:asset(inherits/@type) != 'T:System.Object'">
         <xsl:choose>
           <xsl:when test="inherits/with">
-            <xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/inherits/@type]" mode="syntax-cs-naming">
+            <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/inherits/@type]" mode="syntax-cs-naming">-->
+            <xsl:apply-templates select="ld:key('aid', current()/inherits/@type)" mode="syntax-cs-naming">
               <xsl:with-param name="typeargs" select="inherits/with"/>
             </xsl:apply-templates>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates select="//bundle/assembly/namespace//*[@assetId = current()/inherits/@type]" mode="syntax-cs-naming"/>
+            <!--<xsl:apply-templates select="//bundle/assembly/namespace//*[@assetId = current()/inherits/@type]" mode="syntax-cs-naming"/>-->
+            <xsl:apply-templates select="ld:key('aid', current()/inherits/@type)" mode="syntax-cs-naming"/>
           </xsl:otherwise>
         </xsl:choose>
         <xsl:if test="implements">
@@ -275,12 +278,14 @@
     </xsl:if>
     <xsl:choose>
       <xsl:when test="with">
-        <xsl:apply-templates select="//bundle/assembly/namespace//*[@assetId = current()/@interface]" mode="syntax-cs-naming">
+        <!--<xsl:apply-templates select="//bundle/assembly/namespace//*[@assetId = current()/@interface]" mode="syntax-cs-naming">-->
+        <xsl:apply-templates select="ld:key('aid', current()/@interface)" mode="syntax-cs-naming">
           <xsl:with-param name="typeargs" select="with"/>
         </xsl:apply-templates>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="//bundle/assembly/namespace//*[@assetId = current()/@interface]" mode="syntax-cs-naming"/>
+        <!--<xsl:apply-templates select="//bundle/assembly/namespace//*[@assetId = current()/@interface]" mode="syntax-cs-naming"/>-->
+        <xsl:apply-templates select="ld:key('aid', current()/@interface)" mode="syntax-cs-naming"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -672,7 +677,8 @@
       <xsl:text>, </xsl:text>
     </xsl:if>
     <xsl:if test="@member">
-      <xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/@member]" mode="syntax-cs-naming"/>
+      <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/@member]" mode="syntax-cs-naming"/>-->
+      <xsl:apply-templates select="ld:key('aid', current()/@member)" mode="syntax-cs-naming"/>
       <xsl:text> = </xsl:text>
     </xsl:if>
     <xsl:choose>
@@ -732,7 +738,7 @@
     <xsl:if test="position() > 1">
       <xsl:text> | </xsl:text>
     </xsl:if>
-    <xsl:value-of select="/bundle/assembly/namespace//enum[@assetId = current()/ancestor::argument/@type]/@name"/>
+    <xsl:value-of select="ld:key('aid', current()/ancestor::argument/@type)/@name"/>
     <xsl:text>.</xsl:text>
     <xsl:value-of select="@value"/>
   </xsl:template>

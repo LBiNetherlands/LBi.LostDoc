@@ -120,7 +120,8 @@
 
   <xsl:template match="class | struct | interface | delegate | enum | assembly" mode="list-item">
     <xsl:variable name="aid" select="ld:nover(@assetId)"/>
-    <xsl:if test="not(preceding::*[@assetId and ld:nover(@assetId) = $aid])">
+    <xsl:if test="count(ld:key('aidNoVer', ld:asset(@assetId))) = 1 or @assetId = ld:key('aidNoVer', ld:asset(@assetId))[1]/@assetId">
+    <!--<xsl:if test="not(preceding::*[@assetId and ld:nover(@assetId) = $aid])">-->
       <tr>
         <td class="icons">
           <span>
@@ -167,7 +168,8 @@
 
   <xsl:template match="namespace" mode="list-item">
     <xsl:variable name="aid" select="ld:nover(@assetId)"/>
-    <xsl:if test="not(preceding::*[@assetId and ld:nover(@assetId) = $aid])">
+    <!--<xsl:if test="not(preceding::*[@assetId and ld:nover(@assetId) = $aid])">-->
+    <xsl:if test="count(ld:key('aidNoVer', ld:asset(@assetId))) = 1 or @assetId = ld:key('aidNoVer', ld:asset(@assetId))[1]/@assetId">
       <tr>
         <td class="icons">
           <span class="icon-namespace">

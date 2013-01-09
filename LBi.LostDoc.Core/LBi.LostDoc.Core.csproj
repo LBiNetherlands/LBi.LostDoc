@@ -109,7 +109,7 @@
     <Compile Include="Templating\TemplatingContext.cs" />
     <Compile Include="Templating\IAssetUriResolver.cs" />
     <Compile Include="ProcessingContext.cs" />
-    <Compile Include="Templating\XPath\IndexingXPathNavigator.cs" />
+    <Compile Include="Templating\XPath\XPathNavigatorIndex.cs" />
     <Compile Include="VersionComponent.cs" />
     <Compile Include="Templating\XmlFileProviderResolver.cs" />
     <Compile Include="Templating\XPath\XsltContextAssetIdGetter.cs" />

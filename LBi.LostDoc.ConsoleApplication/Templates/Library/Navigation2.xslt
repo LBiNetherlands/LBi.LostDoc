@@ -277,7 +277,8 @@
                 <!-- list members -->
                 <xsl:apply-templates select="*[@assetId and @phase = '0' and (self::method | self::property | self::field | self::event | self::constructor | self::operator)]" mode="xnav-item">
                   <xsl:with-param name="current" select="@assetId"/>
-                  <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
+                  <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
+                  <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                 </xsl:apply-templates>
               </ul>
             </li>
@@ -313,7 +314,8 @@
                     <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@phase = '0' and ld:nover(@assetId) = ld:nover(current()/parent::*/@assetId)]/*[@assetId and @phase = '0']" mode="xnav-item">-->
                     <xsl:apply-templates select="parent::*/method[@phase = '0' and @name = current()/@name]" mode="xnav-item-disambiguation">
                       <xsl:with-param name="current" select="@assetId"/>
-                      <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
+                      <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
+                      <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                     </xsl:apply-templates>
                   </ul>
                 </li>
@@ -344,7 +346,8 @@
                     <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@phase = '0' and ld:nover(@assetId) = ld:nover(current()/parent::*/@assetId)]/*[@assetId and @phase = '0']" mode="xnav-item">-->
                     <xsl:apply-templates select="parent::*/property[@phase = '0' and @name = current()/@name]" mode="xnav-item-disambiguation">
                       <xsl:with-param name="current" select="@assetId"/>
-                      <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
+                      <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
+                      <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                     </xsl:apply-templates>
                   </ul>
                 </li>
@@ -375,7 +378,8 @@
                     <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@phase = '0' and ld:nover(@assetId) = ld:nover(current()/parent::*/@assetId)]/*[@assetId and @phase = '0']" mode="xnav-item">-->
                     <xsl:apply-templates select="parent::*/operator[@phase = '0' and @name = current()/@name]" mode="xnav-item-disambiguation">
                       <xsl:with-param name="current" select="@assetId"/>
-                      <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
+                      <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
+                      <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                     </xsl:apply-templates>
                   </ul>
                 </li>
@@ -401,7 +405,8 @@
                     
                     <xsl:apply-templates select="parent::*/*[(self::method | self::property | self::field | self::event | self::constructor | self::operator) and @assetId and @phase = '0']" mode="xnav-item">
                       <xsl:with-param name="current" select="@assetId"/>
-                      <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
+                      <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
+                      <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                     </xsl:apply-templates>
                   </ul>
                 </li>
@@ -502,7 +507,9 @@
 
   <xsl:template match="/bundle/assembly/namespace//*[(self::class | self::struct | self::enum | self::delegate)]" mode="xnav-item">
     <xsl:param name="current"/>
-    <xsl:if test="not(preceding::*[@assetId and ld:cmpnover(@assetId , current()/@assetId)])">
+    <!--<xsl:if test="not(preceding::*[@assetId and ld:cmpnover(@assetId , current()/@assetId)])">-->
+    <!--<xsl:if test="count(ld:key('aidNoVer', ld:nover(@assetId))) = 1 or @assetId = ld:key('aidNoVer', ld:nover(@assetId))[1]/@assetId">-->
+    <xsl:if test="count(ld:key('aidNoVer', ld:asset(@assetId))) = 1 or @assetId = ld:key('aidNoVer', ld:asset(@assetId))[1]/@assetId">
       <li>
         <xsl:if test="$current = @assetId">
           <xsl:attribute name="class">

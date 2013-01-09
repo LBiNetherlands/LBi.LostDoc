@@ -54,9 +54,10 @@
         <xsl:choose>
           <xsl:when test="ld:canResolve(@assetId)">
             <xsl:variable name="title">
-              <xsl:apply-templates select="/bundle/assembly/namespace//*[*/@assetId = current()/implements/@member]" mode="displayText" />
+              <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[*/@assetId = current()/implements/@member]" mode="displayText" />-->
+              <xsl:apply-templates select="ld:key('aid',current()/implements/@member)/.." mode="displayText" />
               <xsl:text>.</xsl:text>
-              <xsl:apply-templates select="/bundle/assembly/namespace//*/*[@assetId = current()/implements/@member]" mode="displayText"/>
+              <xsl:apply-templates select="ld:key('aid',current()/implements/@member)" mode="displayText"/>
               <xsl:if test="$includeNoun">
                 <xsl:text> </xsl:text>
                 <xsl:apply-templates select="." mode="nounSingular" />
@@ -69,7 +70,8 @@
           </xsl:when>
           <xsl:otherwise>
             <!-- recursive call with implements/@member -->
-            <xsl:apply-templates select="/bundle/assembly/namespace//*/*[@assetId = current()/implements/@member]" mode="link" >
+            <!--<xsl:apply-templates select="/bundle/assembly/namespace//*/*[@assetId = current()/implements/@member]" mode="link" >-->
+            <xsl:apply-templates select="ld:key('aid', current()/implements/@member)" mode="link" >
               <xsl:with-param name="includeNoun" select="$includeNoun" />
             </xsl:apply-templates>
           </xsl:otherwise>
@@ -98,9 +100,11 @@
         <xsl:choose>
           <xsl:when test="ld:canResolve(@declaredAs)">
             <xsl:variable name="title">
-              <xsl:apply-templates select="/bundle/assembly/namespace//*[*/@assetId = current()/implements/@member]" mode="displayText" />
+              <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[*/@assetId = current()/implements/@member]" mode="displayText" />-->
+              <xsl:apply-templates select="ld:key('aid', current()/implements/@member)/.." mode="displayText"/>
               <xsl:text>.</xsl:text>
-              <xsl:apply-templates select="/bundle/assembly/namespace//*/*[@assetId = current()/implements/@member]" mode="displayText"/>
+              <!--<xsl:apply-templates select="/bundle/assembly/namespace//*/*[@assetId = current()/implements/@member]" mode="displayText"/>-->
+              <xsl:apply-templates select="ld:key('aid', current()/implements/@member)" mode="displayText"/>
               <xsl:if test="$includeNoun">
                 <xsl:text> </xsl:text>
                 <xsl:apply-templates select="." mode="nounSingular" />
@@ -113,7 +117,7 @@
           </xsl:when>
           <xsl:otherwise>
             <!--recursive call with implements/@member-->
-            <xsl:apply-templates select="/bundle/assembly/namespace//*/*[@assetId = current()/implements/@member]" mode="link">
+            <xsl:apply-templates select="ld:key('aid', current()/implements/@member)" mode="link">
               <xsl:with-param name="includeNoun" select="$includeNoun" />
             </xsl:apply-templates>
           </xsl:otherwise>

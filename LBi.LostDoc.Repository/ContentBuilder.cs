@@ -107,16 +107,18 @@ namespace LBi.LostDoc.Repository
             using (var reader = mergedDoc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
                 xpathDoc = new XPathDocument(reader);
 
-            IndexingXPathNavigator indexedNavigator = new IndexingXPathNavigator(xpathDoc.CreateNavigator());
-            indexedNavigator.AddKey("aid", "*[@assetId]", "@assetId");
-            indexedNavigator.AddKey("aidNoVer", "*[@assetId]", "ld:nover(@assetId)");
-            indexedNavigator.BuildIndexes();
+            var navigator = xpathDoc.CreateNavigator();
+            XPathNavigatorIndex navigatorIndex = new XPathNavigatorIndex(navigator.Clone());
+            navigatorIndex.AddKey("aid", "*[@assetId]", "@assetId");
+            navigatorIndex.AddKey("aidNoVer", "*[@assetId]", "ld:nover(@assetId)");
+            navigatorIndex.BuildIndexes();
 
             // generate output
             var templateData = new TemplateData
                                    {
                                        AssetRedirects = assetRedirects,
-                                       Document = indexedNavigator,
+                                       DocumentIndex = navigatorIndex,
+                                       Document = navigator,
                                        XDocument = mergedDoc,
                                        IgnoredVersionComponent = this.IgnoreVersionComponent,
                                        TargetDirectory = htmlDir.FullName

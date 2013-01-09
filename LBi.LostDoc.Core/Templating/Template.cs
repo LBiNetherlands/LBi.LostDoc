@@ -673,7 +673,7 @@ namespace LBi.LostDoc.Core.Templating
             // process all units of work
             ParallelOptions parallelOptions = new ParallelOptions
                                                   {
-                                                      MaxDegreeOfParallelism = 1
+                                                      //MaxDegreeOfParallelism = 1
                                                   };
             Parallel.ForEach(work,
                              parallelOptions,

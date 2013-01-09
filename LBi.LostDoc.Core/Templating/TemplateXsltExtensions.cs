@@ -166,7 +166,7 @@ namespace LBi.LostDoc.Core.Templating
         
         public XPathNodeIterator key(string keyName, object value)
         {
-            return ((IndexingXPathNavigator) this._context.TemplateData.Document).Get(keyName, value);
+            return this._context.TemplateData.DocumentIndex.Get(keyName, value);
         }
 
         public bool cmpnover(string aid1, string aid2)
