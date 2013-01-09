@@ -42,7 +42,8 @@
   </xsl:template>
 
   <xsl:template name="navigation">
-    <xsl:apply-templates select="(/bundle/assembly/namespace[@assetId = $assetId])[1]" mode="xnav"/>
+    
+    <xsl:apply-templates select="ld:key('aid', $assetId)[1]" mode="xnav"/>
   </xsl:template>
 
   <xsl:template name="content">

@@ -115,8 +115,9 @@
 
   <xsl:template match="namespace">
     <xsl:variable name="aid" select="ld:nover(@assetId)"/>
-    <xsl:if test="not(preceding::namespace[@assetId and ld:nover(@assetId) = $aid])">
-      <tr>
+    <!--<xsl:if test="not(preceding::namespace[@assetId and ld:nover(@assetId) = $aid])">-->
+    <xsl:if test="@assetId = ld:key('aidNoVer', ld:asset(@assetId))[1]/@assetId">
+    <tr>
         <td class="icons">
           <span class="icon-namespace"></span>
         </td>

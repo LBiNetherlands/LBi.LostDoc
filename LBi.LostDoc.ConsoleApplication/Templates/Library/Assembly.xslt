@@ -33,13 +33,13 @@
   <xsl:include href="DocComments.xslt"/>
 
   <xsl:template name="title">
-    <xsl:apply-templates select="/bundle/assembly[@assetId = $assetId]" mode="title"/>
+    <xsl:apply-templates select="ld:key('aid', $assetId)" mode="title"/>
   </xsl:template>
 
 
 
   <xsl:template name="navigation">
-    <xsl:apply-templates select="/bundle/assembly[@assetId = $assetId]" mode="xnav"/>
+    <xsl:apply-templates select="ld:key('aid', $assetId)" mode="xnav"/>
   </xsl:template>
 
 
@@ -49,7 +49,7 @@
     <h1>
       <xsl:call-template name="title"/>
     </h1>
-    <xsl:apply-templates select="/bundle/assembly[@assetId = $assetId]"/>
+    <xsl:apply-templates select="ld:key('aid', $assetId)"/>
 
   </xsl:template>
 
@@ -58,14 +58,14 @@
       <span>
         Version <xsl:value-of select="ld:significantVersion(@assetId)"/>
       </span>
-      <xsl:if test="/bundle/assembly[ld:cmpnover(@assetId, current()/@assetId)]/@assetId">
+      <xsl:if test="count(ld:key('aidNoVer', ld:asset(current()/@assetId))) &gt; 1">
         <xsl:text>&#160;|&#160;</xsl:text>
         <div class="version-selector">
           <a href="javascript:void(0);">
             <xsl:text>Other Versions</xsl:text>
           </a>
           <ul>
-            <xsl:apply-templates select="/bundle/assembly[ld:cmpnover(@assetId, current()/@assetId)]/@assetId" mode="version"/>
+            <xsl:apply-templates select="ld:key('aidNoVer', ld:asset(current()/@assetId))/@assetId" mode="version"/>
           </ul>
         </div>
       </xsl:if>
