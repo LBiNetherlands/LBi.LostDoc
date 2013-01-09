@@ -180,7 +180,7 @@ namespace LBi.LostDoc.Core.Templating
                                                          (object)stylesheet.Name);
 
             CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
-            
+
             XElement[] inputElements =
                 templateData.XDocument.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
 
@@ -511,6 +511,7 @@ namespace LBi.LostDoc.Core.Templating
             // loading template
             List<Stylesheet> stylesheets = new List<Stylesheet>();
             List<Resource> resources = new List<Resource>();
+            List<Index> indices = new List<Index>();
             foreach (XElement elem in workingDoc.Root.Elements())
             {
                 // we alread proessed the parameters
@@ -520,6 +521,10 @@ namespace LBi.LostDoc.Core.Templating
                 if (elem.Name.LocalName == "apply-stylesheet")
                 {
                     stylesheets.Add(this.ParseStylesheet(stylesheets, elem));
+                }
+                else if (elem.Name.LocalName == "index")
+                {
+                    indices.Add(this.ParseIndex(elem));
                 }
                 else if (elem.Name.LocalName == "include-resource")
                 {
@@ -538,8 +543,16 @@ namespace LBi.LostDoc.Core.Templating
             return new ParsedTemplate
                        {
                            Resources = resources.ToArray(),
-                           Stylesheets = stylesheets.ToArray()
+                           Stylesheets = stylesheets.ToArray(),
+                           Indices = indices.ToArray()
                        };
+        }
+
+        protected virtual Index ParseIndex(XElement elem)
+        {
+            return new Index(elem.Attribute("name").Value,
+                             elem.Attribute("match").Value,
+                             elem.Attribute("key").Value);
         }
 
         private static bool EvalCondition(CustomXsltContext customContext, XNode contextNode, string condition)
@@ -621,6 +634,21 @@ namespace LBi.LostDoc.Core.Templating
 
             ParsedTemplate tmpl = this.PrepareTemplate(templateData);
 
+            // fill indices
+            var customXsltContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
+            foreach (var index in tmpl.Indices)
+            {
+                TraceSources.TemplateSource.TraceVerbose("Adding index {0} (match: '{1}', key: '{1}')",
+                                                         index.Name,
+                                                         index.MatchExpr,
+                                                         index.KeyExpr);
+                templateData.DocumentIndex.AddKey(index.Name, index.MatchExpr, index.KeyExpr, customXsltContext);
+            }
+
+            using (TraceSources.TemplateSource.TraceActivity("Indexing input document"))
+                templateData.DocumentIndex.BuildIndexes();
+
+
             // collect all work that has to be done
             List<UnitOfWork> work = new List<UnitOfWork>();
 
@@ -678,24 +706,24 @@ namespace LBi.LostDoc.Core.Templating
             Parallel.ForEach(work,
                              parallelOptions,
                              uow =>
+                             {
+                                 results.Add(uow.Execute(context));
+                                 int c = Interlocked.Increment(ref processed);
+                                 long lp = Interlocked.Read(ref lastProgress);
+                                 if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 5.0)
                                  {
-                                     results.Add(uow.Execute(context));
-                                     int c = Interlocked.Increment(ref processed);
-                                     long lp = Interlocked.Read(ref lastProgress);
-                                     if ((Stopwatch.GetTimestamp() - lp)/(double) Stopwatch.Frequency > 5.0)
+                                     if (Interlocked.CompareExchange(ref lastProgress,
+                                                                     Stopwatch.GetTimestamp(),
+                                                                     lp) == lp)
                                      {
-                                         if (Interlocked.CompareExchange(ref lastProgress,
-                                                                         Stopwatch.GetTimestamp(),
-                                                                         lp) == lp)
-                                         {
-                                             TraceSources.TemplateSource.TraceInformation(
-                                                 "Progress: {0:P1} ({1:N0}/{2:N0})",
-                                                 c/(double) totalCount,
-                                                 c,
-                                                 totalCount);
-                                         }
+                                         TraceSources.TemplateSource.TraceInformation(
+                                             "Progress: {0:P1} ({1:N0}/{2:N0})",
+                                             c / (double)totalCount,
+                                             c,
+                                             totalCount);
                                      }
-                                 });
+                                 }
+                             });
 
             // stop timing
             timer.Stop();

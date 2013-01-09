@@ -5,6 +5,11 @@
   <parameter name="SearchUri" select="''" />
   <parameter name="GenerateIndex" select="boolean($SearchUri)" />
   <parameter name="LogoUrl" select="false()" />
+  
+  <!-- indexed nodes, accessible through ld:key('indexName', value) -->
+  <index name="aid" match="*[@assetId]" key="@assetId"/>
+  <index name="aidNoVer" match="*[@assetId]" key="get-id(@assetId)"/>
+  <index name="aidInherits" match="*[@assetId and inherits/@type]" key="inherits/@type"/>
 
   <!-- this stylsheet will be applied to _this_ file -->
   <meta-template condition="$GenerateIndex"
@@ -13,7 +18,7 @@
   </meta-template>
   
   <include-resource path="style.css" />
-
+  
   <apply-stylesheet name="Library" select="/bundle" assetId="'*:*'" version="'0.0.0.0'" output="'Library.html'"
                     stylesheet="Library.xslt">
   </apply-stylesheet>
@@ -183,4 +188,5 @@
                     stylesheet="Member.xslt">
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
+  
 </template>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012,2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,22 @@ namespace LBi.LostDoc.Core.Templating
 {
     public class TemplateData
     {
-        public TemplateData()
+        public TemplateData(XDocument doc, AssetRedirectCollection assetRedirects)
         {
+            XPathDocument xpathDoc;
+            using (var reader = doc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
+                xpathDoc = new XPathDocument(reader);
+            this.Document = xpathDoc.CreateNavigator();
+            this.DocumentIndex = new XPathNavigatorIndex(this.Document.Clone());
+            this.AssetRedirects = assetRedirects;
             this.Arguments = new Dictionary<string, object>();
         }
+        public XPathNavigatorIndex DocumentIndex { get; protected set; }
+        public XPathNavigator Document { get; protected set; }
+        public XDocument XDocument { get; protected set; }
+        public AssetRedirectCollection AssetRedirects { get; protected set; }
+
         public VersionComponent? IgnoredVersionComponent { get; set; }
-        public AssetRedirectCollection AssetRedirects { get; set; }
-        public XPathNavigatorIndex DocumentIndex { get; set; }
-        public XPathNavigator Document { get; set; }
-        public XDocument XDocument { get; set; }
         public Dictionary<string, object> Arguments { get; set; }
         public string TargetDirectory { get; set; }
         public bool OverwriteExistingFiles { get; set; }

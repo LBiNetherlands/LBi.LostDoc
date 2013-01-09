@@ -88,6 +88,7 @@
     <Compile Include="Templating\DirectoryFileProvider.cs" />
     <Compile Include="Templating\AssetResolvers\FileResolver.cs" />
     <Compile Include="Templating\AssetResolvers\MsdnResolver.cs" />
+    <Compile Include="Templating\Index.cs" />
     <Compile Include="Templating\ParsedTemplate.cs" />
     <Compile Include="Templating\ProgressArgs.cs" />
     <Compile Include="Templating\Resource.cs" />

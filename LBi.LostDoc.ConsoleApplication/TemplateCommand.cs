@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012,2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,27 +182,11 @@ namespace LBi.LostDoc.ConsoleApplication
                 template.Load(templatePath);
                 AssetRedirectCollection assetRedirects;
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
-                XPathDocument xpathDoc;
-                using (var reader = mergedDoc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
-                    xpathDoc = new XPathDocument(reader);
-                
-                CustomXsltContext customXsltContext = new CustomXsltContext();
-                customXsltContext.RegisterFunction(string.Empty, "get-id", new XsltContextAssetIdGetter());
-                var navigator = xpathDoc.CreateNavigator();
-                XPathNavigatorIndex indexedNavigator = new XPathNavigatorIndex(navigator.Clone());
-                indexedNavigator.AddKey("aid", "*[@assetId]", "@assetId");
-                indexedNavigator.AddKey("aidNoVer", "*[@assetId]", "get-id(@assetId)", customXsltContext);
-                indexedNavigator.AddKey("aidInherits", "*[@assetId and inherits/@type]", "inherits/@type", customXsltContext);
-                
-                indexedNavigator.BuildIndexes();
 
-                var templateData = new TemplateData
+                
+                var templateData = new TemplateData(mergedDoc, assetRedirects)
                                        {
                                            OverwriteExistingFiles = this.Force.IsPresent,
-                                           AssetRedirects = assetRedirects,
-                                           XDocument = mergedDoc,
-                                           DocumentIndex =  indexedNavigator,
-                                           Document = navigator, 
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            Arguments = this.Arguments,
                                            TargetDirectory = outputDir

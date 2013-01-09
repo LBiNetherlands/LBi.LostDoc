@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,17 @@
 
 namespace LBi.LostDoc.Core.Templating
 {
-    public class ParsedTemplate
+    public class Index
     {
-        public Stylesheet[] Stylesheets { get; set; }
-        public Resource[] Resources { get; set; }
-        public Index[] Indices { get; set; }
+        public Index(string name, string matchExpr, string keyExpr)
+        {
+            this.Name = name;
+            this.MatchExpr = matchExpr;
+            this.KeyExpr = keyExpr;
+        }
+
+        public string Name { get; protected set; }
+        public string MatchExpr { get; protected set; }
+        public string KeyExpr { get; protected set; }
     }
 }
