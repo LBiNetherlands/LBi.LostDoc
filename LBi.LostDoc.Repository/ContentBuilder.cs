@@ -104,8 +104,9 @@ namespace LBi.LostDoc.Repository
             var mergedDoc = bundle.Merge(out assetRedirects);
 
             // generate output
-            var templateData = new TemplateData(mergedDoc, assetRedirects)
+            var templateData = new TemplateData(mergedDoc)
                                    {
+                                       AssetRedirects = assetRedirects,
                                        IgnoredVersionComponent = this.IgnoreVersionComponent,
                                        TargetDirectory = htmlDir.FullName
                                    };
@@ -122,9 +123,9 @@ namespace LBi.LostDoc.Repository
             using (var directory = FSDirectory.Open(indexDir))
             using (stopWordsReader)
             {
-                Analyzer analyzer = new StandardAnalyzer(global::Lucene.Net.Util.Version.LUCENE_29, stopWordsReader);
+                Analyzer analyzer = new StandardAnalyzer(global::Lucene.Net.Util.Version.LUCENE_30, stopWordsReader);
                 Analyzer titleAnalyzer = new TitleAnalyzer();
-                IDictionary fieldAnalyzers = new Dictionary<string, Analyzer>
+                IDictionary<string,Analyzer> fieldAnalyzers = new Dictionary<string, Analyzer>
                                                  {
                                                      { "title", titleAnalyzer } 
                                                  };

@@ -24,21 +24,15 @@ namespace LBi.LostDoc.Core.Templating
 {
     public class TemplateData
     {
-        public TemplateData(XDocument doc, AssetRedirectCollection assetRedirects)
+        public TemplateData(XDocument doc)
         {
             this.XDocument = doc;
-            XPathDocument xpathDoc;
-            using (var reader = doc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
-                xpathDoc = new XPathDocument(reader);
-            this.Document = xpathDoc.CreateNavigator();
-            this.DocumentIndex = new XPathNavigatorIndex(this.Document.Clone());
-            this.AssetRedirects = assetRedirects;
+       
+            this.AssetRedirects = new AssetRedirectCollection();
             this.Arguments = new Dictionary<string, object>();
         }
-        public XPathNavigatorIndex DocumentIndex { get; protected set; }
-        public XPathNavigator Document { get; protected set; }
         public XDocument XDocument { get; protected set; }
-        public AssetRedirectCollection AssetRedirects { get; protected set; }
+        public AssetRedirectCollection AssetRedirects { get; set; }
 
         public VersionComponent? IgnoredVersionComponent { get; set; }
         public Dictionary<string, object> Arguments { get; set; }

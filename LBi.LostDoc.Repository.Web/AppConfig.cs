@@ -34,6 +34,18 @@ namespace LBi.LostDoc.Repository.Web
             _basePath = HttpRuntime.AppDomainAppPath;
         }
 
+
+        /// <summary>
+        /// The Api Key
+        /// </summary>
+        public static string ApiKey
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.ApiKey"];
+            }
+        }
+
         /// <summary>
         /// Gets the path where all ldoc files are stored.
         /// </summary>

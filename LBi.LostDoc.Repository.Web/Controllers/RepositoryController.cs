@@ -25,12 +25,14 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Repository.Web.Models;
+using LBi.LostDoc.Repository.Web.Security;
 
 namespace LBi.LostDoc.Repository.Web.Controllers
 {
     /// <summary>
     /// This is the main LostDoc <see cref="ApiController"/>. It handles basic CRUD operations.
     /// </summary>
+    [ApiKeyAuthorize]
     public class RepositoryController : ApiController
     {
         // GET /repository/

@@ -80,14 +80,14 @@ namespace LBi.LostDoc.Repository
                 for (int i = 0; i < rawTerms.Length; i++)
                 {
                     string rawTerm = rawTerms[i];
-                    BooleanClause.Occur occur;
+                    Occur occur;
                     if (rawTerms[i].StartsWith("-"))
                     {
                         rawTerm = rawTerm.Substring(1);
-                        occur = BooleanClause.Occur.MUST_NOT;
+                        occur = Occur.MUST_NOT;
                     }
                     else
-                        occur = BooleanClause.Occur.MUST;
+                        occur = Occur.MUST;
 
                     titleQuery.Add(new TermQuery(new Term("title", rawTerm)), occur);
 
@@ -98,12 +98,12 @@ namespace LBi.LostDoc.Repository
 
                 BooleanQuery q = new BooleanQuery();
 
-                titleQuery.SetBoost(8f);
-                contentQuery.SetBoost(0.7f);
+                titleQuery.Boost = 8f;
+                contentQuery.Boost = 0.7f;
                 
-                q.Add(titleQuery, BooleanClause.Occur.SHOULD);
-                q.Add(summaryQuery, BooleanClause.Occur.SHOULD);
-                q.Add(contentQuery, BooleanClause.Occur.SHOULD);
+                q.Add(titleQuery, Occur.SHOULD);
+                q.Add(summaryQuery, Occur.SHOULD);
+                q.Add(contentQuery, Occur.SHOULD);
 
                 TopDocs docs = this._indexSearcher.Search(titleQuery, offset + count);
 
@@ -117,15 +117,15 @@ namespace LBi.LostDoc.Repository
                 for (int i = 0; i < ret.Results.Length; i++)
                 {
                     var scoreDoc = docs.ScoreDocs[offset + i];
-
-                    Document doc = this._indexSearcher.Doc(scoreDoc.doc);
+                    
+                    Document doc = this._indexSearcher.Doc(scoreDoc.Doc);
 
                     ret.Results[i] = new SearchResult
                                          {
-                                             AssetId = AssetIdentifier.Parse(doc.GetField("aid").StringValue()),
-                                             Title = doc.GetField("title").StringValue(),
-                                             Url = new Uri(doc.GetField("uri").StringValue(), UriKind.RelativeOrAbsolute),
-                                             Blurb = doc.GetField("summary").StringValue(),
+                                             AssetId = AssetIdentifier.Parse(doc.GetField("aid").StringValue),
+                                             Title = doc.GetField("title").StringValue,
+                                             Url = new Uri(doc.GetField("uri").StringValue, UriKind.RelativeOrAbsolute),
+                                             Blurb = doc.GetField("summary").StringValue,
                                          };
                 }
 

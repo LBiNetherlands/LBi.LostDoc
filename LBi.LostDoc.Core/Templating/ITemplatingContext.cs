@@ -15,6 +15,8 @@
  */
 
 using System.Xml.Linq;
+using System.Xml.XPath;
+using LBi.LostDoc.Core.Templating.XPath;
 
 namespace LBi.LostDoc.Core.Templating
 {
@@ -22,6 +24,9 @@ namespace LBi.LostDoc.Core.Templating
     {
         string BasePath { get; }
         TemplateData TemplateData { get; }
+        XPathNavigatorIndex DocumentIndex { get; }
+        XPathNavigator Document { get; }
+
         IAssetUriResolver[] AssetUriResolvers { get; }
         IFileProvider FileProvider { get; }
     }

@@ -24,7 +24,8 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc hrc ld">
   <xsl:output method="xml"/>
-
+  <xsl:include href="Naming.xslt"/>
+  <xsl:include href="DocComments.xslt"/>
   <xsl:param name="assetId"/>
 
   <xsl:template match="/">
@@ -35,7 +36,15 @@
 
   <xsl:template match="*"
                 mode="index">
-    <xsl:apply-templates select=".//doc:*/text()" />
+    <title>
+      <xsl:apply-templates select="ld:key('aid', @assetId)" mode="title"/>
+    </title>
+    <summary>
+     <xsl:apply-templates select="doc:summary" mode="doc"/>
+    </summary>
+    <text>
+      <xsl:apply-templates select=".//doc:*/text()" />
+    </text>
   </xsl:template>
 </xsl:stylesheet>
 

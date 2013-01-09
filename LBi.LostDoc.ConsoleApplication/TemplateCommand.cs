@@ -184,8 +184,9 @@ namespace LBi.LostDoc.ConsoleApplication
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
 
                 
-                var templateData = new TemplateData(mergedDoc, assetRedirects)
+                var templateData = new TemplateData(mergedDoc)
                                        {
+                                           AssetRedirects = assetRedirects,
                                            OverwriteExistingFiles = this.Force.IsPresent,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            Arguments = this.Arguments,

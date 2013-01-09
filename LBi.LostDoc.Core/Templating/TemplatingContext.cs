@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Xml.Linq;
+using System.Xml.XPath;
+using LBi.LostDoc.Core.Templating.XPath;
 
 namespace LBi.LostDoc.Core.Templating
 {
@@ -30,6 +32,12 @@ namespace LBi.LostDoc.Core.Templating
             this.AssetUriResolvers = resolvers.ToArray();
             this.FileProvider = fileProvider;
             this.Cache = cache;
+
+            XPathDocument xpathDoc;
+            using (var reader = data.XDocument.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
+                xpathDoc = new XPathDocument(reader);
+            this.Document = xpathDoc.CreateNavigator();
+            this.DocumentIndex = new XPathNavigatorIndex(this.Document.Clone());
         }
 
         #region ITemplatingContext Members
@@ -37,6 +45,8 @@ namespace LBi.LostDoc.Core.Templating
         public string BasePath { get; protected set; }
 
         public TemplateData TemplateData { get; protected set; }
+        public XPathNavigatorIndex DocumentIndex { get; protected set; }
+        public XPathNavigator Document { get; protected set; }
 
         public IAssetUriResolver[] AssetUriResolvers { get; protected set; }
 

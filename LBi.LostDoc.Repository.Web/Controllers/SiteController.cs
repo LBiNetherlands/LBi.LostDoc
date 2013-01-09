@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using LBi.LostDoc.Repository.Web.Security;
 
 namespace LBi.LostDoc.Repository.Web.Controllers
 {
@@ -31,6 +32,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
         }
 
         [HttpPost]
+        [ApiKeyAuthorize]
         public bool Rebuild(string message)
         {
             try

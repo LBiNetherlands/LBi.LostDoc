@@ -634,20 +634,6 @@ namespace LBi.LostDoc.Core.Templating
 
             ParsedTemplate tmpl = this.PrepareTemplate(templateData);
 
-            // fill indices
-            var customXsltContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
-            foreach (var index in tmpl.Indices)
-            {
-                TraceSources.TemplateSource.TraceVerbose("Adding index {0} (match: '{1}', key: '{1}')",
-                                                         index.Name,
-                                                         index.MatchExpr,
-                                                         index.KeyExpr);
-                templateData.DocumentIndex.AddKey(index.Name, index.MatchExpr, index.KeyExpr, customXsltContext);
-            }
-
-            using (TraceSources.TemplateSource.TraceActivity("Indexing input document"))
-                templateData.DocumentIndex.BuildIndexes();
-
 
             // collect all work that has to be done
             List<UnitOfWork> work = new List<UnitOfWork>();
@@ -694,6 +680,25 @@ namespace LBi.LostDoc.Core.Templating
                                                                templateData,
                                                                this._resolvers,
                                                                this._fileProvider);
+
+
+            // fill indices
+            using (TraceSources.TemplateSource.TraceActivity("Indexing input document"))
+            {
+                var customXsltContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
+                foreach (var index in tmpl.Indices)
+                {
+                    TraceSources.TemplateSource.TraceVerbose("Adding index {0} (match: '{1}', key: '{1}')",
+                                                             index.Name,
+                                                             index.MatchExpr,
+                                                             index.KeyExpr);
+                    context.DocumentIndex.AddKey(index.Name, index.MatchExpr, index.KeyExpr, customXsltContext);
+                }
+
+                TraceSources.TemplateSource.TraceInformation("Indexing...");
+                context.DocumentIndex.BuildIndexes();
+            }
+
 
             int totalCount = work.Count;
             long lastProgress = Stopwatch.GetTimestamp();
