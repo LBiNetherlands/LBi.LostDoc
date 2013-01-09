@@ -62,9 +62,10 @@ namespace LBi.LostDoc.Core.Reflection
             }
             catch (FileLoadException)
             {
+                var assemblyName = AssemblyName.GetAssemblyName(path);
+                var fullName = assemblyName.FullName;
                 var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-                var absPath = Path.GetFullPath(path);
-                assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.Location, absPath));
+                assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
             }
 
             return assembly;

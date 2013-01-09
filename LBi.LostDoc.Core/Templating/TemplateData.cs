@@ -26,6 +26,7 @@ namespace LBi.LostDoc.Core.Templating
     {
         public TemplateData(XDocument doc, AssetRedirectCollection assetRedirects)
         {
+            this.XDocument = doc;
             XPathDocument xpathDoc;
             using (var reader = doc.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
                 xpathDoc = new XPathDocument(reader);

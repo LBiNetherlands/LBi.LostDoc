@@ -28,16 +28,14 @@
   <xsl:param name="assetId"/>
 
   <xsl:template match="/">
-    <index>
-      <xsl:apply-templates select="//*[@assetId = $assetId]" mode="index"/>
+    <index assetId="{$assetId}">
+      <xsl:apply-templates select="ld:key('aid', $assetId)" mode="index"/>
     </index>
   </xsl:template>
 
   <xsl:template match="*"
                 mode="index">
-    <text>
-      <xsl:copy-of select="."/>
-    </text>
+    <xsl:apply-templates select=".//doc:*/text()" />
   </xsl:template>
 </xsl:stylesheet>
 

@@ -97,9 +97,9 @@ namespace LBi.LostDoc.Core.Templating
                     this.Transform.Transform(context.TemplateData.Document,
                                              argList,
                                              xmlWriter);
-                    TraceSources.TemplateSource.TraceInformation("Transform applied in: {0:N0} ms",
-                                             ((localTimer.ElapsedTicks - tickStart) /
-                                              (double)Stopwatch.Frequency) * 1000);
+                    TraceSources.TemplateSource.TraceVerbose("Transform applied in: {0:N0} ms",
+                                                             ((localTimer.ElapsedTicks - tickStart)/
+                                                              (double) Stopwatch.Frequency)*1000);
 
                     xmlWriter.Close();
                 }

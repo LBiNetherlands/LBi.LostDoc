@@ -150,24 +150,13 @@ namespace LBi.LostDoc.ConsoleApplication
                 gen.AddAssembly(this.Path);
 
 
-                Assembly assembly;
-                try
-                {
-                    assembly = Assembly.ReflectionOnlyLoadFrom(this.Path);
-                }
-                catch (FileLoadException)
-                {
-                    var assemblyName = AssemblyName.GetAssemblyName(this.Path);
-                    var fullName = assemblyName.FullName;
-                    var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-                    assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
-                }
+                var assemblyName = AssemblyName.GetAssemblyName(this.Path);
 
                 XDocument rawDoc = gen.Generate();
                 string fileName = System.IO.Path.Combine(this.Output ?? System.IO.Path.GetDirectoryName(this.Path),
                                                          string.Format("{0}_{1}.ldoc",
                                                                        System.IO.Path.GetFileName(this.Path),
-                                                                       assembly.GetName().Version));
+                                                                       assemblyName.Version));
 
                 this.Output = System.IO.Path.GetFullPath(fileName);
 
