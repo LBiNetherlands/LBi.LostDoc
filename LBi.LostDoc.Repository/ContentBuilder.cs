@@ -138,7 +138,6 @@ namespace LBi.LostDoc.Repository
                 using (var writer = new IndexWriter(directory, analyzerWrapper, IndexWriter.MaxFieldLength.UNLIMITED))
                 {
                     var saResults = templateOutput.Results.Select(wur => wur.WorkUnit).OfType<StylesheetApplication>();
-                    var dupGroups = saResults.GroupBy(sa => sa.Asset).Where(g => g.Count() > 1);
 
                     var saDict = saResults.ToDictionary(sa => sa.Asset);
 
@@ -151,9 +150,9 @@ namespace LBi.LostDoc.Repository
                         XDocument indexDoc = XDocument.Load(absPath);
 
                         string assetId = indexDoc.Root.Attribute("assetId").Value;
-                        string title = indexDoc.Root.Element("title").Value;
-                        string summary = indexDoc.Root.Element("summary").Value;
-                        string text = indexDoc.Root.Element("text").Value;
+                        string title = indexDoc.Root.Element("title").Value.Trim();
+                        string summary = indexDoc.Root.Element("summary").Value.Trim();
+                        string text = indexDoc.Root.Element("text").Value.Trim();
 
                         var ssApplication = saDict[AssetIdentifier.Parse(assetId)];
 

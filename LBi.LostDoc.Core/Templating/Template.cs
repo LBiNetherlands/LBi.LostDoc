@@ -490,6 +490,7 @@ namespace LBi.LostDoc.Core.Templating
                                                 fileResolver);
                     }
 
+
                     TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
                                                              metaNode.Attribute("stylesheet").Value);
 

@@ -29,16 +29,29 @@ namespace LBi.LostDoc.Repository.Lucene
         public override TokenStream TokenStream(string fieldName, TextReader reader)
         {
             string str = reader.ReadToEnd();
-            str = str.Replace('.', ' ');
-            str = str.Replace('<', ' ');
-            str = str.Replace('>', ' ');
-            str = str.Replace('[', ' ');
-            str = str.Replace(']', ' ');
-            str = str.Replace('(', ' ');
-            str = str.Replace(')', ' ');
-            str = str.Replace(',', ' ');
+            StringBuilder builder = new StringBuilder(str);
+            builder.Replace('.', ' ');
+            builder.Replace('<', ' ');
+            builder.Replace('>', ' ');
+            builder.Replace('[', ' ');
+            builder.Replace(']', ' ');
+            builder.Replace('(', ' ');
+            builder.Replace(')', ' ');
+            builder.Replace(',', ' ');
 
-            return new LowerCaseFilter(new WhitespaceTokenizer(new StringReader(str)));
+            builder.Replace("  ", " ");
+
+            str = builder.ToString();
+            
+            for (int i = builder.Length - 1; i > 0; i--)
+            {
+                if (char.IsUpper(builder[i]))
+                    builder.Insert(i, ' ');
+            }
+
+            builder.Append(' ').Append(str);
+
+            return new LowerCaseFilter(new WhitespaceTokenizer(new StringReader(builder.ToString())));
         }
     }
 }
