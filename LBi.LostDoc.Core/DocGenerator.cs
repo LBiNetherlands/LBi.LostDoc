@@ -195,8 +195,16 @@ namespace LBi.LostDoc.Core
             {
                 foreach (Type t in asm.GetTypes())
                 {
-                    // generate namespace hierarchy
+                    // check if type survives filtering
+                    AssetIdentifier typeAsset = AssetIdentifier.FromMemberInfo(t);
 
+                    if (this.IsFiltered(filterContext, typeAsset)) 
+                        continue;
+
+                    /* type was not filtered */
+                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.AssetId);
+
+                    // generate namespace hierarchy
                     if (!string.IsNullOrEmpty(t.Namespace))
                     {
                         Version nsVersion = t.Module.Assembly.GetName().Version;
@@ -211,37 +219,24 @@ namespace LBi.LostDoc.Core
                         }
                     }
 
-                    // Debug.Write("Type: " + t.Name);
-                    // check if type survives filtering
-                    AssetIdentifier typeAsset = AssetIdentifier.FromMemberInfo(t);
-                    bool filtered = this.IsFiltered(filterContext, typeAsset);
+                    if (distinctSet.Add(typeAsset))
+                        yield return typeAsset;
 
-                    if (!filtered)
+
+                    MemberInfo[] members =
+                        t.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
+                                     BindingFlags.NonPublic);
+
+                    foreach (MemberInfo member in members)
                     {
-                        /* type was not filtered */
-                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.AssetId);
+                        AssetIdentifier memberAsset = AssetIdentifier.FromMemberInfo(member);
+                        if (this.IsFiltered(filterContext, memberAsset)) 
+                            continue;
 
-                        if (distinctSet.Add(typeAsset))
-                            yield return typeAsset;
-
-
-                        MemberInfo[] members =
-                            t.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
-                                         BindingFlags.NonPublic);
-
-                        foreach (MemberInfo member in members)
-                        {
-                            AssetIdentifier memberAsset = AssetIdentifier.FromMemberInfo(member);
-                            filtered = this.IsFiltered(filterContext, memberAsset);
-
-                            if (!filtered)
-                            {
-                                TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}",
-                                                                        memberAsset.AssetId);
-                                if (distinctSet.Add(memberAsset))
-                                    yield return memberAsset;
-                            }
-                        }
+                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}",
+                                                                memberAsset.AssetId);
+                        if (distinctSet.Add(memberAsset))
+                            yield return memberAsset;
                     }
                 }
 
