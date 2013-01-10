@@ -47,7 +47,7 @@ namespace LBi.LostDoc.Core.Templating.XPath
             string s2 = args[1] as string;
             int ix = s1.LastIndexOf(s2, StringComparison.Ordinal);
             if (ix > 0)
-                return s1.Substring(0, ix - 1);
+                return s1.Substring(0, ix);
             
             return string.Empty;
         }

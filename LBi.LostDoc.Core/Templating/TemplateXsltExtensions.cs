@@ -188,7 +188,7 @@ namespace LBi.LostDoc.Core.Templating
             int lastIndexOf = str.LastIndexOf(last, StringComparison.OrdinalIgnoreCase);
             if (lastIndexOf <= 0)
                 return string.Empty;
-            return str.Substring(0, lastIndexOf - 1);
+            return str.Substring(0, lastIndexOf);
         }
 
         public string substringAfterLast(string str, string last)

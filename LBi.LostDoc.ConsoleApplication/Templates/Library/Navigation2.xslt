@@ -307,7 +307,7 @@
                   <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
                   <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
                   <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-                  <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+                  <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
                   
                   <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
                     <xsl:value-of select="$title"/>
@@ -343,7 +343,7 @@
                   <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
                   <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
                   <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-                  <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+                  <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
                   <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
                     <xsl:value-of select="$title"/>
@@ -379,7 +379,7 @@
                   <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
                   <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
                   <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-                  <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+                  <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
                   <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
                     <xsl:value-of select="$title"/>
@@ -448,7 +448,7 @@
               <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
               <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
               <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-              <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+              <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
               <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
                 <xsl:value-of select="$title"/>
@@ -552,7 +552,7 @@
           <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
           <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
           <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-          <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+          <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
           <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
             <xsl:value-of select="$title"/>
@@ -609,7 +609,7 @@
           <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
           <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
           <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-          <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+          <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
           <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
             <xsl:value-of select="$title"/>
@@ -663,7 +663,7 @@
           <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
           <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
           <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-          <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+          <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
           <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
             <xsl:value-of select="$title"/>
