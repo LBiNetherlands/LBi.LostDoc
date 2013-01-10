@@ -59,12 +59,11 @@ namespace LBi.LostDoc.Repository.Web
 
             routes.MapHttpRoute(
                                 name: "Rebuild",
-                                routeTemplate: "site/rebuild/{message}",
+                                routeTemplate: "site/rebuild",
                                 defaults: new
                                               {
                                                   controller = "Site",
                                                   action = "Rebuild",
-                                                  message = RouteParameter.Optional
                                               });
 
             routes.MapHttpRoute(

@@ -54,7 +54,7 @@
     <apply-stylesheet name="{concat('Index for: ', ld:coalesce(@name, substring-before(@stylesheet, '.')))}"
                       stylesheet="CreateIndex.xslt"
                       assetId="concat(({@assetId}), '-index')"
-                      output="concat(substring-before(({@output}), '.html'), '.index')">
+                      output="'Index\index.xml'">
       <xsl:copy-of select="@*[local-name() != 'name' and local-name() != 'stylesheet' and local-name() != 'output' and local-name() != 'assetId']"/>
       <with-param name="assetId" select="@assetId" />
     </apply-stylesheet>

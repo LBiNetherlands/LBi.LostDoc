@@ -35,6 +35,9 @@ namespace LBi.LostDoc.ConsoleApplication
     [ParameterSet("Template", Command = "Template", HelpMessage = "Apply template to a set of ldoc files to generate output.")]
     public class TemplateCommand : ICommand
     {
+        [Parameter(HelpMessage = "Include errors and warning output only.")]
+        public LBi.Cli.Arguments.Switch Quiet { get; set; }
+
         [Parameter(HelpMessage = "Include verbose output.")]
         public LBi.Cli.Arguments.Switch Verbose { get; set; }
 
@@ -83,7 +86,14 @@ namespace LBi.LostDoc.ConsoleApplication
             TraceSources.AssetResolverSource.Listeners.Add(traceListener);
             try
             {
-                if (this.Verbose.IsPresent)
+                if (this.Quiet.IsPresent)
+                {
+                    const SourceLevels quietLevel = SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical;
+                    TraceSources.TemplateSource.Switch.Level = quietLevel;
+                    TraceSources.AssetResolverSource.Switch.Level = quietLevel;
+                    TraceSources.BundleSource.Listeners.Add(traceListener);
+                }
+                else if (this.Verbose.IsPresent)
                 {
                     const SourceLevels verboseLevel = SourceLevels.All;
                     TraceSources.TemplateSource.Switch.Level = verboseLevel;

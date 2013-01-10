@@ -33,11 +33,11 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 
         [HttpPost]
         [ApiKeyAuthorize]
-        public bool Rebuild(string message)
+        public bool Rebuild()
         {
             try
             {
-                ContentManager.Instance.QueueRebuild(message);
+                ContentManager.Instance.QueueRebuild("");
                 return true;
             } 
             catch (Exception ex)

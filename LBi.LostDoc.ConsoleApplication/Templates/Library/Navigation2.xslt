@@ -304,8 +304,12 @@
                   </xsl:variable>
                   <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
                   <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-                  <xsl:variable name="cleanAsset" select="ld:coalesce(substring-before($asset, '`'), $asset)"/>
-                  <a title="{$title}" href="{ld:resolveAsset(concat('M*:', $cleanAsset), ld:version(@assetId))}">
+                  <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
+                  <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
+                  <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
+                  <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+                  
+                  <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
                     <xsl:value-of select="$title"/>
                   </a>
 
@@ -336,8 +340,12 @@
                   </xsl:variable>
                   <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
                   <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-                  <xsl:variable name="cleanAsset" select="ld:coalesce(substring-before($asset, '`'), $asset)"/>
-                  <a title="{$title}" href="{ld:resolveAsset(concat('P*:', $cleanAsset), ld:version(@assetId))}">
+                  <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
+                  <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
+                  <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
+                  <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+
+                  <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
                     <xsl:value-of select="$title"/>
                   </a>
 
@@ -368,8 +376,12 @@
                   </xsl:variable>
                   <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
                   <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-                  <xsl:variable name="cleanAsset" select="ld:coalesce(substring-before($asset, '`'), $asset)"/>
-                  <a title="{$title}" href="{ld:resolveAsset(concat('M*:', $cleanAsset), ld:version(@assetId))}">
+                  <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
+                  <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
+                  <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
+                  <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+
+                  <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
                     <xsl:value-of select="$title"/>
                   </a>
 
@@ -433,18 +445,12 @@
               </xsl:variable>
               <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
               <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-              <xsl:variable name="cleanAsset" select="ld:coalesce(substring-before($asset, '`'), $asset)"/>
-              <xsl:variable name="assetUri">
-                <xsl:choose>
-                  <xsl:when test="self::property">
-                    <xsl:value-of select ="ld:resolveAsset(concat('P*:', $cleanAsset), ld:version(@assetId))"/>
-                  </xsl:when>
-                  <xsl:when test="self::operator | self::method">
-                    <xsl:value-of select ="ld:resolveAsset(concat('M*:', $cleanAsset), ld:version(@assetId))"/>
-                  </xsl:when>
-                </xsl:choose>
-              </xsl:variable>
-              <a title="{$title}" href="{$assetUri}">
+              <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
+              <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
+              <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
+              <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+
+              <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
                 <xsl:value-of select="$title"/>
               </a>
 
@@ -543,8 +549,12 @@
           </xsl:if>
           <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
           <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-          <xsl:variable name="cleanAsset" select="ld:coalesce(substring-before($asset, '`'), $asset)"/>
-          <a title="{$title}" href="{ld:resolveAsset(concat('M*:', $cleanAsset), ld:version(@assetId))}">
+          <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
+          <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
+          <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
+          <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+
+          <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
             <xsl:value-of select="$title"/>
           </a>
         </li>
@@ -596,8 +606,12 @@
           </xsl:if>
           <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
           <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-          <xsl:variable name="cleanAsset" select="ld:coalesce(substring-before($asset, '`'), $asset)"/>
-          <a title="{$title}" href="{ld:resolveAsset(concat('P*:', $cleanAsset), ld:version(@assetId))}">
+          <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
+          <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
+          <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
+          <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+
+          <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
             <xsl:value-of select="$title"/>
           </a>
         </li>
@@ -646,8 +660,12 @@
           </xsl:if>
           <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
           <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-          <xsl:variable name="cleanAsset" select="ld:coalesce(substring-before($asset, '`'), $asset)"/>
-          <a title="{$title}" href="{ld:resolveAsset(concat('M*:', $cleanAsset), ld:version(@assetId))}">
+          <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
+          <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
+          <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
+          <xsl:variable name="trailing-clean" select="ld:coalesce(ld:substringBeforeLast($trailing, '`'), $trailing)"/>
+
+          <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
             <xsl:value-of select="$title"/>
           </a>
         </li>

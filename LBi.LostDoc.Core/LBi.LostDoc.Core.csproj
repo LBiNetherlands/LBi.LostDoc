@@ -111,6 +111,9 @@
     <Compile Include="Templating\IAssetUriResolver.cs" />
     <Compile Include="ProcessingContext.cs" />
     <Compile Include="Templating\XPath\XPathNavigatorIndex.cs" />
+    <Compile Include="Templating\XPath\XsltContextSubstringAfterLastFunction.cs" />
+    <Compile Include="Templating\XPath\XsltContextSubstringBeforeLastFunction.cs" />
+    <Compile Include="Templating\XPath\XsltContextTernaryOperator.cs" />
     <Compile Include="VersionComponent.cs" />
     <Compile Include="Templating\XmlFileProviderResolver.cs" />
     <Compile Include="Templating\XPath\XsltContextAssetIdGetter.cs" />

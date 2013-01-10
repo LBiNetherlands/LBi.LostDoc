@@ -34,10 +34,13 @@ namespace LBi.LostDoc.ConsoleApplication
     [ParameterSet("Extract", Command = "Extract", HelpMessage = "Extracts metadata from an assembly to create a ldoc file.")]
     public class ExtractCommand : ICommand
     {
+        [Parameter(HelpMessage = "Include errors and warning output only.")]
+        public LBi.Cli.Arguments.Switch Quiet { get; set; }
+
         [Parameter(HelpMessage = "Include verbose output.")]
         public LBi.Cli.Arguments.Switch Verbose { get; set; }
 
-        [Parameter (HelpMessage = "Include non-public members.")]
+        [Parameter(HelpMessage = "Include non-public members.")]
         public LBi.Cli.Arguments.Switch IncludeNonPublic { get; set; }
 
         [Parameter(HelpMessage = "Includes doc comments from the BCL for referenced types.")]
@@ -70,15 +73,23 @@ namespace LBi.LostDoc.ConsoleApplication
 
             try
             {
-
-                if (this.Verbose.IsPresent)
+                if (this.Quiet.IsPresent)
+                {
+                    const SourceLevels quietLevel = SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical;
+                    TraceSources.GeneratorSource.Switch.Level = quietLevel;
+                }
+                else  if (this.Verbose.IsPresent)
                 {
                     const SourceLevels verboseLevel = SourceLevels.All;
                     TraceSources.GeneratorSource.Switch.Level = verboseLevel;
                 }
                 else
                 {
-                    const SourceLevels normalLevel = SourceLevels.Information | SourceLevels.Warning | SourceLevels.Error | SourceLevels.ActivityTracing;
+                    const SourceLevels normalLevel = SourceLevels.Information |
+                                                     SourceLevels.Warning |
+                                                     SourceLevels.Error |
+                                                     SourceLevels.Critical |
+                                                     SourceLevels.ActivityTracing;
                     TraceSources.GeneratorSource.Switch.Level = normalLevel;
                 }
 
@@ -95,7 +106,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 gen.AssetFilters.Add(new SpecialNameMemberInfoFilter());
 
                 if (!string.IsNullOrWhiteSpace(this.Filter))
-                    gen.AssetFilters.Add(new AssetGlobFilter {Include = this.Filter});
+                    gen.AssetFilters.Add(new AssetGlobFilter { Include = this.Filter });
 
                 XmlDocEnricher docEnricher = new XmlDocEnricher();
                 gen.Enrichers.Add(docEnricher);

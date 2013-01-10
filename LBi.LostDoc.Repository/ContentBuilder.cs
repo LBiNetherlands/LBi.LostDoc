@@ -138,10 +138,11 @@ namespace LBi.LostDoc.Repository
                 using (var writer = new IndexWriter(directory, analyzerWrapper, IndexWriter.MaxFieldLength.UNLIMITED))
                 {
                     var saResults = templateOutput.Results.Select(wur => wur.WorkUnit).OfType<StylesheetApplication>();
+                    var dupGroups = saResults.GroupBy(sa => sa.Asset).Where(g => g.Count() > 1);
 
                     var saDict = saResults.ToDictionary(sa => sa.Asset);
 
-                    var indexResults = saDict.Values.Where(sa => sa.SaveAs.EndsWith(".index"));
+                    var indexResults = saDict.Values.Where(sa => sa.SaveAs.EndsWith(".xml"));
 
                     foreach (var sa in indexResults)
                     {

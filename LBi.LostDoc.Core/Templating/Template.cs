@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012,2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -790,6 +790,9 @@ namespace LBi.LostDoc.Core.Templating
             CustomXsltContext xpathContext = new CustomXsltContext();
             xpathContext.RegisterFunction(string.Empty, "get-id", new XsltContextAssetIdGetter());
             xpathContext.RegisterFunction(string.Empty, "get-version", new XsltContextAssetVersionGetter());
+            xpathContext.RegisterFunction(string.Empty, "substring-before-last", new XsltContextSubstringBeforeLastFunction());
+            xpathContext.RegisterFunction(string.Empty, "substring-after-last", new XsltContextSubstringAfterLastFunction());
+            xpathContext.RegisterFunction(string.Empty, "iif", new XsltContextTernaryOperator());
             xpathContext.RegisterFunction(string.Empty, "get-significant-version", new XsltContextAssetVersionGetter(ignoredVersionComponent));
             xpathContext.RegisterFunction(string.Empty, "coalesce", new XsltContextCoalesceFunction());
             xpathContext.RegisterFunction(string.Empty, "join", new XsltContextJoinFunction());
@@ -829,7 +832,7 @@ namespace LBi.LostDoc.Core.Templating
          * a string is true if and only if its length is non-zero
          * an object of a type other than the four basic types is converted to a boolean in a way that is dependent on that type
          */
-        private static bool ResultToBool(object res)
+        protected internal static bool ResultToBool(object res)
         {
             bool ret;
             if (res == null)

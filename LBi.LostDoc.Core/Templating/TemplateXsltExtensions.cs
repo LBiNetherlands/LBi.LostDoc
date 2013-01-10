@@ -186,9 +186,17 @@ namespace LBi.LostDoc.Core.Templating
         public string substringBeforeLast(string str, string last)
         {
             int lastIndexOf = str.LastIndexOf(last, StringComparison.OrdinalIgnoreCase);
+            if (lastIndexOf <= 0)
+                return string.Empty;
+            return str.Substring(0, lastIndexOf - 1);
+        }
+
+        public string substringAfterLast(string str, string last)
+        {
+            int lastIndexOf = str.LastIndexOf(last, StringComparison.OrdinalIgnoreCase);
             if (lastIndexOf == -1)
                 return string.Empty;
-            return str.Substring(0, lastIndexOf);
+            return str.Substring(lastIndexOf + 1);
         }
 
         public string join(object iterator, string sep)
