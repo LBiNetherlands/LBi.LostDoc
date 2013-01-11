@@ -259,9 +259,8 @@
     </ul>
   </xsl:template>
 
-  <xsl:template match="/bundle/assembly/namespace//*[(self::class | self::struct | self::enum | self::delegate)]" mode="xnav">
+  <xsl:template match="/bundle/assembly/namespace//*[(self::class | self::struct | self::enum | self::delegate | self::interface) and @assetId]" mode="xnav">
     <ul>
-
       <xsl:apply-templates select="ancestor::namespace" mode="xnav-ancestor">
         <xsl:with-param name="current" select="@assetId"/>
         <xsl:with-param name="children">

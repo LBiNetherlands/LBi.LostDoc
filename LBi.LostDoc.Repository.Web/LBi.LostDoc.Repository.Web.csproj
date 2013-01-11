@@ -15,7 +15,7 @@
     <AssemblyName>LBi.LostDoc.Repository.Web</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
@@ -158,9 +158,62 @@
     <Compile Include="TraceSources.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Assembly.xslt">
+      <Link>App_Data\Template\Assembly.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Common.xslt">
+      <Link>App_Data\Template\Common.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\CreateIndex.xslt">
+      <Link>App_Data\Template\CreateIndex.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\DocComments.xslt">
+      <Link>App_Data\Template\DocComments.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\IndexInjector.xslt">
+      <Link>App_Data\Template\IndexInjector.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Layout.xslt">
+      <Link>App_Data\Template\Layout.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Library.xslt">
+      <Link>App_Data\Template\Library.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Member.xslt">
+      <Link>App_Data\Template\Member.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Namespace.xslt">
+      <Link>App_Data\Template\Namespace.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Naming.xslt">
+      <Link>App_Data\Template\Naming.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Navigation2.xslt">
+      <Link>App_Data\Template\Navigation2.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Overloads.xslt">
+      <Link>App_Data\Template\Overloads.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\style.css">
+      <Link>App_Data\Template\style.css</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Syntax-csharp.xslt">
+      <Link>App_Data\Template\Syntax-csharp.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Syntax.xslt">
+      <Link>App_Data\Template\Syntax.xslt</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\template.xml">
+      <Link>App_Data\Template\template.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Type.xslt">
+      <Link>App_Data\Template\Type.xslt</Link>
+    </EmbeddedResource>
     <Content Include="Global.asax" />
     <Content Include="ManualUpload.html" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -238,7 +291,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>53300</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:53300/</IISUrl>
+          <IISUrl>http://localhost:888</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

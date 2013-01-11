@@ -17,9 +17,8 @@
 using System;
 using System.IO;
 using System.Reflection;
-using LBi.LostDoc.Core.Templating;
 
-namespace LBi.LostDoc.ConsoleApplication
+namespace LBi.LostDoc.Core.Templating
 {
     public class ResourceFileProvider : IFileProvider
     {
@@ -49,7 +48,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
         public Stream OpenFile(string path)
         {
-            var ret = this._asm.GetManifestResourceStream(this.ConvertPath(path));
+            var ret = this._asm.GetManifestResourceStream(this.ConvertPath(path.TrimStart('/')));
             if (ret == null)
                 throw new FileNotFoundException(string.Format("Resource not found: {0} (Was: {1})", this.ConvertPath(path), path), path);
             return ret;

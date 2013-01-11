@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,15 @@
  * limitations under the License. 
  */
 
-using System.Runtime.Caching;
+using System;
 
-namespace LBi.LostDoc.Core
+namespace LBi.LostDoc.Core.Filters
 {
-    public class FilterContext : IFilterContext
+    public class ComObjectTypeFilter : IAssetFilter
     {
-        public FilterContext(ObjectCache cache, IAssetResolver assetResolver, FilterState state)
+        public bool Filter(IFilterContext context, AssetIdentifier asset)
         {
-            this.Cache = cache;
-            this.AssetResolver = assetResolver;
-            this.State = state;
+            return asset.AssetId.Equals("T:System.__ComObject", StringComparison.Ordinal);
         }
-
-        #region IFilterContext Members
-
-        public IAssetResolver AssetResolver { get; private set; }
-        public FilterState State { get; private set; }
-
-        #endregion
-
-        public ObjectCache Cache { get; private set; }
     }
 }

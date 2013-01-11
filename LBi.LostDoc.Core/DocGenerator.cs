@@ -106,12 +106,12 @@ namespace LBi.LostDoc.Core
             IAssemblyLoader assemblyLoader = new ReflectionOnlyAssemblyLoader(
                 this._cache,
                 this._assemblyPaths.Select(Path.GetDirectoryName));
-
+            
             this._assemblies = this._assemblyPaths.Select(assemblyLoader.LoadFrom).ToArray();
 
             XNamespace defaultNs = string.Empty;
-            var sourceAssemblies = this._assemblies.SelectMany(assemblyLoader.GetAssemblyChain);
-            IAssetResolver assetResolver = new AssetResolver(sourceAssemblies);
+            // pass in assemblyLoader instead
+            IAssetResolver assetResolver = new AssetResolver(assemblyLoader);
 
             // collect phase zero assets
             List<AssetIdentifier> assets = this.DiscoverAssets(assetResolver, this._assemblies).ToList();
@@ -139,43 +139,60 @@ namespace LBi.LostDoc.Core
             int phase = 0;
             HashSet<AssetIdentifier> referencedAssets = new HashSet<AssetIdentifier>();
 
-
+            long lastProgressOutput = Stopwatch.GetTimestamp();
             // main output loop
             while (assets.Count > 0)
             {
-                TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Processing phase {0}", phase);
-                foreach (AssetIdentifier asset in assets)
+                int phaseAssetCount = 0;
+                using (TraceSources.GeneratorSource.TraceActivity("Phase {0} ({1:N0} assets)", phase, assets.Count))
                 {
-                    // skip already emitted assets
-                    if (!emittedAssets.Add(asset))
-                        continue;
-
-                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Generating {0}", asset);
-
-                    // get hierarchy
-                    LinkedList<AssetIdentifier> hierarchy = new LinkedList<AssetIdentifier>();
-
-                    foreach (AssetIdentifier assetIdentifier in assetResolver.GetAssetHierarchy(asset))
-                        hierarchy.AddFirst(assetIdentifier);
-
-                    if (hierarchy.First != null)
+                    foreach (AssetIdentifier asset in assets)
                     {
-                        this.BuildHierarchy(assetResolver,
-                                            ret.Root,
-                                            hierarchy.First,
-                                            asset,
-                                            referencedAssets,
-                                            emittedAssets,
-                                            phase);
+                        // skip already emitted assets
+                        if (!emittedAssets.Add(asset))
+                            continue;
+
+                        phaseAssetCount++;
+
+                        if (((Stopwatch.GetTimestamp() - lastProgressOutput)/(double) Stopwatch.Frequency) > 5.0)
+                        {
+                            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0,
+                                                                    "Phase {0} progress {1:P1} ({2:N0}/{3:N0})",
+                                                                    phase,
+                                                                    phaseAssetCount/(double) assets.Count,
+                                                                    phaseAssetCount,
+                                                                    assets.Count);
+
+                            lastProgressOutput = Stopwatch.GetTimestamp();
+                        }
+
+                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Generating {0}", asset);
+
+                        // get hierarchy
+                        LinkedList<AssetIdentifier> hierarchy = new LinkedList<AssetIdentifier>();
+
+                        foreach (AssetIdentifier assetIdentifier in assetResolver.GetAssetHierarchy(asset))
+                            hierarchy.AddFirst(assetIdentifier);
+
+                        if (hierarchy.First != null)
+                        {
+                            this.BuildHierarchy(assetResolver,
+                                                ret.Root,
+                                                hierarchy.First,
+                                                asset,
+                                                referencedAssets,
+                                                emittedAssets,
+                                                phase);
+                        }
                     }
+
+
+                    ++phase;
+                    assets.Clear();
+                    referencedAssets.ExceptWith(emittedAssets);
+                    assets = referencedAssets.ToList();
+                    referencedAssets.Clear();
                 }
-
-
-                ++phase;
-                assets.Clear();
-                referencedAssets.ExceptWith(emittedAssets);
-                assets = referencedAssets.ToList();
-                referencedAssets.Clear();
             }
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Generating document");
@@ -188,7 +205,7 @@ namespace LBi.LostDoc.Core
         {
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
             HashSet<AssetIdentifier> distinctSet = new HashSet<AssetIdentifier>();
-            IFilterContext filterContext = new FilterContext(this._cache, assetResolver);
+            IFilterContext filterContext = new FilterContext(this._cache, assetResolver, FilterState.Discovery);
 
             // find and filter all types from all assemblies 
             foreach (Assembly asm in assemblies)
@@ -482,9 +499,13 @@ namespace LBi.LostDoc.Core
 
             if (type.BaseType != null)
             {
-                var inheritsElem = new XElement("inherits");
-                ret.Add(inheritsElem);
-                GenerateTypeRef(context.Clone(inheritsElem), type.BaseType);
+                AssetIdentifier baseAid = AssetIdentifier.FromType(type.BaseType);
+                if (!context.IsFiltered(baseAid))
+                {
+                    var inheritsElem = new XElement("inherits");
+                    ret.Add(inheritsElem);
+                    GenerateTypeRef(context.Clone(inheritsElem), type.BaseType);
+                }
             }
 
             if (type.ContainsGenericParameters)

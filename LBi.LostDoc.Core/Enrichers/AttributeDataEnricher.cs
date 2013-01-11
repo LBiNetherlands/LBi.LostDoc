@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
@@ -151,9 +152,7 @@ namespace LBi.LostDoc.Core.Enrichers
                                                                 cta.TypedValue.Value).Select(
                                                                                              ata =>
                                                                                              new XElement("element",
-                                                                                                          GenerateAttributeArgument
-                                                                                                              (context,
-                                                                                                               ata))))));
+                                                                                                          GenerateAttributeArgument(context, ata))))));
                     }
                     else
                     {
@@ -166,11 +165,15 @@ namespace LBi.LostDoc.Core.Enrichers
 
                 context.Element.Add(attrElem);
             }
+
+            //using (var ms = new MemoryStream())
+            //    context.Element.Save(ms);
         }
 
         private static IEnumerable<XObject> GenerateAttributeArgument(IProcessingContext context,
                                                                       CustomAttributeTypedArgument cata)
         {
+            // TODO this needs to be cleaned up, and fixed
             context.AddReference(AssetIdentifier.FromMemberInfo(cata.ArgumentType));
             yield return new XAttribute("type", AssetIdentifier.FromMemberInfo(cata.ArgumentType));
 
@@ -186,14 +189,18 @@ namespace LBi.LostDoc.Core.Enrichers
                     string[] parts = flags.Split(',');
 
                     yield return
-                        new XElement("enum",
+                        new XElement("literal",
+                                     new XAttribute("value", cata.Value),
                                      Array.ConvertAll(parts,
                                                       s => new XElement("flag", new XAttribute("value", s.Trim()))));
                 }
                 else
                 {
-                    yield return
-                        new XElement("enum", new XAttribute("value", Enum.GetName(cata.ArgumentType, cata.Value)));
+                    string value = Enum.GetName(cata.ArgumentType, cata.Value);
+                    if (value != null)
+                        yield return new XElement("literal", new XAttribute("value", value));
+
+                    yield return new XElement("literal", new XAttribute("value", cata.Value));
                 }
             }
             else if (cata.ArgumentType == typeof(Type))
@@ -204,11 +211,9 @@ namespace LBi.LostDoc.Core.Enrichers
                 foreach (XElement xElement in tmp.Elements())
                     yield return xElement;
 
-
-// yield return new XAttribute("value", AssetIdentifier.FromMemberInfo((Type)cata.Value));
             }
             else
-                yield return new XAttribute("value", cata.Value.ToString());
+                yield return new XAttribute("value", cata.Value.ToString().Replace("\0", "\\0"));
         }
     }
 }

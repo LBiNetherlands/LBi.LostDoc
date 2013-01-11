@@ -317,6 +317,9 @@
   </xsl:template>
 
   <xsl:template match="enum" mode="displayText">
+    <xsl:if test="not(@assetId)">
+      <xsl:message terminate="yes">No asset id found on enum!</xsl:message>
+    </xsl:if>
     <xsl:if test="parent::*[not(self::namespace)]">
       <xsl:apply-templates select="parent::*" mode="displayText"/>
       <xsl:text>.</xsl:text>

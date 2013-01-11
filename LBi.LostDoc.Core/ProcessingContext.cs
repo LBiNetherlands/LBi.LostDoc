@@ -106,11 +106,17 @@ namespace LBi.LostDoc.Core
 
         public bool IsFiltered(AssetIdentifier assetId)
         {
-            IFilterContext filterContext = new FilterContext(this.Cache, this.AssetResolver);
+            IFilterContext filterContext = new FilterContext(this.Cache, this.AssetResolver, FilterState.Generating);
             for (int i = 0; i < this._filters.Length; i++)
             {
                 if (this._filters[i].Filter(filterContext, assetId))
+                {
+                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
+                                        0,
+                                        "{0} - Filtered by {1}",
+                                        assetId.AssetId, this._filters[i]);
                     return true;
+                }
             }
 
             return false;

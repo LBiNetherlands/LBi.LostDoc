@@ -38,7 +38,8 @@ namespace LBi.LostDoc.Core.Filters
 
         public bool Filter(IFilterContext context, AssetIdentifier asset)
         {
-            return !this._regex.IsMatch(asset.AssetId.Substring(2));
+            return context.State == FilterState.Discovery &&
+                   !this._regex.IsMatch(asset.AssetId.Substring(2));
         }
     }
 }

@@ -15,7 +15,8 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
-    <AlternateReferenceLocation></AlternateReferenceLocation>
+    <AlternateReferenceLocation>
+    </AlternateReferenceLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +40,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -76,7 +78,6 @@
       <Name>Company.Project.Library</Name>
     </ProjectReference>
   </ItemGroup>
-
   <!--  manual edit, the build server needs to reference a dll rather than a project -->
   <Choose>
     <When Condition=" '$(AlternateReferenceLocation)' != '' ">
@@ -95,7 +96,6 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

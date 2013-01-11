@@ -21,6 +21,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using LBi.Cli.Arguments;
 using LBi.LostDoc.Core;
@@ -94,7 +96,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 }
 
                 DocGenerator gen = new DocGenerator();
-
+                gen.AssetFilters.Add(new ComObjectTypeFilter());
                 gen.AssetFilters.Add(new CompilerGeneratedFilter());
                 if (!this.IncludeNonPublic.IsPresent)
                     gen.AssetFilters.Add(new PublicTypeFilter());
@@ -173,8 +175,25 @@ namespace LBi.LostDoc.ConsoleApplication
 
                 if (!Directory.Exists(System.IO.Path.GetDirectoryName(fileName)))
                     Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fileName));
+                //StringWriter output = new StringWriter();
+                //try
+                //{
+                //    using (
+                //        XmlWriter writer = XmlWriter.Create(output,
+                //                                            new XmlWriterSettings
+                //                                                {
+                //                                                    CheckCharacters = true,
+                //                                                    Encoding = Encoding.ASCII
+                //                                                }))
+                //        rawDoc.Save(writer);
+                //}
+                //catch
+                //{
+                    
+                //}
 
                 rawDoc.Save(fileName);
+
             }
             finally
             {

@@ -20,7 +20,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Caching;
 using Company.Project.Library;
+using LBi.LostDoc.Core.Reflection;
 using Xunit;
 using Xunit.Extensions;
 
@@ -43,7 +45,7 @@ namespace LBi.LostDoc.Core.Test
             Type resolvedType = this._resolver.GetDeclaringType(aid.AssetId.Substring(aid.TypeMarker.Length + 1),
                                                                 ref pos,
                                                                 null);
-            Assert.Equal(resolvedType, declaringType);
+            Assert.Equal(declaringType.AssemblyQualifiedName, resolvedType.AssemblyQualifiedName);
         }
 
         [Theory]
@@ -59,7 +61,7 @@ namespace LBi.LostDoc.Core.Test
             Type resolvedType = this._resolver.GetDeclaringType(aid.AssetId.Substring(aid.TypeMarker.Length + 1),
                                                                 ref pos,
                                                                 declaringType.Assembly);
-            Assert.Equal(resolvedType, declaringType);
+            Assert.Equal(declaringType.AssemblyQualifiedName, resolvedType.AssemblyQualifiedName);
         }
 
 
@@ -154,7 +156,12 @@ namespace LBi.LostDoc.Core.Test
 
         public void SetFixture(AssemblyFixture data)
         {
-            this._resolver = new AssetResolver(data);
+            ReflectionOnlyAssemblyLoader loader = new ReflectionOnlyAssemblyLoader(new MemoryCache("test"), new[] {Assembly.GetExecutingAssembly().Location});
+            foreach (Assembly assembly in data)
+            {
+                loader.Load(assembly.FullName);
+            }
+            this._resolver = new AssetResolver(loader);
         }
     }
 

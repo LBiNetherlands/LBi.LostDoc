@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -29,11 +30,13 @@ namespace LBi.LostDoc.Core.Reflection
     {
         private readonly ObjectCache _cache;
         private readonly string[] _locations;
+        private HashSet<Assembly> _loadedAssemblies;
 
         public ReflectionOnlyAssemblyLoader(ObjectCache cache, IEnumerable<string> assemblyLocation)
         {
             this._cache = cache;
             this._locations = assemblyLocation.ToArray();
+            this._loadedAssemblies = new HashSet<Assembly>();
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += this.OnFailedAssemblyResolve;
         }
 
@@ -50,7 +53,24 @@ namespace LBi.LostDoc.Core.Reflection
                 assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, name));
             }
 
+            this.RegisterAssembly(assembly);
+            
             return assembly;
+        }
+
+        private void RegisterAssembly(Assembly assembly, bool direct = true)
+        {
+            if (assembly != null && this._loadedAssemblies.Add(assembly))
+            {
+                TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheHit,
+                                         "Loading assembly {0}.",
+                                         assembly.FullName);
+
+                if (direct)
+                {
+                    this.GetAssemblyChain(assembly);
+                }
+            } 
         }
 
         public Assembly LoadFrom(string path)
@@ -67,6 +87,8 @@ namespace LBi.LostDoc.Core.Reflection
                 var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
                 assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
             }
+
+            this.RegisterAssembly(assembly);
 
             return assembly;
         }
@@ -150,17 +172,42 @@ namespace LBi.LostDoc.Core.Reflection
                 }
             }
 
+            this.RegisterAssembly(ret, direct: false);
+
             return ret;
         }
 
         private Assembly OnFailedAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            return this.LoadAssemblyInternal(args.Name, Path.GetDirectoryName(args.RequestingAssembly.Location));
+            var asm = this.LoadAssemblyInternal(args.Name, Path.GetDirectoryName(args.RequestingAssembly.Location));
+            
+            var obj = this._cache.Get(args.RequestingAssembly.FullName);
+            if (asm != null && obj != null)
+            {
+                Assembly[] assemblies = (Assembly[]) obj;
+                if (Array.IndexOf(assemblies, asm) < 0)
+                {
+                    Array.Resize(ref assemblies, assemblies.Length + 1);
+                    assemblies[assemblies.Length - 1] = asm;
+                    this._cache.Add(args.RequestingAssembly.FullName, assemblies, ObjectCache.InfiniteAbsoluteExpiration);
+                }
+            }
+            return asm;
         }
 
         public void Dispose()
         {
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.OnFailedAssemblyResolve;
+        }
+
+        public IEnumerator<Assembly> GetEnumerator()
+        {
+            return this._loadedAssemblies.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }

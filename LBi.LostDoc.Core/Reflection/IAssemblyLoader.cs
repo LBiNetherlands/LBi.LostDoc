@@ -20,7 +20,7 @@ using System.Reflection;
 
 namespace LBi.LostDoc.Core.Reflection
 {
-    public interface IAssemblyLoader : IDisposable
+    public interface IAssemblyLoader : IDisposable, IEnumerable<Assembly>
     {
         Assembly Load(string name);
         Assembly LoadFrom(string path);

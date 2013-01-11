@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012,2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using LBi.LostDoc.Core.Diagnostics;
+using LBi.LostDoc.Core.Reflection;
 
 namespace LBi.LostDoc.Core
 {
     public class AssetResolver : IAssetResolver
     {
-        private Assembly[] _assemblies;
-        private Dictionary<AssetIdentifier, object> _cache;
+        private readonly IAssemblyLoader _assemblyLoader;
+        private readonly Dictionary<AssetIdentifier, object> _cache;
 
-        public AssetResolver(IEnumerable<Assembly> sourceAssemblies)
+        public AssetResolver(IAssemblyLoader assemblyLoader)
         {
-            this._assemblies = sourceAssemblies.ToArray();
+            this._assemblyLoader = assemblyLoader;
             this._cache = new Dictionary<AssetIdentifier, object>();
         }
 
@@ -67,7 +68,7 @@ namespace LBi.LostDoc.Core
                 case AssetType.Namespace:
                     string ns = (string)this.Resolve(assetId);
                     Assembly[] matchingAssemblies =
-                        this._assemblies.Where(a => a.GetName().Version == assetId.Version)
+                        this._assemblyLoader.Where(a => a.GetName().Version == assetId.Version)
                             .Where(a => a.GetTypes().Any(
                                 t1 =>
                                 t1.Namespace != null &&
@@ -123,7 +124,7 @@ namespace LBi.LostDoc.Core
 
         public IEnumerable<Assembly> Context
         {
-            get { return this._assemblies; }
+            get { return this._assemblyLoader; }
         }
 
         #endregion
@@ -224,13 +225,13 @@ namespace LBi.LostDoc.Core
         private object ResolveAssembly(AssetIdentifier assetId, Assembly hintAssembly)
         {
             IEnumerable<Assembly> referencedAssemblies =
-                this._assemblies.SelectMany(
+                this._assemblyLoader.SelectMany(
                                             a =>
                                             a.GetReferencedAssemblies().Select(
                                                                                n =>
                                                                                Assembly.ReflectionOnlyLoad(n.FullName)));
 
-            IEnumerable<Assembly> assemblies = this._assemblies.Concat(referencedAssemblies);
+            IEnumerable<Assembly> assemblies = this._assemblyLoader.Concat(referencedAssemblies);
             foreach (Assembly assembly in assemblies)
             {
                 if (AssetIdentifier.FromAssembly(assembly).Equals(assetId))
@@ -309,7 +310,7 @@ namespace LBi.LostDoc.Core
                     return true;
             }
 
-            foreach (var assembly in this._assemblies)
+            foreach (var assembly in this._assemblyLoader)
             {
                 var tmp = assembly.GetType(typeName, false, false);
                 if (tmp != null)

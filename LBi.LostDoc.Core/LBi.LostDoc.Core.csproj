@@ -59,7 +59,9 @@
     <Compile Include="Enrichers\ExternalNamespaceDocEnricher.cs" />
     <Compile Include="Enrichers\XmlDocEnricher.cs" />
     <Compile Include="FilterContext.cs" />
+    <Compile Include="FilterState.cs" />
     <Compile Include="Filters\CompilerGeneratedFilter.cs" />
+    <Compile Include="Filters\ComObjectTypeFilter.cs" />
     <Compile Include="Filters\DynamicallyInvokableAttributeFilter.cs" />
     <Compile Include="Filters\EnumMetadataFilter.cs" />
     <Compile Include="Filters\PrivateImplementationDetailsFilter.cs" />
@@ -93,6 +95,7 @@
     <Compile Include="Templating\ProgressArgs.cs" />
     <Compile Include="Templating\Resource.cs" />
     <Compile Include="Templating\ResourceDeployment.cs" />
+    <Compile Include="Templating\ResourceFileProvider.cs" />
     <Compile Include="Templating\SectionRegistration.cs" />
     <Compile Include="Templating\Stylesheet.cs" />
     <Compile Include="Templating\StylesheetApplication.cs" />

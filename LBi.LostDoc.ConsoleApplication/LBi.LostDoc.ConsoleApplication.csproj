@@ -64,7 +64,6 @@
     <Compile Include="ICommandProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceFileProvider.cs" />
     <Compile Include="SaveTemplateCommand.cs" />
     <Compile Include="ExtractAndTemplateCommand.cs" />
     <Compile Include="TemplateCommand.cs" />

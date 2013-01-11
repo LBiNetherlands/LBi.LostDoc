@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using Microsoft.Web.Administration;
@@ -25,25 +26,6 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 {
     public class ContentController : Controller
     {
-        private static readonly Dictionary<string, string> _mimeLookup;
-
-        static ContentController()
-        {
-            _mimeLookup = new Dictionary<string, string>();
-            using (ServerManager serverManager = new ServerManager())
-            {
-                var siteName = HostingEnvironment.ApplicationHost.GetSiteName();
-                Configuration config = serverManager.GetWebConfiguration(siteName);
-                ConfigurationSection staticContentSection = config.GetSection("system.webServer/staticContent");
-                ConfigurationElementCollection staticContentCollection = staticContentSection.GetCollection();
-
-                foreach (ConfigurationElement confElem in staticContentCollection)
-                {
-                    _mimeLookup.Add(confElem.GetAttributeValue("fileExtension").ToString(),
-                                    confElem.GetAttributeValue("mimeType").ToString());
-                }
-            }
-        }
 
         public ActionResult GetContent(string id, string path)
         {
@@ -58,9 +40,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                 else
                     contentPath = Path.Combine(ContentManager.Instance.GetContentRoot(id), "Html", path);
 
-                string contentType;
-                if (!_mimeLookup.TryGetValue(Path.GetExtension(contentPath), out contentType))
-                    contentType = "application/octet-stream";
+                string contentType = MimeMapping.GetMimeMapping(Path.GetExtension(contentPath));
                 return this.File(contentPath, contentType);
             }
             catch (InvalidOperationException)

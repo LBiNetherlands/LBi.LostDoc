@@ -89,9 +89,7 @@ namespace LBi.LostDoc.Repository.Web
         {
             get
             {
-                return
-                    Path.Combine(_basePath,
-                                 System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.TemplatePath"]);
+                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.TemplatePath"];
             }
         }
     }
