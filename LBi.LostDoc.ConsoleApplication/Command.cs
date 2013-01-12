@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,18 @@
  * limitations under the License. 
  */
 
+using LBi.Cli.Arguments;
+
 namespace LBi.LostDoc.ConsoleApplication
 {
-    public interface ICommand
+    public abstract class Command : ICommand
     {
-        void Invoke();
+        [Parameter(HelpMessage = "Include errors and warning output only.")]
+        public LBi.Cli.Arguments.Switch Quiet { get; set; }
+
+        [Parameter(HelpMessage = "Include verbose output.")]
+        public LBi.Cli.Arguments.Switch Verbose { get; set; }
+
+        public abstract void Invoke();
     }
 }

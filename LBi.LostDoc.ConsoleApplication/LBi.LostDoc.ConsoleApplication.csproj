@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Command.cs" />
     <Compile Include="ConsolidatedConsoleTraceListener.cs" />
     <Compile Include="DefaultCommandProvider.cs" />
     <Compile Include="ExtractCommand.cs" />

@@ -90,12 +90,16 @@ namespace LBi.LostDoc.Core.Enrichers
 
         #endregion
 
+        // TODO fix this, and the accompanying XSLT template, the construction of attribute 
+        // arguments isn't very consitent 
         private static void GenerateAttributeElements(IProcessingContext context,
                                                       IEnumerable<CustomAttributeData> attrData)
         {
             foreach (CustomAttributeData custAttr in attrData)
             {
-                AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(custAttr.Constructor.ReflectedType ?? custAttr.Constructor.DeclaringType);
+                AssetIdentifier typeAssetId =
+                    AssetIdentifier.FromMemberInfo(custAttr.Constructor.ReflectedType
+                                                   ?? custAttr.Constructor.DeclaringType);
 
                 if (context.IsFiltered(typeAssetId))
                     continue;
@@ -212,7 +216,7 @@ namespace LBi.LostDoc.Core.Enrichers
                     yield return xElement;
 
             }
-            else
+            else // TODO fix how this encodes unprintable characters 
                 yield return new XAttribute("value", cata.Value.ToString().Replace("\0", "\\0"));
         }
     }

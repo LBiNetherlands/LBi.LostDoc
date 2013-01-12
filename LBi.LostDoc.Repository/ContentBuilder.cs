@@ -15,17 +15,15 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using LBi.LostDoc.Core;
 using LBi.LostDoc.Core.Diagnostics;
 using LBi.LostDoc.Core.Templating;
-using LBi.LostDoc.Core.Templating.XPath;
 using LBi.LostDoc.Repository.Lucene;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
@@ -84,11 +82,13 @@ namespace LBi.LostDoc.Repository
             string htmlRoot = Path.Combine(targetDirectory, "Html");
             string indexRoot = Path.Combine(targetDirectory, "Index");
             string sourceRoot = Path.Combine(targetDirectory, "Source");
+            string logRoot = Path.Combine(targetDirectory, "Logs");
+
 
             DirectoryInfo htmlDir = Directory.CreateDirectory(htmlRoot);
             DirectoryInfo indexDir = Directory.CreateDirectory(indexRoot);
             DirectoryInfo sourceDir = Directory.CreateDirectory(sourceRoot);
-
+            DirectoryInfo logDir = Directory.CreateDirectory(logRoot);
             var sourceFiles = Directory.EnumerateFiles(sourceDirectory, "*.ldoc", SearchOption.TopDirectoryOnly);
 
             // copy all source files to output directory and add to bundle
@@ -100,89 +100,134 @@ namespace LBi.LostDoc.Repository
                 bundle.Add(XDocument.Load(targetFile));
             }
 
-            // merge ldoc files
-            this.OnStateChanged(State.Merging);
-            AssetRedirectCollection assetRedirects;
-            var mergedDoc = bundle.Merge(out assetRedirects);
+            TemplateOutput templateOutput;
 
-            // generate output
-            var templateData = new TemplateData(mergedDoc)
-                                   {
-                                       AssetRedirects = assetRedirects,
-                                       IgnoredVersionComponent = this.IgnoreVersionComponent,
-                                       TargetDirectory = htmlDir.FullName,
-                                       Arguments = new Dictionary<string, object> {{"SearchUri", "/search/"}}
-                                   };
+            // wire up logging
+            using (TextWriterTraceListener traceListener =
+                new TextWriterTraceListener(Path.Combine(logDir.FullName,
+                                                         string.Format(
+                                                             "template_{0:yyyy'_'MM'_'dd'__'HH'_'mm'_'ss}.log",
+                                                             DateTime.Now))))
+            {
 
-            this.OnStateChanged(State.Templating);
-            TemplateOutput templateOutput = this.Template.Generate(templateData);
+                // log everything
+                traceListener.Filter = new EventTypeFilter(SourceLevels.All);
+                LBi.LostDoc.Core.Diagnostics.TraceSources.TemplateSource.Switch.Level = SourceLevels.All;
+                LBi.LostDoc.Core.Diagnostics.TraceSources.BundleSource.Switch.Level = SourceLevels.All;
+                LBi.LostDoc.Core.Diagnostics.TraceSources.AssetResolverSource.Switch.Level = SourceLevels.All;
+                LBi.LostDoc.Core.Diagnostics.TraceSources.TemplateSource.Listeners.Add(traceListener);
+                LBi.LostDoc.Core.Diagnostics.TraceSources.BundleSource.Listeners.Add(traceListener);
+                LBi.LostDoc.Core.Diagnostics.TraceSources.AssetResolverSource.Listeners.Add(traceListener);
 
+                // merge ldoc files
+                this.OnStateChanged(State.Merging);
+                AssetRedirectCollection assetRedirects;
+                var mergedDoc = bundle.Merge(out assetRedirects);
+
+                // generate output
+                var templateData = new TemplateData(mergedDoc)
+                                       {
+                                           AssetRedirects = assetRedirects,
+                                           IgnoredVersionComponent = this.IgnoreVersionComponent,
+                                           TargetDirectory = htmlDir.FullName,
+                                           Arguments = new Dictionary<string, object> {{"SearchUri", "/search/"}}
+                                       };
+
+                this.OnStateChanged(State.Templating);
+                templateOutput = this.Template.Generate(templateData);
+
+                LBi.LostDoc.Core.Diagnostics.TraceSources.TemplateSource.Listeners.Remove(traceListener);
+                LBi.LostDoc.Core.Diagnostics.TraceSources.BundleSource.Listeners.Remove(traceListener);
+                LBi.LostDoc.Core.Diagnostics.TraceSources.AssetResolverSource.Listeners.Remove(traceListener);
+            }
 
             this.OnStateChanged(State.Indexing);
-            // one stop-word per line
-            StringReader stopWordsReader = new StringReader(@"missing");
 
-            // index output
-            using (var directory = FSDirectory.Open(indexDir))
-            using (stopWordsReader)
+            using (TextWriterTraceListener traceListener =
+                new TextWriterTraceListener(Path.Combine(logDir.FullName,
+                                                         string.Format(
+                                                             "index_{0:yyyy'_'MM'_'dd'__'HH'_'mm'_'ss}.log",
+                                                             DateTime.Now))))
             {
-                Analyzer analyzer = new StandardAnalyzer(global::Lucene.Net.Util.Version.LUCENE_30, stopWordsReader);
-                Analyzer titleAnalyzer = new TitleAnalyzer();
-                IDictionary<string,Analyzer> fieldAnalyzers = new Dictionary<string, Analyzer>
-                                                 {
-                                                     { "title", titleAnalyzer } 
-                                                 };
+                // log everything
+                traceListener.Filter = new EventTypeFilter(SourceLevels.All);
+                TraceSources.ContentBuilderSource.Switch.Level = SourceLevels.All;
+                TraceSources.ContentBuilderSource.Listeners.Add(traceListener);
                 
-                PerFieldAnalyzerWrapper analyzerWrapper = new PerFieldAnalyzerWrapper(analyzer, fieldAnalyzers);
-                
-                using (var writer = new IndexWriter(directory, analyzerWrapper, IndexWriter.MaxFieldLength.UNLIMITED))
+
+                // one stop-word per line
+                StringReader stopWordsReader = new StringReader(@"missing");
+
+                // index output
+                using (var directory = FSDirectory.Open(indexDir))
+                using (stopWordsReader)
                 {
-                    var saResults = templateOutput.Results.Select(wur => wur.WorkUnit).OfType<StylesheetApplication>();
+                    Analyzer analyzer = new StandardAnalyzer(global::Lucene.Net.Util.Version.LUCENE_30, stopWordsReader);
+                    Analyzer titleAnalyzer = new TitleAnalyzer();
+                    IDictionary<string, Analyzer> fieldAnalyzers = new Dictionary<string, Analyzer>
+                                                                       {
+                                                                           {"title", titleAnalyzer}
+                                                                       };
 
-                    var saDict = saResults.ToDictionary(sa => sa.Asset);
+                    PerFieldAnalyzerWrapper analyzerWrapper = new PerFieldAnalyzerWrapper(analyzer, fieldAnalyzers);
 
-                    var indexResults = saDict.Values.Where(sa => sa.SaveAs.EndsWith(".xml"));
-
-                    foreach (var sa in indexResults)
+                    using (
+                        var writer = new IndexWriter(directory, analyzerWrapper, IndexWriter.MaxFieldLength.UNLIMITED))
                     {
-                        string absPath = Path.Combine(htmlDir.FullName, sa.SaveAs);
+                        var saResults =
+                            templateOutput.Results.Select(wur => wur.WorkUnit).OfType<StylesheetApplication>();
 
-                        XDocument indexDoc = XDocument.Load(absPath);
+                        var saDict = saResults.ToDictionary(sa => sa.Asset);
 
-                        string assetId = indexDoc.Root.Attribute("assetId").Value;
-                        string title = indexDoc.Root.Element("title").Value.Trim();
-                        string summary = indexDoc.Root.Element("summary").Value.Trim();
-                        string text = indexDoc.Root.Element("text").Value.Trim();
+                        var indexResults = saDict.Values.Where(sa => sa.SaveAs.EndsWith(".xml"));
 
-                        var ssApplication = saDict[AssetIdentifier.Parse(assetId)];
-
-
-                        var doc = new Document();
-
-                        doc.Add(new Field("uri", new Uri(ssApplication.SaveAs, UriKind.Relative).ToString(), Field.Store.YES, Field.Index.NO));
-                        doc.Add(new Field("aid", ssApplication.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                        foreach (AssetIdentifier aid in ssApplication.Aliases)
-                            doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
-
-                        foreach (var section in ssApplication.Sections)
+                        foreach (var sa in indexResults)
                         {
-                            doc.Add(new Field("section", section.AssetIdentifier,
-                                              Field.Store.NO,
-                                              Field.Index.NOT_ANALYZED));
+                            string absPath = Path.Combine(htmlDir.FullName, sa.SaveAs);
+
+                            XDocument indexDoc = XDocument.Load(absPath);
+
+                            string assetId = indexDoc.Root.Attribute("assetId").Value;
+                            string title = indexDoc.Root.Element("title").Value.Trim();
+                            string summary = indexDoc.Root.Element("summary").Value.Trim();
+                            string text = indexDoc.Root.Element("text").Value.Trim();
+
+                            var ssApplication = saDict[AssetIdentifier.Parse(assetId)];
+
+
+                            var doc = new Document();
+
+                            doc.Add(new Field("uri",
+                                              new Uri(ssApplication.SaveAs, UriKind.Relative).ToString(),
+                                              Field.Store.YES,
+                                              Field.Index.NO));
+                            doc.Add(new Field("aid", ssApplication.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                            foreach (AssetIdentifier aid in ssApplication.Aliases)
+                                doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
+
+                            foreach (var section in ssApplication.Sections)
+                            {
+                                doc.Add(new Field("section",
+                                                  section.AssetIdentifier,
+                                                  Field.Store.NO,
+                                                  Field.Index.NOT_ANALYZED));
+                            }
+
+                            doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED));
+                            doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED));
+                            doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED));
+                            TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
+                            writer.AddDocument(doc);
                         }
 
-                        doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED));
-                        doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED));
-                        doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED));
-                        TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
-                        writer.AddDocument(doc);
+                        writer.Optimize();
+                        writer.Commit();
                     }
-
-                    writer.Optimize();
-                    writer.Commit();
+                    analyzerWrapper.Close();
+                    analyzer.Close();
                 }
-                analyzerWrapper.Close();
-                analyzer.Close();
+
+                TraceSources.ContentBuilderSource.Listeners.Remove(traceListener);
             }
             this.OnStateChanged(State.Finalizing);
 
@@ -215,7 +260,7 @@ namespace LBi.LostDoc.Repository
                                                     new XElement("alias", new XAttribute("assetId", wual))),
                                 ssWu.Sections.Select(
                                                      wuse =>
-                                                     new XElement("alias",
+                                                     new XElement("section",
                                                          new XAttribute("name",wuse.Name),
                                                          new XAttribute("assetId",wuse.AssetIdentifier))),
                                 new XElement("template",
