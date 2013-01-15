@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,8 +28,8 @@ namespace LBi.LostDoc.Core.Templating
 {
     public class TemplateXsltExtensions
     {
-        private readonly Dictionary<string, AssetIdentifier> _aidCache;
-        private readonly Dictionary<AssetIdentifier, string> _resolveCache;
+        private readonly ConcurrentDictionary<string, AssetIdentifier> _aidCache;
+        private readonly ConcurrentDictionary<AssetIdentifier, string> _resolveCache;
         private readonly ITemplatingContext _context;
         private readonly Uri _currentUri;
 
@@ -37,16 +38,32 @@ namespace LBi.LostDoc.Core.Templating
             this._context = context;
             this._currentUri = currentUri;
 
-            this._aidCache = new Dictionary<string, AssetIdentifier>();
-            this._resolveCache = new Dictionary<AssetIdentifier, string>();
+            this._aidCache = new ConcurrentDictionary<string, AssetIdentifier>();
+            this._resolveCache = new ConcurrentDictionary<AssetIdentifier, string>();
         }
 
         private AssetIdentifier Parse(string str)
         {
-            AssetIdentifier ret;
-            if (!this._aidCache.TryGetValue(str, out ret))
-                this._aidCache.Add(str, ret = AssetIdentifier.Parse(str));
-            return ret;
+            return _aidCache.GetOrAdd(str, AssetIdentifier.Parse);
+        }
+        private string ResolveAssetIdentifier(string assetId, string version)
+        {
+
+            for (int i = 0; i < this._context.AssetUriResolvers.Length; i++)
+            {
+                Uri target = this._context.AssetUriResolvers[i].ResolveAssetId(assetId,
+                                                                               string.IsNullOrEmpty(version)
+                                                                                   ? null
+                                                                                   : new Version(version));
+                if (target != null)
+                {
+                    if (!target.IsAbsoluteUri)
+                        target = this.MakeRelative(target);
+
+                    return target.ToString();
+                }
+            }
+            return null;
         }
 
         public string resolve(string assetId)
@@ -82,26 +99,7 @@ namespace LBi.LostDoc.Core.Templating
             if (aid == null)
                 aid = new AssetIdentifier(assetId, new Version());
 
-            // TODO this doesn't seem very threadsafe, use concurrent dictionary?
-            if (!_resolveCache.TryGetValue(aid, out ret))
-            {
-                for (int i = 0; i < this._context.AssetUriResolvers.Length; i++)
-                {
-                    Uri target = this._context.AssetUriResolvers[i].ResolveAssetId(assetId,
-                                                                                   string.IsNullOrEmpty(version)
-                                                                                       ? null
-                                                                                       : new Version(version));
-                    if (target != null)
-                    {
-                        if (!target.IsAbsoluteUri)
-                            target = this.MakeRelative(target);
-
-                        ret = target.ToString();
-                        break;
-                    }
-                }
-                _resolveCache.Add(aid, ret);
-            }
+            ret = _resolveCache.GetOrAdd(aid, id => ResolveAssetIdentifier(assetId, version));
 
             if (ret == null)
             {
@@ -114,7 +112,6 @@ namespace LBi.LostDoc.Core.Templating
 
             return ret;
         }
-
         public bool canResolve(string assetId)
         {
             string ret = this.resolve(assetId);
