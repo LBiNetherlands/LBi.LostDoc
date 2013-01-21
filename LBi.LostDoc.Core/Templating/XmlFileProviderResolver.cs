@@ -23,9 +23,9 @@ namespace LBi.LostDoc.Core.Templating
     internal class XmlFileProviderResolver : XmlResolver
     {
         private string _basePath;
-        private IFileProvider _fileProvider;
+        private IReadOnlyFileProvider _fileProvider;
 
-        public XmlFileProviderResolver(IFileProvider fileProvider, string basePath)
+        public XmlFileProviderResolver(IReadOnlyFileProvider fileProvider, string basePath)
         {
             this._fileProvider = fileProvider;
             this._basePath = basePath;

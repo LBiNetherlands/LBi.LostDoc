@@ -20,7 +20,7 @@ using System.Reflection;
 
 namespace LBi.LostDoc.Core.Templating
 {
-    public class ResourceFileProvider : IFileProvider
+    public class ResourceFileProvider : IReadOnlyFileProvider
     {
         private Assembly _asm;
         private string _ns;
@@ -38,8 +38,13 @@ namespace LBi.LostDoc.Core.Templating
 
             this._asm = asm;
         }
+        
+        private string ConvertPath(string path)
+        {
+            return this._ns + path.Replace('\\', '.').Replace('/', '.');
+        }
 
-        #region IFileProvider Members
+        #region IReadOnlyFileProvider Members
 
         public bool FileExists(string path)
         {
@@ -53,17 +58,6 @@ namespace LBi.LostDoc.Core.Templating
                 throw new FileNotFoundException(string.Format("Resource not found: {0} (Was: {1})", this.ConvertPath(path), path), path);
             return ret;
         }
-
-        public Stream CreateFile(string path)
-        {
-            throw new NotSupportedException();
-        }
-
         #endregion
-
-        private string ConvertPath(string path)
-        {
-            return this._ns + path.Replace('\\', '.').Replace('/', '.');
-        }
     }
 }

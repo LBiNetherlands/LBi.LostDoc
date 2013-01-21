@@ -18,6 +18,9 @@ using System.Reflection;
 
 namespace LBi.LostDoc.Core
 {
+    /// <summary>
+    /// Base class for <see cref="MemberInfo"/> based filters.
+    /// </summary>
     public abstract class MemberInfoFilter : IAssetFilter
     {
         #region IAssetFilter Members

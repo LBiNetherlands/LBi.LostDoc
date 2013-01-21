@@ -97,6 +97,8 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                             ex.GetType().Name);
                         return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
                     }
+
+                    fi.Delete();
                 }
 
             }

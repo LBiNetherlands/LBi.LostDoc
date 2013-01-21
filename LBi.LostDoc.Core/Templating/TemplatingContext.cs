@@ -25,7 +25,7 @@ namespace LBi.LostDoc.Core.Templating
 {
     public class TemplatingContext : ITemplatingContext
     {
-        public TemplatingContext(ObjectCache cache, string basePath, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IFileProvider fileProvider)
+        public TemplatingContext(ObjectCache cache, string basePath, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IReadOnlyFileProvider fileProvider)
         {
             this.BasePath = basePath;
             this.TemplateData = data;
@@ -50,7 +50,7 @@ namespace LBi.LostDoc.Core.Templating
 
         public IAssetUriResolver[] AssetUriResolvers { get; protected set; }
 
-        public IFileProvider FileProvider { get; protected set; }
+        public IReadOnlyFileProvider FileProvider { get; protected set; }
 
         #endregion
 

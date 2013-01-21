@@ -38,6 +38,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\LBi.Cli.Arguments.0.0.2.112-dev\lib\net45\LBi.Cli.Arguments.dll</HintPath>
     </Reference>
+    <Reference Include="Roslyn.Compilers">
+      <HintPath>..\packages\Roslyn.Compilers.Common.1.2.20906.2\lib\net45\Roslyn.Compilers.dll</HintPath>
+    </Reference>
+    <Reference Include="Roslyn.Compilers.CSharp">
+      <HintPath>..\packages\Roslyn.Compilers.CSharp.1.2.20906.2\lib\net45\Roslyn.Compilers.CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -51,6 +57,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandProvider.cs" />
+    <Compile Include="PatchCommand.cs" />
+    <Compile Include="Patch\CSharp\DocCommentRewriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushCommand.cs" />
   </ItemGroup>
@@ -75,7 +83,16 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>mkdir $(ProjectDir)..\Lbi.LostDoc.ConsoleApplication\bin\Debug\Plugins\
+copy $(ProjectDir)$(OutDir)*.* $(ProjectDir)..\Lbi.LostDoc.ConsoleApplication\bin\Debug\Plugins\</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

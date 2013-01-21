@@ -14,30 +14,56 @@
  * limitations under the License. 
  */
 
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace LBi.LostDoc.Core.Templating
 {
-    public class DirectoryFileProvider : IFileProvider
+    public class DirectoryFileProvider : IReadOnlyFileProvider
     {
-        // private string _basePath;
-        #region IFileProvider Members
 
-        public bool FileExists(string path)
+        public DirectoryFileProvider(params string[] paths) : this(paths.AsEnumerable())
         {
-            return File.Exists(path);
         }
 
-        public Stream OpenFile(string path)
+        private DirectoryFileProvider(IEnumerable<string> paths)
         {
-            // return File.Open(Path.Combine(this._basePath, path), FileMode.Open);
+            this.SearchPaths = paths;
+        }
+
+        protected IEnumerable<string> SearchPaths { get; set; }
+
+        protected virtual IEnumerable<string> GeneratePaths(string path)
+        {
+            yield return path;
+
+            if (!Path.IsPathRooted(path))
+            {
+                foreach (string basePath in this.SearchPaths)
+                    yield return Path.Combine(basePath, path);
+            }
+        }
+
+        #region IReadOnlyFileProvider Members
+        
+        public virtual bool FileExists(string path)
+        {
+            return this.GeneratePaths(path)
+                       .FirstOrDefault(File.Exists) != null;
+        }
+
+        public virtual Stream OpenFile(string path)
+        {
+            string filePath = this.GeneratePaths(path)
+                                  .FirstOrDefault(File.Exists);
+            if (filePath != null)
+            {
+                throw new FileNotFoundException("Tried the following paths: {0}",
+                                                string.Join(", ", this.GeneratePaths(path)));
+            }
+
             return File.Open(path, FileMode.Open);
-        }
-
-        public Stream CreateFile(string path)
-        {
-            // return File.Create(Path.Combine(this._basePath, path));
-            return File.Create(path);
         }
 
         #endregion

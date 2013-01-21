@@ -28,6 +28,6 @@ namespace LBi.LostDoc.Core.Templating
         XPathNavigator Document { get; }
 
         IAssetUriResolver[] AssetUriResolvers { get; }
-        IFileProvider FileProvider { get; }
+        IReadOnlyFileProvider FileProvider { get; }
     }
 }

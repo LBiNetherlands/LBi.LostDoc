@@ -23,6 +23,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -101,12 +103,13 @@
     <Compile Include="Templating\StylesheetApplication.cs" />
     <Compile Include="Templating\TemplateData.cs" />
     <Compile Include="Templating\TemplateOutput.cs" />
+    <Compile Include="Templating\TemplateResolver.cs" />
     <Compile Include="Templating\UnitOfWork.cs" />
     <Compile Include="Templating\WorkUnitResult.cs" />
     <Compile Include="Templating\XPathVariable.cs" />
     <Compile Include="Templating\XPath\XPathNavigatorIterator.cs" />
     <Compile Include="Templating\XPath\CustomXsltContext.cs" />
-    <Compile Include="Templating\IFileProvider.cs" />
+    <Compile Include="Templating\IReadOnlyFileProvider.cs" />
     <Compile Include="Templating\ITemplatingContext.cs" />
     <Compile Include="Templating\Template.cs" />
     <Compile Include="Templating\TemplateXsltExtensions.cs" />

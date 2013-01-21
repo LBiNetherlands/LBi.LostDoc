@@ -34,13 +34,9 @@ using LBi.LostDoc.Core.Templating.XPath;
 
 namespace LBi.LostDoc.Core.Templating
 {
-    public interface ITemplate
+    public class Template 
     {
-    }
-
-    public class Template : ITemplate
-    {
-        private readonly IFileProvider _fileProvider;
+        private readonly TemplateResolver _resolver;
         private readonly ObjectCache _cache;
         private string _basePath;
         private FileResolver _fileResolver;
@@ -57,10 +53,10 @@ namespace LBi.LostDoc.Core.Templating
                 handler(this, new ProgressArgs(percent));
         }
 
-        public Template(IFileProvider fileProvider)
+        public Template(TemplateResolver resolver)
         {
             this._cache = new MemoryCache("TemplateCache");
-            this._fileProvider = fileProvider;
+            this._resolver = resolver;
             this._fileResolver = new FileResolver();
             this._resolvers = new List<IAssetUriResolver>();
             this._resolvers.Add(this._fileResolver);
@@ -71,7 +67,7 @@ namespace LBi.LostDoc.Core.Templating
 
         public virtual void Load(string path)
         {
-            using (Stream str = this._fileProvider.OpenFile(path))
+            using (Stream str = this._resolver.OpenFile(path))
                 _templateDefinition = XDocument.Load(str);
 
             this._basePath = Path.GetDirectoryName(path);
@@ -161,11 +157,11 @@ namespace LBi.LostDoc.Core.Templating
         private XslCompiledTransform LoadStylesheet(string name)
         {
             XslCompiledTransform ret = new XslCompiledTransform(true);
-            using (Stream str = this._fileProvider.OpenFile(Path.Combine(this._basePath, name)))
+            using (Stream str = this._resolver.OpenFile(Path.Combine(this._basePath, name)))
             {
                 XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                 XsltSettings settings = new XsltSettings(false, true);
-                XmlResolver resolver = new XmlFileProviderResolver(this._fileProvider, this._basePath);
+                XmlResolver resolver = new XmlFileProviderResolver(this._resolver, this._basePath);
                 ret.Load(reader, settings, resolver);
             }
 
@@ -393,8 +389,13 @@ namespace LBi.LostDoc.Core.Templating
             // clone orig doc
             XDocument workingDoc = new XDocument(this._templateDefinition);
 
-            // start by loading any parameters as they are needed for meta-template evaluation
+            XAttribute templateInheritsAttr = workingDoc.Root.Attribute("inherits");
+            if (templateInheritsAttr != null)
+            {
+                // load 
+            }
 
+            // start by loading any parameters as they are needed for meta-template evaluation
             Dictionary<string, XPathVariable> globalParams = new Dictionary<string, XPathVariable>();
 
             XElement[] paramNodes = workingDoc.Root.Elements("parameter").ToArray();
@@ -446,7 +447,7 @@ namespace LBi.LostDoc.Core.Templating
             XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
 
             // we're going to need this later
-            XmlFileProviderResolver fileResolver = new XmlFileProviderResolver(this._fileProvider, this._basePath);
+            XmlFileProviderResolver fileResolver = new XmlFileProviderResolver(this._resolver, this._basePath);
 
             while (metaNode != null)
             {
@@ -680,7 +681,7 @@ namespace LBi.LostDoc.Core.Templating
                                                                this._basePath,
                                                                templateData,
                                                                this._resolvers,
-                                                               this._fileProvider);
+                                                               this._resolver);
 
 
             // fill indices

@@ -139,57 +139,25 @@ namespace LBi.LostDoc.ConsoleApplication
                 string cwDir = Directory.GetCurrentDirectory();
 
 
-                IFileProvider fsProvider = new DirectoryFileProvider();
-                IFileProvider resourceProvider = new ResourceFileProvider("LBi.LostDoc.ConsoleApplication.Templates");
+                IReadOnlyFileProvider fsProvider = new DirectoryFileProvider();
+                IReadOnlyFileProvider resourceProvider = new ResourceFileProvider("LBi.LostDoc.ConsoleApplication.Templates");
 
-                IFileProvider selectedFileProvider = null;
-                string templatePath = null;
+                TemplateResolver templateResolver = new TemplateResolver(fsProvider, resourceProvider);
 
-                if (System.IO.Path.IsPathRooted(this.Template) &&
-                    fsProvider.FileExists(System.IO.Path.Combine(this.Template, "template.xml")))
-                {
-                    selectedFileProvider = fsProvider;
-                    templatePath = this.Template;
-                }
-                else if (!System.IO.Path.IsPathRooted(this.Template))
-                {
-                    string tmp = System.IO.Path.Combine(cwDir, this.Template, "template.xml");
-                    if (fsProvider.FileExists(tmp))
-                    {
-                        selectedFileProvider = fsProvider;
-                        templatePath = tmp;
-                    }
-                    else
-                    {
-                        tmp = System.IO.Path.Combine(appDir, this.Template, "template.xml");
-                        if (fsProvider.FileExists(tmp))
-                        {
-                            selectedFileProvider = fsProvider;
-                            templatePath = tmp;
-                        }
-                        else
-                        {
-                            tmp = System.IO.Path.Combine(this.Template, "template.xml");
-                            if (resourceProvider.FileExists(tmp))
-                            {
-                                selectedFileProvider = resourceProvider;
-                                templatePath = tmp;
-                            }
-                        }
-                    }
-                }
+                //IReadOnlyFileProvider selectedFileProvider;
+                Template template= templateResolver.Resolve(this.Template);
 
-                if (templatePath == null)
-                    throw new FileNotFoundException(this.Template);
+                //if (templatePath == null)
+                //    throw new FileNotFoundException(this.Template);
 
                 string outputDir = this.Output
                                    ?? (Directory.Exists(this.Path)
                                            ? this.Path
                                            : System.IO.Path.GetDirectoryName(this.Path));
 
-                Template template = new Template(selectedFileProvider);
+                //Template template = new Template(selectedFileProvider);
 
-                template.Load(templatePath);
+                //template.Load(templatePath);
                 AssetRedirectCollection assetRedirects;
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
 
