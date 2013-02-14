@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012,2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace LBi.LostDoc.Core.Templating
 {
@@ -67,5 +68,13 @@ namespace LBi.LostDoc.Core.Templating
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            StringBuilder ret = new StringBuilder();
+            foreach (var searchPath in this.SearchPaths)
+                ret.AppendLine(searchPath);
+            return ret.ToString();
+        }
     }
 }

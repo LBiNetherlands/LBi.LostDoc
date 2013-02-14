@@ -92,6 +92,7 @@
     <Compile Include="Templating\DirectoryFileProvider.cs" />
     <Compile Include="Templating\AssetResolvers\FileResolver.cs" />
     <Compile Include="Templating\AssetResolvers\MsdnResolver.cs" />
+    <Compile Include="Templating\ScopedFileProvider.cs" />
     <Compile Include="Templating\Index.cs" />
     <Compile Include="Templating\ParsedTemplate.cs" />
     <Compile Include="Templating\ProgressArgs.cs" />
@@ -139,7 +140,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="Service References\MsdnContentService\atoms.xsd">
       <SubType>Designer</SubType>
     </None>

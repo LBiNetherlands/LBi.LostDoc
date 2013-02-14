@@ -22,10 +22,11 @@ namespace LBi.LostDoc.Core.Templating
 {
     internal class XmlFileProviderResolver : XmlResolver
     {
-        private string _basePath;
-        private IReadOnlyFileProvider _fileProvider;
+        private readonly string _basePath;
+        private readonly IReadOnlyFileProvider _fileProvider;
 
-        public XmlFileProviderResolver(IReadOnlyFileProvider fileProvider, string basePath)
+        // TODO investigate whether basePath can be deleted entirely
+        public XmlFileProviderResolver(IReadOnlyFileProvider fileProvider, string basePath = null)
         {
             this._fileProvider = fileProvider;
             this._basePath = basePath;
@@ -76,10 +77,10 @@ namespace LBi.LostDoc.Core.Templating
 
         public override Uri ResolveUri(Uri baseUri, string relativeUri)
         {
-            // if (baseUri == null)
-            return new Uri(this._basePath + "/" + relativeUri, UriKind.Relative);
+            if (this._basePath != null)
+                return new Uri(this._basePath + "/" + relativeUri, UriKind.Relative);
 
-            // return base.ResolveUri(baseUri, relativeUri);
+            return new Uri(relativeUri, UriKind.RelativeOrAbsolute);
         }
     }
 }

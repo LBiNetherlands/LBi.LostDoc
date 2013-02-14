@@ -144,24 +144,16 @@ namespace LBi.LostDoc.ConsoleApplication
 
                 TemplateResolver templateResolver = new TemplateResolver(fsProvider, resourceProvider);
 
-                //IReadOnlyFileProvider selectedFileProvider;
-                Template template= templateResolver.Resolve(this.Template);
-
-                //if (templatePath == null)
-                //    throw new FileNotFoundException(this.Template);
+                Template template = new Template();
+                template.Load(templateResolver, this.Template);
 
                 string outputDir = this.Output
                                    ?? (Directory.Exists(this.Path)
                                            ? this.Path
                                            : System.IO.Path.GetDirectoryName(this.Path));
-
-                //Template template = new Template(selectedFileProvider);
-
-                //template.Load(templatePath);
                 AssetRedirectCollection assetRedirects;
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
 
-                
                 var templateData = new TemplateData(mergedDoc)
                                        {
                                            AssetRedirects = assetRedirects,

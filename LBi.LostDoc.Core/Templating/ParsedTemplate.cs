@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012,2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,30 @@
  * limitations under the License. 
  */
 
+using System.Xml.Linq;
+
 namespace LBi.LostDoc.Core.Templating
 {
     public class ParsedTemplate
     {
+        /// <summary>
+        /// Contains all stylesheet definitions specified in the template.
+        /// </summary>
         public Stylesheet[] Stylesheets { get; set; }
+
+        /// <summary>
+        /// Contains all resource definitions specified in the template.
+        /// </summary>
         public Resource[] Resources { get; set; }
+
+        /// <summary>
+        /// Contains the index definitions specified in the template.
+        /// </summary>
         public Index[] Indices { get; set; }
+        
+        /// <summary>
+        /// Contains the source document, required for template inheritence.
+        /// </summary>
+        public XDocument Source { get; set; }
     }
 }

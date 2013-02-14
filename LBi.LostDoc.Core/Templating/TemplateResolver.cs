@@ -15,7 +15,9 @@
  */
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace LBi.LostDoc.Core.Templating
 {
@@ -33,25 +35,17 @@ namespace LBi.LostDoc.Core.Templating
 
         protected IReadOnlyFileProvider[] Providers { get; set; }
 
-        //protected internal string ResolvePath(string nameOrPath)
-        //{
-        //    string ret ;
-        //    IReadOnlyFileProvider fileProvider;
-        //    const string definitionFileName = "template.xml";
-            
-        //    if (this.FileExists(System.IO.Path.Combine(nameOrPath, definitionFileName), out fileProvider))
-        //        ret = System.IO.Path.Combine(nameOrPath, definitionFileName);
-        //    else
-        //        ret = null;
 
-        //    return ret;
-        //}
-
-        // template will have to be able to load inherited template files from its' fileprovider!
+        public bool Resolve(string name, out IReadOnlyFileProvider fileProvider, out string path)
+        {
+            path = Path.Combine(name, Template.TemplateDefinitionFileName);
+            return this.FileExists(path, out fileProvider);
+        }
 
         private bool FileExists(string path, out IReadOnlyFileProvider fileProvider)
         {
             bool ret = false;
+            fileProvider = null;
 
             foreach (IReadOnlyFileProvider provider in this.Providers)
             {
@@ -62,18 +56,18 @@ namespace LBi.LostDoc.Core.Templating
                     break;
                 }
              }
-
-            if (!ret)
-                fileProvider = null;
-
             return ret;
         }
 
-        public Template Resolve(string name)
+        public override string ToString()
         {
-            Template ret;
-            ret = new Template(this);
-            return ret;
+            StringBuilder ret = new StringBuilder();
+            foreach (IReadOnlyFileProvider provider in this.Providers)
+            {
+                ret.Append("Provider: ").AppendLine(provider.GetType().Name);
+                ret.AppendLine(provider.ToString());
+            }
+            return ret.ToString();
         }
     }
 }

@@ -34,15 +34,21 @@ using LBi.LostDoc.Core.Templating.XPath;
 
 namespace LBi.LostDoc.Core.Templating
 {
-    public class Template 
+
+
+    public class Template
     {
-        private readonly TemplateResolver _resolver;
+        public const string TemplateDefinitionFileName = "template.xml";
+
         private readonly ObjectCache _cache;
         private string _basePath;
+        private XDocument _templateDefinition;
+
         private FileResolver _fileResolver;
         private List<IAssetUriResolver> _resolvers;
 
-        private XDocument _templateDefinition;
+        private IReadOnlyFileProvider _fileProvider;
+        private TemplateResolver _templateResolver;
 
         public event EventHandler<ProgressArgs> Progress;
 
@@ -53,10 +59,9 @@ namespace LBi.LostDoc.Core.Templating
                 handler(this, new ProgressArgs(percent));
         }
 
-        public Template(TemplateResolver resolver)
+        public Template()
         {
             this._cache = new MemoryCache("TemplateCache");
-            this._resolver = resolver;
             this._fileResolver = new FileResolver();
             this._resolvers = new List<IAssetUriResolver>();
             this._resolvers.Add(this._fileResolver);
@@ -65,12 +70,26 @@ namespace LBi.LostDoc.Core.Templating
 
         #region LoadFrom Template
 
-        public virtual void Load(string path)
+        public virtual void Load(TemplateResolver resolver, string name)
         {
-            using (Stream str = this._resolver.OpenFile(path))
-                _templateDefinition = XDocument.Load(str);
+            string path;
+            if (resolver.Resolve(name, out this._fileProvider, out path))
+            {
+                using (Stream str = this._fileProvider.OpenFile(path))
+                    _templateDefinition = XDocument.Load(str);
 
-            this._basePath = Path.GetDirectoryName(path);
+                this._basePath = Path.GetDirectoryName(path);
+                this._templateResolver = resolver;
+            }
+            else
+            {
+                throw new FileNotFoundException("Template not found, search paths: {0}", resolver.ToString());
+            }
+        }
+
+        protected virtual IReadOnlyFileProvider GetScopedFileProvider()
+        {
+            return new ScopedFileProvider(this._fileProvider, this._basePath);
         }
 
 
@@ -150,18 +169,19 @@ namespace LBi.LostDoc.Core.Templating
         /// <summary>
         /// The load stylesheet.
         /// </summary>
+        /// <param name="resourceProvider"></param>
         /// <param name="name">
         /// </param>
         /// <returns>
         /// </returns>
-        private XslCompiledTransform LoadStylesheet(string name)
+        private XslCompiledTransform LoadStylesheet(IReadOnlyFileProvider resourceProvider, string name)
         {
             XslCompiledTransform ret = new XslCompiledTransform(true);
-            using (Stream str = this._resolver.OpenFile(Path.Combine(this._basePath, name)))
+            using (Stream str = resourceProvider.OpenFile(name))
             {
                 XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                 XsltSettings settings = new XsltSettings(false, true);
-                XmlResolver resolver = new XmlFileProviderResolver(this._resolver, this._basePath);
+                XmlResolver resolver = new XmlFileProviderResolver(resourceProvider);
                 ret.Load(reader, settings, resolver);
             }
 
@@ -180,6 +200,7 @@ namespace LBi.LostDoc.Core.Templating
             XElement[] inputElements =
                 templateData.XDocument.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
 
+            // TODO this code requires a proper cleanup to make the scoping/resolution rules more obvious
             foreach (XElement inputElement in inputElements)
             {
                 // create resolver
@@ -384,7 +405,7 @@ namespace LBi.LostDoc.Core.Templating
         }
 
 
-        protected virtual ParsedTemplate PrepareTemplate(TemplateData templateData)
+        protected virtual ParsedTemplate PrepareTemplate(TemplateData templateData, Dictionary<string, IReadOnlyFileProvider> providers = null)
         {
             // clone orig doc
             XDocument workingDoc = new XDocument(this._templateDefinition);
@@ -392,7 +413,24 @@ namespace LBi.LostDoc.Core.Templating
             XAttribute templateInheritsAttr = workingDoc.Root.Attribute("inherits");
             if (templateInheritsAttr != null)
             {
-                // load 
+                if (providers == null)
+                    providers = new Dictionary<string, IReadOnlyFileProvider>();
+
+                int depth = providers.Count + 1;
+                Template inheritedTemplate = new Template();
+                inheritedTemplate.Load(this._templateResolver, templateInheritsAttr.Value);
+                ParsedTemplate parsedTemplate = inheritedTemplate.PrepareTemplate(templateData, providers);
+
+                providers.Add(depth.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                              inheritedTemplate.GetScopedFileProvider());
+
+                // a little hacky but it should work with the Reverse()/AddFirst()
+                foreach (XElement elem in parsedTemplate.Source.Root.Elements().Reverse())
+                {
+                    var clone = new XElement(elem);
+                    clone.Add(new XAttribute("source", depth));
+                    workingDoc.Root.AddFirst(clone);
+                }
             }
 
             // start by loading any parameters as they are needed for meta-template evaluation
@@ -447,7 +485,7 @@ namespace LBi.LostDoc.Core.Templating
             XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
 
             // we're going to need this later
-            XmlFileProviderResolver fileResolver = new XmlFileProviderResolver(this._resolver, this._basePath);
+            XmlFileProviderResolver fileResolver = new XmlFileProviderResolver(this._fileProvider, this._basePath);
 
             while (metaNode != null)
             {
@@ -463,7 +501,7 @@ namespace LBi.LostDoc.Core.Templating
 
                     #endregion
 
-                    XslCompiledTransform metaTransform = this.LoadStylesheet(metaNode.Attribute("stylesheet").Value);
+                    XslCompiledTransform metaTransform = this.LoadStylesheet(this.GetScopedFileProvider(), metaNode.Attribute("stylesheet").Value);
 
                     XsltArgumentList xsltArgList = new XsltArgumentList();
 
@@ -522,7 +560,21 @@ namespace LBi.LostDoc.Core.Templating
 
                 if (elem.Name.LocalName == "apply-stylesheet")
                 {
-                    stylesheets.Add(this.ParseStylesheet(stylesheets, elem));
+                    XAttribute depthAttr = elem.Attribute("depth");
+
+                    IReadOnlyFileProvider resourceProvider;
+                    if (depthAttr == null)
+                    {
+                        resourceProvider = this.GetScopedFileProvider();
+                    }
+                    else if (providers == null || !providers.TryGetValue(depthAttr.Value, out resourceProvider))
+                    {
+                        throw new InvalidOperationException(
+                            "Depth specified on 'apply-stylesheet' but the corresponding provider was not found.");
+                    }
+
+                    //FIX THIS HERE
+                    stylesheets.Add(this.ParseStylesheet(resourceProvider, stylesheets, elem));
                 }
                 else if (elem.Name.LocalName == "index")
                 {
@@ -530,11 +582,22 @@ namespace LBi.LostDoc.Core.Templating
                 }
                 else if (elem.Name.LocalName == "include-resource")
                 {
-                    resources.Add(new Resource
-                                      {
-                                          Path = elem.Attribute("path").Value,
-                                          ConditionExpression = this.GetAttributeValueOrDefault(elem, "condition")
-                                      });
+                    XAttribute depthAttr = elem.Attribute("depth");
+                    IReadOnlyFileProvider resourceProvider;
+                    if (depthAttr == null)
+                    {
+                        resourceProvider = this.GetScopedFileProvider();
+                    }
+                    else if (providers == null || !providers.TryGetValue(depthAttr.Value, out resourceProvider))
+                    {
+                        throw new InvalidOperationException(
+                            "Depth specified on 'include-resource' but the corresponding provider was not found.");
+                    }
+
+                    resources.Add(new Resource(this.GetAttributeValueOrDefault(elem, "condition"),
+                                               resourceProvider,
+                                               elem.Attribute("path").Value));
+
                 }
                 else
                 {
@@ -544,6 +607,7 @@ namespace LBi.LostDoc.Core.Templating
 
             return new ParsedTemplate
                        {
+                           Source = workingDoc,
                            Resources = resources.ToArray(),
                            Stylesheets = stylesheets.ToArray(),
                            Indices = indices.ToArray()
@@ -570,7 +634,7 @@ namespace LBi.LostDoc.Core.Templating
             return shouldApply;
         }
 
-        private Stylesheet ParseStylesheet(IEnumerable<Stylesheet> stylesheets, XElement elem)
+        private Stylesheet ParseStylesheet(IReadOnlyFileProvider resourceProvider, IEnumerable<Stylesheet> stylesheets, XElement elem)
         {
 
             IEnumerable<XAttribute> variableAttrs =
@@ -588,11 +652,12 @@ namespace LBi.LostDoc.Core.Templating
             string src = elem.Attribute("stylesheet").Value;
             XslCompiledTransform transform;
 
+            // TODO this could very well not be enough that the providers are involved
             Stylesheet match = stylesheets.FirstOrDefault(s => String.Equals(s.Source, src, StringComparison.Ordinal));
             if (match != null)
                 transform = match.Transform;
             else
-                transform = this.LoadStylesheet(src);
+                transform = this.LoadStylesheet(resourceProvider, src);
 
 
             return new Stylesheet
@@ -681,7 +746,7 @@ namespace LBi.LostDoc.Core.Templating
                                                                this._basePath,
                                                                templateData,
                                                                this._resolvers,
-                                                               this._resolver);
+                                                               this._fileProvider);
 
 
             // fill indices
@@ -781,7 +846,7 @@ namespace LBi.LostDoc.Core.Templating
             {
                 CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
                 if (EvalCondition(xpathContext, templateData.XDocument.Root, resources[i].ConditionExpression))
-                    yield return new ResourceDeployment(resources[i].Path);
+                    yield return new ResourceDeployment(resources[i].FileProvider, resources[i].Path);
             }
 
         }

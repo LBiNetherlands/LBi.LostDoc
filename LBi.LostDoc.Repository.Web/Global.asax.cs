@@ -126,9 +126,10 @@ namespace LBi.LostDoc.Repository.Web
         protected void Application_Start()
         {
             //Template template = new Template(new DirectoryFileProvider());
-            Template template = new Template(new ResourceFileProvider("LBi.LostDoc.Repository.Web.App_Data.Template"));
+            Template template = new Template();
 
-            template.Load(AppConfig.TemplatePath);
+            TemplateResolver resolver = new TemplateResolver(new ResourceFileProvider("LBi.LostDoc.Repository.Web.App_Data.Template"));
+            template.Load(resolver, AppConfig.TemplatePath);
 
             ContentManager.Initialize(new ContentSettings
                                           {

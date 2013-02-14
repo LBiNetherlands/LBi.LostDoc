@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
     <id>LBi.Cli.Arguments</id>
-    <version>0.0.2.112-dev</version>
+    <version>0.0.2.113-dev</version>
     <title>LBi.Cli.Arguments</title>
     <authors>LBi Netherlands</authors>
     <owners>LBi Netherlands</owners>
@@ -11,6 +11,7 @@
     <iconUrl>https://raw.github.com/LBiNetherlands/LBi.Cli.Arguments/master/Resources/logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This is a command line argument parser that attempts to mimic the syntax and capabilities of PowerShell.</description>
+    <copyright>© LBi Netherlands</copyright>
     <tags>LBi CLI arguments powershell</tags>
     <references>
       <reference file="LBi.Cli.Arguments.dll" />

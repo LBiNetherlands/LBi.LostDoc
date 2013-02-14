@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,30 @@
  * limitations under the License. 
  */
 
+using System.IO;
+
 namespace LBi.LostDoc.Core.Templating
 {
-    public class Resource
+    public class ScopedFileProvider : IReadOnlyFileProvider
     {
-        public Resource(string conditional, IReadOnlyFileProvider fileProvider, string path)
+        public ScopedFileProvider(IReadOnlyFileProvider fileProvider, string basePath)
         {
-            this.ConditionExpression = conditional;
             this.FileProvider = fileProvider;
-            this.Path = path;
+            this.BasePath = basePath;
         }
-        public IReadOnlyFileProvider FileProvider { get; set; }
-        public string ConditionExpression { get; set; }
-        public string Path { get; set; }
+
+        public IReadOnlyFileProvider FileProvider { get; protected set; }
+
+        public string BasePath { get; protected set; }
+
+        public bool FileExists(string path)
+        {
+            return this.FileProvider.FileExists(Path.Combine(this.BasePath, path));
+        }
+
+        public Stream OpenFile(string path)
+        {
+            return this.FileProvider.OpenFile(Path.Combine(this.BasePath, path));
+        }
     }
 }

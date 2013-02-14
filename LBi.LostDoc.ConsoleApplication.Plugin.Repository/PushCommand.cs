@@ -6,7 +6,7 @@ using LBi.Cli.Arguments;
 
 namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
 {
-    [ParameterSet("Push ldoc file to repository", Command = "Push")]
+    [ParameterSet("Push ldoc file to repository", Command = "Push", HelpMessage= "Uploads ldoc file to repository.")]
     public class PushCommand : ICommand
     {
         [Parameter(HelpMessage = "Include verbose output.")]

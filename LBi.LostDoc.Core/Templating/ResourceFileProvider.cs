@@ -58,6 +58,12 @@ namespace LBi.LostDoc.Core.Templating
                 throw new FileNotFoundException(string.Format("Resource not found: {0} (Was: {1})", this.ConvertPath(path), path), path);
             return ret;
         }
+
         #endregion
+
+        public override string ToString()
+        {
+            return string.Format("[{0}]{1}", this._asm.GetName().Name, this._ns);
+        }
     }
 }

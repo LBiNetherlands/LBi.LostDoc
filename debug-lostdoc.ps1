@@ -2,7 +2,11 @@
 
 [void][System.Reflection.Assembly]::LoadFrom($ldPath);
 [bool]$script:verbose = $false;
-$choices = @( 
+$choices = @(
+    (New-Object -TypeName PSObject @{
+                                        C = "Extract other"; 
+                                        A = @("Extract -IncludeBclDocComments -Path C:\temp\testdlls\Aquabrowser.Core100.dll -Filter `"Aqua*`" -Output .\tmp\")
+                                    }),
     (New-Object -TypeName PSObject @{
                                         C = "Extract Company.Project.Library"; 
                                         A = @("Extract -IncludeBclDocComments -Path ..\..\..\Company.Project.Library\bin\Debug\Company.Project.Library.dll -Output .\tmp\")
