@@ -7,9 +7,10 @@ TestResults
 *.suo
 *.*~
 *.user
-
-App_Data
+Content
 /Output
 /LBi.LostDoc.Core.Test/Data
 _TeamCity.*
 _ReSharper.*
+/LBi.LostDoc.Repository.Web/App_Data/Repository
+/LBi.LostDoc.Repository.Web/App_Data/Content

@@ -158,56 +158,15 @@
     <Compile Include="TraceSources.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Assembly.xslt">
-      <Link>App_Data\Template\Assembly.xslt</Link>
+    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\**\*">
+      <Link>App_Data\Templates\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Common.xslt">
-      <Link>App_Data\Template\Common.xslt</Link>
+    <EmbeddedResource Include="App_Data\Templates\Repository\template.xml">
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\CreateIndex.xslt">
-      <Link>App_Data\Template\CreateIndex.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\DocComments.xslt">
-      <Link>App_Data\Template\DocComments.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\IndexInjector.xslt">
-      <Link>App_Data\Template\IndexInjector.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Layout.xslt">
-      <Link>App_Data\Template\Layout.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Library.xslt">
-      <Link>App_Data\Template\Library.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Member.xslt">
-      <Link>App_Data\Template\Member.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Namespace.xslt">
-      <Link>App_Data\Template\Namespace.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Naming.xslt">
-      <Link>App_Data\Template\Naming.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Navigation2.xslt">
-      <Link>App_Data\Template\Navigation2.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Overloads.xslt">
-      <Link>App_Data\Template\Overloads.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\style.css">
-      <Link>App_Data\Template\style.css</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Syntax-csharp.xslt">
-      <Link>App_Data\Template\Syntax-csharp.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Syntax.xslt">
-      <Link>App_Data\Template\Syntax.xslt</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\template.xml">
-      <Link>App_Data\Template\template.xml</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\LBi.LostDoc.ConsoleApplication\Templates\Library\Type.xslt">
-      <Link>App_Data\Template\Type.xslt</Link>
+    <EmbeddedResource Include="App_Data\Templates\Repository\IndexInjector.xslt" />
+    <EmbeddedResource Include="App_Data\Templates\Repository\CreateIndex.xslt">
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <Content Include="Global.asax" />
     <Content Include="ManualUpload.html" />
