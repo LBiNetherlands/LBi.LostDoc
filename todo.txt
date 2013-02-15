@@ -30,8 +30,6 @@ TODO
   2. capture output in node-set
   3. Sort node-set on li/a/@title
 
-* replace psargs with something not so hacked up
-
 * method/types with generics need constraints in the C# syntax!
 
 * sort out messed up Lostdoc URN Namespacing
@@ -40,4 +38,5 @@ TODO
 * add command to generate a template NSdoc file (also with assembly level comment)
 
 * create service template
+
 

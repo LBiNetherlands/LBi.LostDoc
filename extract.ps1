@@ -20,14 +20,14 @@ if (!$?) {
 # Get-Content ".\Company.Project.AnotherLibrary\bin\$Configuration\Company.Project.AnotherLibrary.dll_$Version.ldoc" -Encoding UTF8 | Foreach-Object {$_ -replace $Version, "2.3.4.5"} | Set-Content ".\Company.Project.AnotherLibrary\bin\$Configuration\Company.Project.AnotherLibrary.dll_2.3.4.5.ldoc" -Encoding UTF8
 #copy
 
-if (-not (Test-Path -Path .\LBi.LostDoc.Core.Test\Data\)) {
-    New-Item -Path .\LBi.LostDoc.Core.Test\Data\ -ItemType Directory
+if (-not (Test-Path -Path .\LBi.LostDoc.Test\Data\)) {
+    New-Item -Path .\LBi.LostDoc.Test\Data\ -ItemType Directory
 }
 
 $srcOne = ".\Company.Project.Library\bin\$Configuration\*.ldoc"
 $srcTwo = ".\Company.Project.AnotherLibrary\bin\$Configuration\*.ldoc"
 
 Write-Host -Object "Copying from: $srcOne"
-Copy-Item -Path $srcOne -Destination .\LBi.LostDoc.Core.Test\Data\ -Force
+Copy-Item -Path $srcOne -Destination .\LBi.LostDoc.Test\Data\ -Force
 Write-Host -Object "Copying from: $srcTwo"
-Copy-Item -Path $srcTwo -Destination .\LBi.LostDoc.Core.Test\Data\ -Force
+Copy-Item -Path $srcTwo -Destination .\LBi.LostDoc.Test\Data\ -Force

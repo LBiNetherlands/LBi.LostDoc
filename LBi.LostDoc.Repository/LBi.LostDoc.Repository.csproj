@@ -41,10 +41,6 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="LBi.Diagnostics, Version=1.0.0.3, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\3rdParty\LBi.Diagnostics.dll</HintPath>
-    </Reference>
     <Reference Include="Lucene.Net, Version=3.0.3.0, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
@@ -113,8 +109,8 @@
   <Choose>
     <When Condition=" '$(AlternateReferenceLocation)' != '' ">
       <ItemGroup>
-        <Reference Include="LBi.LostDoc.Core">
-          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.Core.dll</HintPath>
+        <Reference Include="LBi.LostDoc">
+          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.dll</HintPath>
         </Reference>
       </ItemGroup>
     </When>

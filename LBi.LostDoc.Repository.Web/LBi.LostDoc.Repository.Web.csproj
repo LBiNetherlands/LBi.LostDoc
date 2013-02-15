@@ -207,8 +207,8 @@
   <Choose>
     <When Condition=" '$(AlternateReferenceLocation)' != '' ">
       <ItemGroup>
-        <Reference Include="LBi.LostDoc.Core">
-          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.Core.dll</HintPath>
+        <Reference Include="LBi.LostDoc">
+          <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.dll</HintPath>
         </Reference>
         <Reference Include="LBi.LostDoc.Repository">
           <HintPath>$(AlternateReferenceLocation)\LBi.LostDoc.Repository.dll</HintPath>
