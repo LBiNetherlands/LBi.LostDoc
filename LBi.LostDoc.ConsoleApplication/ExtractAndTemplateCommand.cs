@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using LBi.Cli.Arguments;
-using LBi.LostDoc.Core;
+using LBi.LostDoc;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
@@ -32,7 +32,7 @@ namespace LBi.LostDoc.ConsoleApplication
         [Parameter(HelpMessage = "Which version components to ignore for deduplication.")]
         public VersionComponent? IgnoreVersionComponent { get; set; }
 
-        [Parameter(HelpMessage = "Path to xml containing additional comments for Assembly and Namespaces.")]
+        [Parameter(HelpMessage = "Source to xml containing additional comments for Assembly and Namespaces.")]
         public string NamespaceDocPath { get; set; }
 
         [Parameter(HelpMessage = "Type name filter (Compared against the type's FullName, including Namespace).")]

@@ -16,7 +16,7 @@
 
 using System;
 using System.Runtime.Serialization;
-using LBi.LostDoc.Core;
+using LBi.LostDoc;
 
 namespace LBi.LostDoc.Repository.Web.Models
 {

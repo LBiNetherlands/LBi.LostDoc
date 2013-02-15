@@ -21,9 +21,9 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using LBi.LostDoc.Core;
-using LBi.LostDoc.Core.Diagnostics;
-using LBi.LostDoc.Core.Templating;
+using LBi.LostDoc;
+using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Templating;
 using LBi.LostDoc.Repository.Lucene;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
@@ -112,12 +112,12 @@ namespace LBi.LostDoc.Repository
 
                 // log everything
                 traceListener.Filter = new EventTypeFilter(SourceLevels.All);
-                LBi.LostDoc.Core.Diagnostics.TraceSources.TemplateSource.Switch.Level = SourceLevels.All;
-                LBi.LostDoc.Core.Diagnostics.TraceSources.BundleSource.Switch.Level = SourceLevels.All;
-                LBi.LostDoc.Core.Diagnostics.TraceSources.AssetResolverSource.Switch.Level = SourceLevels.All;
-                LBi.LostDoc.Core.Diagnostics.TraceSources.TemplateSource.Listeners.Add(traceListener);
-                LBi.LostDoc.Core.Diagnostics.TraceSources.BundleSource.Listeners.Add(traceListener);
-                LBi.LostDoc.Core.Diagnostics.TraceSources.AssetResolverSource.Listeners.Add(traceListener);
+                LostDoc.Diagnostics.TraceSources.TemplateSource.Switch.Level = SourceLevels.All;
+                LostDoc.Diagnostics.TraceSources.BundleSource.Switch.Level = SourceLevels.All;
+                LostDoc.Diagnostics.TraceSources.AssetResolverSource.Switch.Level = SourceLevels.All;
+                LostDoc.Diagnostics.TraceSources.TemplateSource.Listeners.Add(traceListener);
+                LostDoc.Diagnostics.TraceSources.BundleSource.Listeners.Add(traceListener);
+                LostDoc.Diagnostics.TraceSources.AssetResolverSource.Listeners.Add(traceListener);
 
                 // merge ldoc files
                 this.OnStateChanged(State.Merging);
@@ -136,9 +136,9 @@ namespace LBi.LostDoc.Repository
                 this.OnStateChanged(State.Templating);
                 templateOutput = this.Template.Generate(templateData);
 
-                LBi.LostDoc.Core.Diagnostics.TraceSources.TemplateSource.Listeners.Remove(traceListener);
-                LBi.LostDoc.Core.Diagnostics.TraceSources.BundleSource.Listeners.Remove(traceListener);
-                LBi.LostDoc.Core.Diagnostics.TraceSources.AssetResolverSource.Listeners.Remove(traceListener);
+                LostDoc.Diagnostics.TraceSources.TemplateSource.Listeners.Remove(traceListener);
+                LostDoc.Diagnostics.TraceSources.BundleSource.Listeners.Remove(traceListener);
+                LostDoc.Diagnostics.TraceSources.AssetResolverSource.Listeners.Remove(traceListener);
             }
 
             this.OnStateChanged(State.Indexing);

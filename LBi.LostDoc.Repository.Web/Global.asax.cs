@@ -19,8 +19,9 @@ using System.Web.Http.WebHost.Routing;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using LBi.LostDoc.Core;
-using LBi.LostDoc.Core.Templating;
+using LBi.LostDoc;
+using LBi.LostDoc.Templating;
+using LBi.LostDoc.Templating.FileProviders;
 
 namespace LBi.LostDoc.Repository.Web
 {
@@ -128,8 +129,8 @@ namespace LBi.LostDoc.Repository.Web
             //Template template = new Template(new DirectoryFileProvider());
             Template template = new Template();
 
-            TemplateResolver resolver = new TemplateResolver(new ResourceFileProvider("LBi.LostDoc.Repository.Web.App_Data.Template"));
-            template.Load(resolver, AppConfig.TemplatePath);
+            TemplateResolver resolver = new TemplateResolver(new ResourceFileProvider("LBi.LostDoc.Repository.Web.App_Data.Templates"));
+            template.Load(resolver, AppConfig.Template);
 
             ContentManager.Initialize(new ContentSettings
                                           {
@@ -143,8 +144,6 @@ namespace LBi.LostDoc.Repository.Web
 
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
-
-            BundleTable.Bundles.RegisterTemplateBundles();
         }
 
     }

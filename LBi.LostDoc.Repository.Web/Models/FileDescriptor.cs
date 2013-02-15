@@ -19,7 +19,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
-using LBi.LostDoc.Core;
+using LBi.LostDoc;
 
 namespace LBi.LostDoc.Repository.Web.Models
 {

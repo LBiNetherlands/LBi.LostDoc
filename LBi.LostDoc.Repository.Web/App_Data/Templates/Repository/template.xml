@@ -2,15 +2,9 @@
 
 <template xmlns:var="urn:lost-doc:template.variable"
           inherts="Library">
-  <!-- I can add params like this, so I can influnce templating without modifying it -->
-  <parameter name="SearchUri"  />
-  <parameter name="LogoUrl" select="false()" />
   
-  <!-- indexed nodes, accessible through ld:key('indexName', value) -->
-  <index name="aid" match="*[@assetId]" key="@assetId"/>
-  <index name="aidNoVer" match="*[@assetId]" key="get-id(@assetId)"/>
-  <index name="aidInherits" match="*[@assetId and inherits/@type]" key="inherits/@type"/>
-
+  <parameter name="SearchUri"  />
+  
   <!-- this stylsheet will be applied to _this_ file -->
   <meta-template stylesheet="IndexInjector.xslt">
     <with-param name="targets" select="'Type.xslt,Member.xslt'"/>

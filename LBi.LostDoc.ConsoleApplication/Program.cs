@@ -38,10 +38,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
             using (AggregateCatalog aggregateCatalog = new AggregateCatalog())
             {
-                foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    aggregateCatalog.Catalogs.Add(new AssemblyCatalog(asm));
-                }
+                aggregateCatalog.Catalogs.Add(new ApplicationCatalog());
 
                 string appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string pluginPath = Path.Combine(appPath, "plugins");

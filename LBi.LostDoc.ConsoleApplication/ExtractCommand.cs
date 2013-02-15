@@ -25,11 +25,11 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using LBi.Cli.Arguments;
-using LBi.LostDoc.Core;
-using LBi.LostDoc.Core.Diagnostics;
-using LBi.LostDoc.Core.Enrichers;
-using LBi.LostDoc.Core.Filters;
-using LBi.LostDoc.Core.Reflection;
+using LBi.LostDoc;
+using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Enrichers;
+using LBi.LostDoc.Filters;
+using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
@@ -48,11 +48,11 @@ namespace LBi.LostDoc.ConsoleApplication
         [Parameter(HelpMessage = "Includes doc comments from the BCL for referenced types.")]
         public LBi.Cli.Arguments.Switch IncludeBclDocComments { get; set; }
 
-        [Parameter(HelpMessage = "Path to assembly to extract."), Required]
+        [Parameter(HelpMessage = "Source to assembly to extract."), Required]
         [ExampleValue("With filter", "\"c:\\projects\\Company.Library.Project.dll\"")]
         public string Path { get; set; }
 
-        [Parameter(HelpMessage = "Path to xml containing additional comments for Assembly and Namespaces.")]
+        [Parameter(HelpMessage = "Source to xml containing additional comments for Assembly and Namespaces.")]
         public string NamespaceDocPath { get; set; }
 
         [Parameter(HelpMessage = "Type name filter (Compared against the type's FullName, including Namespace).")]

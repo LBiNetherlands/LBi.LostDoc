@@ -2,29 +2,43 @@
 
 <template xmlns:var="urn:lost-doc:template.variable">
   <!-- I can add params like this, so I can influnce templating without modifying it -->
-  <parameter name="SearchUri" select="''" />
-  <parameter name="GenerateIndex" select="boolean($SearchUri)" />
-  <parameter name="LogoUrl" select="false()" />
-  
+  <parameter name="LogoUrl" select="lostdoc.png" />
+
   <!-- indexed nodes, accessible through ld:key('indexName', value) -->
   <index name="aid" match="*[@assetId]" key="@assetId"/>
   <index name="aidNoVer" match="*[@assetId]" key="get-id(@assetId)"/>
   <index name="aidInherits" match="*[@assetId and inherits/@type]" key="inherits/@type"/>
 
-  <!-- this stylsheet will be applied to _this_ file -->
-  <meta-template condition="$GenerateIndex"
-                 stylesheet="IndexInjector.xslt">
-    <with-param name="targets" select="'Type.xslt,Member.xslt'"/>
+  <include-resource path="style.css" />
+
+  <!-- if include-resource also supported 'url' in addition to 'path' -->
+  <include-resource path="style.less" output="style.css">
+    <transform name="less"/>
+  </include-resource>
+  
+  <include-resource path="$LogoUrl" 
+                    output="concat('static/logo.' substring-after-last($LogoUrl, '.'))">
+    <transform name="scale">
+      <with-param name="mode" select="'Bound'"/>
+      <with-param name="width" select="200"/>
+      <with-param name="height" select="75"/>
+    </transform>
+  </include-resource>
+
+  <!-- inject 'with-param' element in all 'apply-stylesheet' directives found. -->
+  <meta-template stylesheet="GlobalParameter.xslt">
+    <with-param name="name" select="'logoUri'"/>
+    <with-param name="value" select="concat('static/logo.' substring-after-last($LogoUrl, '.'))"/>
   </meta-template>
   
-  <include-resource path="style.css" />
   
+
   <apply-stylesheet name="Library" select="/bundle" assetId="'*:*'" version="'0.0.0.0'" output="'Library.html'"
                     stylesheet="Library.xslt">
   </apply-stylesheet>
 
   <apply-stylesheet name="Assembly summary" select="/bundle/assembly[@phase = '0']" assetId="get-id(@assetId)"
-                    version="get-version(@assetId)" 
+                    version="get-version(@assetId)"
                     output="concat(@filename, '/', get-significant-version(@assetId), '.html')"
                     stylesheet="Assembly.xslt">
     <with-param name="assetId" select="@assetId" />
@@ -32,15 +46,15 @@
 
   <apply-stylesheet name="Merged Namespaces"
                     select="/bundle/assembly/namespace[not(preceding::namespace[@phase = '0']/@name = @name) and @phase = '0']"
-                    assetId="get-id(@assetId)" 
-                    version="'0.0.0.0'" 
+                    assetId="get-id(@assetId)"
+                    version="'0.0.0.0'"
                     var:ns="@name"
                     output="concat(@name, '.html')"
                     stylesheet="Namespace.xslt">
     <with-param name="assetId" select="@assetId" />
     <with-param name="namespace" select="@name" />
 
-    <register-alias select="/bundle/assembly/namespace[@phase = '0' and @name= $ns]" 
+    <register-alias select="/bundle/assembly/namespace[@phase = '0' and @name= $ns]"
                     assetId="get-id(@assetId)"
                     version="get-version(@assetId)" />
 
@@ -56,26 +70,26 @@
 
 
   <apply-stylesheet name="Enumerations" select="/bundle/assembly/namespace//enum[@phase = '0']"
-                    assetId="get-id(@assetId)" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'), '.html')"
                     stylesheet="Type.xslt">
-    <register-section select="field" 
-                      assetId="get-id(@assetId)" 
-                      version="get-version(@assetId)" 
+    <register-section select="field"
+                      assetId="get-id(@assetId)"
+                      version="get-version(@assetId)"
                       name="@name" />
-    
+
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
 
   <apply-stylesheet name="Method overload disambiguation"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and @phase = '0']/method[not(preceding-sibling::method/@name = @name) and following-sibling::method/@name = @name]"
-                    var:aid="substring-after(get-id(@assetId), ':')" 
+                    var:aid="substring-after(get-id(@assetId), ':')"
                     var:asset="coalesce(substring-before($aid, '('), $aid)"
                     var:leading="substring-before-last($asset, '.')"
                     var:leading-clean="iif($leading, concat($leading, '.'), '')"
                     var:trailing="coalesce(substring-after-last($asset, '.'), $asset)"
-                    var:trailing-clean="coalesce(substring-before($trailing, '`'), $trailing)" 
+                    var:trailing-clean="coalesce(substring-before($trailing, '`'), $trailing)"
                     assetId="concat('Overload:', $leading-clean, $trailing-clean)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'), '.html')"
@@ -87,8 +101,8 @@
 
   <apply-stylesheet name="Overloaded methods"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and namespace-uri(.) = '' and @phase = '0']/method[not(@declaredAs) and (preceding-sibling::method/@name = @name or following-sibling::method/@name = @name)]"
-                    assetId="get-id(@assetId)" 
-                    version="get-version(@assetId)" 
+                    assetId="get-id(@assetId)"
+                    version="get-version(@assetId)"
                     var:name="@name"
                     var:count="count(preceding-sibling::method[@name = $name]) + 1"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'), '-', $count, '.html')"
@@ -107,12 +121,12 @@
 
   <apply-stylesheet name="Property overload disambiguation"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and @phase = '0']/property[not(preceding-sibling::property/@name = @name) and following-sibling::property/@name = @name]"
-                    var:aid="substring-after(get-id(@assetId), ':')" 
+                    var:aid="substring-after(get-id(@assetId), ':')"
                     var:asset="coalesce(substring-before($aid, '('), $aid)"
                     var:leading="substring-before-last($asset, '.')"
                     var:leading-clean="iif($leading, concat($leading, '.'), '')"
                     var:trailing="coalesce(substring-after-last($asset, '.'), $asset)"
-                    var:trailing-clean="coalesce(substring-before($trailing, '`'), $trailing)" 
+                    var:trailing-clean="coalesce(substring-before($trailing, '`'), $trailing)"
                     assetId="concat('Overload:', $leading-clean, $trailing-clean)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'),  '-Properties.html')"
@@ -124,8 +138,8 @@
 
   <apply-stylesheet name="Overloaded properties"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and namespace-uri(.) = '' and @phase = '0']/property[not(@declaredAs) and (preceding-sibling::property/@name = @name or following-sibling::property/@name = @name)]"
-                    assetId="get-id(@assetId)" 
-                    version="get-version(@assetId)" 
+                    assetId="get-id(@assetId)"
+                    version="get-version(@assetId)"
                     var:name="@name"
                     var:count="count(preceding-sibling::property[@name = $name]) + 1"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'), '-', $count, '.html')"
@@ -136,7 +150,7 @@
 
   <apply-stylesheet name="Remaining properties"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and namespace-uri(.) = '' and @phase = '0']/property[not(@declaredAs) and not(preceding-sibling::property/@name = @name) and not(following-sibling::property/@name = @name)]"
-                    assetId="get-id(@assetId)" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'),  '.html')"
                     stylesheet="Member.xslt">
@@ -145,12 +159,12 @@
 
   <apply-stylesheet name="Operators overload disambiguation"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and @phase = '0']/operator[not(preceding-sibling::operator/@name = @name) and following-sibling::operator/@name = @name]"
-                    var:aid="substring-after(get-id(@assetId), ':')" 
+                    var:aid="substring-after(get-id(@assetId), ':')"
                     var:asset="coalesce(substring-before($aid, '('), $aid)"
                     var:leading="substring-before-last($asset, '.')"
                     var:leading-clean="iif($leading, concat($leading, '.'), '')"
                     var:trailing="coalesce(substring-after-last($asset, '.'), $asset)"
-                    var:trailing-clean="coalesce(substring-before($trailing, '`'), $trailing)" 
+                    var:trailing-clean="coalesce(substring-before($trailing, '`'), $trailing)"
                     assetId="concat('Overload:', $leading-clean, $trailing-clean)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'),  '-Operators.html')"
@@ -162,7 +176,7 @@
 
   <apply-stylesheet name="Overloaded operators"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and namespace-uri(.) = '' and @phase = '0']/operator[not(@declaredAs) and (preceding-sibling::operator/@name = @name or following-sibling::operator/@name = @name)]"
-                    assetId="get-id(@assetId)" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     var:name="@name"
                     var:count="count(preceding-sibling::operator[@name = $name]) + 1"
@@ -173,7 +187,7 @@
 
   <apply-stylesheet name="Remaining Operators"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and namespace-uri(.) = '' and @phase = '0']/operator[not(@declaredAs) and not(preceding-sibling::operator/@name = @name) and not(following-sibling::operator/@name = @name)]"
-                    assetId="get-id(@assetId)" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'),  '.html')"
                     stylesheet="Member.xslt">
@@ -182,7 +196,7 @@
 
 
   <apply-stylesheet name="Constructors" select="/bundle/assembly/namespace//*/constructor[@phase = '0']"
-                    assetId="get-id(@assetId)" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'), 'ctor', count(./preceding-sibling::constructor) + 1, '.html')"
                     stylesheet="Member.xslt">
@@ -191,11 +205,11 @@
 
   <apply-stylesheet name="Members"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface)]/*[(self::field|self::event) and not(@declaredAs) and @phase = '0']"
-                    assetId="get-id(@assetId)" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'),  '.html')"
                     stylesheet="Member.xslt">
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
-  
+
 </template>

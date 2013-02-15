@@ -17,8 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LBi.LostDoc.Core;
-using LBi.LostDoc.Core.Diagnostics;
+using LBi.LostDoc;
+using LBi.LostDoc.Diagnostics;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;

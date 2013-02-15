@@ -15,7 +15,7 @@
  */
 
 using System;
-using LBi.LostDoc.Core;
+using LBi.LostDoc;
 
 namespace LBi.LostDoc.Repository
 {

@@ -85,11 +85,12 @@ namespace LBi.LostDoc.Repository.Web
             }
         }
 
-        public static string TemplatePath
+
+        public static string Template
         {
             get
             {
-                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.TemplatePath"];
+                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.Template"];
             }
         }
     }

@@ -25,10 +25,11 @@ using System.Reflection;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using LBi.Cli.Arguments;
-using LBi.LostDoc.Core;
-using LBi.LostDoc.Core.Diagnostics;
-using LBi.LostDoc.Core.Templating;
-using LBi.LostDoc.Core.Templating.XPath;
+using LBi.LostDoc;
+using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Templating;
+using LBi.LostDoc.Templating.FileProviders;
+using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
@@ -44,7 +45,7 @@ namespace LBi.LostDoc.ConsoleApplication
         [Parameter(HelpMessage = "Overwrites existing files.")]
         public LBi.Cli.Arguments.Switch Force { get; set; }
 
-        [Parameter(HelpMessage = "Path to ldoc file (or folder containing multiple ldoc files)."), Required]
+        [Parameter(HelpMessage = "Source to ldoc file (or folder containing multiple ldoc files)."), Required]
         public string Path { get; set; }
 
         [Parameter(HelpMessage = "Template name or path"), Required]
@@ -127,7 +128,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
                 foreach (FileInfo file in includedFiles)
                 {
-                    TraceSources.TemplateSource.TraceEvent(TraceEventType.Information, 0, "Path: {0}", file.Name);
+                    TraceSources.TemplateSource.TraceEvent(TraceEventType.Information, 0, "Source: {0}", file.Name);
                     XDocument fileDoc = XDocument.Load(file.FullName);
 
                     bundle.Add(fileDoc);

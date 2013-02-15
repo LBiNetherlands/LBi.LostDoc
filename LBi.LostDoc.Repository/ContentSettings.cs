@@ -14,8 +14,8 @@
  * limitations under the License. 
  */
 
-using LBi.LostDoc.Core;
-using LBi.LostDoc.Core.Templating;
+using LBi.LostDoc;
+using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Repository
 {

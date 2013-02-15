@@ -19,9 +19,9 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using LBi.LostDoc.Core;
-using LBi.LostDoc.Core.Diagnostics;
-using LBi.LostDoc.Core.Templating;
+using LBi.LostDoc;
+using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Repository
 {

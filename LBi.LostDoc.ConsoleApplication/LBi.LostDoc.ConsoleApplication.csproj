@@ -80,9 +80,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <ProjectReference Include="..\LBi.LostDoc.Core\LBi.LostDoc.Core.csproj">
+        <ProjectReference Include="..\LBi.LostDoc\LBi.LostDoc.csproj">
           <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
-          <Name>LBi.LostDoc.Core</Name>
+          <Name>LBi.LostDoc</Name>
         </ProjectReference>
       </ItemGroup>
     </Otherwise>
@@ -136,16 +136,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Library\IndexInjector.xslt" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\Library\CreateIndex.xslt">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

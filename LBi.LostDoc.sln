@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.ConsoleApplication", "LBi.LostDoc.ConsoleApplication\LBi.LostDoc.ConsoleApplication.csproj", "{9AA8D187-75E5-4472-81BA-5BE5CFCCECC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Core", "LBi.LostDoc.Core\LBi.LostDoc.Core.csproj", "{B411734E-B768-422F-BA1C-5B9AEEF97C52}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc", "LBi.LostDoc\LBi.LostDoc.csproj", "{B411734E-B768-422F-BA1C-5B9AEEF97C52}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{0FC44D72-B7A8-4E66-AF4A-CDD177EF5E7E}"
 EndProject
@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Company.Project.Library", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Company.Project.Service", "Company.Project.Service\Company.Project.Service.csproj", "{709535B2-25C0-4718-AD1D-459D9E272F2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Core.Test", "LBi.LostDoc.Core.Test\LBi.LostDoc.Core.Test.csproj", "{ABDE3820-BCFF-4394-AC42-8A1305FB668F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Test", "LBi.LostDoc.Test\LBi.LostDoc.Test.csproj", "{ABDE3820-BCFF-4394-AC42-8A1305FB668F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Company.Project.AnotherLibrary", "Company.Project.AnotherLibrary\Company.Project.AnotherLibrary.csproj", "{927BD07E-35D1-4C12-AAAA-BE5216627FBD}"
 EndProject

@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandProvider.cs" />
+    <Compile Include="PullCommand.cs" />
     <Compile Include="PatchCommand.cs" />
     <Compile Include="Patch\CSharp\DocCommentRewriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
