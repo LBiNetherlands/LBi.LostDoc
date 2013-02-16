@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
@@ -35,7 +36,7 @@ namespace LBi.LostDoc.ConsoleApplication
         #region ICommand Members
 
 
-        public void Invoke()
+        public void Invoke(CompositionContainer container)
         {
             var traceListener = new ConsolidatedConsoleTraceListener(new Dictionary<string, string>());
 

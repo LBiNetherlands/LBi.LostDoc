@@ -16,6 +16,8 @@ namespace LBi.LostDoc.Templating.Transforms.Less
                                                              {
                                                                  CacheEnabled = false,
                                                                  Debug = false,
+                                                                 HandleWebCompression = false,
+                                                                 MinifyOutput = false
                                                              });
                 return new MemoryStream(Encoding.UTF8.GetBytes(lessDoc)) {Position = 0};
             }

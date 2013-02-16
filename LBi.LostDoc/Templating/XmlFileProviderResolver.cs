@@ -20,7 +20,7 @@ using System.Xml;
 
 namespace LBi.LostDoc.Templating
 {
-    internal class XmlFileProviderResolver : XmlResolver
+    public class XmlFileProviderResolver : XmlResolver
     {
         private readonly string _basePath;
         private readonly IReadOnlyFileProvider _fileProvider;

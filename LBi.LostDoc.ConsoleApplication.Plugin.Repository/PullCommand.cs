@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Net.Http;
@@ -37,7 +38,7 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
         [Parameter(HelpMessage = "Security key."), Required]
         public string ApiKey { get; set; }
 
-        public void Invoke()
+        public void Invoke(CompositionContainer container)
         {
             UriBuilder requestUri = new UriBuilder(this.Server);
             requestUri.Query = "apiKey=" + this.ApiKey;

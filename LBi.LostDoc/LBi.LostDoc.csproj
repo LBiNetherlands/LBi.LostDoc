@@ -98,6 +98,7 @@
     <Compile Include="Templating\FileProviders\HttpFileProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
+    <Compile Include="Templating\ParameterExport.cs" />
     <Compile Include="Templating\ScopedFileProvider.cs" />
     <Compile Include="Templating\Index.cs" />
     <Compile Include="Templating\ParsedTemplate.cs" />

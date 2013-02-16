@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using LBi.Cli.Arguments;
@@ -41,7 +42,7 @@ namespace LBi.LostDoc.ConsoleApplication
         [Parameter(HelpMessage = "Include verbose output.")]
         public Switch Verbose { get; set; }
 
-        public void Invoke()
+        public void Invoke(CompositionContainer container)
         {
             // this is very quick & dirty
             List<string> ldocFiles = new List<string>();
@@ -54,7 +55,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 extract.IncludeBclDocComments = this.IncludeBclDocComments;
                 extract.NamespaceDocPath = this.NamespaceDocPath;
                 extract.Path = path;
-                extract.Invoke();
+                extract.Invoke(container);
                 ldocFiles.Add(extract.Output);
             }
 
@@ -75,7 +76,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 template.Output = this.Output;
                 template.Template = this.Template;
                 template.Verbose = this.Verbose;
-                template.Invoke();
+                template.Invoke(container);
             }
             finally
             {

@@ -15,6 +15,7 @@
  */
 
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Xml.Linq;
@@ -25,8 +26,9 @@ namespace LBi.LostDoc.Templating
 {
     public class TemplatingContext : ITemplatingContext
     {
-        public TemplatingContext(ObjectCache cache, string basePath, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IReadOnlyFileProvider fileProvider)
+        public TemplatingContext(ObjectCache cache, CompositionContainer container, string basePath, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IReadOnlyFileProvider fileProvider)
         {
+            this.Container = container;
             this.BasePath = basePath;
             this.TemplateData = data;
             this.AssetUriResolvers = resolvers.ToArray();
@@ -55,5 +57,7 @@ namespace LBi.LostDoc.Templating
         #endregion
 
         public ObjectCache Cache { get; private set; }
+
+        public CompositionContainer Container { get; private set; }
     }
 }

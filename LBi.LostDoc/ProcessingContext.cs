@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Caching;
@@ -30,18 +31,13 @@ namespace LBi.LostDoc
         private readonly IAssetFilter[] _filters;
         private readonly HashSet<AssetIdentifier> _references;
 
-        public ProcessingContext(ObjectCache cache,
-                                 IEnumerable<IAssetFilter> filters,
-                                 IAssemblyLoader assemblyLoader,
-                                 IAssetResolver assetResolver,
-                                 XElement element,
-                                 HashSet<AssetIdentifier> references,
-                                 int phase)
+        public ProcessingContext(ObjectCache cache, CompositionContainer container, IEnumerable<IAssetFilter> filters, IAssemblyLoader assemblyLoader, IAssetResolver assetResolver, XElement element, HashSet<AssetIdentifier> references, int phase)
         {
             this._filters = filters.ToArray();
             this.AssetResolver = assetResolver;
             this.Element = element;
             this._references = references;
+            Container = container;
             this.Phase = phase;
             this.Cache = cache;
             this.AssemblyLoader = assemblyLoader;
@@ -53,6 +49,7 @@ namespace LBi.LostDoc
 
         public ObjectCache Cache { get; private set; }
 
+        public CompositionContainer Container { get; private set; }
 
         public XElement Element { get; private set; }
 
@@ -96,6 +93,7 @@ namespace LBi.LostDoc
         public IProcessingContext Clone(XElement newElement)
         {
             return new ProcessingContext(this.Cache,
+                                         this.Container,
                                          this._filters,
                                          this.AssemblyLoader,
                                          this.AssetResolver,
@@ -106,7 +104,7 @@ namespace LBi.LostDoc
 
         public bool IsFiltered(AssetIdentifier assetId)
         {
-            IFilterContext filterContext = new FilterContext(this.Cache, this.AssetResolver, FilterState.Generating);
+            IFilterContext filterContext = new FilterContext(this.Cache, this.Container, this.AssetResolver, FilterState.Generating);
             for (int i = 0; i < this._filters.Length; i++)
             {
                 if (this._filters[i].Filter(filterContext, assetId))

@@ -54,7 +54,7 @@ namespace LBi.LostDoc.ConsoleApplication
                     ICommand command;
                     if (argumentParser.TryParse(args, out command))
                     {
-                        command.Invoke();
+                        command.Invoke(container);
                     }
                 }
             }

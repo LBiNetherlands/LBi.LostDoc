@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -36,10 +37,11 @@ namespace LBi.LostDoc
         private readonly List<string> _assemblyPaths;
         private readonly List<IEnricher> _enrichers;
         private readonly List<IAssetFilter> _filters;
+        private readonly ObjectCache _cache;
+        private readonly CompositionContainer _container;
         private Assembly[] _assemblies;
-        private ObjectCache _cache;
 
-        public DocGenerator()
+        public DocGenerator(CompositionContainer container)
         {
             this._assemblyPaths = new List<string>();
             this._filters = new List<IAssetFilter>();
@@ -47,6 +49,7 @@ namespace LBi.LostDoc
             this.Enrichers.Add(new AttributeDataEnricher());
             this.AssetFilters.Add(new EnumMetadataFilter());
             this._cache = new MemoryCache("DocGeneratorCache");
+            this._container = container;
         }
 
         public List<IAssetFilter> AssetFilters
@@ -121,6 +124,7 @@ namespace LBi.LostDoc
 
 
             IProcessingContext pctx = new ProcessingContext(this._cache,
+                                                            this._container,
                                                             this._filters,
                                                             assemblyLoader,
                                                             assetResolver,
@@ -205,7 +209,7 @@ namespace LBi.LostDoc
         {
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
             HashSet<AssetIdentifier> distinctSet = new HashSet<AssetIdentifier>();
-            IFilterContext filterContext = new FilterContext(this._cache, assetResolver, FilterState.Discovery);
+            IFilterContext filterContext = new FilterContext(this._cache, this._container, assetResolver, FilterState.Discovery);
 
             // find and filter all types from all assemblies 
             foreach (Assembly asm in assemblies)
@@ -300,6 +304,7 @@ namespace LBi.LostDoc
 
             AssetIdentifier aid = hierarchy.Value;
             IProcessingContext pctx = new ProcessingContext(this._cache,
+                                                            this._container,
                                                             this._filters,
                                                             assemblyLoader,
                                                             assetResolver,

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
@@ -64,7 +65,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
         #region ICommand Members
 
-        public void Invoke()
+        public void Invoke(CompositionContainer container)
         {
             var traceListener = new ConsolidatedConsoleTraceListener(new Dictionary<string, string>
                                                                          {
@@ -80,7 +81,7 @@ namespace LBi.LostDoc.ConsoleApplication
                     const SourceLevels quietLevel = SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical;
                     TraceSources.GeneratorSource.Switch.Level = quietLevel;
                 }
-                else  if (this.Verbose.IsPresent)
+                else if (this.Verbose.IsPresent)
                 {
                     const SourceLevels verboseLevel = SourceLevels.All;
                     TraceSources.GeneratorSource.Switch.Level = verboseLevel;
@@ -95,7 +96,7 @@ namespace LBi.LostDoc.ConsoleApplication
                     TraceSources.GeneratorSource.Switch.Level = normalLevel;
                 }
 
-                DocGenerator gen = new DocGenerator();
+                DocGenerator gen = new DocGenerator(container);
                 gen.AssetFilters.Add(new ComObjectTypeFilter());
                 gen.AssetFilters.Add(new CompilerGeneratedFilter());
                 if (!this.IncludeNonPublic.IsPresent)

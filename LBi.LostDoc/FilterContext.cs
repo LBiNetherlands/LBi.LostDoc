@@ -14,14 +14,16 @@
  * limitations under the License. 
  */
 
+using System.ComponentModel.Composition.Hosting;
 using System.Runtime.Caching;
 
 namespace LBi.LostDoc
 {
     public class FilterContext : IFilterContext
     {
-        public FilterContext(ObjectCache cache, IAssetResolver assetResolver, FilterState state)
+        public FilterContext(ObjectCache cache, CompositionContainer container, IAssetResolver assetResolver, FilterState state)
         {
+            this.Container = container;
             this.Cache = cache;
             this.AssetResolver = assetResolver;
             this.State = state;
@@ -35,5 +37,7 @@ namespace LBi.LostDoc
         #endregion
 
         public ObjectCache Cache { get; private set; }
+
+        public CompositionContainer Container { get; private set; }
     }
 }

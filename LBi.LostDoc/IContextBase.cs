@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System.ComponentModel.Composition.Hosting;
 using System.Runtime.Caching;
 using LBi.LostDoc.Reflection;
 
@@ -22,5 +23,6 @@ namespace LBi.LostDoc
     public interface IContextBase
     {
         ObjectCache Cache { get; }
+        CompositionContainer Container { get; }
     }
 }

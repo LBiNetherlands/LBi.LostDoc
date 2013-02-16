@@ -36,7 +36,7 @@ namespace LBi.LostDoc.Templating
         public Index[] Indices { get; set; }
         
         /// <summary>
-        /// Contains the source document, required for template inheritence.
+        /// Contains the processed source document, required for template inheritence.
         /// </summary>
         public XDocument Source { get; set; }
     }

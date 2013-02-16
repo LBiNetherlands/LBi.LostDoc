@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -37,7 +38,7 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
         [Parameter(HelpMessage = "Input xml document comment file.")]
         public string XmlDocument { get; set; }
 
-        public override void Invoke()
+        public override void Invoke(CompositionContainer container)
         {
             if (!this.Source.Exists)
                 Console.WriteLine("Source dir '{0}' does not exist.", this.Source.FullName);

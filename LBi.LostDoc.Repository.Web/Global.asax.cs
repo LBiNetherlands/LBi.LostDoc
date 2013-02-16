@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System.ComponentModel.Composition.Hosting;
 using System.Web.Http;
 using System.Web.Http.WebHost.Routing;
 using System.Web.Mvc;
@@ -127,7 +128,11 @@ namespace LBi.LostDoc.Repository.Web
         protected void Application_Start()
         {
             //Template template = new Template(new DirectoryFileProvider());
-            Template template = new Template();
+            AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog(),
+                                                            new DirectoryCatalog(@".\bin\plugins\"));
+
+            CompositionContainer container = new CompositionContainer(catalog);
+            Template template = new Template(container);
 
             TemplateResolver resolver = new TemplateResolver(new ResourceFileProvider("LBi.LostDoc.Repository.Web.App_Data.Templates"));
             template.Load(resolver, AppConfig.Template);

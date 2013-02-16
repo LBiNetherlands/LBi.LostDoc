@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System.ComponentModel.Composition.Hosting;
 using LBi.Cli.Arguments;
 
 namespace LBi.LostDoc.ConsoleApplication
@@ -26,6 +27,6 @@ namespace LBi.LostDoc.ConsoleApplication
         [Parameter(HelpMessage = "Include verbose output.")]
         public LBi.Cli.Arguments.Switch Verbose { get; set; }
 
-        public abstract void Invoke();
+        public abstract void Invoke(CompositionContainer container);
     }
 }

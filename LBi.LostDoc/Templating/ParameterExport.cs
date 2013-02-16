@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,2013 LBi Netherlands B.V.
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,18 @@
  * limitations under the License. 
  */
 
-using System.ComponentModel.Composition.Hosting;
-
-namespace LBi.LostDoc.ConsoleApplication
+namespace LBi.LostDoc.Templating
 {
-    public interface ICommand
+    public class ParameterExport
     {
-        void Invoke(CompositionContainer container);
+        public ParameterExport(string name, object value)
+        {
+            this.Name = name;
+            this.Value = value;
+        }
+
+        public object Value { get; protected set; }
+
+        public string Name { get; protected set; }
     }
 }

@@ -18,6 +18,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -42,12 +43,12 @@ namespace LBi.LostDoc.Templating
         public const string TemplateDefinitionFileName = "template.xml";
 
         private readonly ObjectCache _cache;
+        private readonly CompositionContainer _container;
+        private readonly FileResolver _fileResolver;
+        private readonly List<IAssetUriResolver> _resolvers;
+
         private string _basePath;
         private XDocument _templateDefinition;
-
-        private FileResolver _fileResolver;
-        private List<IAssetUriResolver> _resolvers;
-
         private IReadOnlyFileProvider _fileProvider;
         private TemplateResolver _templateResolver;
 
@@ -60,13 +61,14 @@ namespace LBi.LostDoc.Templating
                 handler(this, new ProgressArgs(percent));
         }
 
-        public Template()
+        public Template(CompositionContainer container)
         {
             this._cache = new MemoryCache("TemplateCache");
             this._fileResolver = new FileResolver();
             this._resolvers = new List<IAssetUriResolver>();
             this._resolvers.Add(this._fileResolver);
             this._resolvers.Add(new MsdnResolver());
+            this._container = container;
         }
 
         #region LoadFrom Template
@@ -299,9 +301,7 @@ namespace LBi.LostDoc.Templating
                         Func<string, object> sectionResolver =
                             v =>
                             {
-
                                 if (HasVariable(section, v))
-
                                     return EvalVariable(section.Variables, xpathContext, sectionInputElement, v);
 
                                 return EvalVariable(stylesheet.Variables, xpathContext, inputElement, v);
@@ -418,7 +418,7 @@ namespace LBi.LostDoc.Templating
                     providers = new Dictionary<string, IReadOnlyFileProvider>();
 
                 int depth = providers.Count + 1;
-                Template inheritedTemplate = new Template();
+                Template inheritedTemplate = new Template(this._container);
                 inheritedTemplate.Load(this._templateResolver, templateInheritsAttr.Value);
                 ParsedTemplate parsedTemplate = inheritedTemplate.PrepareTemplate(templateData, providers);
 
@@ -482,12 +482,96 @@ namespace LBi.LostDoc.Templating
                     return onFailedResolve(s);
                 };
 
-            // check for meta-template directives and expand
-            XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
 
             // we're going to need this later
             XmlFileProviderResolver fileResolver = new XmlFileProviderResolver(this._fileProvider, this._basePath);
 
+            // expand any meta-template directives
+            workingDoc = ApplyMetaTransforms(workingDoc, customContext, fileResolver);
+
+            // loading template
+            List<Stylesheet> stylesheets = new List<Stylesheet>();
+            List<Resource> resources = new List<Resource>();
+            List<Index> indices = new List<Index>();
+            foreach (XElement elem in workingDoc.Root.Elements())
+            {
+                // we alread proessed the parameters
+                if (elem.Name.LocalName == "parameter")
+                    continue;
+
+                if (elem.Name.LocalName == "apply-stylesheet")
+                {
+                    stylesheets.Add(this.ParseStylesheet(providers, stylesheets, elem));
+                }
+                else if (elem.Name.LocalName == "index")
+                {
+                    indices.Add(this.ParseIndexDefinition(elem));
+                }
+                else if (elem.Name.LocalName == "include-resource")
+                {
+                    resources.Add(ParseResouceDefinition(providers, elem));
+                }
+                else
+                {
+                    throw new Exception("Unknown element: " + elem.Name.LocalName);
+                }
+            }
+
+            return new ParsedTemplate
+                       {
+                           Source = workingDoc,
+                           Resources = resources.ToArray(),
+                           Stylesheets = stylesheets.ToArray(),
+                           Indices = indices.ToArray()
+                       };
+        }
+
+        private Resource ParseResouceDefinition(Dictionary<string, IReadOnlyFileProvider> providers, XElement elem)
+        {
+            XAttribute depthAttr = elem.Attribute("depth");
+
+            var source = elem.Attribute("source").Value;
+
+            IReadOnlyFileProvider resourceProvider;
+            Uri sourceUri;
+            if (Uri.TryCreate(source, UriKind.Absolute, out sourceUri))
+            {
+                resourceProvider = new HttpFileProvider();
+            }
+            else
+            {
+                if (depthAttr == null)
+                {
+                    resourceProvider = this.GetScopedFileProvider();
+                }
+                else if (providers == null || !providers.TryGetValue(depthAttr.Value, out resourceProvider))
+                {
+                    throw new InvalidOperationException(
+                        "Depth specified on 'include-resource' but the corresponding provider was not found.");
+                }
+            }
+
+            XAttribute outputAttr = elem.Attribute("output");
+
+            string output;
+            if (outputAttr != null)
+                output = outputAttr.Value;
+            else
+                output = '\'' + Path.GetFileName(source) + '\'';
+
+            foreach (XElement transform in elem.Elements("transform"))
+            {
+
+            }
+
+            var resource = new Resource(this.GetAttributeValueOrDefault(elem, "condition"), resourceProvider, source, output);
+            return resource;
+        }
+
+        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc, CustomXsltContext customContext, XmlFileProviderResolver fileResolver)
+        {
+            // check for meta-template directives and expand
+            XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
             while (metaNode != null)
             {
                 if (EvalCondition(customContext, metaNode, this.GetAttributeValueOrDefault(metaNode, "condition")))
@@ -502,7 +586,8 @@ namespace LBi.LostDoc.Templating
 
                     #endregion
 
-                    XslCompiledTransform metaTransform = this.LoadStylesheet(this.GetScopedFileProvider(), metaNode.Attribute("stylesheet").Value);
+                    XslCompiledTransform metaTransform = this.LoadStylesheet(this.GetScopedFileProvider(),
+                                                                             metaNode.Attribute("stylesheet").Value);
 
                     XsltArgumentList xsltArgList = new XsltArgumentList();
 
@@ -548,93 +633,10 @@ namespace LBi.LostDoc.Templating
                 // select next template
                 metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
             }
-
-            // loading template
-            List<Stylesheet> stylesheets = new List<Stylesheet>();
-            List<Resource> resources = new List<Resource>();
-            List<Index> indices = new List<Index>();
-            foreach (XElement elem in workingDoc.Root.Elements())
-            {
-                // we alread proessed the parameters
-                if (elem.Name.LocalName == "parameter")
-                    continue;
-
-                if (elem.Name.LocalName == "apply-stylesheet")
-                {
-                    XAttribute depthAttr = elem.Attribute("depth");
-
-                    IReadOnlyFileProvider resourceProvider;
-                    if (depthAttr == null)
-                    {
-                        resourceProvider = this.GetScopedFileProvider();
-                    }
-                    else if (providers == null || !providers.TryGetValue(depthAttr.Value, out resourceProvider))
-                    {
-                        throw new InvalidOperationException(
-                            "Depth specified on 'apply-stylesheet' but the corresponding provider was not found.");
-                    }
-
-                    stylesheets.Add(this.ParseStylesheet(resourceProvider, stylesheets, elem));
-                }
-                else if (elem.Name.LocalName == "index")
-                {
-                    indices.Add(this.ParseIndex(elem));
-                }
-                else if (elem.Name.LocalName == "include-resource")
-                {
-                    XAttribute depthAttr = elem.Attribute("depth");
-                    
-                    var source = elem.Attribute("source").Value;
-
-                    IReadOnlyFileProvider resourceProvider;
-                    Uri sourceUri;
-                    if (Uri.TryCreate(source, UriKind.Absolute, out sourceUri))
-                    {
-                        resourceProvider = new HttpFileProvider();
-                    }
-                    else
-                    {
-                        if (depthAttr == null)
-                        {
-                            resourceProvider = this.GetScopedFileProvider();
-                        }
-                        else if (providers == null || !providers.TryGetValue(depthAttr.Value, out resourceProvider))
-                        {
-                            throw new InvalidOperationException(
-                                "Depth specified on 'include-resource' but the corresponding provider was not found.");
-                        }
-                    }
-
-                    XAttribute outputAttr = elem.Attribute("output");
-                    
-                    string output;
-                    if (outputAttr != null)
-                        output = outputAttr.Value;
-                    else
-                        output = '\'' + Path.GetFileName(source) + '\'';
-                    
-                    resources.Add(new Resource(this.GetAttributeValueOrDefault(elem, "condition"),
-                                               resourceProvider,
-                                               source,
-                                               output));
-
-                }
-                else
-                {
-                    throw new Exception("Unknown element: " + elem.Name.LocalName);
-                }
-            }
-
-            return new ParsedTemplate
-                       {
-                           Source = workingDoc,
-                           Resources = resources.ToArray(),
-                           Stylesheets = stylesheets.ToArray(),
-                           Indices = indices.ToArray()
-                       };
+            return workingDoc;
         }
 
-        protected virtual Index ParseIndex(XElement elem)
+        protected virtual Index ParseIndexDefinition(XElement elem)
         {
             return new Index(elem.Attribute("name").Value,
                              elem.Attribute("match").Value,
@@ -654,8 +656,18 @@ namespace LBi.LostDoc.Templating
             return shouldApply;
         }
 
-        private Stylesheet ParseStylesheet(IReadOnlyFileProvider resourceProvider, IEnumerable<Stylesheet> stylesheets, XElement elem)
+        private Stylesheet ParseStylesheet(Dictionary<string, IReadOnlyFileProvider> providers, IEnumerable<Stylesheet> stylesheets, XElement elem)
         {
+            XAttribute depthAttr = elem.Attribute("depth");
+
+            IReadOnlyFileProvider resourceProvider;
+            if (depthAttr == null)
+                resourceProvider = this.GetScopedFileProvider();
+            else if (providers == null || !providers.TryGetValue(depthAttr.Value, out resourceProvider))
+            {
+                throw new InvalidOperationException(
+                    "Depth specified on 'apply-stylesheet' but the corresponding provider was not found.");
+            }
 
             IEnumerable<XAttribute> variableAttrs =
                 elem.Attributes()
@@ -706,8 +718,6 @@ namespace LBi.LostDoc.Templating
 
             return attr.Value;
         }
-
-
 
         /// <summary>
         /// Applies the loaded templates to <paramref name="templateData"/>.
@@ -763,6 +773,7 @@ namespace LBi.LostDoc.Templating
 
             // create context
             ITemplatingContext context = new TemplatingContext(this._cache,
+                this._container,
                                                                this._basePath,
                                                                templateData,
                                                                this._resolvers,
@@ -870,7 +881,6 @@ namespace LBi.LostDoc.Templating
             }
 
         }
-
 
         private static CustomXsltContext CreateCustomXsltContext(VersionComponent? ignoredVersionComponent)
         {
