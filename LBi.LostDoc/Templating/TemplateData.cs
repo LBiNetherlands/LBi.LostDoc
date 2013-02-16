@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
@@ -27,10 +28,11 @@ namespace LBi.LostDoc.Templating
        
             this.AssetRedirects = new AssetRedirectCollection();
             this.Arguments = new Dictionary<string, object>();
+            this.Filters = uow => true;
         }
         public XDocument XDocument { get; protected set; }
         public AssetRedirectCollection AssetRedirects { get; set; }
-
+        public Func<UnitOfWork, bool> Filters { get; set; } 
         public VersionComponent? IgnoredVersionComponent { get; set; }
         public Dictionary<string, object> Arguments { get; set; }
         public string TargetDirectory { get; set; }

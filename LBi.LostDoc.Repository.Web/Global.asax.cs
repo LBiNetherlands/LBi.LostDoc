@@ -127,7 +127,6 @@ namespace LBi.LostDoc.Repository.Web
 
         protected void Application_Start()
         {
-            //Template template = new Template(new DirectoryFileProvider());
             AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog(),
                                                             new DirectoryCatalog(@".\bin\plugins\"));
 

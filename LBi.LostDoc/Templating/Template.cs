@@ -806,7 +806,20 @@ namespace LBi.LostDoc.Templating
                                                   {
                                                       //MaxDegreeOfParallelism = 1
                                                   };
-            Parallel.ForEach(work,
+
+            Func<UnitOfWork, bool> filter =
+                uow =>
+                    {
+                        if (templateData.Filters(uow))
+                            return true;
+
+                        TraceSources.TemplateSource.TraceInformation("Filtered unit of work: [{0}] {1}",
+                                                                     uow.GetType().Name,
+                                                                     uow.ToString());
+                        return false;
+                    };
+
+            Parallel.ForEach(work.Where(filter),
                              parallelOptions,
                              uow =>
                              {
