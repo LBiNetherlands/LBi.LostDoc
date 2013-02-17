@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012,2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,17 @@ namespace LBi.LostDoc.Templating
     public class ResourceDeployment : UnitOfWork
     {
         
-        public ResourceDeployment(IReadOnlyFileProvider fileProvider, string path)
+        public ResourceDeployment(IReadOnlyFileProvider fileProvider, string path, string destination, IResourceTransform[] transforms)
         {
             this.FileProvider = fileProvider;
             this.ResourcePath = path;
+            this.Destination = destination;
+            this.Transforms = transforms;
         }
+
+        public IResourceTransform[] Transforms { get; protected set; }
+
+        public string Destination { get; protected set; }
 
         public IReadOnlyFileProvider FileProvider { get; protected set; }
 
@@ -40,26 +46,43 @@ namespace LBi.LostDoc.Templating
             string rootPath = Path.GetFullPath(context.TemplateData.TargetDirectory);
             // copy resources to output dir
 
-            string target = Path.Combine(rootPath, this.ResourcePath);
+            string target = Path.Combine(rootPath, this.Destination ?? this.ResourcePath);
             string targetDir = Path.GetDirectoryName(target);
 
-            TraceSources.TemplateSource.TraceInformation("Copying resource: {0}", this.ResourcePath);
-
+            if (this.Destination != null)
+            {
+                TraceSources.TemplateSource.TraceInformation("Copying resource: {0} => {1}",
+                                                             this.ResourcePath,
+                                                             this.Destination);
+            }
+            else
+                TraceSources.TemplateSource.TraceInformation("Copying resource: {0}", this.ResourcePath);
+            
             if (!Directory.Exists(targetDir))
                 Directory.CreateDirectory(targetDir);
 
             using (Stream streamSrc = this.FileProvider.OpenFile(this.ResourcePath))
             using (Stream streamDest = File.Create(target))
             {
-                streamSrc.CopyTo(streamDest);
+                Stream outStream = streamSrc;
+                for (int i = 0; i < this.Transforms.Length; i++)
+                {
+                    TraceSources.TemplateSource.TraceInformation("Applying '{0}' to resource: {1}",
+                                                                 this.Transforms[i].GetType().Name,
+                                                                 this.ResourcePath);
+                    Stream oldStream = outStream;
+                    outStream = this.Transforms[i].Transform(outStream);
+                    oldStream.Dispose();
+                }
+                outStream.CopyTo(streamDest);
                 streamDest.Close();
-                streamSrc.Close();
+                outStream.Dispose();
             }
 
             return new WorkUnitResult
                        {
                            WorkUnit = this,
-                           Duration = (long)Math.Round((double)(localTimer.ElapsedTicks/Stopwatch.Frequency)*1000000)
+                           Duration = (long)Math.Round(((double)localTimer.ElapsedTicks / Stopwatch.Frequency) * 1,000,000)
                        };
         }
     }

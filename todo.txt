@@ -31,9 +31,11 @@ TODO
   3. Sort node-set on li/a/@title
 
 * method/types with generics need constraints in the C# syntax!
+* add StatisticsBuilder and expose it so Repository can get nice statistics
+  also reduces the line count in Template.cs
 
 * sort out messed up Lostdoc URN Namespacing
-  should be: urn:schemas-lbi-nl:lostdoc:template
+  should be: urn:schemas-lbi-nl:lostdoc:template ??
 
 * add command to generate a template NSdoc file (also with assembly level comment)
 

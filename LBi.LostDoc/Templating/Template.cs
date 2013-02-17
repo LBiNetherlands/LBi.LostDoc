@@ -18,7 +18,9 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -30,6 +32,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using LBi.LostDoc.Composition;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Templating.AssetResolvers;
 using LBi.LostDoc.Templating.FileProviders;
@@ -38,7 +41,7 @@ using LBi.LostDoc.Templating.XPath;
 namespace LBi.LostDoc.Templating
 {
 
-
+    // TODO fix error handling, a bad template.xml file will just throw random exceptions
     public class Template
     {
         public const string TemplateDefinitionFileName = "template.xml";
@@ -47,7 +50,7 @@ namespace LBi.LostDoc.Templating
         private readonly CompositionContainer _container;
         private readonly FileResolver _fileResolver;
         private readonly List<IAssetUriResolver> _resolvers;
-
+        private readonly Lazy<IResourceTransform, IResourceTransformMetadata>[] _resourceTransformers;
         private string _basePath;
         private XDocument _templateDefinition;
         private IReadOnlyFileProvider _fileProvider;
@@ -70,6 +73,7 @@ namespace LBi.LostDoc.Templating
             this._resolvers.Add(this._fileResolver);
             this._resolvers.Add(new MsdnResolver());
             this._container = container;
+            this._resourceTransformers = this._container.GetExports<IResourceTransform, IResourceTransformMetadata>().ToArray();
         }
 
         #region LoadFrom Template
@@ -189,7 +193,6 @@ namespace LBi.LostDoc.Templating
             XElement[] inputElements =
                 templateData.XDocument.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
 
-            // TODO this code requires a proper cleanup to make the scoping/resolution rules more obvious
             foreach (XElement inputElement in inputElements)
             {
                 xpathContext.PushVariableScope(inputElement, stylesheet.Variables);
@@ -308,7 +311,9 @@ namespace LBi.LostDoc.Templating
             xpathContext.PopVariableScope();
         }
 
-        private static IEnumerable<KeyValuePair<string, object>> ResolveXsltParams(IEnumerable<XPathVariable> xsltParams, XElement contextElement, XsltContext xpathContext)
+        private static IEnumerable<KeyValuePair<string, object>> ResolveXsltParams(IEnumerable<XPathVariable> xsltParams,
+                                                                                   XElement contextElement,
+                                                                                   XsltContext xpathContext)
         {
             foreach (var param in xsltParams)
             {
@@ -442,16 +447,24 @@ namespace LBi.LostDoc.Templating
             else
                 output = '\'' + Path.GetFileName(source) + '\'';
 
+            List<ResourceTransform> transforms = new List<ResourceTransform>();
             foreach (XElement transform in elem.Elements("transform"))
             {
+                string transformName = transform.Attribute("name").Value;
 
+                var transformParams = transform.Elements("with-param")
+                                               .Select(p => new ExpressionXPathVariable(p.Attribute("name").Value,
+                                                                                        p.Attribute("select").Value));
+
+                transforms.Add(new ResourceTransform(transformName, transformParams));
             }
 
             var resource = new Resource(this.GetAttributeValueOrDefault(elem, "condition"),
                                         this.ParseVariables(elem).ToArray(),
                                         resourceProvider,
                                         source,
-                                        output);
+                                        output,
+                                        transforms.ToArray());
             return resource;
         }
 
@@ -760,6 +773,7 @@ namespace LBi.LostDoc.Templating
                                                              statGroup.Average(ps => ps.Duration) / 1000.0);
 
 
+                // TODO this is quick and dirty, should be cleaned up 
                 long[] buckets = new long[20];
                 int rows = 6;
                 /* 
@@ -813,7 +827,7 @@ namespace LBi.LostDoc.Templating
                     graph.Append('│');
                     for (int col = 0; col < buckets.Length; col++)
                     {
-                        if (buckets[col] > (rowHeight * (rows - (row + 1)) + rowHeight / 2.0))                            
+                        if (buckets[col] > (rowHeight * (rows - (row + 1)) + rowHeight / 2.0))
                             graph.Append('█');
                         else if (buckets[col] > rowHeight * (rows - (row + 1)))
                             graph.Append('▄');
@@ -863,7 +877,7 @@ namespace LBi.LostDoc.Templating
                 lastLine.Append("   1% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .01))].Duration / 1000.0).ToString("N0"));
                 graph.Append(lastLine.ToString());
 
-                TraceSources.TemplateSource.TraceInformation(graph.ToString());
+                TraceSources.TemplateSource.TraceVerbose(graph.ToString());
 
             }
 
@@ -896,8 +910,35 @@ namespace LBi.LostDoc.Templating
                 xpathContext.PushVariableScope(templateData.XDocument.Root, resources[i].Variables);
 
                 if (EvalCondition(xpathContext, templateData.XDocument.Root, resources[i].ConditionExpression))
-                    yield return new ResourceDeployment(resources[i].FileProvider, resources[i].Source);
+                {
+                    List<IResourceTransform> transforms = new List<IResourceTransform>();
 
+                    foreach (var resourceTransform in resources[i].Transforms)
+                    {
+                        CompositionContainer paramContainer = new CompositionContainer(this._container);
+
+                        // TODO export resourceTransform.Parameters into paramContainer
+                        ImportDefinition importDefinition =
+                            new MetadataContractBasedImportDefinition(
+                                typeof(IResourceTransform),
+                                null,
+                                new Dictionary<string, object> {{"Name", resourceTransform.Name}}, // TODO force an IEqualityComparer<T> here
+                                ImportCardinality.ExactlyOne,
+                                false,
+                                false,
+                                CreationPolicy.NonShared);
+
+                        Export transformExport = paramContainer.GetExports(importDefinition).Single();
+
+                        transforms.Add((IResourceTransform)transformExport.Value);
+                    }
+
+                    yield return
+                        new ResourceDeployment(resources[i].FileProvider,
+                                               resources[i].Source,
+                                               resources[i].Output,
+                                               transforms.ToArray());
+                }
                 xpathContext.PopVariableScope();
             }
             xpathContext.PopVariableScope();

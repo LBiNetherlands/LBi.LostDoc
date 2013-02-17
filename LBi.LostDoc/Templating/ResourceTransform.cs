@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,21 @@
  * limitations under the License. 
  */
 
+using System.Collections.Generic;
+using System.Linq;
+
 namespace LBi.LostDoc.Templating
 {
-    public interface IResourceTransformMetadata
+    public class ResourceTransform
     {
-        string Name { get; }
+        public ResourceTransform(string name, IEnumerable<XPathVariable> parameters)
+        {
+            this.Name = name;
+            this.Parameters = parameters.ToArray();
+        }
+
+        public XPathVariable[] Parameters { get; set; }
+
+        public string Name { get; protected set; }
     }
 }

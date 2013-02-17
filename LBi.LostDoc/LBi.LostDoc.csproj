@@ -55,6 +55,7 @@
     <Compile Include="AssetResolver.cs" />
     <Compile Include="AssetType.cs" />
     <Compile Include="Bundle.cs" />
+    <Compile Include="Composition\MetadataContractBasedImportDefinition.cs" />
     <Compile Include="Diagnostics\TraceActivity.cs" />
     <Compile Include="Diagnostics\TraceExtensions.cs" />
     <Compile Include="Diagnostics\TraceSources.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
     <Compile Include="Templating\ParameterExport.cs" />
+    <Compile Include="Templating\ResourceTransform.cs" />
     <Compile Include="Templating\ScopedFileProvider.cs" />
     <Compile Include="Templating\Index.cs" />
     <Compile Include="Templating\ParsedTemplate.cs" />

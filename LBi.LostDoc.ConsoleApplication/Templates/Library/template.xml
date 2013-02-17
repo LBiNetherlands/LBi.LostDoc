@@ -8,15 +8,13 @@
   <index name="aid" match="*[@assetId]" key="@assetId"/>
   <index name="aidNoVer" match="*[@assetId]" key="get-id(@assetId)"/>
   <index name="aidInherits" match="*[@assetId and inherits/@type]" key="inherits/@type"/>
-
-  <include-resource path="style.css" />
-
-  <!--<include-resource path="style.less" output="style.css">
+s
+  <include-resource path="style.less" output="style.css">
     <transform name="less"/>
-  </include-resource>-->
+  </include-resource>
   
   <!--<include-resource path="$LogoUrl" 
-                    output="concat('static/logo.', substring-after-last($LogoUrl, '.'))">
+                    output="{concat('static/logo.', substring-after-last($LogoUrl, '.'))}">
     --><!--<transform name="scale">
       <with-param name="mode" select="'Bound'"/>
       <with-param name="width" select="200"/>
@@ -30,8 +28,6 @@
     <with-param name="value" select="concat('static/logo.', substring-after-last($LogoUrl, '.'))"/>
   </meta-template>
   
-  
-
   <apply-stylesheet name="Library" select="/bundle" assetId="'*:*'" version="'0.0.0.0'" output="'Library.html'"
                     stylesheet="Library.xslt">
   </apply-stylesheet>
