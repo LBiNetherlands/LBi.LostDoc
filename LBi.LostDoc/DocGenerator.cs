@@ -94,7 +94,7 @@ namespace LBi.LostDoc
                                                         enricher.GetType().FullName);
             }
 
-            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Filters:");
+            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Filter:");
             for (int i = 0; i < this.AssetFilters.Count; i++)
             {
                 TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,

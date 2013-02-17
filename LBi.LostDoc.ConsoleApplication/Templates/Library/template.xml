@@ -2,7 +2,7 @@
 
 <template xmlns:var="urn:lost-doc:template.variable">
   <!-- I can add params like this, so I can influnce templating without modifying it -->
-  <parameter name="LogoUrl" select="lostdoc.png" />
+  <parameter name="LogoUrl" select="'lostdoc.png'" />
 
   <!-- indexed nodes, accessible through ld:key('indexName', value) -->
   <index name="aid" match="*[@assetId]" key="@assetId"/>
@@ -11,24 +11,23 @@
 
   <include-resource path="style.css" />
 
-  <!-- if include-resource also supported 'url' in addition to 'path' -->
-  <include-resource path="style.less" output="style.css">
+  <!--<include-resource path="style.less" output="style.css">
     <transform name="less"/>
-  </include-resource>
+  </include-resource>-->
   
-  <include-resource path="$LogoUrl" 
-                    output="concat('static/logo.' substring-after-last($LogoUrl, '.'))">
-    <transform name="scale">
+  <!--<include-resource path="$LogoUrl" 
+                    output="concat('static/logo.', substring-after-last($LogoUrl, '.'))">
+    --><!--<transform name="scale">
       <with-param name="mode" select="'Bound'"/>
       <with-param name="width" select="200"/>
       <with-param name="height" select="75"/>
-    </transform>
-  </include-resource>
+    </transform>--><!--
+  </include-resource>-->
 
   <!-- inject 'with-param' element in all 'apply-stylesheet' directives found. -->
   <meta-template stylesheet="GlobalParameter.xslt">
     <with-param name="name" select="'logoUri'"/>
-    <with-param name="value" select="concat('static/logo.' substring-after-last($LogoUrl, '.'))"/>
+    <with-param name="value" select="concat('static/logo.', substring-after-last($LogoUrl, '.'))"/>
   </meta-template>
   
   

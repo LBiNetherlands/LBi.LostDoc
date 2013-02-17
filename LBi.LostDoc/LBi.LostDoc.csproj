@@ -91,7 +91,9 @@
     </Compile>
     <Compile Include="Templating\AliasRegistration.cs" />
     <Compile Include="Templating\AssetSection.cs" />
+    <Compile Include="Templating\ConstantXPathVariable.cs" />
     <Compile Include="Templating\ExportTransformAttribute.cs" />
+    <Compile Include="Templating\ExpressionXPathVariable.cs" />
     <Compile Include="Templating\FileProviders\DirectoryFileProvider.cs" />
     <Compile Include="Templating\AssetResolvers\FileResolver.cs" />
     <Compile Include="Templating\AssetResolvers\MsdnResolver.cs" />

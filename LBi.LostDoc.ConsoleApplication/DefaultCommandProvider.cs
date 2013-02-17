@@ -19,7 +19,6 @@ using System.ComponentModel.Composition;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
-    [Export(typeof(ICommandProvider))]
     public class DefaultCommandProvider : ICommandProvider
     {
         public Type[] GetCommands()

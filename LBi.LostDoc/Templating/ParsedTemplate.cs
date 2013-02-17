@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace LBi.LostDoc.Templating
@@ -39,5 +40,10 @@ namespace LBi.LostDoc.Templating
         /// Contains the processed source document, required for template inheritence.
         /// </summary>
         public XDocument Source { get; set; }
+
+        /// <summary>
+        /// Set of parameters
+        /// </summary>
+        public XPathVariable[] Parameters { get; set; }
     }
 }

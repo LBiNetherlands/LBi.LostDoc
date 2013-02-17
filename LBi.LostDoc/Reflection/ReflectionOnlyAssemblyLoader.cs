@@ -202,7 +202,20 @@ namespace LBi.LostDoc.Reflection
 
         public IEnumerator<Assembly> GetEnumerator()
         {
-            return this._loadedAssemblies.GetEnumerator();
+            var clone = new HashSet<Assembly>(this._loadedAssemblies);
+            var seen = new HashSet<Assembly>();
+            do
+            {
+                foreach (Assembly assembly in clone)
+                {
+                    yield return assembly;
+                }
+
+                seen.UnionWith(clone);
+                clone = new HashSet<Assembly>(this._loadedAssemblies);
+                clone.ExceptWith(seen);
+                
+            } while (clone.Count > 0);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

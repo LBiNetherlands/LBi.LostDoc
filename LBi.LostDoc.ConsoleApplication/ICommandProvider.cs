@@ -15,9 +15,11 @@
  */
 
 using System;
+using System.ComponentModel.Composition;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
+    [InheritedExport(typeof(ICommandProvider))]
     public interface ICommandProvider
     {
         Type[] GetCommands();

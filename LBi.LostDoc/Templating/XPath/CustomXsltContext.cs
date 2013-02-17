@@ -34,15 +34,20 @@ namespace LBi.LostDoc.Templating.XPath
 
     public class CustomXsltContext : System.Xml.Xsl.XsltContext
     {
-        private Dictionary<string, IXsltContextFunction> functions = new Dictionary<string, IXsltContextFunction>();
+        protected Dictionary<string, IXsltContextFunction> Functions;
+        protected Stack<XPathVariableList> Variables;
 
         public CustomXsltContext()
         {
+            this.Functions = new Dictionary<string, IXsltContextFunction>();
+            this.Variables = new Stack<XPathVariableList>();
         }
 
         public CustomXsltContext(NameTable nameTable)
             : base(nameTable)
         {
+            this.Functions = new Dictionary<string, IXsltContextFunction>();
+            this.Variables = new Stack<XPathVariableList>();
         }
 
         public override bool Whitespace
@@ -73,17 +78,15 @@ namespace LBi.LostDoc.Templating.XPath
             if (name == null)
                 throw new ArgumentNullException("name");
 
-            this.functions[prefix + ":" + name] = function;
+            this.Functions[prefix + ":" + name] = function;
         }
-
-        public event Func<string, object> OnResolveVariable;
 
         public override IXsltContextFunction ResolveFunction(string prefix, string name,
                                                              XPathResultType[] argTypes)
         {
-            IXsltContextFunction function = null;
+            IXsltContextFunction function;
 
-            if (this.functions.TryGetValue(prefix + ":" + name, out function))
+            if (this.Functions.TryGetValue(prefix + ":" + name, out function))
             {
                 return function;
             }
@@ -93,13 +96,12 @@ namespace LBi.LostDoc.Templating.XPath
 
         public override IXsltContextVariable ResolveVariable(string prefix, string name)
         {
-            if (this.OnResolveVariable != null)
-            {
-                object val = this.OnResolveVariable(name);
-                return new XPathArg(val);
-            }
+            IXsltContextVariable ret = this.Variables.Peek().Resolve(name);
 
-            throw new InvalidOperationException("No OnResolveVariable event listener found.");
+            if (ret == null)
+                throw new XsltException("Invalid variable: " + name);
+
+            return ret;
         }
 
         internal static string GetValue(object v)
@@ -107,122 +109,58 @@ namespace LBi.LostDoc.Templating.XPath
             if (v == null)
                 return null;
 
-            if (v is System.Xml.XPath.XPathNodeIterator)
+            if (v is XPathNodeIterator)
             {
-                foreach (XPathNavigator n in v as System.Xml.XPath.XPathNodeIterator)
+                foreach (XPathNavigator n in v as XPathNodeIterator)
                     return n.Value;
             }
 
             return Convert.ToString(v);
         }
 
-        #region Nested type: XPathArg
-
-        private class XPathArg : IXsltContextVariable
+        #region Nested type: XPathVariableList
+        protected class XPathVariableList : List<XPathVariable>
         {
-            private object _value;
-
-            public XPathArg(object val)
+            public XPathVariableList(XPathVariableList parent, XNode scope, IXmlNamespaceResolver resolver)
             {
-                if (!(val is string) && val is IEnumerable)
-                {
-                    object[] data = ((IEnumerable)val).Cast<object>().ToArray();
-
-                    if (data.Length == 1)
-                    {
-                        if (data[0] is XAttribute)
-                            val = ((XAttribute)data[0]).Value;
-                        else if (data[0] is XText)
-                            val = ((XText)data[0]).Value;
-                        else if (data[0] is XCData)
-                            val = ((XCData)data[0]).Value;
-                        else if (data[0] is XNode)
-                            val = ((XNode)data[0]).CreateNavigator();
-                    }
-                    else
-                        val = data.Cast<XNode>().Select(n => n.CreateNavigator()).ToArray();
-                }
-
-                this._value = val;
+                this.Parent = parent;
+                this.Scope = scope;
+                this.Resolver = resolver;
             }
 
-            #region IXsltContextVariable Members
+            protected IXmlNamespaceResolver Resolver { get; set; }
 
-            /// <summary>
-            /// Evaluates the variable at runtime and returns an object that represents the value of the variable.
-            /// </summary>
-            /// <returns>
-            /// An <see cref="T:System.Object"/> representing the value of the variable. Possible return types include number, string, Boolean, document fragment, or node set. 
-            /// </returns>
-            /// <param name="xsltContext">
-            /// An <see cref="T:System.Xml.Xsl.XsltContext"/> representing the execution context of the variable. 
-            /// </param>
-            public object Evaluate(XsltContext xsltContext)
+            protected XNode Scope { get; set; }
+
+            protected XPathVariableList Parent { get; set; }
+
+            public IXsltContextVariable Resolve(string name)
             {
-                return this._value;
+                IXsltContextVariable ret = null;
+                XPathVariable var = this.Find(x => StringComparer.InvariantCulture.Equals(x.Name, name));
+
+                if (var != null)
+                    ret = var.Evaluate(this.Scope, this.Resolver);
+                else if (this.Parent != null)
+                    ret = this.Parent.Resolve(name);
+
+                return ret;
             }
 
-            /// <summary>
-            ///   Gets a value indicating whether the variable is local.
-            /// </summary>
-            /// <returns> true if the variable is a local variable in the current context; otherwise, false. </returns>
-            public bool IsLocal
-            {
-                get { return true; }
-            }
+        }
+        #endregion
 
-            /// <summary>
-            ///   Gets a value indicating whether the variable is an Extensible Stylesheet Language Transformations (XSLT) parameter. This can be a parameter to a style sheet or a template.
-            /// </summary>
-            /// <returns> true if the variable is an XSLT parameter; otherwise, false. </returns>
-            public bool IsParam
-            {
-                get { return false; }
-            }
 
-            /// <summary>
-            ///   Gets the <see cref="T:System.Xml.XPath.XPathResultType" /> representing the XML Path Language (XPath) type of the variable.
-            /// </summary>
-            /// <returns> The <see cref="T:System.Xml.XPath.XPathResultType" /> representing the XPath type of the variable. </returns>
-            public XPathResultType VariableType
-            {
-                get
-                {
-                    switch (Type.GetTypeCode(this._value.GetType()))
-                    {
-                        case TypeCode.Empty:
-                        case TypeCode.Object:
-                        case TypeCode.DBNull:
-                            return XPathResultType.Any;
-                        case TypeCode.Boolean:
-                            return XPathResultType.Boolean;
-                        case TypeCode.Char:
-                            return XPathResultType.String;
-                        case TypeCode.SByte:
-                        case TypeCode.Byte:
-                        case TypeCode.Int16:
-                        case TypeCode.UInt16:
-                        case TypeCode.Int32:
-                        case TypeCode.UInt32:
-                        case TypeCode.Int64:
-                        case TypeCode.UInt64:
-                        case TypeCode.Single:
-                        case TypeCode.Double:
-                        case TypeCode.Decimal:
-                            return XPathResultType.Number;
-                        case TypeCode.DateTime:
-                            return XPathResultType.String;
-                        case TypeCode.String:
-                            return XPathResultType.String;
-                        default:
-                            return XPathResultType.Error;
-                    }
-                }
-            }
-
-            #endregion
+        public void PushVariableScope(XNode scope, params XPathVariable[] variables)
+        {
+            var list = new XPathVariableList(this.Variables.Count == 0 ? null : this.Variables.Peek(), scope, this);
+            list.AddRange(variables);
+            this.Variables.Push(list);
         }
 
-        #endregion
+        public void PopVariableScope()
+        {
+            this.Variables.Pop();
+        }
     }
 }

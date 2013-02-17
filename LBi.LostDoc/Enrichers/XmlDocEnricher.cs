@@ -37,7 +37,7 @@ namespace LBi.LostDoc.Enrichers
             this._docReaders = new Dictionary<Assembly, XmlDocReader>();
             this._paths = new List<string>();
             this._xslTransform = new XslCompiledTransform();
-            using (Stream resource = Assembly.GetExecutingAssembly().GetManifestResourceStream("LBi.LostDoc.Core.Enrichers.enrich-doc-comments.xslt"))
+            using (Stream resource = Assembly.GetExecutingAssembly().GetManifestResourceStream("LBi.LostDoc.Enrichers.enrich-doc-comments.xslt"))
             {
                 XmlReader reader = XmlReader.Create(resource);
                 this._xslTransform.Load(reader);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,2013 LBi Netherlands B.V.
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,23 @@
 
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using System.Xml.Xsl;
 
 namespace LBi.LostDoc.Templating
 {
-    public abstract class XPathVariable
+    public class ExpressionXPathVariable : XPathVariable
     {
-        protected XPathVariable(string name)
+        public ExpressionXPathVariable(string name, string expression) : base(name)
         {
-            this.Name = name;
+            this.ValueExpression = expression;
         }
 
-        public string Name { get; protected set; }
+        public string ValueExpression { get; protected set; }
 
-        public abstract IXsltContextVariable Evaluate(XNode scope, IXmlNamespaceResolver resolver);
+        public override IXsltContextVariable Evaluate(XNode scope, IXmlNamespaceResolver resolver)
+        {
+            return new ConstantXPathVariable(this.Name, scope.XPathEvaluate(this.ValueExpression, resolver));
+        }
     }
 }
