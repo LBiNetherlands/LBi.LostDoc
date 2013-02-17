@@ -792,7 +792,21 @@ namespace LBi.LostDoc.Templating
 
                 StringBuilder graph = new StringBuilder();
                 graph.AppendLine("Graph:");
-                graph.Append('┌').Append('─', buckets.Length).Append('┐').Append('◄').Append(' ').Append(bucketMax.ToString("N0")).AppendLine();
+                const int gutter = 2;
+                int columnWidth = graph.Length;
+                graph.Append('┌').Append('─', buckets.Length).Append('┐').Append('◄').Append(' ').Append(bucketMax.ToString("N0"));
+                int firstLineLength = graph.Length - columnWidth;
+                columnWidth = graph.Length - columnWidth + gutter;
+                StringBuilder lastLine = new StringBuilder();
+                lastLine.Append('▲').Append(' ').Append((min / 1000.0).ToString("N0")).Append("ms");
+                lastLine.Append(' ', (buckets.Length + 2) - lastLine.Length - 1);
+                lastLine.Append('▲').Append(' ').Append((max / 1000.0).ToString("N0")).Append("ms");
+                columnWidth = Math.Max(columnWidth, lastLine.Length + gutter);
+
+                if (columnWidth > firstLineLength)
+                    graph.Append(' ', columnWidth - firstLineLength);
+                graph.AppendLine("Percentage of the applications processed within a certain time (ms)");
+
                 for (int row = 0; row < rows; row++)
                 {
                     // │┌┐└┘─
@@ -808,14 +822,47 @@ namespace LBi.LostDoc.Templating
                         else
                             graph.Append(' ');
                     }
-                    graph.Append('│').AppendLine();
+                    graph.Append('│');
+
+                    graph.Append(' ', columnWidth - (buckets.Length + 2));
+                    switch (row)
+                    {
+                        case 0:
+                            graph.Append(" 100% ").Append((max / 1000.0).ToString("N0"));
+                            break;
+                        case 1:
+                            graph.Append("  95% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.95))].Duration / 1000.0).ToString("N0"));
+                            break;
+                        case 2:
+                            graph.Append("  90% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .9))].Duration / 1000.0).ToString("N0"));
+                            break;
+                        case 3:
+                            graph.Append("  80% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.8))].Duration / 1000.0).ToString("N0"));
+                            break;
+                        case 4:
+                            graph.Append("  70% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.7))].Duration / 1000.0).ToString("N0"));
+                            break;
+                        case 5:
+                            graph.Append("  50% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.5))].Duration / 1000.0).ToString("N0"));
+                            break;
+                    }
+
+                    graph.AppendLine();
                 }
-                graph.Append('└').Append('─', buckets.Length).Append('┘').Append('◄').Append(" 0").AppendLine();
                 int len = graph.Length;
-                graph.Append('▲').Append(' ').Append((min / 1000.0).ToString("N0")).Append("ms");
-                graph.Append(' ', (buckets.Length + 2) - (graph.Length - len) - 1);
-                graph.Append('▲').Append(' ').Append((max / 1000.0).ToString("N0")).Append("ms");
-                
+                graph.Append('└').Append('─', buckets.Length).Append('┘').Append('◄').Append(" 0");
+                len = graph.Length - len;
+                if (columnWidth > len)
+                    graph.Append(' ', columnWidth - len);
+
+                graph.Append("  10% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .1))].Duration / 1000.0).ToString("N0"));
+
+                graph.AppendLine();
+
+                lastLine.Append(' ', columnWidth - lastLine.Length);
+                lastLine.Append("   1% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .01))].Duration / 1000.0).ToString("N0"));
+                graph.Append(lastLine.ToString());
+
                 TraceSources.TemplateSource.TraceInformation(graph.ToString());
 
             }
@@ -846,8 +893,8 @@ namespace LBi.LostDoc.Templating
             xpathContext.PushVariableScope(templateData.XDocument.Root, parameters);
             for (int i = 0; i < resources.Length; i++)
             {
-                xpathContext.PushVariableScope(templateData.XDocument.Root, resources[i].Variables);   
-                
+                xpathContext.PushVariableScope(templateData.XDocument.Root, resources[i].Variables);
+
                 if (EvalCondition(xpathContext, templateData.XDocument.Root, resources[i].ConditionExpression))
                     yield return new ResourceDeployment(resources[i].FileProvider, resources[i].Source);
 
