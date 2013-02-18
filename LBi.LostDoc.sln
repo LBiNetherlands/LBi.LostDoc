@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Templating.Tran
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.ConsoleApplication.Extensibility", "LBi.LostDoc.ConsoleApplication.Extensibility\LBi.LostDoc.ConsoleApplication.Extensibility.csproj", "{937A6F0F-EFDC-4689-A88D-30954A92C027}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Templates", "LBi.LostDoc.Templates\LBi.LostDoc.Templates.csproj", "{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,16 @@ Global
 		{937A6F0F-EFDC-4689-A88D-30954A92C027}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{937A6F0F-EFDC-4689-A88D-30954A92C027}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{937A6F0F-EFDC-4689-A88D-30954A92C027}.Release|x86.ActiveCfg = Release|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{357E5BA0-0AA0-4C30-B7BB-EEC8EAAA6D17}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

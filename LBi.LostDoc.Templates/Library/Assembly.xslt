@@ -36,14 +36,9 @@
     <xsl:apply-templates select="ld:key('aid', $assetId)" mode="title"/>
   </xsl:template>
 
-
-
   <xsl:template name="navigation">
     <xsl:apply-templates select="ld:key('aid', $assetId)" mode="xnav"/>
   </xsl:template>
-
-
-
 
   <xsl:template name="content">
     <h1>

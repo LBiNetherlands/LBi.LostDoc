@@ -1,6 +1,9 @@
 ﻿param($ldPath = $(throw "ldpath required"));
 
-[void][System.Reflection.Assembly]::LoadFrom($ldPath);
+[System.AppDomainSetup]$setup = New-Object -TypeName System.AppDomainSetup -Property @{ApplicationBase = [System.IO.Path]::GetDirectoryName($ldPath)}
+[System.AppDomain]$app = [System.AppDomain]::CreateDomain("lostdoc", [System.AppDomain]::CurrentDomain.Evidence, $setup)
+#$app.Load("LBi.LostDoc.ConsoleApplication"); 
+#[void][System.Reflection.Assembly]::LoadFrom($ldPath);
 [bool]$script:verbose = $false;
 $choices = @(
     (New-Object -TypeName PSObject @{
@@ -98,7 +101,7 @@ while ($true) {
                 if ($script:verbose) {
                     $arg += ' -Verbose';
                 }
-                [LBi.LostDoc.ConsoleApplication.Program]::Main($arg);
+                $app.ExecuteAssembly($ldPath, $arg)
             }
         }
     }

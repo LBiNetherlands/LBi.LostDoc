@@ -57,7 +57,8 @@ namespace LBi.LostDoc.Templating
         private IReadOnlyFileProvider _fileProvider;
         private TemplateResolver _templateResolver;
         private string _templateSourcePath;
-
+        private string _name;
+        
         public event EventHandler<ProgressArgs> Progress;
 
         protected virtual void OnProgress(int percent)

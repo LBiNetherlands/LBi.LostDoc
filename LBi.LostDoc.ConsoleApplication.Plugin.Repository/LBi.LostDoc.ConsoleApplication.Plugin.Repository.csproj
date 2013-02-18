@@ -81,6 +81,7 @@
     <ProjectReference Include="..\LBi.LostDoc.ConsoleApplication.Extensibility\LBi.LostDoc.ConsoleApplication.Extensibility.csproj">
       <Project>{937A6F0F-EFDC-4689-A88D-30954A92C027}</Project>
       <Name>LBi.LostDoc.ConsoleApplication.Extensibility</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

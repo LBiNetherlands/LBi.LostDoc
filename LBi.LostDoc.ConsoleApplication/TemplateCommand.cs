@@ -132,16 +132,10 @@ namespace LBi.LostDoc.ConsoleApplication
                     bundle.Add(fileDoc);
                 }
 
-
-                // find template
-                string appDir = Assembly.GetExecutingAssembly().Location;
-                string cwDir = Directory.GetCurrentDirectory();
-
-
-                IReadOnlyFileProvider fsProvider = new DirectoryFileProvider();
-                IReadOnlyFileProvider resourceProvider = new ResourceFileProvider("LBi.LostDoc.ConsoleApplication.Templates");
-
-                TemplateResolver templateResolver = new TemplateResolver(fsProvider, resourceProvider);
+                // TODO replace literal with constant
+                var lazyProviders = container.GetExports<IReadOnlyFileProvider>("TemplateProvider");
+                var realProviders = lazyProviders.Select(lazy => lazy.Value);
+                TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
 
                 Template template = new Template(container);
                 template.Load(templateResolver, this.Template);

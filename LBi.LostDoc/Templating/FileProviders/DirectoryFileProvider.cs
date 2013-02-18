@@ -15,16 +15,23 @@
  */
 
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace LBi.LostDoc.Templating.FileProviders
 {
+    [Export("TemplateProvider", typeof(IReadOnlyFileProvider))]
     public class DirectoryFileProvider : IReadOnlyFileProvider
     {
+        public DirectoryFileProvider()
+            : this(Enumerable.Empty<string>())
+        {
+        }
 
-        public DirectoryFileProvider(params string[] paths) : this(paths.AsEnumerable())
+        public DirectoryFileProvider(params string[] paths)
+            : this(paths.AsEnumerable())
         {
         }
 
@@ -47,7 +54,7 @@ namespace LBi.LostDoc.Templating.FileProviders
         }
 
         #region IReadOnlyFileProvider Members
-        
+
         public virtual bool FileExists(string path)
         {
             return this.GeneratePaths(path)
