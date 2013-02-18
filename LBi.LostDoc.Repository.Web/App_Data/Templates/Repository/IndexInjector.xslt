@@ -20,7 +20,8 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
                 exclude-result-prefixes="msxsl"
-                xmlns:ld="urn:lostdoc-core">
+                xmlns:ld="urn:lostdoc-core"
+                xmlns:doc="urn:doc">
 
   <xsl:output method="xml" indent="yes"/>
 
@@ -35,27 +36,32 @@
   </xsl:template>
 
   <xsl:template match="meta-template[@stylesheet='IndexInjector.xslt']">
-    <xsl:if test="$targets">
-      <xsl:variable name="next" select="substring-after($targets, ',')"/>
-      <xsl:variable name="first" select="normalize-space(ld:coalesce(substring-before($targets, ','), $targets))"/>
-      <xsl:apply-templates select="/template/apply-stylesheet[@stylesheet = $first]" mode="inject"/>
-      <xsl:if test="$next">
-        <!-- if there is more data, inject own processing instructions -->
-        <meta-template stylesheet="IndexInjector.xslt">
-          <with-param name="targets" select="'{normalize-space($next)}'" />
-        </meta-template>
-      </xsl:if>
-    </xsl:if>
-  </xsl:template>
 
-  <xsl:template match="apply-stylesheet"
-                mode="inject">
-    <apply-stylesheet name="{concat('Index for: ', ld:coalesce(@name, substring-before(@stylesheet, '.')))}"
+    <!--<xsl:variable name="selector">
+      <xsl:call-template name="get-selector">
+        <xsl:with-param name="targets" select="$targets"/>
+      </xsl:call-template>
+    </xsl:variable>-->
+
+    <apply-stylesheet name="Index"
                       stylesheet="CreateIndex.xslt"
-                      assetId="concat(({@assetId}), '-index')"
-                      output="'Index\index.xml'">
-      <xsl:copy-of select="@*[local-name() != 'name' and local-name() != 'stylesheet' and local-name() != 'output' and local-name() != 'assetId']"/>
+                      select="//*[doc:*]"
+                      assetId="'IX:*'"
+                      version="'0.0.0.0'"
+                      output="'index.xml'">
       <with-param name="assetId" select="@assetId" />
     </apply-stylesheet>
   </xsl:template>
+
+  <!--<xsl:template name="get-selector">
+    <xsl:param name="targets"/>
+    <xsl:if test="$targets">
+      <xsl:variable name="next" select="substring-after($targets, ',')"/>
+      <xsl:variable name="first" select="normalize-space(ld:coalesce(substring-before($targets, ','), $targets))"/>
+      <xsl:value-of select="/template/apply-stylesheet[@stylesheet = $first]"/>
+      <xsl:call-template name="get-selector">
+        <xsl:with-param name="targets" select="$next"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>-->
 </xsl:stylesheet>

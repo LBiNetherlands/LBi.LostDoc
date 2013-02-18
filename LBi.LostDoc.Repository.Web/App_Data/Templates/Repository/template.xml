@@ -4,9 +4,18 @@
           inherts="Library">
   
   <parameter name="SearchUri"  />
+
+  <apply-stylesheet name="Index"
+                  stylesheet="CreateIndex.xslt"
+                  select="/bundle"
+                  assetId="'IX:*'"
+                  version="'0.0.0.0'"
+                  output="'index.xml'">
+    <with-param name="assetId" select="@assetId" />
+  </apply-stylesheet>
   
-  <!-- this stylsheet will be applied to _this_ file -->
+  <!-- this stylsheet will be applied to _this_ file --><!--
   <meta-template stylesheet="IndexInjector.xslt">
     <with-param name="targets" select="'Type.xslt,Member.xslt'"/>
-  </meta-template>  
+  </meta-template>-->  
 </template>

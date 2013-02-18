@@ -217,7 +217,7 @@ namespace LBi.LostDoc.Enrichers
         private void RewriteXml(IProcessingContext context, Assembly hintAssembly, XElement element, params string[] exclude)
         {
             element = this.EnrichXml(context, hintAssembly, element);
-            XNamespace ns = "urn:doc";
+            XNamespace ns = Namespaces.BundleDocComments;
             foreach (XElement elem in element.Elements())
             {
                 if (exclude.Contains(elem.Name.LocalName))
@@ -230,7 +230,7 @@ namespace LBi.LostDoc.Enrichers
         private void RewriteXmlContent(IProcessingContext context, Assembly hintAssembly, string container, XElement element)
         {
             element = this.EnrichXml(context, hintAssembly, element);
-            XNamespace ns = "urn:doc";
+            XNamespace ns = Namespaces.BundleDocComments;
             if (element.Nodes().Any())
                 context.Element.Add(new XElement(ns + container, element.Attributes(), element.Nodes()));
         }
@@ -242,7 +242,7 @@ namespace LBi.LostDoc.Enrichers
             using (XmlWriter nodeWriter = ret.CreateWriter())
             {
                 XsltArgumentList argList = new XsltArgumentList();
-                argList.AddExtensionObject("urn:lostdoc-core", new AssetVersionResolver(context, hintAssembly));
+                argList.AddExtensionObject(Namespaces.TemplateExtensions, new AssetVersionResolver(context, hintAssembly));
 
                 this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
                 nodeWriter.Close();
@@ -264,7 +264,6 @@ namespace LBi.LostDoc.Enrichers
             XmlDocReader reader = this.GetDocReader(methodInfo.ReflectedType.Assembly);
             if (reader != null)
             {
-                XNamespace ns = "urn:doc";
                 XElement element = reader.GetTypeParameterSummary(methodInfo, typeParameter);
                 if (element != null)
                     this.RewriteXmlContent(context, methodInfo.ReflectedType.Assembly, "summary", element);
@@ -276,7 +275,6 @@ namespace LBi.LostDoc.Enrichers
             XmlDocReader reader = this.GetDocReader(type.Assembly);
             if (reader != null)
             {
-                XNamespace ns = "urn:doc";
                 XElement element = reader.GetTypeParameterSummary(type, typeParameter);
                 if (element != null)
                     this.RewriteXmlContent(context, typeParameter.Assembly, "summary", element);

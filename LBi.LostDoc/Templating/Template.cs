@@ -517,11 +517,11 @@ namespace LBi.LostDoc.Templating
                         }
                         catch (XPathException ex)
                         {
-                            throw new Exception(
-                                string.Format("Unable to process 'with-param' element in with name '{0}': {1}",
-                                              pName,
-                                              ex.Message),
-                                ex);
+                            throw new TemplateException(paramNode.Attribute("select"),
+                                                        string.Format(
+                                                            "Unable to process XPath expression: '{0}'",
+                                                            pExpr),
+                                                        ex);
                         }
                     }
 
@@ -543,8 +543,7 @@ namespace LBi.LostDoc.Templating
 
                         using (var xmlReader = outputDoc.CreateReader())
                         {
-                            outputDoc = XDocument.Load(xmlReader,
-                                                       LoadOptions.SetLineInfo | LoadOptions.PreserveWhitespace);
+                            outputDoc = XDocument.Load(xmlReader, LoadOptions.SetLineInfo | LoadOptions.PreserveWhitespace);
                         }
                     }
 

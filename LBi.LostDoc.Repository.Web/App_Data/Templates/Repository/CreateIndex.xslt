@@ -24,6 +24,7 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc hrc ld">
   <xsl:output method="xml"/>
+  
   <xsl:include href="Naming.xslt"/>
   <xsl:include href="DocComments.xslt"/>
   <xsl:param name="assetId"/>

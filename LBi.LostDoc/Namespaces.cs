@@ -21,7 +21,7 @@ namespace LBi.LostDoc
         public const string TemplateDefinition = "";
         public const string TemplateVariable = "urn:lost-doc:template.variable";
         public const string Bundle = "";
-        public const string BundleDocComments = "";
+        public const string BundleDocComments = "urn:doc";
         public const string TemplateExtensions = "urn:lostdoc-core";
     }
 }
