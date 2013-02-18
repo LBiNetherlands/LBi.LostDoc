@@ -4,7 +4,7 @@ using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using LBi.Cli.Arguments;
-using LBi.LostDoc;
+using LBi.LostDoc.ConsoleApplication.Extensibility;
 
 namespace LBi.LostDoc.ConsoleApplication
 {

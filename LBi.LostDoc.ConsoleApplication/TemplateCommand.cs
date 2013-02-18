@@ -16,7 +16,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -24,13 +23,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using LBi.Cli.Arguments;
-using LBi.LostDoc;
+using LBi.LostDoc.ConsoleApplication.Extensibility;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Templating;
 using LBi.LostDoc.Templating.FileProviders;
-using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.ConsoleApplication
 {

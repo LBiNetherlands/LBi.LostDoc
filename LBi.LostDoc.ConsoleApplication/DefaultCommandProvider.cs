@@ -15,7 +15,7 @@
  */
 
 using System;
-using System.ComponentModel.Composition;
+using LBi.LostDoc.ConsoleApplication.Extensibility;
 
 namespace LBi.LostDoc.ConsoleApplication
 {

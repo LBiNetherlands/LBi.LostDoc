@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 LBi Netherlands B.V.
+ * Copyright 2012,2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,11 @@
  */
 
 using System.ComponentModel.Composition.Hosting;
-using LBi.Cli.Arguments;
 
-namespace LBi.LostDoc.ConsoleApplication
+namespace LBi.LostDoc.ConsoleApplication.Extensibility
 {
-    public abstract class Command : ICommand
+    public interface ICommand
     {
-        [Parameter(HelpMessage = "Include errors and warning output only.")]
-        public LBi.Cli.Arguments.Switch Quiet { get; set; }
-
-        [Parameter(HelpMessage = "Include verbose output.")]
-        public LBi.Cli.Arguments.Switch Verbose { get; set; }
-
-        public abstract void Invoke(CompositionContainer container);
+        void Invoke(CompositionContainer container);
     }
 }

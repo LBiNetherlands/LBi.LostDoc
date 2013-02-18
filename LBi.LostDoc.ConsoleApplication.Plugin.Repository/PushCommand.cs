@@ -21,6 +21,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Net.Http;
 using LBi.Cli.Arguments;
+using LBi.LostDoc.ConsoleApplication.Extensibility;
 
 namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
 {

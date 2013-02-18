@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,2013 LBi Netherlands B.V.
+ * Copyright 2012 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License. 
  */
 
-using System.ComponentModel.Composition.Hosting;
+using System;
+using System.ComponentModel.Composition;
 
-namespace LBi.LostDoc.ConsoleApplication
+namespace LBi.LostDoc.ConsoleApplication.Extensibility
 {
-    public interface ICommand
+    [InheritedExport(typeof(ICommandProvider))]
+    public interface ICommandProvider
     {
-        void Invoke(CompositionContainer container);
+        Type[] GetCommands();
     }
 }

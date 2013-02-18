@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using LBi.Cli.Arguments;
+using LBi.LostDoc.ConsoleApplication.Extensibility;
 
 namespace LBi.LostDoc.ConsoleApplication
 {

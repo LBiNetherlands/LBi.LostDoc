@@ -16,13 +16,10 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LBi.Cli.Arguments;
+using LBi.LostDoc.ConsoleApplication.Extensibility;
 
 namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
 {

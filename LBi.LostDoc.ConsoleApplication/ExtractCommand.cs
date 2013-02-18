@@ -20,17 +20,13 @@ using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 using LBi.Cli.Arguments;
-using LBi.LostDoc;
+using LBi.LostDoc.ConsoleApplication.Extensibility;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Enrichers;
 using LBi.LostDoc.Filters;
-using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
