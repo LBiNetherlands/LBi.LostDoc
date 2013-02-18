@@ -21,21 +21,22 @@ namespace LBi.LostDoc.Templating
 {
     public class TemplateException : Exception
     {
-        public static TemplateException MissingAttribute(IXmlLineInfo lineInfo, string attributeName)
+        public static TemplateException MissingAttribute(string filename, IXmlLineInfo lineInfo, string attributeName)
         {
-            return new TemplateException(lineInfo, string.Format("Missing required attribute '{0}'", attributeName));
+            return new TemplateException(filename, lineInfo, string.Format("Missing required attribute '{0}'", attributeName));
         }
 
 
-        public TemplateException(IXmlLineInfo lineInfo, string message)
-            : this(lineInfo, message, null)
+        public TemplateException(string filename, IXmlLineInfo lineInfo, string message)
+            : this(filename, lineInfo, message, null)
         {
         }
 
-        public TemplateException(IXmlLineInfo lineInfo, string message, Exception innerException)
+        public TemplateException(string filename, IXmlLineInfo lineInfo, string message, Exception innerException)
             : base(WrapMessage(lineInfo, message, innerException), innerException)
         {
             this.LineInfo = lineInfo;
+            this.Path = filename;
         }
 
         private static string WrapMessage(IXmlLineInfo lineInfo, string message, Exception innerException)
@@ -48,5 +49,6 @@ namespace LBi.LostDoc.Templating
         }
 
         public IXmlLineInfo LineInfo { get; protected set; }
+        public string Path { get; protected set; }
     }
 }

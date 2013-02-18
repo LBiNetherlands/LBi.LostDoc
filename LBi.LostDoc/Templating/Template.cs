@@ -56,6 +56,7 @@ namespace LBi.LostDoc.Templating
         private XDocument _templateDefinition;
         private IReadOnlyFileProvider _fileProvider;
         private TemplateResolver _templateResolver;
+        private string _templateSourcePath;
 
         public event EventHandler<ProgressArgs> Progress;
 
@@ -80,6 +81,8 @@ namespace LBi.LostDoc.Templating
 
         public virtual void Load(TemplateResolver resolver, string name)
         {
+            this._templateSourcePath = null;
+
             string path;
             if (resolver.Resolve(name, out this._fileProvider, out path))
             {
@@ -345,14 +348,18 @@ namespace LBi.LostDoc.Templating
             {
                 if (providers == null)
                     providers = new Dictionary<string, IReadOnlyFileProvider>();
+                
+                //XXXXXXX
+                // figure out how to pass this to the XmlFileProviderResolver
+                // Dictionary<string, IReadOnlyFileProvider>  needs to be something else that has order
+                // List<KeyValuePair<string, IROF> ??
 
                 int depth = providers.Count + 1;
                 Template inheritedTemplate = new Template(this._container);
                 inheritedTemplate.Load(this._templateResolver, templateInheritsAttr.Value);
                 ParsedTemplate parsedTemplate = inheritedTemplate.PrepareTemplate(templateData, providers);
 
-                providers.Add(depth.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                              inheritedTemplate.GetScopedFileProvider());
+                providers.Add(depth.ToString(CultureInfo.InvariantCulture), inheritedTemplate.GetScopedFileProvider());
 
                 // a little hacky but it should work with the Reverse()/AddFirst()
                 foreach (XElement elem in parsedTemplate.Source.Root.Elements().Reverse())
@@ -362,10 +369,9 @@ namespace LBi.LostDoc.Templating
                     workingDoc.Root.AddFirst(clone);
                 }
 
-                // create and register temp file
-                var tempFileName = Path.Combine(tempFiles.TempDir, Path.GetDirectoryName(this._basePath) + TemplateDefinitionFileName + ".inherited." + depth);
-                workingDoc.Save(tempFileName, SaveOptions.OmitDuplicateNamespaces);
-                tempFiles.AddFile(tempFileName, tempFiles.KeepFiles);
+                // create and register temp file (this can be overriden later if there are meta-template directives
+                // in the template
+                this._templateSourcePath = this.SaveTempFile(tempFiles, workingDoc, "inherited." + depth);
             }
 
             // start by loading any parameters as they are needed for meta-template evaluation
@@ -391,6 +397,13 @@ namespace LBi.LostDoc.Templating
 
             // expand any meta-template directives
             workingDoc = ApplyMetaTransforms(workingDoc, customContext, fileResolver, tempFiles);
+
+            // there was neither inheretance, nor any meta-template directives
+            if (this._templateSourcePath == null)
+            {
+                // save current template to disk
+                this._templateSourcePath = this.SaveTempFile(tempFiles, workingDoc);
+            }
 
             // loading template
             List<Stylesheet> stylesheets = new List<Stylesheet>();
@@ -429,6 +442,17 @@ namespace LBi.LostDoc.Templating
                            Indices = indices.ToArray(),
                            TemporaryFiles = tempFiles,
                        };
+        }
+
+        private string SaveTempFile(TempFileCollection tempFiles, XDocument workingDoc, string suffix = null)
+        {
+            var tempFileName = Path.Combine(tempFiles.TempDir,
+                                            Path.GetDirectoryName(this._basePath)
+                                            + TemplateDefinitionFileName
+                                            + (suffix != null ? "." + suffix : ""));
+            workingDoc.Save(tempFileName, SaveOptions.OmitDuplicateNamespaces);
+            tempFiles.AddFile(tempFileName, tempFiles.KeepFiles);
+            return tempFileName;
         }
 
         private Resource ParseResouceDefinition(Dictionary<string, IReadOnlyFileProvider> providers, XElement elem)
@@ -517,7 +541,8 @@ namespace LBi.LostDoc.Templating
                         }
                         catch (XPathException ex)
                         {
-                            throw new TemplateException(paramNode.Attribute("select"),
+                            throw new TemplateException(this._templateSourcePath,
+                                                        paramNode.Attribute("select"),
                                                         string.Format(
                                                             "Unable to process XPath expression: '{0}'",
                                                             pExpr),
@@ -525,9 +550,14 @@ namespace LBi.LostDoc.Templating
                         }
                     }
 
-                    XDocument outputDoc = new XDocument();
-                    using (XmlWriter outputWriter = outputDoc.CreateWriter())
+                    
+                    
+                    // this isn't very, but I can't figure out another way to get LineInfo included in the transformed document
+                    XDocument outputDoc;
+                    using (MemoryStream tempStream = new MemoryStream())
+                    using (XmlWriter outputWriter = XmlWriter.Create(tempStream, new XmlWriterSettings {Indent = true}))
                     {
+                        
                         metaTransform.Transform(workingDoc.CreateNavigator(),
                                                 xsltArgList,
                                                 outputWriter,
@@ -535,16 +565,17 @@ namespace LBi.LostDoc.Templating
 
                         outputWriter.Close();
 
-                        // create and register temp file
-                        // TODO this is a bit hacky, maybe add Template.Name {get;}
-                        var tempFileName = Path.Combine(tempFiles.TempDir, this._basePath + '.' + TemplateDefinitionFileName + ".meta." + (++metaCount).ToString(CultureInfo.InvariantCulture));
-                        outputDoc.Save(tempFileName, SaveOptions.OmitDuplicateNamespaces);
-                        tempFiles.AddFile(tempFileName, tempFiles.KeepFiles);
+                        // rewind stream
+                        tempStream.Seek(0, SeekOrigin.Begin);
+                        outputDoc = XDocument.Load(tempStream, LoadOptions.SetLineInfo);
 
-                        using (var xmlReader = outputDoc.CreateReader())
-                        {
-                            outputDoc = XDocument.Load(xmlReader, LoadOptions.SetLineInfo | LoadOptions.PreserveWhitespace);
-                        }
+                        // create and register temp file
+                        // this will override the value set in PrepareTemplate in case of template inhertence
+                        // TODO this is a bit hacky, maybe add Template.Name {get;} instead of this._basePath (which could be anything)
+                        this._templateSourcePath = this.SaveTempFile(tempFiles, outputDoc,
+                                                                     this._basePath
+                                                                     + ".meta."
+                                                                     + (++metaCount).ToString(CultureInfo.InvariantCulture));
                     }
 
 
@@ -655,7 +686,7 @@ namespace LBi.LostDoc.Templating
             var attr = elem.Attribute(attName);
 
             if (attr == null)
-                throw TemplateException.MissingAttribute(elem, attName);
+                throw TemplateException.MissingAttribute(this._templateSourcePath, elem, attName);
 
             return attr.Value;
         }
