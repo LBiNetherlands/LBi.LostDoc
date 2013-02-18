@@ -15,6 +15,8 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Xml;
 
@@ -23,12 +25,12 @@ namespace LBi.LostDoc.Templating
     public class XmlFileProviderResolver : XmlResolver
     {
         private readonly string _basePath;
-        private readonly IReadOnlyFileProvider _fileProvider;
+        private readonly Stack<IReadOnlyFileProvider> _fileProviders;
 
         // TODO investigate whether basePath can be deleted entirely
-        public XmlFileProviderResolver(IReadOnlyFileProvider fileProvider, string basePath = null)
+        public XmlFileProviderResolver(Stack<IReadOnlyFileProvider> fileProviders, string basePath = null)
         {
-            this._fileProvider = fileProvider;
+            this._fileProviders = fileProviders;
             this._basePath = basePath;
         }
 
@@ -72,7 +74,15 @@ namespace LBi.LostDoc.Templating
         /// </exception>
         public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
         {
-            return this._fileProvider.OpenFile(absoluteUri.ToString());
+            string uri = absoluteUri.ToString();
+
+            foreach (IReadOnlyFileProvider fileProvider in this._fileProviders)
+            {
+                if (fileProvider.FileExists(uri))
+                    return fileProvider.OpenFile(uri);
+            }
+
+            throw new FileNotFoundException("File not found: " + uri, uri);
         }
 
         public override Uri ResolveUri(Uri baseUri, string relativeUri)
