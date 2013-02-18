@@ -81,6 +81,7 @@
     <Compile Include="IProcessingContext.cs" />
     <Compile Include="ITypeFilter.cs" />
     <Compile Include="Filters\SpecialNameMemberInfoFilter.cs" />
+    <Compile Include="Namespaces.cs" />
     <Compile Include="Naming.cs" />
     <Compile Include="ProcessingContextExtensions.cs" />
     <Compile Include="Reflection\IAssemblyLoader.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Templating\Stylesheet.cs" />
     <Compile Include="Templating\StylesheetApplication.cs" />
     <Compile Include="Templating\TemplateData.cs" />
+    <Compile Include="Templating\TemplateException.cs" />
     <Compile Include="Templating\TemplateOutput.cs" />
     <Compile Include="Templating\TemplateResolver.cs" />
     <Compile Include="Templating\Transformers\ImageScaleTransform.cs" />

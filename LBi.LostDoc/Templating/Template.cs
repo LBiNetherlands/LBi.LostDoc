@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
@@ -50,7 +52,6 @@ namespace LBi.LostDoc.Templating
         private readonly CompositionContainer _container;
         private readonly FileResolver _fileResolver;
         private readonly List<IAssetUriResolver> _resolvers;
-        private readonly Lazy<IResourceTransform, IResourceTransformMetadata>[] _resourceTransformers;
         private string _basePath;
         private XDocument _templateDefinition;
         private IReadOnlyFileProvider _fileProvider;
@@ -73,7 +74,6 @@ namespace LBi.LostDoc.Templating
             this._resolvers.Add(this._fileResolver);
             this._resolvers.Add(new MsdnResolver());
             this._container = container;
-            this._resourceTransformers = this._container.GetExports<IResourceTransform, IResourceTransformMetadata>().ToArray();
         }
 
         #region LoadFrom Template
@@ -84,7 +84,7 @@ namespace LBi.LostDoc.Templating
             if (resolver.Resolve(name, out this._fileProvider, out path))
             {
                 using (Stream str = this._fileProvider.OpenFile(path))
-                    _templateDefinition = XDocument.Load(str);
+                    _templateDefinition = XDocument.Load(str, LoadOptions.SetLineInfo);
 
                 this._basePath = Path.GetDirectoryName(path);
                 this._templateResolver = resolver;
@@ -109,9 +109,9 @@ namespace LBi.LostDoc.Templating
                     new AliasRegistration
                         {
                             Variables = this.ParseVariables(elem).ToArray(),
-                            SelectExpression = elem.Attribute("select") == null ? "." : elem.Attribute("select").Value,
-                            AssetIdExpression = elem.Attribute("assetId").Value,
-                            VersionExpression = elem.Attribute("version").Value,
+                            SelectExpression = this.GetAttributeValueOrDefault(elem, "select", "."),
+                            AssetIdExpression = this.GetAttributeValue(elem, "assetId"),
+                            VersionExpression = this.GetAttributeValue(elem, "version"),
                         };
             }
         }
@@ -123,10 +123,10 @@ namespace LBi.LostDoc.Templating
                 yield return
                     new SectionRegistration
                         {
-                            SelectExpression = elem.Attribute("select").Value,
-                            NameExpression = elem.Attribute("name").Value,
-                            AssetIdExpression = elem.Attribute("assetId").Value,
-                            VersionExpression = elem.Attribute("version").Value,
+                            SelectExpression = this.GetAttributeValue(elem, "select"),
+                            NameExpression = this.GetAttributeValue(elem, "name"),
+                            AssetIdExpression = this.GetAttributeValue(elem, "assetId"),
+                            VersionExpression = this.GetAttributeValue(elem, "version"),
                             ConditionExpression = GetAttributeValueOrDefault(elem, "condition"),
                             Variables = this.ParseVariables(elem).ToArray(),
                         };
@@ -137,7 +137,7 @@ namespace LBi.LostDoc.Templating
         {
             return
                 element.Attributes()
-                       .Where(a => a.Name.NamespaceName == "urn:lost-doc:template.variable")
+                       .Where(a => a.Name.NamespaceName == Namespaces.TemplateVariable)
                        .Select(a => new ExpressionXPathVariable(a.Name.LocalName, a.Value));
         }
 
@@ -147,8 +147,8 @@ namespace LBi.LostDoc.Templating
             {
                 if (elem.Name.LocalName == "with-param")
                 {
-                    yield return new ExpressionXPathVariable(elem.Attribute("name").Value,
-                                                             elem.Attribute("select").Value);
+                    yield return new ExpressionXPathVariable(this.GetAttributeValue(elem, "name"),
+                                                             this.GetAttributeValue(elem, "select"));
                 }
                 else
                 {
@@ -188,10 +188,10 @@ namespace LBi.LostDoc.Templating
 
             CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
 
-            xpathContext.PushVariableScope(templateData.XDocument.Root, parameters);
+            xpathContext.PushVariableScope(templateData.Document.Root, parameters);
 
             XElement[] inputElements =
-                templateData.XDocument.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
+                templateData.Document.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
 
             foreach (XElement inputElement in inputElements)
             {
@@ -325,9 +325,20 @@ namespace LBi.LostDoc.Templating
 
         protected virtual ParsedTemplate PrepareTemplate(TemplateData templateData, Dictionary<string, IReadOnlyFileProvider> providers = null)
         {
-            // clone orig doc
-            XDocument workingDoc = new XDocument(this._templateDefinition);
+            // set up temp file container
+            TempFileCollection tempFiles = new TempFileCollection(templateData.TemporaryFilesPath,
+                                                                  templateData.KeepTemporaryFiles);
 
+            if (!Directory.Exists(tempFiles.TempDir))
+                Directory.CreateDirectory(tempFiles.TempDir);
+
+            // clone orig doc
+            XDocument workingDoc;
+
+            // this is required to preserve the line information 
+            using (var xmlReader = this._templateDefinition.CreateReader())
+                workingDoc = XDocument.Load(xmlReader, LoadOptions.SetLineInfo);
+            
             // template inheritence
             XAttribute templateInheritsAttr = workingDoc.Root.Attribute("inherits");
             if (templateInheritsAttr != null)
@@ -350,6 +361,11 @@ namespace LBi.LostDoc.Templating
                     clone.Add(new XAttribute("source", depth));
                     workingDoc.Root.AddFirst(clone);
                 }
+
+                // create and register temp file
+                var tempFileName = Path.Combine(tempFiles.TempDir, Path.GetDirectoryName(this._basePath) + TemplateDefinitionFileName + ".inherited." + depth);
+                workingDoc.Save(tempFileName, SaveOptions.OmitDuplicateNamespaces);
+                tempFiles.AddFile(tempFileName, tempFiles.KeepFiles);
             }
 
             // start by loading any parameters as they are needed for meta-template evaluation
@@ -358,7 +374,7 @@ namespace LBi.LostDoc.Templating
             XElement[] paramNodes = workingDoc.Root.Elements("parameter").ToArray();
             var globalParams =
                 paramNodes.Select(paramNode =>
-                                  new ExpressionXPathVariable(paramNode.Attribute("name").Value,
+                                  new ExpressionXPathVariable(this.GetAttributeValue(paramNode, "name"),
                                                               this.GetAttributeValueOrDefault(paramNode, "select")))
                           .ToArray();
 
@@ -374,7 +390,7 @@ namespace LBi.LostDoc.Templating
             XmlFileProviderResolver fileResolver = new XmlFileProviderResolver(this._fileProvider, this._basePath);
 
             // expand any meta-template directives
-            workingDoc = ApplyMetaTransforms(workingDoc, customContext, fileResolver);
+            workingDoc = ApplyMetaTransforms(workingDoc, customContext, fileResolver, tempFiles);
 
             // loading template
             List<Stylesheet> stylesheets = new List<Stylesheet>();
@@ -410,7 +426,8 @@ namespace LBi.LostDoc.Templating
                            Source = workingDoc,
                            Resources = resources.ToArray(),
                            Stylesheets = stylesheets.ToArray(),
-                           Indices = indices.ToArray()
+                           Indices = indices.ToArray(),
+                           TemporaryFiles = tempFiles,
                        };
         }
 
@@ -418,7 +435,7 @@ namespace LBi.LostDoc.Templating
         {
             XAttribute depthAttr = elem.Attribute("depth");
 
-            var source = elem.Attribute("path").Value;
+            var source = this.GetAttributeValue(elem, "path");
 
             IReadOnlyFileProvider resourceProvider;
             Uri sourceUri;
@@ -450,11 +467,11 @@ namespace LBi.LostDoc.Templating
             List<ResourceTransform> transforms = new List<ResourceTransform>();
             foreach (XElement transform in elem.Elements("transform"))
             {
-                string transformName = transform.Attribute("name").Value;
+                string transformName = this.GetAttributeValue(transform, "name");
 
                 var transformParams = transform.Elements("with-param")
-                                               .Select(p => new ExpressionXPathVariable(p.Attribute("name").Value,
-                                                                                        p.Attribute("select").Value));
+                                               .Select(p => new ExpressionXPathVariable(this.GetAttributeValue(p, "name"),
+                                                                                        this.GetAttributeValue(p, "select")));
 
                 transforms.Add(new ResourceTransform(transformName, transformParams));
             }
@@ -468,28 +485,29 @@ namespace LBi.LostDoc.Templating
             return resource;
         }
 
-        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc, CustomXsltContext customContext, XmlFileProviderResolver fileResolver)
+        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc, CustomXsltContext customContext, XmlFileProviderResolver fileResolver, TempFileCollection tempFiles)
         {
             // check for meta-template directives and expand
+            int metaCount = 0;
             XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
             while (metaNode != null)
             {
                 if (EvalCondition(customContext, metaNode, this.GetAttributeValueOrDefault(metaNode, "condition")))
                 {
                     XslCompiledTransform metaTransform = this.LoadStylesheet(this.GetScopedFileProvider(),
-                                                                             metaNode.Attribute("stylesheet").Value);
+                                                                             this.GetAttributeValue(metaNode, "stylesheet"));
 
                     XsltArgumentList xsltArgList = new XsltArgumentList();
 
                     // TODO this is a quick fix/hack
-                    xsltArgList.AddExtensionObject("urn:lostdoc-core", new TemplateXsltExtensions(null, null));
+                    xsltArgList.AddExtensionObject(Namespaces.TemplateExtensions, new TemplateXsltExtensions(null, null));
 
                     var metaParamNodes = metaNode.Elements("with-param");
 
                     foreach (XElement paramNode in metaParamNodes)
                     {
-                        string pName = paramNode.Attribute("name").Value;
-                        string pExpr = paramNode.Attribute("select").Value;
+                        string pName = this.GetAttributeValue(paramNode, "name");
+                        string pExpr = this.GetAttributeValue(paramNode, "select");
 
                         try
                         {
@@ -514,11 +532,25 @@ namespace LBi.LostDoc.Templating
                                                 xsltArgList,
                                                 outputWriter,
                                                 fileResolver);
+
+                        outputWriter.Close();
+
+                        // create and register temp file
+                        // TODO this is a bit hacky, maybe add Template.Name {get;}
+                        var tempFileName = Path.Combine(tempFiles.TempDir, this._basePath + '.' + TemplateDefinitionFileName + ".meta." + (++metaCount).ToString(CultureInfo.InvariantCulture));
+                        outputDoc.Save(tempFileName, SaveOptions.OmitDuplicateNamespaces);
+                        tempFiles.AddFile(tempFileName, tempFiles.KeepFiles);
+
+                        using (var xmlReader = outputDoc.CreateReader())
+                        {
+                            outputDoc = XDocument.Load(xmlReader,
+                                                       LoadOptions.SetLineInfo | LoadOptions.PreserveWhitespace);
+                        }
                     }
 
 
                     TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
-                                                             metaNode.Attribute("stylesheet").Value);
+                                                             this.GetAttributeValue(metaNode, "stylesheet"));
 
                     TraceSources.TemplateSource.TraceData(TraceEventType.Verbose, 1, outputDoc.CreateNavigator());
 
@@ -530,7 +562,6 @@ namespace LBi.LostDoc.Templating
                     metaNode.Remove();
                 }
 
-
                 // select next template
                 metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
             }
@@ -539,9 +570,9 @@ namespace LBi.LostDoc.Templating
 
         protected virtual Index ParseIndexDefinition(XElement elem)
         {
-            return new Index(elem.Attribute("name").Value,
-                             elem.Attribute("match").Value,
-                             elem.Attribute("key").Value);
+            return new Index(this.GetAttributeValue(elem, "name"),
+                             this.GetAttributeValue(elem, "match"),
+                             this.GetAttributeValue(elem, "key"));
         }
 
         private static bool EvalCondition(CustomXsltContext customContext, XNode contextNode, string condition)
@@ -571,15 +602,19 @@ namespace LBi.LostDoc.Templating
             }
 
 
-            string name = elem.Attribute("name") == null
-                              ? Path.GetFileNameWithoutExtension(elem.Attribute("stylesheet").Value)
-                              : elem.Attribute("name").Value;
-            if (elem.Attribute("name") != null)
-                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0} ({1})", name, elem.Attribute("stylesheet").Value);
+            var nameAttr = elem.Attribute("name");
+            var src = this.GetAttributeValue(elem, "stylesheet");
+            string name;
+            if (nameAttr != null)
+            {
+                name = nameAttr.Value;
+                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0} ({1})", name, src);
+            }
             else
+            {
+                name = Path.GetFileNameWithoutExtension(src);
                 TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0}", name);
-
-            string src = elem.Attribute("stylesheet").Value;
+            }
             XslCompiledTransform transform;
 
             Stylesheet match = stylesheets.FirstOrDefault(s => String.Equals(s.Source, src, StringComparison.Ordinal));
@@ -593,10 +628,10 @@ namespace LBi.LostDoc.Templating
                        {
                            Source = src,
                            Transform = transform,
-                           SelectExpression = elem.Attribute("select").Value,
-                           AssetIdExpression = elem.Attribute("assetId").Value,
-                           OutputExpression = elem.Attribute("output").Value,
-                           VersionExpression = elem.Attribute("version").Value,
+                           SelectExpression = this.GetAttributeValue(elem, "select"),
+                           AssetIdExpression = this.GetAttributeValue(elem, "assetId"),
+                           OutputExpression = this.GetAttributeValue(elem, "output"),
+                           VersionExpression = this.GetAttributeValue(elem, "version"),
                            XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
                            Variables = this.ParseVariables(elem).ToArray(),
                            Name = name,
@@ -616,6 +651,16 @@ namespace LBi.LostDoc.Templating
             return attr.Value;
         }
 
+        private string GetAttributeValue(XElement elem, string attName)
+        {
+            var attr = elem.Attribute(attName);
+
+            if (attr == null)
+                throw TemplateException.MissingAttribute(elem, attName);
+
+            return attr.Value;
+        }
+
         /// <summary>
         /// Applies the loaded templates to <paramref name="templateData"/>.
         /// </summary>
@@ -627,7 +672,6 @@ namespace LBi.LostDoc.Templating
             Stopwatch timer = Stopwatch.StartNew();
 
             ParsedTemplate tmpl = this.PrepareTemplate(templateData);
-
 
             // collect all work that has to be done
             List<UnitOfWork> work = new List<UnitOfWork>();
@@ -670,7 +714,7 @@ namespace LBi.LostDoc.Templating
 
             // create context
             ITemplatingContext context = new TemplatingContext(this._cache,
-                this._container,
+                                                               this._container,
                                                                this._basePath,
                                                                templateData,
                                                                this._resolvers,
@@ -898,18 +942,18 @@ namespace LBi.LostDoc.Templating
             TraceSources.TemplateSource.TraceInformation("Statistics generated in {0:N1} seconds",
                                                          statsTimer.Elapsed.TotalSeconds);
 
-            return new TemplateOutput(results.ToArray());
+            return new TemplateOutput(results.ToArray(), tmpl.TemporaryFiles);
         }
 
         private IEnumerable<UnitOfWork> DiscoverWork(TemplateData templateData, XPathVariable[] parameters, Resource[] resources)
         {
             CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
-            xpathContext.PushVariableScope(templateData.XDocument.Root, parameters);
+            xpathContext.PushVariableScope(templateData.Document.Root, parameters);
             for (int i = 0; i < resources.Length; i++)
             {
-                xpathContext.PushVariableScope(templateData.XDocument.Root, resources[i].Variables);
+                xpathContext.PushVariableScope(templateData.Document.Root, resources[i].Variables);
 
-                if (EvalCondition(xpathContext, templateData.XDocument.Root, resources[i].ConditionExpression))
+                if (EvalCondition(xpathContext, templateData.Document.Root, resources[i].ConditionExpression))
                 {
                     List<IResourceTransform> transforms = new List<IResourceTransform>();
 

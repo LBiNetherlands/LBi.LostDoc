@@ -1,5 +1,5 @@
-/*
- * Copyright 2012,2013 LBi Netherlands B.V.
+﻿/*
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,14 @@
  * limitations under the License. 
  */
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace LBi.LostDoc.Templating
+namespace LBi.LostDoc
 {
-    public class TemplateOutput
+    public static class Namespaces
     {
-        public TemplateOutput(WorkUnitResult[] result, TempFileCollection tempFiles)
-        {
-            this.Results = result;
-            this.TemporaryFiles = tempFiles;
-        }
-
-        public TempFileCollection TemporaryFiles { get; protected set; }
-        public WorkUnitResult[] Results { get; protected set; }
+        public const string TemplateDefinition = "";
+        public const string TemplateVariable = "urn:lost-doc:template.variable";
+        public const string Bundle = "";
+        public const string BundleDocComments = "";
+        public const string TemplateExtensions = "urn:lostdoc-core";
     }
 }

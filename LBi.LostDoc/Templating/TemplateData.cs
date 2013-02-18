@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml.Linq;
 
 namespace LBi.LostDoc.Templating
@@ -24,18 +25,23 @@ namespace LBi.LostDoc.Templating
     {
         public TemplateData(XDocument doc)
         {
-            this.XDocument = doc;
+            this.Document = doc;
        
             this.AssetRedirects = new AssetRedirectCollection();
             this.Arguments = new Dictionary<string, object>();
             this.Filter = null;
+            this.KeepTemporaryFiles = true;
+            this.TemporaryFilesPath = Directory.GetCurrentDirectory();
         }
-        public XDocument XDocument { get; protected set; }
+
+        public XDocument Document { get; protected set; }
         public AssetRedirectCollection AssetRedirects { get; set; }
         public Func<UnitOfWork, bool> Filter { get; set; } 
         public VersionComponent? IgnoredVersionComponent { get; set; }
         public Dictionary<string, object> Arguments { get; set; }
         public string TargetDirectory { get; set; }
         public bool OverwriteExistingFiles { get; set; }
+        public bool KeepTemporaryFiles { get; set; }
+        public string TemporaryFilesPath { get; set; }
     }
 }

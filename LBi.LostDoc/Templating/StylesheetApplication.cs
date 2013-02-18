@@ -69,7 +69,7 @@ namespace LBi.LostDoc.Templating
                     (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
 
                 // and custom extensions
-                argList.AddExtensionObject("urn:lostdoc-core", new TemplateXsltExtensions(context, newUri));
+                argList.AddExtensionObject(Namespaces.TemplateExtensions, new TemplateXsltExtensions(context, newUri));
 
                 using (FileStream stream = File.Create(targetPath))
                 using (XmlWriter xmlWriter = XmlWriter.Create(stream,

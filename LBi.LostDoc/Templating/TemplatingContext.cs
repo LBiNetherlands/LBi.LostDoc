@@ -36,7 +36,7 @@ namespace LBi.LostDoc.Templating
             this.Cache = cache;
 
             XPathDocument xpathDoc;
-            using (var reader = data.XDocument.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
+            using (var reader = data.Document.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
                 xpathDoc = new XPathDocument(reader);
             this.Document = xpathDoc.CreateNavigator();
             this.DocumentIndex = new XPathNavigatorIndex(this.Document.Clone());

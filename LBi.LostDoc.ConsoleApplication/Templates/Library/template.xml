@@ -22,7 +22,7 @@
     </transform>--><!--
   </include-resource>-->
 
-  <!-- inject 'with-param' element in all 'apply-stylesheet' directives found. -->
+  <!-- inject [with-param/@name='logoUri'] element in all 'apply-stylesheet' directives found. -->
   <meta-template stylesheet="GlobalParameter.xslt">
     <with-param name="name" select="'logoUri'"/>
     <with-param name="value" select="concat('static/logo.', substring-after-last($LogoUrl, '.'))"/>
@@ -32,7 +32,9 @@
                     stylesheet="Library.xslt">
   </apply-stylesheet>
 
-  <apply-stylesheet name="Assembly summary" select="/bundle/assembly[@phase = '0']" assetId="get-id(@assetId)"
+  <apply-stylesheet name="Assembly summary" 
+                    select="/bundle/assembly[@phase = '0']" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(@filename, '/', get-significant-version(@assetId), '.html')"
                     stylesheet="Assembly.xslt">
@@ -57,14 +59,16 @@
 
   <apply-stylesheet name="Types"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface) and @phase = '0']"
-                    assetId="get-id(@assetId)" version="get-version(@assetId)"
+                    assetId="get-id(@assetId)" 
+                    version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'), '.html')"
                     stylesheet="Type.xslt">
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
 
 
-  <apply-stylesheet name="Enumerations" select="/bundle/assembly/namespace//enum[@phase = '0']"
+  <apply-stylesheet name="Enumerations" 
+                    select="/bundle/assembly/namespace//enum[@phase = '0']"
                     assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'), '.html')"
@@ -108,7 +112,8 @@
 
   <apply-stylesheet name="Remaining methods"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and namespace-uri(.) = '' and @phase = '0']/method[not(@declaredAs) and not(preceding-sibling::method/@name = @name) and not(following-sibling::method/@name = @name)]"
-                    assetId="get-id(@assetId)" version="get-version(@assetId)"
+                    assetId="get-id(@assetId)"
+                    version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.', '-/'),  '.html')"
                     stylesheet="Member.xslt">
     <with-param name="assetId" select="@assetId" />

@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
@@ -45,5 +46,10 @@ namespace LBi.LostDoc.Templating
         /// Set of parameters
         /// </summary>
         public XPathVariable[] Parameters { get; set; }
+
+        /// <summary>
+        /// Temporary files generated while templating, useful for debugging.
+        /// </summary>
+        public TempFileCollection TemporaryFiles { get; set; }
     }
 }
