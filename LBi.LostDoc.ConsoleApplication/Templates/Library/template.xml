@@ -8,7 +8,7 @@
   <index name="aid" match="*[@assetId]" key="@assetId"/>
   <index name="aidNoVer" match="*[@assetId]" key="get-id(@assetId)"/>
   <index name="aidInherits" match="*[@assetId and inherits/@type]" key="inherits/@type"/>
-s
+
   <include-resource path="style.less" output="style.css">
     <transform name="less"/>
   </include-resource>
