@@ -139,6 +139,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppConfig.cs" />
+    <Compile Include="Areas\Administration\AdministrationAreaRegistration.cs" />
+    <Compile Include="Areas\Administration\Controllers\AddInController.cs" />
+    <Compile Include="Areas\Administration\Controllers\RepositoryController.cs" />
+    <Compile Include="Areas\Administration\Controllers\SystemController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\LibraryController.cs" />
@@ -191,6 +195,8 @@
   <ItemGroup>
     <Folder Include="App_Data\Content\" />
     <Folder Include="App_Data\Repository\temp\" />
+    <Folder Include="Areas\Administration\Models\" />
+    <Folder Include="Areas\Administration\Views\Shared\" />
     <Folder Include="Images\" />
     <Folder Include="Scripts\" />
   </ItemGroup>
@@ -226,9 +232,14 @@
     <Content Include="repository.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Administration\Views\Web.config" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LBi.LostDoc.Repository.Web.Extensibility\LBi.LostDoc.Repository.Web.Extensibility.csproj">
+      <Project>{dfb6c104-0bfe-4f9f-8eac-d3766b0b9b40}</Project>
+      <Name>LBi.LostDoc.Repository.Web.Extensibility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LBi.LostDoc.Templates\LBi.LostDoc.Templates.csproj">
       <Project>{357e5ba0-0aa0-4c30-b7bb-eec8eaaa6d17}</Project>
       <Name>LBi.LostDoc.Templates</Name>

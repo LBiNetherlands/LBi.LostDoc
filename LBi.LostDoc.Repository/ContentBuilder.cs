@@ -21,7 +21,6 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using LBi.LostDoc;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Templating;
 using LBi.LostDoc.Repository.Lucene;
@@ -130,7 +129,9 @@ namespace LBi.LostDoc.Repository
                                            AssetRedirects = assetRedirects,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            TargetDirectory = htmlDir.FullName,
-                                           Arguments = new Dictionary<string, object> {{"SearchUri", "/search/"}}
+                                           Arguments = new Dictionary<string, object> {{"SearchUri", "/search/"}},
+                                           KeepTemporaryFiles = true,
+                                           TemporaryFilesPath = Path.Combine(logDir.FullName, "temp")
                                        };
 
                 this.OnStateChanged(State.Templating);
