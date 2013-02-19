@@ -24,6 +24,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using LBi.Cli.Arguments;
+using LBi.LostDoc.Composition;
 using LBi.LostDoc.ConsoleApplication.Extensibility;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Templating;
@@ -133,7 +134,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 }
 
                 // TODO replace literal with constant
-                var lazyProviders = container.GetExports<IReadOnlyFileProvider>("TemplateProvider");
+                var lazyProviders = container.GetExports<IReadOnlyFileProvider>(ContractNames.TemplateProvider);
                 var realProviders = lazyProviders.Select(lazy => lazy.Value);
                 TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
 

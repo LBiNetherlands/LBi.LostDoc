@@ -19,10 +19,11 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
+using LBi.LostDoc.Composition;
 
 namespace LBi.LostDoc.Templating.FileProviders
 {
-    [Export("TemplateProvider", typeof(IReadOnlyFileProvider))]
+    [Export(ContractNames.TemplateProvider, typeof(IReadOnlyFileProvider))]
     public class DirectoryFileProvider : IReadOnlyFileProvider
     {
         public DirectoryFileProvider()

@@ -44,7 +44,9 @@
     <Compile Include="Export.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Library\Assembly.xslt" />
+    <EmbeddedResource Include="Library\Assembly.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Library\Common.xslt" />
     <EmbeddedResource Include="Library\DocComments.xslt" />
     <EmbeddedResource Include="Library\GlobalParameter.xslt" />
