@@ -15,3 +15,4 @@ _ReSharper.*
 /LBi.LostDoc.Repository.Web/App_Data/Repository
 /LBi.LostDoc.Repository.Web/App_Data/Content
 /test.ps1
+/_TeamCity.LBi.LostDoc
