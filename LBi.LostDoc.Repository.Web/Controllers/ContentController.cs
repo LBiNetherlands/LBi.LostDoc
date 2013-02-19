@@ -36,9 +36,9 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 
                 string contentPath;
                 if (id == "current")
-                    contentPath = Path.Combine(ContentManager.Instance.ContentRoot, "Html", path);
+                    contentPath = Path.Combine(App.Instance.ContentManager.ContentRoot, "Html", path);
                 else
-                    contentPath = Path.Combine(ContentManager.Instance.GetContentRoot(id), "Html", path);
+                    contentPath = Path.Combine(App.Instance.ContentManager.GetContentRoot(id), "Html", path);
 
                 string contentType = MimeMapping.GetMimeMapping(Path.GetExtension(contentPath));
                 return this.File(contentPath, contentType);

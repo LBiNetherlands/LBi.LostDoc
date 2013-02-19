@@ -21,7 +21,14 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     public class AddInPackage
     {
-        public AddInPackage(string id, SemanticVersion version, bool isReleaseVersion, Uri iconUrl, string title, string summary, string description, Uri projectUrl)
+        public AddInPackage(string id,
+                            SemanticVersion version,
+                            bool isReleaseVersion,
+                            Uri iconUrl,
+                            string title,
+                            string summary,
+                            string description,
+                            Uri projectUrl)
         {
             this.Id = id;
             this.Version = version.Version;

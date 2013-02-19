@@ -45,7 +45,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                                                                          XDocument.Load(Path.Combine(d, "info.xml")).
                                                                           Element("content").Attribute("created").Value)
                                            }),
-                           Current = ContentManager.Instance.ContentFolder
+                           Current = App.Instance.ContentManager.ContentFolder
                        };
         }
 
@@ -68,7 +68,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
             if (dir == null)
                 return false;
 
-            ContentManager.Instance.SetCurrentContentFolder(id);
+            App.Instance.ContentManager.SetCurrentContentFolder(id);
 
             return true;
         }

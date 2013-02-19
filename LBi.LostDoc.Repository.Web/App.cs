@@ -16,20 +16,31 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
+using LBi.LostDoc.Templating;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
+namespace LBi.LostDoc.Repository.Web
 {
-    public class AddInController : Controller
+    public class App
     {
-        // default action is to list
-        public ActionResult Index()
+        private App(CompositionContainer container, ContentManager contentManager)
         {
-
-            return View();
+            this.Container = container;
+            this.ContentManager = contentManager;
         }
+
+        public static App Instance { get; protected set; }
+
+        public static void Initialize(CompositionContainer container, ContentManager contentManager)
+        {
+            Instance = new App(container, contentManager);
+        }
+
+        public CompositionContainer Container { get; protected set; }
+        public ContentManager ContentManager { get; protected set; }
+
 
     }
 }

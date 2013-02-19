@@ -26,6 +26,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     {
         private readonly IPackageRepository _repository;
 
+        // TODO introduce a "PackageSource" to encapsulate name &  url
         public AddInRepository(string officalSource, params string[] otherSources)
         {
             List<PackageSource> packageSources = new List<PackageSource>();

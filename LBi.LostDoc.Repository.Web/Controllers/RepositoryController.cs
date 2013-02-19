@@ -115,7 +115,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                                           builder => builder.ToString());
 
             if (ret.Count > 0)
-                ContentManager.Instance.QueueRebuild("Added assemblies: " + reason);
+                App.Instance.ContentManager.QueueRebuild("Added assemblies: " + reason);
 
             return Request.CreateResponse(HttpStatusCode.Accepted, ret.AsEnumerable());
 
@@ -140,14 +140,14 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 
             File.Delete(file);
 
-            ContentManager.Instance.QueueRebuild(String.Format("Deleted assembly: {{A:{0}, V:{1}}}", assembly, realVersion.ToString()));
+            App.Instance.ContentManager.QueueRebuild(String.Format("Deleted assembly: {{A:{0}, V:{1}}}", assembly, realVersion.ToString()));
         }
 
 
         [HttpGet]
         public string State()
         {
-            return ContentManager.Instance.CurrentState.ToString();
+            return App.Instance.ContentManager.CurrentState.ToString();
         }
     }
 }

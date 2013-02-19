@@ -135,13 +135,15 @@ namespace LBi.LostDoc.Repository.Web
             TemplateResolver resolver = new TemplateResolver(new ResourceFileProvider("LBi.LostDoc.Repository.Web.App_Data.Templates"));
             template.Load(resolver, AppConfig.Template);
 
-            ContentManager.Initialize(new ContentSettings
+            ContentManager contentManager = new ContentManager(new ContentSettings
                                           {
                                               ContentPath = AppConfig.ContentPath,
                                               IgnoreVersionComponent = VersionComponent.Patch,
                                               RepositoryPath = AppConfig.RepositoryPath,
                                               Template = template
                                           });
+
+            App.Initialize(container, contentManager);
 
             AreaRegistration.RegisterAllAreas();
 

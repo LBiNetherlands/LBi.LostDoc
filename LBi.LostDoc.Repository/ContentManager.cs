@@ -101,7 +101,7 @@ namespace LBi.LostDoc.Repository
             public DateTime Created { get; set; }
         }
 
-        private ContentManager(ContentSettings settings)
+        public ContentManager(ContentSettings settings)
         {
             this._state = State.Idle;
             this._repositoryPath = settings.RepositoryPath;
@@ -184,16 +184,6 @@ namespace LBi.LostDoc.Repository
             {
                 this._contentLock.ExitWriteLock();
             }
-        }
-
-        public static ContentManager Instance
-        {
-            get { return _instance; }
-        }
-
-        public static void Initialize(ContentSettings settings)
-        {
-            ContentManager._instance = new ContentManager(settings);
         }
 
         public void QueueRebuild(string reason)
