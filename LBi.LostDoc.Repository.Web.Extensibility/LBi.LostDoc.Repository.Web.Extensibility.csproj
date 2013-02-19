@@ -43,8 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddInManager.cs" />
     <Compile Include="AddInPackage.cs" />
     <Compile Include="AddInRepository.cs" />
+    <Compile Include="AddInSource.cs" />
+    <Compile Include="PackageEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

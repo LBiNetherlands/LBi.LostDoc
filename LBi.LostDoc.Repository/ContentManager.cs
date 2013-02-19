@@ -28,6 +28,7 @@ namespace LBi.LostDoc.Repository
     /// <summary>
     /// This acts as the main content manager for the repository.
     /// </summary>
+    // TODO enable different (git?) storage backend
     public class ContentManager
     {
         private const string CONTENT_REF_NAME = ".latest";
@@ -153,9 +154,9 @@ namespace LBi.LostDoc.Repository
                         catch (Exception ex)
                         {
                             TraceSources.ContentManagerSource.TraceCritical(
-                                                                            "An unhandled exception of type {0} occured while setting current content folder: {1}",
-                                                                            ex.GetType().Name,
-                                                                            ex.ToString());
+                                "An unhandled exception of type {0} occured while setting current content folder: {1}",
+                                ex.GetType().Name,
+                                ex.ToString());
                             throw;
 
                         }

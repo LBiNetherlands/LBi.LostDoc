@@ -93,5 +93,21 @@ namespace LBi.LostDoc.Repository.Web
                 return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.Template"];
             }
         }
+
+        public static string AddInInstallPath
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.Extensibility.InstallPath"];
+            }
+        }
+
+        public static string AddInPackagePath
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.Extensibility.PackagePath"];
+            }
+        }
     }
 }

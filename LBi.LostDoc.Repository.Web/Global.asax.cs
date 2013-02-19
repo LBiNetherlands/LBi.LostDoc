@@ -15,12 +15,15 @@
  */
 
 using System.ComponentModel.Composition.Hosting;
+using System.Linq;
 using System.Web.Http;
 using System.Web.Http.WebHost.Routing;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using LBi.LostDoc;
+using LBi.LostDoc.Composition;
+using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Templating;
 using LBi.LostDoc.Templating.FileProviders;
 
@@ -127,26 +130,46 @@ namespace LBi.LostDoc.Repository.Web
 
         protected void Application_Start()
         {
+            // intialize MEF
             AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog());
 
+            // set up add-in system
+            AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed", "...", isOfficial: true);
+            // load other sources from site-settings (not config)
+            AddInRepository repository = new AddInRepository(officalSource);
+            AddInManager addInManager = new AddInManager(repository, AppConfig.AddInInstallPath, AppConfig.AddInPackagePath);
+            // TODO find the install dir of each package and add it to the container
+
+            // create container
             CompositionContainer container = new CompositionContainer(catalog);
+
+            // set up template resolver
+            var lazyProviders = container.GetExports<IReadOnlyFileProvider>(ContractNames.TemplateProvider);
+            var realProviders = lazyProviders.Select(lazy => lazy.Value);
+            TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
+
+            // load template
             Template template = new Template(container);
+            template.Load(templateResolver, AppConfig.Template);
 
-            TemplateResolver resolver = new TemplateResolver(new ResourceFileProvider("LBi.LostDoc.Repository.Web.App_Data.Templates"));
-            template.Load(resolver, AppConfig.Template);
-
+            // set up content manager
             ContentManager contentManager = new ContentManager(new ContentSettings
                                           {
                                               ContentPath = AppConfig.ContentPath,
+                                              // TODO make this configurable
                                               IgnoreVersionComponent = VersionComponent.Patch,
                                               RepositoryPath = AppConfig.RepositoryPath,
                                               Template = template
                                           });
 
-            App.Initialize(container, contentManager);
 
+
+            // initialize app-singleton
+            App.Initialize(container, contentManager, addInManager);
+
+
+            // MVC init
             AreaRegistration.RegisterAllAreas();
-
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
         }

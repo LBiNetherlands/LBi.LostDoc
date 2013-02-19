@@ -168,13 +168,6 @@
     <Compile Include="TraceSources.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="App_Data\Templates\Repository\template.xml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="App_Data\Templates\Repository\IndexInjector.xslt" />
-    <EmbeddedResource Include="App_Data\Templates\Repository\CreateIndex.xslt">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <Content Include="Global.asax" />
     <Content Include="ManualUpload.html" />
     <Content Include="Web.config">
@@ -194,10 +187,11 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\AddIns\" />
     <Folder Include="App_Data\Content\" />
+    <Folder Include="App_Data\Packages\" />
     <Folder Include="App_Data\Repository\temp\" />
     <Folder Include="Areas\Administration\Models\" />
-    <Folder Include="Areas\Administration\Views\Shared\" />
     <Folder Include="Images\" />
     <Folder Include="Scripts\" />
   </ItemGroup>
@@ -234,6 +228,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Administration\Views\Web.config" />
+    <Content Include="Areas\Administration\Views\Shared\_Layout.cshtml" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
   </ItemGroup>
   <ItemGroup>

@@ -26,40 +26,38 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     {
         private readonly IPackageRepository _repository;
 
-        // TODO introduce a "PackageSource" to encapsulate name &  url
-        public AddInRepository(string officalSource, params string[] otherSources)
+        public AddInRepository(params AddInSource[] sources)
         {
             List<PackageSource> packageSources = new List<PackageSource>();
-            PackageSource officialPackageSource = new PackageSource(officalSource,
-                                                                    "LBi LostDoc Repository Add-in feed.",
-                                                                    isEnabled: true,
-                                                                    isOfficial: true);
-            packageSources.Add(officialPackageSource);
-            for (int i = 0; i < otherSources.Length; i++)
-            {
-                PackageSource otherPackageSource = new PackageSource(otherSources[i],
-                                                                     string.Format("Custom feed {0:N0} ({1})", i, otherSources[i]),
-                                                                     isEnabled: true,
-                                                                     isOfficial: false);
 
-                packageSources.Add(otherPackageSource);
+            foreach (AddInSource source in sources)
+            {
+                PackageSource packageSource = new PackageSource(source.Source,
+                                                                        source.Name,
+                                                                        isEnabled: true,
+                                                                        isOfficial: source.IsOfficial);
+
+                packageSources.Add(packageSource);
             }
-            PackageSourceProvider packageSourceProvider = new PackageSourceProvider(new NullSettings(), new[] {officialPackageSource});
+
+            PackageSourceProvider packageSourceProvider = new PackageSourceProvider(new NullSettings(), packageSources);
             IPackageRepositoryFactory packageRepositoryFactory = new PackageRepositoryFactory();
             
             // TODO probably turn this off and report proper errors
             this._repository = packageSourceProvider.GetAggregate(packageRepositoryFactory, ignoreFailingRepositories: true);
         }
 
-        public IEnumerable<AddInPackage> Search(string terms, bool includePrerelease)
+        public IEnumerable<AddInPackage> Search(string terms, bool includePrerelease, int offset, int count)
         {
             var packages = this._repository.Search(terms, includePrerelease);
-            return packages.Select(this.ConvertPackage);
+            return packages.Skip(offset)
+                           .Take(count)
+                           .Select(this.ConvertPackage);
         }
 
         private AddInPackage ConvertPackage(IPackage pkg)
         {
-            return new AddInPackage(pkg.Id, pkg.Version, pkg.IsReleaseVersion(), pkg.IconUrl, pkg.Title, pkg.Summary, pkg.Description, pkg.ProjectUrl);
+            return new AddInPackage(pkg.Id, pkg.Version.Version, pkg.IsReleaseVersion(), pkg.IconUrl, pkg.Title, pkg.Summary, pkg.Description, pkg.ProjectUrl);
         }
     }
 }

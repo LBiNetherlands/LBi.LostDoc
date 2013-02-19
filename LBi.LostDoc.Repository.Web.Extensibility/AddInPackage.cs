@@ -22,7 +22,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     public class AddInPackage
     {
         public AddInPackage(string id,
-                            SemanticVersion version,
+                            Version version,
                             bool isReleaseVersion,
                             Uri iconUrl,
                             string title,
@@ -31,7 +31,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                             Uri projectUrl)
         {
             this.Id = id;
-            this.Version = version.Version;
+            this.Version = version;
             this.IsReleaseVersion = isReleaseVersion;
             this.Title = title;
             this.Summary = summary;
@@ -40,19 +40,19 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
             this.IconUrl = iconUrl;
         }
 
-        protected Uri IconUrl { get; set; }
+        public Uri IconUrl { get; protected set; }
 
-        protected Uri ProjectUrl { get; set; }
+        public Uri ProjectUrl { get; protected set; }
 
-        protected string Description { get; set; }
+        public string Description { get; protected set; }
 
-        protected string Summary { get; set; }
+        public string Summary { get; protected set; }
 
-        protected string Title { get; set; }
+        public string Title { get; protected set; }
 
-        protected bool IsReleaseVersion { get; set; }
+        public bool IsReleaseVersion { get; protected set; }
 
-        protected Version Version { get; set; }
+        public Version Version { get; protected set; }
 
         public string Id { get; protected set; }
     }

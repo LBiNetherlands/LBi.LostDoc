@@ -19,27 +19,30 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Web;
+using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Repository.Web
 {
     public class App
     {
-        private App(CompositionContainer container, ContentManager contentManager)
+        private App(CompositionContainer container, ContentManager contentManager, AddInManager addInManager)
         {
             this.Container = container;
             this.ContentManager = contentManager;
+            this.AddInManager = addInManager;
         }
 
         public static App Instance { get; protected set; }
 
-        public static void Initialize(CompositionContainer container, ContentManager contentManager)
+        public static void Initialize(CompositionContainer container, ContentManager contentManager, AddInManager addInManager)
         {
-            Instance = new App(container, contentManager);
+            Instance = new App(container, contentManager, addInManager);
         }
 
         public CompositionContainer Container { get; protected set; }
         public ContentManager ContentManager { get; protected set; }
+        public AddInManager AddInManager { get; protected set; }
 
 
     }
