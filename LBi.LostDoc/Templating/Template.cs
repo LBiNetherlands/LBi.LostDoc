@@ -980,7 +980,7 @@ namespace LBi.LostDoc.Templating
                             new MetadataContractBasedImportDefinition(
                                 typeof(IResourceTransform),
                                 null,
-                                new Dictionary<string, object> {{"Name", resourceTransform.Name}}, // TODO force an IEqualityComparer<T> here
+                                new[] {new Tuple<string, object, IEqualityComparer>("Name", resourceTransform.Name, StringComparer.OrdinalIgnoreCase) },
                                 ImportCardinality.ExactlyOne,
                                 false,
                                 false,

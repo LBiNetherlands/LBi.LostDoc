@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
@@ -26,24 +27,23 @@ namespace LBi.LostDoc.Composition
     {
         public MetadataContractBasedImportDefinition(Type contractType,
                                                      string requiredTypeIdentity,
-                                                     IEnumerable<KeyValuePair<string, object>> requiredMetadata,
+                                                     IEnumerable<Tuple<string, object, IEqualityComparer>> requiredMetadata,
                                                      ImportCardinality cardinality,
                                                      bool isRecomposable,
                                                      bool isPrerequisite,
                                                      CreationPolicy requiredCreationPolicy)
             : base(AttributedModelServices.GetContractName(contractType),
                    requiredTypeIdentity,
-                   requiredMetadata.Select(kvp => new KeyValuePair<string, Type>(kvp.Key, kvp.Value.GetType())),
+                   requiredMetadata.Select(t => new KeyValuePair<string, Type>(t.Item1, t.Item2.GetType())),
                    cardinality,
                    isRecomposable,
                    isPrerequisite,
                    requiredCreationPolicy)
         {
-
-            this.RequiredMetadataValues = requiredMetadata;
+            this.RequiredMetadataValues = requiredMetadata.ToArray();
         }
 
-        public IEnumerable<KeyValuePair<string, object>> RequiredMetadataValues { get; protected set; }
+        public IEnumerable<Tuple<string, object, IEqualityComparer>> RequiredMetadataValues { get; protected set; }
 
         public override bool IsConstraintSatisfiedBy(ExportDefinition exportDefinition)
         {
@@ -54,8 +54,7 @@ namespace LBi.LostDoc.Composition
                 foreach (var kvp in this.RequiredMetadataValues)
                 {
                     object value;
-                    if (!exportDefinition.Metadata.TryGetValue(kvp.Key, out value)
-                        || !AreValuesEqual(value, kvp.Value))
+                    if (!exportDefinition.Metadata.TryGetValue(kvp.Item1, out value) || !kvp.Item3.Equals(value, kvp.Item2))
                     {
                         ret = false;
                         break;
@@ -64,18 +63,6 @@ namespace LBi.LostDoc.Composition
             }
 
             return ret;
-        }
-
-        private bool AreValuesEqual(object value, object other)
-        {
-            if (value.GetType() != other.GetType())
-                return false;
-
-            string strVal = value as string;
-            string strOther = other as string;
-
-            // TODO this is way too naive of an implementation
-            return StringComparer.Ordinal.Equals(strVal, strOther);
         }
     }
 }
