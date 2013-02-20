@@ -1,0 +1,27 @@
+﻿@model LBi.LostDoc.Repository.Web.Areas.Administration.Models.SearchResultModel
+@{
+    Layout = null;
+}
+@functions
+{
+    IHtmlString CreateResumptionMarker()
+    {
+        if (Model.NextOffset.HasValue)
+        {
+            return new HtmlString(string.Format("data-resumption-uri=\"{0}\"", Url.Action("Search", new {terms = Model.Terms, offset = Model.NextOffset})));
+        }
+        return MvcHtmlString.Empty;
+    }
+}
+
+<section class="package-list" @this.CreateResumptionMarker()>
+    @foreach (var addIn in Model.Results)
+    {
+        Html.RenderPartial("_CompactView", addIn);
+    }
+</section>
+
+@if (!Model.NextOffset.HasValue)
+{
+    <div>There are no more results</div>
+}

@@ -1,0 +1,67 @@
+//Version
+div.version {
+    font-size: 1.25em;
+    margin-bottom: 20px;
+}
+div.version > span,
+ul.type-hierarchy li span.current {
+    font-weight: 700;
+}
+//version selector
+div.version-selector {
+    position: relative;
+    display: inline;
+    ul {
+        background: @white;
+        border: 1px solid gray;
+        display: none;
+        left: 0;
+        list-style: none;
+        min-width: 100px;
+        padding: 10px;
+        position: absolute;
+        top: 0;
+        li {
+            padding-left: 0;
+        }
+    }
+}
+div.version-selector:hover ul,
+div.version-selector ul li a,
+.syntax dd span.line {
+    display: block;
+}
+//type hierarchy
+ul.type-hierarchy {
+    margin-top: 0;
+    padding-left: 0;
+    ul {
+        list-style: none;
+        padding-left: 10px;
+    }
+}
+.syntax {
+    .keyword {
+        color: blue;
+    }
+    dd {
+        font-family: consolas, "Courier New" , courier, monospace;
+        font-size: .9em;
+        span.line.indent {
+            padding-left: 30px;
+        }
+    }
+}
+dl.parameters dt {
+    font-style: italic;
+}
+dl.origin dt {
+    float: left;
+    clear: left;
+    margin-right: .5em;
+    font-weight: 700;
+}
+dl.origin dd {
+    margin-left: 0;
+}
+

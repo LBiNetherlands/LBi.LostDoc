@@ -1,0 +1,57 @@
+﻿@*
+ * Copyright 2013 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ *@
+
+@model LBi.LostDoc.Repository.Web.Areas.Administration.Models.AddInModel
+
+<article data-package-id="@Model.Package.Id" data-package-version="@Model.Package.Version">
+    <figure>
+        <img src="@Model.Package.IconUrl" alt="120x90" width="120" height="90" />
+    </figure>
+
+    <a href="@Model.Package.ProjectUrl" title="Project site">Project site</a>
+
+    <div class="info">
+        <strong>@Model.Package.Title <span>@Model.Package.Version</span></strong>
+        <p>@Model.Package.Description</p>
+        <span class="date">Published: 
+            @if (Model.Package.Published.HasValue)
+            {
+                <em>@Model.Package.Published.Value.ToString("yyyy-MM-dd")</em>
+            }
+            else
+            {
+                <em>&lt;unknown&gt;</em>
+            }
+        </span>
+    </div>
+
+    <div class="actions">
+        @if (Model.CanInstall)
+        {
+            <a href="@Url.Action("Install")" data-method="POST" class="button">Install</a>
+        }
+        @if (Model.CanUpdate)
+        {
+            <a href="@Url.Action("Update")" data-method="POST" class="button">Update</a>
+        }
+        @if (Model.CanUninstall)
+        {
+            <a href="@Url.Action("Uninstall")" data-method="POST" class="button">Uninstall</a>
+        }
+
+        <a href="#" class="license">License</a>
+    </div>
+</article>

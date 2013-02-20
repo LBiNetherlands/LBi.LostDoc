@@ -144,6 +144,10 @@
     <Compile Include="Areas\Administration\Controllers\AddInController.cs" />
     <Compile Include="Areas\Administration\Controllers\RepositoryController.cs" />
     <Compile Include="Areas\Administration\Controllers\SystemController.cs" />
+    <Compile Include="Areas\Administration\Models\AddInModel.cs" />
+    <Compile Include="Areas\Administration\Models\AddInOverviewModel.cs" />
+    <Compile Include="Areas\Administration\Models\ModelBase.cs" />
+    <Compile Include="Areas\Administration\Models\SearchResultModel.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\LibraryController.cs" />
@@ -181,7 +185,7 @@
     </Content>
     <Content Include="Content\Site.css" />
     <Content Include="Views\Web.config" />
-    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Administration\Views\_ViewStart.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
@@ -191,7 +195,6 @@
     <Folder Include="App_Data\Content\" />
     <Folder Include="App_Data\Packages\" />
     <Folder Include="App_Data\Repository\temp\" />
-    <Folder Include="Areas\Administration\Models\" />
     <Folder Include="Images\" />
     <Folder Include="Scripts\" />
   </ItemGroup>
@@ -229,6 +232,10 @@
   <ItemGroup>
     <Content Include="Areas\Administration\Views\Web.config" />
     <Content Include="Areas\Administration\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Administration\Views\AddIn\Index.cshtml" />
+    <Content Include="Areas\Administration\Views\AddIn\_CompactView.cshtml" />
+    <Content Include="Areas\Administration\Views\AddIn\Repository.cshtml" />
+    <Content Include="Areas\Administration\Views\AddIn\Search.cshtml" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
   </ItemGroup>
   <ItemGroup>
@@ -261,16 +268,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>53300</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8088</IISUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
-          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
     </VisualStudio>

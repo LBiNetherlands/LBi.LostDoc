@@ -21,24 +21,25 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     public class AddInPackage
     {
-        public AddInPackage(string id,
-                            Version version,
-                            bool isReleaseVersion,
-                            Uri iconUrl,
-                            string title,
-                            string summary,
-                            string description,
-                            Uri projectUrl)
+        public AddInPackage(string id, Version version, bool isReleaseVersion, DateTimeOffset? published, Uri iconUrl, string title, string summary, string description, Uri projectUrl)
         {
             this.Id = id;
             this.Version = version;
             this.IsReleaseVersion = isReleaseVersion;
+            this.Published = published;
             this.Title = title;
             this.Summary = summary;
             this.Description = description;
             this.ProjectUrl = projectUrl;
             this.IconUrl = iconUrl;
         }
+
+        internal static AddInPackage Create(IPackage pkg)
+        {
+            return new AddInPackage(pkg.Id, pkg.Version.Version, pkg.IsReleaseVersion(), pkg.Published, pkg.IconUrl, pkg.Title, pkg.Summary, pkg.Description, pkg.ProjectUrl);
+        }
+
+        public DateTimeOffset? Published { get; protected set; }
 
         public Uri IconUrl { get; protected set; }
 

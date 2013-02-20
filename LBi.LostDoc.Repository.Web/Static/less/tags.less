@@ -1,0 +1,120 @@
+.button {
+    background-color: #ccc;
+        background-image: linear-gradient(top, #eee, #ccc);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc));
+        background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    border: 1px solid #777;
+    border-radius: .2em;
+        -webkit-border-radius: .2em;
+    box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
+        -webkit-box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
+    color: @baseColor;
+    display: inline-block;
+    font: bold 1em/2em Arial, Helvetica;
+    margin: 0.5em;
+    padding: 0 1.5em;
+    text-decoration: none;
+    text-shadow: 0 1px 0 rgba(255,255,255,.8);
+    white-space: nowrap;
+    //mixin
+    .transition(0.4s);
+    //pseudo Classes
+    &:hover {
+        background-color: #ddd;
+        background-image: linear-gradient(top, #fafafa, #ddd);
+            background-image: -webkit-gradient(linear, left top, left bottom, from(#fafafa), to(#ddd));
+            background-image: -webkit-linear-gradient(top, #fafafa, #ddd);
+        color: @baseHoverColor;
+        text-decoration: none;
+    }
+    &:active {
+        box-shadow: 0 0 4px 2px rgba(0,0,0,.3) inset;
+            -webkit-box-shadow: 0 0 4px 2px rgba(0,0,0,.3) inset;
+        position: relative;
+        top: 1px;
+    }
+    &:focus {
+        background: #fafafa;
+        outline: 0;
+    }
+    &:before {
+        background: rgba(0,0,0,.1);
+        box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
+            -webkit-box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
+        border-radius: .15em 0 0 .15em;
+            -webkit-border-radius: .15em 0 0 .15em;
+        float: left;
+        font-size: 1.5em;
+        margin: 0 1em 0 -1em;
+        padding: 0 .2em;
+        pointer-events: none;
+        text-align: center;
+        width: 1em;
+    }
+    //icons
+    &.add:before {
+        content: "\271A";
+    }
+    &.edit:before {
+        content: "\270E";
+    }
+    &.delete:before {
+        content: "\2718";
+    }
+    &.save:before,
+    &.sure:before {
+        content: "\2714";
+    }
+    &.preview:before {
+        content: "\2764";
+    }
+    &.back .backToCode {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    &.backToCode:before,
+    &.cancel:before {
+        content: "\2190";
+    }
+}
+//flip effect
+.flip-container {
+    perspective: 1000;
+        -webkit-perspective: 1000;
+    position: relative;
+    width: 100%;
+    .flipper {
+        position: relative;
+        transition: 0.6s;
+            -webkit-transition: 1s;
+        transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+        .front, .back {
+            backface-visibility: hidden;
+               -webkit-backface-visibility: hidden;
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+        .back {
+            background-color: #E5E5E5;
+            height: 100%;
+            position: absolute;
+            transform: rotateX(180deg);
+               -webkit-transform: rotateX(180deg);
+        }
+        .front {
+            z-index: 2;
+        }
+    }
+  /* flip the pane when hovered */
+  &.flip-container.previewCode {
+        .flipper {
+            transform: rotateX(180deg);
+                -webkit-transform: rotateX(180deg);
+        }
+    }
+}
+

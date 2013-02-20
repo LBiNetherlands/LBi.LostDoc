@@ -1,0 +1,33 @@
+body {
+    background-color: @white;
+    font-size: 13px;
+    font-family: 'Segoe UI' , 'Lucida Grande' ,Verdana,Arial,Helvetica,sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    //classes
+    &.grabbing {
+    user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+    }
+    div#wrapper {
+        height: auto!important;
+        min-height: 100%;
+        margin: 0 auto;
+        max-width: 98%;
+        position: relative;
+    }
+    section[role="content"] {
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%,@grey_dark), color-stop(100%,rgba(0,0,0,0)));
+        background-color: @grey_light;
+        background-repeat: no-repeat;
+        background-size: 6px 100%;
+        border-left: 1px solid @grey_dark;
+        float: right;
+        margin-right: -1px;
+        //mark: will be overrided by js;
+            width: 80%;
+        // end mark
+    }
+}

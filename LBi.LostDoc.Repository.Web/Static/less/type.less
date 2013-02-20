@@ -1,0 +1,27 @@
+section[role="content"] > h1 {
+    font-size: 3em;
+    font-family: 'Segoe UI Light' , 'Segoe UI' , 'Lucida Grande' ,Verdana,Arial,Helvetica,sans-serif;
+    color: @dark;
+    font-weight: 400;
+    padding: 15px 0 10px 0;
+    margin: 7px 0 7px 3%;
+}
+section[role="content"] > h2,
+section[role="content"] > h3,
+section[role="content"] > h4,
+section[role="content"] > h5,
+section[role="content"] > h6 {
+    margin: 7px 0 7px 3%;
+}
+a {
+    color: @baseLinkColor;
+    text-decoration: none;
+    .transition(0.4s);
+}
+    a:hover {
+        color: @baseLinkHoverColor;
+        text-decoration: underline;
+    }
+span.error {
+    color: red;
+}

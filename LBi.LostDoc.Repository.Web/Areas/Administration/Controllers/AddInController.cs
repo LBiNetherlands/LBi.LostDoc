@@ -19,17 +19,88 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
     public class AddInController : Controller
     {
-        // default action is to list
+        // default action is to list all installed add-ins
         public ActionResult Index()
         {
 
-            return View();
+            return View(new AddInOverviewModel
+                            {
+                                Title = "Installed Add-ins",
+                                AddIns = App.Instance.AddInManager
+                                            .Select(pkg =>
+                                                    new AddInModel
+                                                        {
+                                                            CanInstall = false,
+                                                            CanUninstall = true,
+                                                            CanUpdate = false,
+                                                            Package = pkg
+                                                        }).ToArray()
+                            });
         }
 
+        public ActionResult Repository()
+        {
+            const int count = 10;
+            AddInModel[] results = App.Instance.AddInManager.Repository.Search(null, true, 0, count)
+                             .Select(pkg =>
+                                     new AddInModel
+                                     {
+                                         CanInstall = true,
+                                         CanUninstall = true,
+                                         CanUpdate = false,
+                                         Package = pkg
+                                     }).ToArray();
+
+            return View(new SearchResultModel
+                            {
+                                Results = results,
+                                NextOffset = results.Length == count ? count: (int?) null
+                            });
+        }
+
+        public ActionResult Search(string terms, int offset = 0)
+        {
+            const int count = 10;
+            AddInModel[] results = App.Instance.AddInManager.Repository.Search(terms, true, offset, count)
+                             .Select(pkg =>
+                                     new AddInModel
+                                         {
+                                             CanInstall = true,
+                                             CanUninstall = true,
+                                             CanUpdate = false,
+                                             Package = pkg
+                                         }).ToArray();
+
+            return View(new SearchResultModel
+                            {
+                                Results = results,
+                                NextOffset = results.Length == count ? offset + results.Length : (int?)null
+                            });
+        }
+
+        [HttpPost]
+        public ActionResult Install([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
+        {
+            return new EmptyResult();
+        }
+
+        [HttpPost]
+        public ActionResult Uninstall([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
+        {
+            return new EmptyResult();
+        }
+
+        [HttpPost]
+        public ActionResult Update([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
+        {
+            return new EmptyResult();
+
+        }
     }
 }

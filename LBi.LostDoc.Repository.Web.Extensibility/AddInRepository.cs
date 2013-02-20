@@ -26,6 +26,8 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     {
         private readonly IPackageRepository _repository;
 
+        internal IPackageRepository NuGetRepository { get { return this._repository; } }
+
         public AddInRepository(params AddInSource[] sources)
         {
             List<PackageSource> packageSources = new List<PackageSource>();
@@ -49,15 +51,21 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
         public IEnumerable<AddInPackage> Search(string terms, bool includePrerelease, int offset, int count)
         {
-            var packages = this._repository.Search(terms, includePrerelease);
+            IQueryable<IPackage> packages;
+            if (string.IsNullOrWhiteSpace(terms))
+            {
+                packages = this._repository.GetPackages();
+                if (!includePrerelease)
+                    packages = packages.Where(pkg => pkg.IsReleaseVersion());
+            }
+            else
+                packages = this._repository.Search(terms, includePrerelease);
+
             return packages.Skip(offset)
                            .Take(count)
-                           .Select(this.ConvertPackage);
+                           .Select(AddInPackage.Create);
         }
 
-        private AddInPackage ConvertPackage(IPackage pkg)
-        {
-            return new AddInPackage(pkg.Id, pkg.Version.Version, pkg.IsReleaseVersion(), pkg.IconUrl, pkg.Title, pkg.Summary, pkg.Description, pkg.ProjectUrl);
-        }
+        
     }
 }

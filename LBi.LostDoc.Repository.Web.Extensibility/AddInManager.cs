@@ -20,32 +20,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NuGet;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     public class AddInManager : IEnumerable<AddInPackage>
     {
+        private PackageManager _packageManager;
+
         public AddInManager(AddInRepository repository, string installDirectory, string packageDirectory)
         {
             this.Repository = repository;
             this.InstallDirectory = installDirectory;
             this.PackageDirectory = packageDirectory;
-        }
-
-        public event EventHandler<PackageEventArgs> OnInstall;
-
-        protected virtual void RaiseOnInstall(PackageEventArgs e)
-        {
-            EventHandler<PackageEventArgs> handler = OnInstall;
-            if (handler != null) handler(this, e);
-        }
-
-        public event EventHandler<PackageEventArgs> OnUninstall;
-
-        protected virtual void RaiseOnUninstall(PackageEventArgs e)
-        {
-            EventHandler<PackageEventArgs> handler = OnUninstall;
-            if (handler != null) handler(this, e);
+             
+            this._packageManager = new PackageManager(repository.NuGetRepository, packageDirectory);
+            
         }
 
         public string PackageDirectory { get; protected set; }
@@ -63,7 +53,9 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
         public IEnumerator<AddInPackage> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return this._packageManager.LocalRepository.GetPackages()
+                                                       .Select(AddInPackage.Create)
+                                                       .GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

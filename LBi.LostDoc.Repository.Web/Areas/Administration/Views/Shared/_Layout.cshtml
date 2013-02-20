@@ -1,17 +1,73 @@
-﻿@{
-    Layout = null;
-}
+﻿@*
+ * Copyright 2013 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ *@
+@model LBi.LostDoc.Repository.Web.Areas.Administration.Models.ModelBase
 
 <!DOCTYPE html>
 
 <html>
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>_Layout</title>
+    <title>@Model.PageTitle</title>
+    <script>
+        // clear any less cached items from localStorage (XXX doesn't really make
+        // sense to me, but the less compiler (a testing tool!) caches compiled
+        // results in localStorage)
+        for (var key in (localStorage || {})) {
+            if (/^https?:\/\/.*\.less(:timestamp)?$/.test(key)) {
+                delete localStorage[key];
+            }
+        }
+    </script>
+    <link rel="stylesheet/less" href="~/static/less/style.less" />
+    <link rel="stylesheet" href="~/static/css/codemirror.css">
+    <link rel="stylesheet" href="~/static/css/simple-hint.css">
+    <script src="~/static/js/lib/less-1.3.0.min.js"></script>
 </head>
 <body>
-    <div>
-        
+    <div id="wrapper">
+        <nav role="main-navigation">
+            <header role="logo">
+                <div class="logo">
+                    <a href="/" title="LBi" rel="home">
+                        <img src="~/static/img/logo_LBi.gif" alt="LBi"></a>
+                    <div id="country">
+                        LBi Netherlands
+                    </div>
+                </div>
+            </header>
+            <!-- /header -->
+            <span class="handle"></span>
+        </nav>
+        <!-- / Main navigation -->
+
+        <section role="content">
+            @this.RenderBody()
+        </section>
+        <!-- / content section -->
     </div>
+    
+    <!-- Generic libraries -->
+    <script src="~/static/js/lib/zepto.js"></script>
+    <script src="~/static/js/lib/zepto.data.js"></script>
+
+    <!-- Init -->
+    <script src="~/static/js/lostdoc.js"></script>
+    <script src="~/static/js/lib/codemirror.js"></script>
+    <script src="~/static/js/lib/simple-hint.js"></script>
+    <script src="~/static/js/lib/closetag.js"></script>
+    <script src="~/static/js/lib/xml-hint.js"></script>
+    <script src="~/static/js/lib/xml.js"></script>
 </body>
 </html>

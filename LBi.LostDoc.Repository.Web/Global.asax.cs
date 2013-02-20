@@ -15,7 +15,9 @@
  */
 
 using System.ComponentModel.Composition.Hosting;
+using System.IO;
 using System.Linq;
+using System.Web.Hosting;
 using System.Web.Http;
 using System.Web.Http.WebHost.Routing;
 using System.Web.Mvc;
@@ -130,11 +132,17 @@ namespace LBi.LostDoc.Repository.Web
 
         protected void Application_Start()
         {
+            // this might be stupid, but it fixes things for iisexpress
+            Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
+
             // intialize MEF
             AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog());
 
             // set up add-in system
-            AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed", "...", isOfficial: true);
+            AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed",
+                                                        Path.GetFullPath(AppConfig.AddInRepository),
+                                                        isOfficial: true);
+
             // load other sources from site-settings (not config)
             AddInRepository repository = new AddInRepository(officalSource);
             AddInManager addInManager = new AddInManager(repository, AppConfig.AddInInstallPath, AppConfig.AddInPackagePath);
