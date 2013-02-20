@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -66,6 +67,38 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                            .Select(AddInPackage.Create);
         }
 
-        
+
+        public AddInPackage Get(string id, string version)
+        {
+            SemanticVersion ver = SemanticVersion.Parse(version);
+            IPackage pkg =
+                this._repository.GetPackages()
+                    .SingleOrDefault(ip => StringComparer.Ordinal.Equals(id, ip.Id) && ip.Version == ver);
+            
+            if (pkg == null)
+                return null;
+
+            return AddInPackage.Create(pkg);
+        }
+
+
+        public AddInPackage Get(string id, bool includePrerelease)
+        {
+            var packages =
+                this._repository.GetPackages()
+                    .Where(ip => StringComparer.Ordinal.Equals(id, ip.Id));
+
+            if (includePrerelease)
+                packages = packages.Where(p => p.IsAbsoluteLatestVersion);
+            else
+                packages = packages.Where(p => p.IsLatestVersion);
+
+            IPackage pkg = packages.FirstOrDefault();
+
+            if (pkg == null)
+                return null;
+
+            return AddInPackage.Create(pkg);
+        }
     }
 }

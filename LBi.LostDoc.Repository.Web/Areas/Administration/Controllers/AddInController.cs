@@ -17,9 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
+using LBi.LostDoc.Repository.Web.Extensibility;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
@@ -38,10 +40,20 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                                         {
                                                             CanInstall = false,
                                                             CanUninstall = true,
-                                                            CanUpdate = false,
+                                                            CanUpdate = CheckForUpdates(pkg),
                                                             Package = pkg
                                                         }).ToArray()
                             });
+        }
+
+        private bool CheckForUpdates(AddInPackage pkg)
+        {
+            // TODO fix prerelase hack
+            AddInPackage newPackage = App.Instance.AddInManager.Repository.Get(pkg.Id, false);
+            if (newPackage == null)
+                return false;
+
+            return (newPackage.Version > pkg.Version);
         }
 
         public ActionResult Repository()
@@ -84,22 +96,68 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                             });
         }
 
-        [HttpPost]
+        // TODO put this back in
+        // [HttpPost]
         public ActionResult Install([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
         {
-            return new EmptyResult();
+            ActionResult ret;
+            var pkg =  App.Instance.AddInManager.Repository.Get(id, version);
+            if (pkg == null)
+            {
+                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
+                                               string.Format("Package (Id: '{0}', Version: '{1}') not found.",
+                                                             id,
+                                                             version));
+            }
+            else
+            {
+                // TODO handle errors
+                App.Instance.AddInManager.Install(pkg);
+                ret = new HttpStatusCodeResult(HttpStatusCode.NoContent);
+            }
+            return ret;
         }
 
-        [HttpPost]
+        //[HttpPost]
         public ActionResult Uninstall([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
         {
-            return new EmptyResult();
+            ActionResult ret;
+            var pkg = App.Instance.AddInManager.Get(id, version);
+            if (pkg == null)
+            {
+                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
+                                               string.Format("Package (Id: '{0}', Version: '{1}') not found.",
+                                                             id,
+                                                             version));
+            }
+            else
+            {
+                // TODO handle errors
+                App.Instance.AddInManager.Uninstall(pkg);
+                ret = new HttpStatusCodeResult(HttpStatusCode.NoContent);
+            }
+            return ret;
         }
 
         [HttpPost]
         public ActionResult Update([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
         {
-            return new EmptyResult();
+            ActionResult ret;
+            var pkg = App.Instance.AddInManager.Repository.Get(id, version);
+            if (pkg == null)
+            {
+                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
+                                               string.Format("Package (Id: '{0}', Version: '{1}') not found.",
+                                                             id,
+                                                             version));
+            }
+            else
+            {
+                // TODO handle errors
+                App.Instance.AddInManager.Update(pkg);
+                ret = new HttpStatusCodeResult(HttpStatusCode.NoContent);
+            }
+            return ret;
 
         }
     }

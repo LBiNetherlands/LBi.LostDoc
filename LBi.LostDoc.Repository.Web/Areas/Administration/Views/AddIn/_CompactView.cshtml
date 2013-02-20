@@ -52,6 +52,9 @@
             <a href="@Url.Action("Uninstall")" data-method="POST" class="button">Uninstall</a>
         }
 
-        <a href="#" class="license">License</a>
+        @if (Model.Package.LicenseUrl != null)
+        {
+            <a href="@Model.Package.LicenseUrl" class="license">License</a>
+        }
     </div>
 </article>

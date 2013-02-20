@@ -29,8 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Templates", "LB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Repository.Web.Extensibility", "LBi.LostDoc.Repository.Web.Extensibility\LBi.LostDoc.Repository.Web.Extensibility.csproj", "{DFB6C104-0BFE-4F9F-8EAC-D3766B0B9B40}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LocalAddInRepository", "LocalAddInRepository", "{CDA2594A-4814-4C8B-95CC-E7B6EEB5C4E4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

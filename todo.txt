@@ -1,23 +1,45 @@
 TODO
 
+templates
+=========
 * rework xsl:sort in navigation2.xslt
   1. Generate unsorted output _with_ sort-key
   2. capture output in node-set
   3. Sort node-set on li/a/@sort-key
 
-
 * method/types with generics need constraints in the C# syntax!
+
+* create service template
+
+cli
+===
+* add command to generate a template NSdoc file (also with assembly level comment)
+
+core
+====
 
 * add StatisticsBuilder and expose it so Repository can get nice statistics
   also reduces the line count in Template.cs
 
-* add settings to the repository for custom feeds, etc
-
 * sort out messed up Lostdoc URN Namespacing
   should be: urn:schemas-lbi-nl:lostdoc:template ??
 
-* add command to generate a template NSdoc file (also with assembly level comment)
+repository
+==========
 
-* create service template
+* set up app logging
 
+* capture nuget logging and redirect to app log
+
+* add settings to the repository for custom feeds, etc
+
+* add ability down view/select & download templates (as zip package from)
+
+* add ability to upload zip template packages?
+
+* investigate git backend for storing content (since most content is the same it would save on disk space)
+
+* add db/storage for local edits
+
+* implement single-page render for local edit preview/saving
 

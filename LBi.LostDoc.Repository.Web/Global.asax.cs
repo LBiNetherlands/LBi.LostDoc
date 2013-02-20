@@ -135,9 +135,6 @@ namespace LBi.LostDoc.Repository.Web
             // this might be stupid, but it fixes things for iisexpress
             Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
 
-            // intialize MEF
-            AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog());
-
             // set up add-in system
             AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed",
                                                         Path.GetFullPath(AppConfig.AddInRepository),
@@ -146,8 +143,13 @@ namespace LBi.LostDoc.Repository.Web
             // load other sources from site-settings (not config)
             AddInRepository repository = new AddInRepository(officalSource);
             AddInManager addInManager = new AddInManager(repository, AppConfig.AddInInstallPath, AppConfig.AddInPackagePath);
+
+            // delete and redeploy all installed packages
+            addInManager.Restore();
             // TODO find the install dir of each package and add it to the container
 
+            // intialize MEF
+            AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog());
             // create container
             CompositionContainer container = new CompositionContainer(catalog);
 
