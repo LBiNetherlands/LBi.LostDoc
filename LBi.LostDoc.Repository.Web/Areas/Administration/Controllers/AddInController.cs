@@ -26,7 +26,7 @@ using LBi.LostDoc.Repository.Web.Notifications;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
-    public class AddInController : Controller
+    public class AddInController : ControllerBase
     {
         // default action is to list all installed add-ins
         public ActionResult Index()
@@ -113,10 +113,19 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                var result = App.Instance.AddIns.Install(pkg);
+                PackageResult result = App.Instance.AddIns.Install(pkg);
                 if (result == PackageResult.PendingRestart)
-                    App.Instance.Notifications.Add(Guid.NewGuid(), NotificationType.Warning, LifeTime.UntilRestart, "","", NotificationActions.Restart);
-                // TODO push site notification
+                {
+                    App.Instance.Notifications.Add(
+                        Severity.Warning,
+                        Lifetime.Application,
+                        Scope.Administration,
+                        "Pending restart",
+                        string.Format("Package {0} failed to install, another attempt will be made upon site restart.",
+                                      pkg.Id),
+                        NotificationActions.Restart);
+                }
+
                 ret = this.Redirect(Url.Action("Index"));
             }
             return ret;
@@ -137,8 +146,18 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                App.Instance.AddIns.Uninstall(pkg);
-                // TODO push site notification
+                PackageResult result = App.Instance.AddIns.Uninstall(pkg);
+                if (result == PackageResult.PendingRestart)
+                {
+                    App.Instance.Notifications.Add(
+                        Severity.Warning,
+                        Lifetime.Application,
+                        Scope.Administration,
+                        "Pending restart",
+                        string.Format("Package {0} failed to uninstall, another attempt will be made upon site restart.",
+                                      pkg.Id),
+                        NotificationActions.Restart);
+                }
                 ret = this.Redirect(Url.Action("Index"));
             }
             return ret;
@@ -159,8 +178,18 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                App.Instance.AddIns.Update(pkg);
-                // TODO push site notification
+                PackageResult result = App.Instance.AddIns.Update(pkg);
+                if (result == PackageResult.PendingRestart)
+                {
+                    App.Instance.Notifications.Add(
+                        Severity.Warning,
+                        Lifetime.Application,
+                        Scope.Administration,
+                        "Pending restart",
+                        string.Format("Package {0} failed to update, another attempt will be made upon site restart.",
+                                      pkg.Id),
+                        NotificationActions.Restart);
+                }
                 ret = this.Redirect(Url.Action("Index"));
             }
             return ret;

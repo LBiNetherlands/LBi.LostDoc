@@ -14,14 +14,20 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using LBi.LostDoc.Repository.Web.Notifications;
+using System;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Notifications
 {
-    public abstract class ModelBase
+    public class NotificationAction
     {
-        public string PageTitle { get; set; }
-        public IEnumerable<Notification> Notifications { get; set; }
+        public NotificationAction(string text, Uri target)
+        {
+            this.Text = text;
+            this.Target = target;
+        }
+
+        public Uri Target { get; set; }
+
+        public string Text { get; set; }
     }
 }

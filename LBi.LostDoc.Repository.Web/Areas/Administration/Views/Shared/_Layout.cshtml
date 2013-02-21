@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  *@
+@using LBi.LostDoc.Repository
+@using LBi.LostDoc.Repository.Web.Views
 @model LBi.LostDoc.Repository.Web.Areas.Administration.Models.ModelBase
 
 <!DOCTYPE html>
@@ -57,7 +59,26 @@
         </section>
         <!-- / content section -->
     </div>
-    
+
+    <section>
+        <ul>
+            @foreach (var notification in Model.Notifications)
+            {
+                <li id="@notification.Id.ToBase36String()">
+                    <strong>@notification.Title <span>@((DateTime.UtcNow - notification.Created).ToHumanReadableString()) ago</span></strong>
+
+                    <p>@notification.Message</p>
+
+                    @foreach (var action in notification.Actions)
+                    {
+                        <a href="@action.Target" class="action">@action.Text</a>
+                    }
+                </li>
+            }
+
+        </ul>
+    </section>
+
     <!-- Generic libraries -->
     <script src="~/static/js/lib/zepto.js"></script>
     <script src="~/static/js/lib/zepto.data.js"></script>

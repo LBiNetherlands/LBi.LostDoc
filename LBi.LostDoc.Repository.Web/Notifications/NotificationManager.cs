@@ -15,77 +15,80 @@
  */
 
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 
 namespace LBi.LostDoc.Repository.Web.Notifications
 {
-
-    public class Notification
+    public class NotificationManager : IEnumerable<Notification>
     {
-        public Notification(Guid id, NotificationType type, LifeTime lifetime, string title, string message, IEnumerable<NotificationAction> actions)
-        {
-            this.Id = id;
-            this.Type = type;
-            this.LifeTime = lifetime;
-            this.Title = title;
-            this.Message = message;
-            this.Actions = actions.ToArray();
-        }
+        private readonly ConcurrentDictionary<Guid, Notification> _notifications;
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<Guid, Notification>> _userNotifications; 
 
-        protected NotificationType Type { get; set; }
-        public Guid Id { get; protected set; }
-        public LifeTime LifeTime { get; protected set; }
-        public string Title { get; protected set; }
-        public string Message { get; protected set; }
-        public NotificationAction[] Actions { get; protected set; }
-    }
-
-    public class NotificationManager
-    {
-
-        private List<Notification> _notifications;
-
-        // TODO 
         public NotificationManager()
         {
-         this._notifications = new List<Notification>();   
+            this._notifications =new ConcurrentDictionary<Guid, Notification>();
+            this._userNotifications = new ConcurrentDictionary<string, ConcurrentDictionary<Guid, Notification>>(StringComparer.Ordinal);
         }
 
-        public void Add(Guid id, NotificationType type, LifeTime lifeTime, string title, string message, params NotificationAction[] actions)
+        public void Add(Severity severity, Lifetime lifeTime, Scope scope, string title, string message, params NotificationAction[] actions)
         {
-            var note = new Notification(id, type, lifeTime, title, message, actions);
-            this._notifications.Add(note);
+            var note = new Notification(Guid.NewGuid(), DateTime.UtcNow, severity, lifeTime, scope, title, message, actions);
+            if (scope == Scope.User)
+            {
+                // TODO figure out if we can somehow get the HttpContext out, and maybe swap to session?
+                var userNotifications = this._userNotifications.GetOrAdd(HttpContext.Current.User.Identity.Name,
+                                                                         s =>
+                                                                         new ConcurrentDictionary<Guid, Notification>());
+
+                if (!userNotifications.TryAdd(note.Id, note))
+                    throw new ReadOnlyException("Failed to add notifications.");
+            }
+            else
+            {
+                if (!this._notifications.TryAdd(note.Id, note))
+                    throw new ReadOnlyException("Failed to add notifications.");
+            }
         }
 
-
-    }
-
-    public class NotificationAction
-    {
-        public NotificationAction(string text, Uri target)
+        public void Remove(Guid id)
         {
-            this.Text = text;
-            this.Target = target;
+            Notification oldVal;
+            this._notifications.TryRemove(id, out oldVal);
         }
 
-        protected Uri Target { get; set; }
+        public IEnumerator<Notification> GetEnumerator()
+        {
+            IEnumerable<Notification> ret;
+            ConcurrentDictionary<Guid, Notification> userNotifications;
+            // TODO somwhere we need to filter for the right scope
+            if (this._userNotifications.TryGetValue(HttpContext.Current.User.Identity.Name, out userNotifications))
+                ret = userNotifications.Values;
+            else
+                ret = Enumerable.Empty<Notification>();
 
-        public string Text { get; set; }
-    }
+            foreach (var note in ret.Concat(this._notifications.Values))
+            {
+                if (note.LifeTime == Lifetime.Page &&
+                    note.Scope == Scope.User &&
+                    this._userNotifications.TryGetValue(HttpContext.Current.User.Identity.Name,
+                                                        out userNotifications))
+                {
+                    Notification _;
+                    userNotifications.TryRemove(note.Id, out _);
+                }
 
-    public enum LifeTime
-    {
-        UntilRestart,
-        PageLoad
-    }
+                yield return note;
+            }
+        }
 
-    public enum NotificationType
-    {
-        Action,
-        Information,
-        Warning,
-        Error
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

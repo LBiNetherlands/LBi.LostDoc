@@ -14,14 +14,19 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
-using LBi.LostDoc.Repository.Web.Notifications;
+using System.Linq;
+using System.Web;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Views
 {
-    public abstract class ModelBase
+    public static class Extensions
     {
-        public string PageTitle { get; set; }
-        public IEnumerable<Notification> Notifications { get; set; }
+        public static string ToHumanReadableString(this TimeSpan timeSpan)
+        {
+            // TODO implement this properly
+            return timeSpan.ToString();
+        }
     }
 }
