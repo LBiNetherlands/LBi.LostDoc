@@ -32,7 +32,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
             this.Repository = repository;
             this.InstallDirectory = installDirectory;
             this.PackageDirectory = packageDirectory;
-             
+
             this._packageManager = new PackageManager(repository.NuGetRepository, packageDirectory);
         }
 
@@ -46,33 +46,114 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                 DeployAddIn(addInPackage);
         }
 
+        public event EventHandler<AddInInstalledEventArgs> Installed;
+
+        protected virtual void OnInstalled(AddInPackage package, PackageResult result)
+        {
+            var handler = this.Installed;
+            if (handler != null)
+            {
+                var installationPath =
+                    Path.GetFullPath(Path.Combine(this.InstallDirectory,
+                                                  this._packageManager.PathResolver
+                                                      .GetPackageDirectory(package.NuGetPackage)));
+                var packagePath =
+                    Path.GetFullPath(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage));
+
+                handler(this,
+                        new AddInInstalledEventArgs(package,
+                                                    result,
+                                                    installationPath,
+                                                    packagePath));
+            }
+        }
+
+        public event EventHandler<AddInInstalledEventArgs> Uninstalled;
+
+        protected virtual void OnUninstalled(AddInPackage package, PackageResult result)
+        {
+            var handler = this.Uninstalled;
+            if (handler != null)
+            {
+                var installationPath =
+                    Path.GetFullPath(Path.Combine(this.InstallDirectory,
+                                                  this._packageManager.PathResolver
+                                                      .GetPackageDirectory(package.NuGetPackage)));
+
+                handler(this,
+                        new AddInInstalledEventArgs(package,
+                                                    result,
+                                                    installationPath,
+                                                    null));
+            }
+        }
+
         public string PackageDirectory { get; protected set; }
         public string InstallDirectory { get; protected set; }
         public AddInRepository Repository { get; protected set; }
 
-        public void Install(AddInPackage package)
+        public PackageResult Install(AddInPackage package)
         {
             // TODO fix the deps & prerelease hack
+            if (this.Contains(package))
+                throw new InvalidOperationException("Package already installed: " + package.ToString());
             this._packageManager.InstallPackage(package.NuGetPackage, true, !package.IsReleaseVersion);
+            PackageResult ret;
+            if (this.DeployAddIn(package))
+                ret = PackageResult.Ok;
+            else
+                ret = PackageResult.PendingRestart;
+
+            this.OnInstalled(package, ret);
+            return ret;
         }
 
-        private void DeployAddIn(AddInPackage package)
+        private bool DeployAddIn(AddInPackage package)
         {
-            foreach (var assemblyReference in package.NuGetPackage.AssemblyReferences)
-            {
-                string sourcePath = Path.Combine(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage), assemblyReference.Path);
+            bool ret = true;
+            string targetdir = Path.Combine(Path.GetFullPath(this.InstallDirectory),
+                                            this._packageManager.PathResolver
+                                                .GetPackageDirectory(package.NuGetPackage));
 
-                File.Copy(sourcePath,
-                          Path.Combine(this.InstallDirectory,
-                                       this._packageManager.PathResolver.GetPackageDirectory(package.NuGetPackage),
-                                       assemblyReference.EffectivePath));
+            if (!Directory.Exists(targetdir))
+            {
+                Directory.CreateDirectory(targetdir);
+                foreach (var assemblyReference in package.NuGetPackage.AssemblyReferences)
+                {
+                    string sourcePath =
+                        Path.Combine(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage),
+                                     assemblyReference.Path);
+
+
+                    File.Copy(sourcePath,
+                              Path.Combine(targetdir,
+                                           assemblyReference.EffectivePath));
+                }
             }
+            else
+                ret = false;
+
+            return ret;
         }
 
-        public void Uninstall(AddInPackage package)
+
+        public bool Contains(AddInPackage package)
+        {
+            return
+                this._packageManager.LocalRepository.GetPackages()
+                    .SingleOrDefault(
+                        p =>
+                        StringComparer.Ordinal.Equals(p.Id, package.Id) &&
+                        StringComparer.Ordinal.Equals(p.Version.Version, package.Version)) != null;
+        }
+
+        public PackageResult Uninstall(AddInPackage package)
         {
             // TODO fix the force & deps hack
             this._packageManager.UninstallPackage(package.NuGetPackage, true, false);
+            PackageResult ret = PackageResult.PendingRestart;
+            this.OnUninstalled(package, ret);
+            return ret;
         }
 
         public IEnumerator<AddInPackage> GetEnumerator()
@@ -82,10 +163,12 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                                                        .GetEnumerator();
         }
 
-        public void Update(AddInPackage package)
+        public PackageResult Update(AddInPackage package)
         {
+            PackageResult ret = PackageResult.PendingRestart;
             // TODO fix the deps & prerelease hack
             this._packageManager.UpdatePackage(package.NuGetPackage, true, !package.IsReleaseVersion);
+            return ret;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

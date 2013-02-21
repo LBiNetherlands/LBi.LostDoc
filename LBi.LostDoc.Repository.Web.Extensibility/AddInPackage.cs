@@ -23,11 +23,16 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     {
 
         // TODO clean this up
-        internal AddInPackage(IPackage pkg, string id, Version version, bool isReleaseVersion, DateTimeOffset? published, Uri iconUrl, string title, string summary, string description, Uri projectUrl)
+        internal AddInPackage(IPackage pkg, string id, bool isReleaseVersion, DateTimeOffset? published, Uri iconUrl, string title, string summary, string description, Uri projectUrl)
         {
             this.NuGetPackage = pkg;
             this.Id = id;
-            this.Version = version;
+
+            // TODO this can't be right
+            this.Version = pkg.Version.Version.ToString();
+            if (!string.IsNullOrWhiteSpace(pkg.Version.SpecialVersion))
+                this.Version += '-' + pkg.Version.SpecialVersion;
+
             this.IsReleaseVersion = isReleaseVersion;
             this.Published = published;
             this.Title = title;
@@ -40,7 +45,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
         internal static AddInPackage Create(IPackage pkg)
         {   
-            return new AddInPackage(pkg, pkg.Id, pkg.Version.Version, pkg.IsReleaseVersion(), pkg.Published, pkg.IconUrl, pkg.Title, pkg.Summary, pkg.Description, pkg.ProjectUrl);
+            return new AddInPackage(pkg, pkg.Id, pkg.IsReleaseVersion(), pkg.Published, pkg.IconUrl, pkg.Title, pkg.Summary, pkg.Description, pkg.ProjectUrl);
         }
 
         public DateTimeOffset? Published { get; protected set; }
@@ -57,12 +62,17 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
         public bool IsReleaseVersion { get; protected set; }
 
-        public Version Version { get; protected set; }
+        public string Version { get; protected set; }
 
         public string Id { get; protected set; }
 
         internal IPackage NuGetPackage { get; set; }
 
         public Uri LicenseUrl { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{0}.{1}", this.Id, this.Version);
+        }
     }
 }

@@ -26,6 +26,7 @@ using System.Web.Routing;
 using LBi.LostDoc;
 using LBi.LostDoc.Composition;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 using LBi.LostDoc.Templating.FileProviders;
 
@@ -135,21 +136,29 @@ namespace LBi.LostDoc.Repository.Web
             // this might be stupid, but it fixes things for iisexpress
             Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
 
+            // TODO maybe move all of this into the App class with "IAppConfig"
+
             // set up add-in system
             AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed",
                                                         Path.GetFullPath(AppConfig.AddInRepository),
                                                         isOfficial: true);
 
+            // intialize MEF
+            AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog());
+
             // load other sources from site-settings (not config)
             AddInRepository repository = new AddInRepository(officalSource);
             AddInManager addInManager = new AddInManager(repository, AppConfig.AddInInstallPath, AppConfig.AddInPackagePath);
-
-            // delete and redeploy all installed packages
+            
+            // hook event so that installed add-ins get registered in the catalog, if composition occurs after this fires
+            // or if recomposition is enabled, no restart should be requried
+            addInManager.Installed += (sender, args) => catalog.Catalogs.Add(new DirectoryCatalog(args.InstallationPath));
+            
+            // delete and redeploy all installed packages, this will trigger the Installed event ^
+            // this acts as a crude "remove plugins that were in use when uninstalled" hack
             addInManager.Restore();
-            // TODO find the install dir of each package and add it to the container
 
-            // intialize MEF
-            AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog());
+   
             // create container
             CompositionContainer container = new CompositionContainer(catalog);
 
@@ -172,10 +181,12 @@ namespace LBi.LostDoc.Repository.Web
                                               Template = template
                                           });
 
+            // set up notifaction system
 
+            NotificationManager notifications = new NotificationManager();
 
             // initialize app-singleton
-            App.Initialize(container, contentManager, addInManager);
+            App.Initialize(container, contentManager, addInManager, notifications);
 
 
             // MVC init

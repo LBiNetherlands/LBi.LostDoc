@@ -17,15 +17,18 @@
             this.handle = $('.' + this.settings['handleClass']);
             this.leftColumn = $(this.settings['leftColumnSelector']);
             this.rightColumn = $(this.settings['rightColumnSelector']);
-            this.setRightColumnHeight();
+            this.setColumnHeight();
             this.openLocalStorage();
             this.initColumnResizer();
             this.startEditing();
 		},
 
-        setRightColumnHeight: function() {
+        setColumnHeight: function() {
             var height = $(window).height();
             this.rightColumn.css({
+                'min-height' : height
+            });
+            this.leftColumn.css({
                 'min-height' : height
             });
         },

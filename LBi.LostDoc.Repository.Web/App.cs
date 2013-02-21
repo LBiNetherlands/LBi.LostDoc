@@ -20,30 +20,33 @@ using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Web;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Repository.Web
 {
     public class App
     {
-        private App(CompositionContainer container, ContentManager contentManager, AddInManager addInManager)
+        private App(CompositionContainer container, ContentManager contentManager, AddInManager addInManager, NotificationManager notifications)
         {
             this.Container = container;
-            this.ContentManager = contentManager;
-            this.AddInManager = addInManager;
+            this.Content = contentManager;
+            this.AddIns = addInManager;
+            this.Notifications = notifications;
         }
 
         public static App Instance { get; protected set; }
 
-        public static void Initialize(CompositionContainer container, ContentManager contentManager, AddInManager addInManager)
+        public static void Initialize(CompositionContainer container, ContentManager contentManager, AddInManager addInManager, NotificationManager notifications)
         {
-            Instance = new App(container, contentManager, addInManager);
+            Instance = new App(container, contentManager, addInManager, notifications);
         }
 
         public CompositionContainer Container { get; protected set; }
-        public ContentManager ContentManager { get; protected set; }
-        public AddInManager AddInManager { get; protected set; }
-
+        public ContentManager Content { get; protected set; }
+        public AddInManager AddIns { get; protected set; }
+        public NotificationManager Notifications { get; protected set; }
+        
 
     }
 }

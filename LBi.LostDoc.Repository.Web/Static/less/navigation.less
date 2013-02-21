@@ -1,6 +1,16 @@
 nav[role="main-navigation"] {
     float: left;
     position: relative;
+    &:after {
+        content: '';
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%,@grey_dark), color-stop(100%,rgba(0,0,0,0)));
+        display: block;
+        height: 100%;
+        position: absolute;
+        right: -6px;
+        top:0;
+        width: 6px;
+    }
     //mark: will be overrided by js;
         width: 20%;
     // end mark
@@ -74,9 +84,9 @@ nav[role="main-navigation"] {
             cursor: -webkit-grab;
         height: 40px;
         position: absolute;
-        right: -6px;
-        top: 85%;
-        width: 6px;
+        right: -3px;
+        top: 40%;
+        width: 9px;
         &:active {
         cursor: grabbing;
             cursor: -webkit-grabbing;

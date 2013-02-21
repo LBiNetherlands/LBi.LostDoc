@@ -43,3 +43,5 @@ repository
 
 * implement single-page render for local edit preview/saving
 
+* create site-wide admin notifications
+

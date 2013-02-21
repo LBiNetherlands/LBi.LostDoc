@@ -21,6 +21,8 @@
 <form method="GET" action="@Url.Action("Search")" data-target="#results">
     <input type="search" name="terms"placeholder="Search repository"/>
     <input type="submit" value="Search"/>
+    <input type="checkbox" id="cbIncludePrerelease" name="includePrerelease" value="true"/>
+    <label for="cbIncludePrerelease">Include prerelease packages</label>
 </form>
 
 <section class="package-list">

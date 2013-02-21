@@ -68,7 +68,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
             try
             {
                 if (id == "current")
-                    search = this.GetSearcher(App.Instance.ContentManager.ContentFolder);
+                    search = this.GetSearcher(App.Instance.Content.ContentFolder);
                 else
                     search = this.GetSearcher(id);
 

@@ -100,5 +100,14 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
             return AddInPackage.Create(pkg);
         }
+
+        public AddInPackage GetUpdate(AddInPackage package, bool includePrerelease)
+        {
+            var pkg = this._repository.GetUpdates(new[] {package.NuGetPackage}, includePrerelease, true).FirstOrDefault();
+            if (pkg == null)
+                return null;
+
+            return AddInPackage.Create(pkg);
+        }
     }
 }

@@ -22,6 +22,7 @@ using System.Web;
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Notifications;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
@@ -34,7 +35,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             return View(new AddInOverviewModel
                             {
                                 Title = "Installed Add-ins",
-                                AddIns = App.Instance.AddInManager
+                                AddIns = App.Instance.AddIns
                                             .Select(pkg =>
                                                     new AddInModel
                                                         {
@@ -49,25 +50,21 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         private bool CheckForUpdates(AddInPackage pkg)
         {
             // TODO fix prerelase hack
-            AddInPackage newPackage = App.Instance.AddInManager.Repository.Get(pkg.Id, false);
-            if (newPackage == null)
-                return false;
-
-            return (newPackage.Version > pkg.Version);
+            return App.Instance.AddIns.Repository.GetUpdate(pkg, true) != null;
         }
 
         public ActionResult Repository()
         {
             const int count = 10;
-            AddInModel[] results = App.Instance.AddInManager.Repository.Search(null, true, 0, count)
-                             .Select(pkg =>
-                                     new AddInModel
-                                     {
-                                         CanInstall = true,
-                                         CanUninstall = true,
-                                         CanUpdate = false,
-                                         Package = pkg
-                                     }).ToArray();
+            AddInModel[] results = App.Instance.AddIns.Repository.Search(null, true, 0, count)
+                                      .Select(pkg =>
+                                              new AddInModel
+                                                  {
+                                                      CanInstall = !CheckInstalled(pkg),
+                                                      CanUninstall = CheckInstalled(pkg),
+                                                      CanUpdate = CheckInstalled(pkg) && this.CheckForUpdates(pkg),
+                                                      Package = pkg
+                                                  }).ToArray();
 
             return View(new SearchResultModel
                             {
@@ -79,15 +76,15 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult Search(string terms, int offset = 0)
         {
             const int count = 10;
-            AddInModel[] results = App.Instance.AddInManager.Repository.Search(terms, true, offset, count)
-                             .Select(pkg =>
-                                     new AddInModel
-                                         {
-                                             CanInstall = true,
-                                             CanUninstall = true,
-                                             CanUpdate = false,
-                                             Package = pkg
-                                         }).ToArray();
+            AddInModel[] results = App.Instance.AddIns.Repository.Search(terms, true, offset, count)
+                                      .Select(pkg =>
+                                              new AddInModel
+                                                  {
+                                                      CanInstall = !CheckInstalled(pkg),
+                                                      CanUninstall = CheckInstalled(pkg),
+                                                      CanUpdate = CheckInstalled(pkg) && this.CheckForUpdates(pkg),
+                                                      Package = pkg
+                                                  }).ToArray();
 
             return View(new SearchResultModel
                             {
@@ -96,12 +93,16 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                             });
         }
 
-        // TODO put this back in
-        // [HttpPost]
+        private bool CheckInstalled(AddInPackage pkg)
+        {
+            return App.Instance.AddIns.Contains(pkg);
+        }
+
+        [HttpPost]
         public ActionResult Install([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
         {
             ActionResult ret;
-            var pkg =  App.Instance.AddInManager.Repository.Get(id, version);
+            var pkg =  App.Instance.AddIns.Repository.Get(id, version);
             if (pkg == null)
             {
                 ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
@@ -112,17 +113,20 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                App.Instance.AddInManager.Install(pkg);
-                ret = new HttpStatusCodeResult(HttpStatusCode.NoContent);
+                var result = App.Instance.AddIns.Install(pkg);
+                if (result == PackageResult.PendingRestart)
+                    App.Instance.Notifications.Add(Guid.NewGuid(), NotificationType.Warning, LifeTime.UntilRestart, "","", NotificationActions.Restart);
+                // TODO push site notification
+                ret = this.Redirect(Url.Action("Index"));
             }
             return ret;
         }
 
-        //[HttpPost]
+        [HttpPost]
         public ActionResult Uninstall([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
         {
             ActionResult ret;
-            var pkg = App.Instance.AddInManager.Get(id, version);
+            var pkg = App.Instance.AddIns.Get(id, version);
             if (pkg == null)
             {
                 ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
@@ -133,8 +137,9 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                App.Instance.AddInManager.Uninstall(pkg);
-                ret = new HttpStatusCodeResult(HttpStatusCode.NoContent);
+                App.Instance.AddIns.Uninstall(pkg);
+                // TODO push site notification
+                ret = this.Redirect(Url.Action("Index"));
             }
             return ret;
         }
@@ -143,7 +148,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult Update([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
         {
             ActionResult ret;
-            var pkg = App.Instance.AddInManager.Repository.Get(id, version);
+            var pkg = App.Instance.AddIns.Repository.Get(id, version);
             if (pkg == null)
             {
                 ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
@@ -154,8 +159,9 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                App.Instance.AddInManager.Update(pkg);
-                ret = new HttpStatusCodeResult(HttpStatusCode.NoContent);
+                App.Instance.AddIns.Update(pkg);
+                // TODO push site notification
+                ret = this.Redirect(Url.Action("Index"));
             }
             return ret;
 

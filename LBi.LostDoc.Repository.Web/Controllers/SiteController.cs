@@ -28,7 +28,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
         [HttpGet]
         public string GetStatus()
         {
-            return App.Instance.ContentManager.CurrentState.ToString();
+            return App.Instance.Content.CurrentState.ToString();
         }
 
         [HttpPost]
@@ -37,7 +37,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
         {
             try
             {
-                App.Instance.ContentManager.QueueRebuild("");
+                App.Instance.Content.QueueRebuild("");
                 return true;
             } 
             catch (Exception ex)
