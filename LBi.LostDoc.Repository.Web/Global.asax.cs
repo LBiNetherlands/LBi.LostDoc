@@ -144,7 +144,7 @@ namespace LBi.LostDoc.Repository.Web
 
             // set up add-in system
             AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed",
-                                                        Path.GetFullPath(AppConfig.AddInRepository),
+                                                        AppConfig.AddInRepository,
                                                         isOfficial: true);
 
             // intialize MEF

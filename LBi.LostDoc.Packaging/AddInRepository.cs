@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using NuGet;
 
 namespace LBi.LostDoc.Packaging
@@ -69,9 +70,8 @@ namespace LBi.LostDoc.Packaging
         public AddInPackage Get(string id, string version)
         {
             SemanticVersion ver = SemanticVersion.Parse(version);
-            IPackage pkg =
-                this._repository.GetPackages()
-                    .SingleOrDefault(ip => StringComparer.Ordinal.Equals(id, ip.Id) && ip.Version == ver);
+           
+            IPackage pkg = this._repository.FindPackage(id, ver);
             
             if (pkg == null)
                 return null;
