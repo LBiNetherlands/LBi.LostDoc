@@ -16,7 +16,7 @@
 
 using System;
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Packaging
 {
     public class AddInInstalledEventArgs : EventArgs
     {

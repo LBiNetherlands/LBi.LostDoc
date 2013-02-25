@@ -14,15 +14,11 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using LBi.LostDoc.Repository.Web.Extensibility;
-using LBi.LostDoc.Repository.Web.Notifications;
-
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Packaging
 {
-    public abstract class ModelBase : IAdminModel
+    public enum PackageResult
     {
-        public string PageTitle { get; set; }
-        public IEnumerable<Notification> Notifications { get; set; }
+        Ok,
+        PendingRestart
     }
 }

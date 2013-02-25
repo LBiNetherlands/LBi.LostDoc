@@ -17,7 +17,7 @@
 using System;
 using NuGet;
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Packaging
 {
     public class AddInPackage
     {

@@ -14,11 +14,17 @@
  * limitations under the License. 
  */
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+using System;
+
+namespace LBi.LostDoc.Packaging
 {
-    public enum PackageResult
+    public class PackageEventArgs : EventArgs
     {
-        Ok,
-        PendingRestart
+        public PackageEventArgs(AddInPackage package)
+        {
+            this.Package = package;
+        }
+
+        public AddInPackage Package { get; protected set; }
     }
 }

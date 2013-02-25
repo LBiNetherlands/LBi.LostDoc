@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 using System.Web.Mvc;
-using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Packaging;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
 {

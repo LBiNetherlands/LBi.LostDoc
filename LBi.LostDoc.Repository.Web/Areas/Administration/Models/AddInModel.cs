@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Packaging;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
 {

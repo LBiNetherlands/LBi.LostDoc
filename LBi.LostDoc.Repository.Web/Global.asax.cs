@@ -25,7 +25,8 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using LBi.LostDoc;
 using LBi.LostDoc.Composition;
-using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Packaging;
+using LBi.LostDoc.Repository.Web.Areas.Administration;
 using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 using LBi.LostDoc.Templating.FileProviders;
@@ -40,6 +41,9 @@ namespace LBi.LostDoc.Repository.Web
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
+            
+            // this filter injects Notifications into the IBaseModel
+            filters.Add(new AdminFilter());
         }
 
         public static void RegisterRoutes(RouteCollection routes)

@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Web;
-using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 

@@ -21,7 +21,7 @@ using System.IO;
 using System.Linq;
 using NuGet;
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Packaging
 {
     public class AddInManager : IEnumerable<AddInPackage>
     {
@@ -43,7 +43,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                 Directory.Delete(dir, true);
 
             foreach (AddInPackage addInPackage in this)
-                DeployAddIn(addInPackage);
+                this.DeployAddIn(addInPackage);
         }
 
         public event EventHandler<AddInInstalledEventArgs> Installed;
@@ -173,7 +173,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
 
 

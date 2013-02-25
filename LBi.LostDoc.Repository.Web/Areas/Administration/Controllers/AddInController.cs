@@ -21,12 +21,13 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
-using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Repository.Web.Notifications;
+
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
-    public class AddInController : ControllerBase
+    public class AddInController : Controller
     {
         // default action is to list all installed add-ins
         public ActionResult Index()

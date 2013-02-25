@@ -41,7 +41,6 @@ namespace LBi.LostDoc.Repository
         private readonly Template _template;
         private readonly VersionComponent? _ignoreVersionComponent;
         private readonly ReaderWriterLockSlim _contentLock;
-        private static ContentManager _instance;
         private string _currentContentRef;
         private volatile State _state;
 

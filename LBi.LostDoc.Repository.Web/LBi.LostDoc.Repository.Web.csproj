@@ -140,9 +140,9 @@
   <ItemGroup>
     <Compile Include="AppConfig.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="Areas\Administration\AdminFilter.cs" />
     <Compile Include="Areas\Administration\AdministrationAreaRegistration.cs" />
     <Compile Include="Areas\Administration\Controllers\AddInController.cs" />
-    <Compile Include="Areas\Administration\Controllers\ControllerBase.cs" />
     <Compile Include="Areas\Administration\Controllers\NotificationActions.cs" />
     <Compile Include="Areas\Administration\Controllers\RepositoryController.cs" />
     <Compile Include="Areas\Administration\Controllers\SystemController.cs" />
@@ -167,12 +167,6 @@
     <Compile Include="Models\Result.cs" />
     <Compile Include="Models\ResultSet.cs" />
     <Compile Include="Models\SearchResult.cs" />
-    <Compile Include="Notifications\Lifetime.cs" />
-    <Compile Include="Notifications\Notification.cs" />
-    <Compile Include="Notifications\NotificationAction.cs" />
-    <Compile Include="Notifications\NotificationManager.cs" />
-    <Compile Include="Notifications\Scope.cs" />
-    <Compile Include="Notifications\Severity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedirectRouteHandler.cs" />
     <Compile Include="Security\ApiKeyAuthorizeAttribute.cs" />
@@ -248,9 +242,17 @@
     <None Include="Properties\PublishProfiles\Build.pubxml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj">
+      <Project>{32e920e1-127c-45bd-815f-c5bf8779b621}</Project>
+      <Name>LBi.LostDoc.Packaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LBi.LostDoc.Repository.Web.Extensibility\LBi.LostDoc.Repository.Web.Extensibility.csproj">
       <Project>{dfb6c104-0bfe-4f9f-8eac-d3766b0b9b40}</Project>
       <Name>LBi.LostDoc.Repository.Web.Extensibility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LBi.LostDoc.Repository.Web.Notifications\LBi.LostDoc.Repository.Web.Notifications.csproj">
+      <Project>{71577f46-7fef-4c05-97db-5d3e57c1eb76}</Project>
+      <Name>LBi.LostDoc.Repository.Web.Notifications</Name>
     </ProjectReference>
     <ProjectReference Include="..\LBi.LostDoc.Templates\LBi.LostDoc.Templates.csproj">
       <Project>{357e5ba0-0aa0-4c30-b7bb-eec8eaaa6d17}</Project>

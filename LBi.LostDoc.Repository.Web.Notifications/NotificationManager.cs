@@ -15,16 +15,15 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Web;
+using System.Security.Principal;
 
 namespace LBi.LostDoc.Repository.Web.Notifications
 {
-    public class NotificationManager : IEnumerable<Notification>
+    public class NotificationManager
     {
         private readonly ConcurrentDictionary<Guid, Notification> _notifications;
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<Guid, Notification>> _userNotifications; 
@@ -37,11 +36,21 @@ namespace LBi.LostDoc.Repository.Web.Notifications
 
         public void Add(Severity severity, Lifetime lifeTime, Scope scope, string title, string message, params NotificationAction[] actions)
         {
+            if (scope == Scope.User)
+                throw new ArgumentException("Scope 'User' is not allowed for this overload as no IPrincipal is provided.", "scope");
+
+            this.Add(severity, lifeTime, scope, null, title, message, actions);
+        }
+
+        public void Add(Severity severity, Lifetime lifeTime, Scope scope, IPrincipal principal, string title, string message, params NotificationAction[] actions)
+        {
+            if (scope == Scope.User && principal == null)
+                throw new ArgumentNullException("principal", "Argument cannot be null when Scope is 'User'.");
+
             var note = new Notification(Guid.NewGuid(), DateTime.UtcNow, severity, lifeTime, scope, title, message, actions);
             if (scope == Scope.User)
             {
-                // TODO figure out if we can somehow get the HttpContext out, and maybe swap to session?
-                var userNotifications = this._userNotifications.GetOrAdd(HttpContext.Current.User.Identity.Name,
+                var userNotifications = this._userNotifications.GetOrAdd(principal.Identity.Name,
                                                                          s =>
                                                                          new ConcurrentDictionary<Guid, Notification>());
 
@@ -61,12 +70,12 @@ namespace LBi.LostDoc.Repository.Web.Notifications
             this._notifications.TryRemove(id, out oldVal);
         }
 
-        public IEnumerator<Notification> GetEnumerator()
+        public IEnumerable<Notification> Get(IPrincipal principal)
         {
             IEnumerable<Notification> ret;
             ConcurrentDictionary<Guid, Notification> userNotifications;
             // TODO somwhere we need to filter for the right scope
-            if (this._userNotifications.TryGetValue(HttpContext.Current.User.Identity.Name, out userNotifications))
+            if (this._userNotifications.TryGetValue(principal.Identity.Name, out userNotifications))
                 ret = userNotifications.Values;
             else
                 ret = Enumerable.Empty<Notification>();
@@ -75,8 +84,7 @@ namespace LBi.LostDoc.Repository.Web.Notifications
             {
                 if (note.LifeTime == Lifetime.Page &&
                     note.Scope == Scope.User &&
-                    this._userNotifications.TryGetValue(HttpContext.Current.User.Identity.Name,
-                                                        out userNotifications))
+                    this._userNotifications.TryGetValue(principal.Identity.Name, out userNotifications))
                 {
                     Notification _;
                     userNotifications.TryRemove(note.Id, out _);
@@ -84,11 +92,6 @@ namespace LBi.LostDoc.Repository.Web.Notifications
 
                 yield return note;
             }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

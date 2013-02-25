@@ -27,6 +27,8 @@ core
 repository
 ==========
 
+// * create site-wide admin notifications
+
 * set up app logging
 
 * capture nuget logging and redirect to app log
@@ -43,5 +45,5 @@ repository
 
 * implement single-page render for local edit preview/saving
 
-* create site-wide admin notifications
+
 

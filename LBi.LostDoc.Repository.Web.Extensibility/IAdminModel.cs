@@ -15,14 +15,13 @@
  */
 
 using System.Collections.Generic;
-using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Notifications;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-    public abstract class ModelBase : IAdminModel
+    public interface IAdminModel
     {
-        public string PageTitle { get; set; }
-        public IEnumerable<Notification> Notifications { get; set; }
+        string PageTitle { get; set; }
+        IEnumerable<Notification> Notifications { get; set; }
     }
 }
