@@ -25,8 +25,28 @@ namespace LBi.LostDoc.Repository.Web.Views
     {
         public static string ToHumanReadableString(this TimeSpan timeSpan)
         {
-            // TODO implement this properly
-            return timeSpan.ToString();
+            if (timeSpan.TotalDays > 7)
+                return string.Format("{0:N0} weeks", timeSpan.TotalDays/7);
+
+            if (timeSpan.TotalDays >= 1)
+                return string.Format("{0:N0} days", timeSpan.TotalDays);
+
+            if (timeSpan.TotalHours >= 2)
+                return string.Format("{0:N0} hours", timeSpan.TotalHours);
+
+            if (timeSpan.TotalHours >= 1)
+                return string.Format("{0:N0} hour", timeSpan.TotalHours);
+
+            if (timeSpan.TotalMinutes >= 2)
+                return string.Format("{0:N0} minutes", timeSpan.TotalMinutes);
+
+            if (timeSpan.TotalMinutes >= 1)
+                return string.Format("{0:N0} minute", timeSpan.TotalMinutes);
+
+            if (timeSpan.TotalSeconds >= 5)
+                return string.Format("less than one minute");
+
+            return string.Format("{0:N0} seconds", timeSpan.TotalSeconds);
         }
     }
 }
