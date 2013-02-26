@@ -156,6 +156,7 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SiteController.cs" />
     <Compile Include="DisposableExtensions.cs" />
+    <Compile Include="Extensibility\MefControllerFactory.cs" />
     <Compile Include="Models\AssemblyVersion.cs" />
     <Compile Include="Models\FileDescriptor.cs" />
     <Compile Include="Controllers\RepositoryController.cs" />

@@ -22,14 +22,22 @@ using System.Web;
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Packaging;
+using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Notifications;
 
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
+    public static class Groups
+    {
+        public const string Core = "__Core";
+    }
+
+    [AdminController("Add-ins", Group = Groups.Core, Order = 1)]
     public class AddInController : Controller
     {
         // default action is to list all installed add-ins
+        [AdminAction("Installed add-ins", IsDefault = true)]
         public ActionResult Index()
         {
 
@@ -54,6 +62,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             return App.Instance.AddIns.Repository.GetUpdate(pkg, true) != null;
         }
 
+        [AdminAction("Repository", IsDefault = true)]
         public ActionResult Repository()
         {
             const int count = 10;

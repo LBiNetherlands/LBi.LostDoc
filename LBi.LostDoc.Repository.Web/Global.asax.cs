@@ -24,12 +24,13 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using LBi.LostDoc;
-using LBi.LostDoc.Composition;
 using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Repository.Web.Areas.Administration;
+using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 using LBi.LostDoc.Templating.FileProviders;
+using ContractNames = LBi.LostDoc.Composition.ContractNames;
 
 namespace LBi.LostDoc.Repository.Web
 {
@@ -185,8 +186,8 @@ namespace LBi.LostDoc.Repository.Web
                                               Template = template
                                           });
 
-            // set up notifaction system
 
+            // set up notifaction system
             NotificationManager notifications = new NotificationManager();
 
             // initialize app-singleton
@@ -197,6 +198,12 @@ namespace LBi.LostDoc.Repository.Web
             AreaRegistration.RegisterAllAreas();
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
+
+
+            //TODO FIX THIS
+            var controllerFactory = ControllerBuilder.Current.GetControllerFactory();
+            ControllerBuilder.Current.SetControllerFactory(new MefControllerFactory(container, controllerFactory));
+            //GlobalConfiguration.Configuration.Services,.
         }
 
     }

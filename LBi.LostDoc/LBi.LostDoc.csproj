@@ -57,6 +57,7 @@
     <Compile Include="Bundle.cs" />
     <Compile Include="Composition\ContractNames.cs" />
     <Compile Include="Composition\MetadataContractBasedImportDefinition.cs" />
+    <Compile Include="Composition\MetadataContractBuilder.cs" />
     <Compile Include="Diagnostics\TraceActivity.cs" />
     <Compile Include="Diagnostics\TraceExtensions.cs" />
     <Compile Include="Diagnostics\TraceSources.cs" />
