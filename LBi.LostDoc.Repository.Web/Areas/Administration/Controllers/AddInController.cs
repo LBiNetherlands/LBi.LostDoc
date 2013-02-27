@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -33,7 +34,9 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public const string Core = "__Core";
     }
 
+
     [AdminController("Add-ins", Group = Groups.Core, Order = 1)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class AddInController : Controller
     {
         // default action is to list all installed add-ins
@@ -56,11 +59,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                             });
         }
 
-        private bool CheckForUpdates(AddInPackage pkg)
-        {
-            // TODO fix prerelase hack
-            return App.Instance.AddIns.Repository.GetUpdate(pkg, true) != null;
-        }
+
 
         [AdminAction("Repository", IsDefault = true)]
         public ActionResult Repository()
@@ -79,7 +78,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             return View(new SearchResultModel
                             {
                                 Results = results,
-                                NextOffset = results.Length == count ? count: (int?) null
+                                NextOffset = results.Length == count ? count : (int?)null
                             });
         }
 
@@ -103,16 +102,11 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                             });
         }
 
-        private bool CheckInstalled(AddInPackage pkg)
-        {
-            return App.Instance.AddIns.Contains(pkg);
-        }
-
         [HttpPost]
         public ActionResult Install([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
         {
             ActionResult ret;
-            var pkg =  App.Instance.AddIns.Repository.Get(id, version);
+            var pkg = App.Instance.AddIns.Repository.Get(id, version);
             if (pkg == null)
             {
                 ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
@@ -204,6 +198,17 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             }
             return ret;
 
+        }
+
+        private bool CheckInstalled(AddInPackage pkg)
+        {
+            return App.Instance.AddIns.Contains(pkg);
+        }
+
+        private bool CheckForUpdates(AddInPackage pkg)
+        {
+            // TODO fix prerelase hack
+            return App.Instance.AddIns.Repository.GetUpdate(pkg, true) != null;
         }
     }
 }

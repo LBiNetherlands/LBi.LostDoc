@@ -54,12 +54,14 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class AdminControllerAttribute : ExportAttribute, IControllerMetadata
     {
+        private readonly string _name;
+
         public AdminControllerAttribute(string name) : base(ContractNames.AdminController, typeof(IController))
         {
-            this.Name = name;
+            this._name= name;
         }
 
-        public string Name { get; protected set; }
+        public string Name { get { return this._name; } }
 
         public string Group { get; set; }
         public double Order { get; set; }

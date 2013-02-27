@@ -30,34 +30,38 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
     public class MefControllerFactory : IControllerFactory
     {
+        private readonly object _key;
         private readonly CompositionContainer _container;
         private readonly IControllerFactory _nestedFactory;
+        private readonly MetadataContractBuilder<IController, IControllerMetadata> _importBuilder;
 
         public MefControllerFactory(CompositionContainer container, IControllerFactory controllerFactory)
         {
+            this._key = new object();
             this._container = container;
             this._nestedFactory = controllerFactory;
+            this._importBuilder = new MetadataContractBuilder<IController, IControllerMetadata>(ImportCardinality.ExactlyOne, CreationPolicy.NonShared);
+            this._importBuilder.Add((contract, meta) => StringComparer.OrdinalIgnoreCase.Equals(meta.Name, contract.Name));
         }
 
         public IController CreateController(RequestContext requestContext, string controllerName)
         {
             IController ret;
 
-            var importBuilder = new MetadataContractBuilder<IController, IControllerMetadata>(ImportCardinality.ExactlyOne, CreationPolicy.NonShared);
-            importBuilder.Add(m => StringComparer.OrdinalIgnoreCase.Equals(m.Name, controllerName));
-            ImportDefinition importDefinition = importBuilder.GetImportDefinition(); 
+            ImportDefinition importDefinition = this._importBuilder.WithValue(c => c.Name, controllerName);
+                                                                   //.WithValue(c => c.OtherMetaData, "SomeValue");
 
             Export export = this._container.GetExports(importDefinition).SingleOrDefault();
             if (export != null)
             {
                 ret = (IController) export.Value;
-                requestContext.HttpContext.Items[this] = this;
+                requestContext.HttpContext.Items[this._key] = this;
             }
             else
             {
                 ret = this._nestedFactory.CreateController(requestContext, controllerName);
                 if (ret != null)
-                    requestContext.HttpContext.Items[this] = this._nestedFactory;
+                    requestContext.HttpContext.Items[this._key] = this._nestedFactory;
             }
 
 
@@ -72,7 +76,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
         public void ReleaseController(IController controller)
         {
-            IControllerFactory factory = HttpContext.Current.Items[this] as IControllerFactory;
+            IControllerFactory factory = HttpContext.Current.Items[this._key] as IControllerFactory;
             if (factory == this)
             {
                 IDisposable disposable = controller as IDisposable;

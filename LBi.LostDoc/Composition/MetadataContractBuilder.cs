@@ -22,38 +22,50 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Threading;
 
 namespace LBi.LostDoc.Composition
 {
+
     public class MetadataContractBuilder<T, TMetadata>
     {
-        private readonly List<Expression<Func<TMetadata, bool>>> _constraints;
+        private static long _counter = 0;
+
+        private readonly List<Expression<Func<TMetadata, TMetadata, bool>>> _constraints;
         private readonly List<KeyValuePair<string, Type>> _metadata;
         private readonly ImportCardinality _cardinality;
         private readonly CreationPolicy _creationPolicy;
+        private Func<TMetadata, ExportDefinition, bool> _constraint;
+        private Type _metadataType;
+        private Func<TMetadata> _metadataCtor;
+        private Action<TMetadata, object>[] _propSetters;
+        private PropertyInfo[] _interfaceProperties;
 
         public MetadataContractBuilder(ImportCardinality importCardinality, CreationPolicy creationPolicy)
         {
             this._cardinality = importCardinality;
             this._creationPolicy = creationPolicy;
-            this._constraints = new List<Expression<Func<TMetadata, bool>>>();
+            this._constraints = new List<Expression<Func<TMetadata, TMetadata, bool>>>();
             this._metadata = new List<KeyValuePair<string, Type>>();
         }
 
-        public ImportDefinition GetImportDefinition()
+        public void Prepare()
         {
-            return new MetadataContract(this._metadata,
-                                        this.CompileConstraint(this._constraints),
-                                        this._cardinality,
-                                        this._creationPolicy);
+            if (this._constraint == null)
+            {
+                this._constraint = this.CompileConstraint(this._constraints);
+                this.CreateMetadataImpl(typeof(TMetadata));
+            }
         }
 
-        private Func<ExportDefinition, bool> CompileConstraint(IEnumerable<Expression<Func<TMetadata, bool>>> constraints)
+
+        private Func<TMetadata, ExportDefinition, bool> CompileConstraint(IEnumerable<Expression<Func<TMetadata, TMetadata, bool>>> constraints)
         {
             ParameterExpression exportDefParam = Expression.Parameter(typeof(ExportDefinition), "exportDefinition");
+            ParameterExpression contractParam = Expression.Parameter(typeof(TMetadata), "contract");
 
             ParameterExpression metadataParam = Expression.Variable(typeof(TMetadata), "metadata");
-
 
             MethodInfo convertMethod = typeof(AttributedModelServices).GetMethod("GetMetadataView",
                                                                                  BindingFlags.Static | BindingFlags.Public);
@@ -65,9 +77,11 @@ namespace LBi.LostDoc.Composition
             Expression convertExpr = Expression.Assign(metadataParam,
                                                        Expression.Call(null, convertMethod, metadataExpr));
             Expression bodyExpr = null;
-            foreach (Expression<Func<TMetadata, bool>> constraint in constraints)
+            foreach (Expression<Func<TMetadata, TMetadata, bool>> constraint in constraints)
             {
                 Expression newConstraint = new ParameterRewriter(constraint.Parameters[0], metadataParam).Visit(constraint.Body);
+                newConstraint = new ParameterRewriter(constraint.Parameters[1], contractParam).Visit(newConstraint);
+
                 if (bodyExpr == null)
                     bodyExpr = newConstraint;
                 else
@@ -77,14 +91,97 @@ namespace LBi.LostDoc.Composition
             if (bodyExpr == null)
                 bodyExpr = Expression.Constant(true, typeof(bool));
 
-            Expression<Func<ExportDefinition, bool>> lambdaExpr =
-                Expression.Lambda<Func<ExportDefinition, bool>>(
-                    Expression.Block(new[] {metadataParam}, convertExpr, bodyExpr), exportDefParam);
+            Expression<Func<TMetadata, ExportDefinition, bool>> lambdaExpr =
+                Expression.Lambda<Func<TMetadata, ExportDefinition, bool>>(
+                    Expression.Block(new[] { metadataParam }, convertExpr, bodyExpr), contractParam, exportDefParam);
 
             return lambdaExpr.Compile();
         }
 
-        public void Add(Expression<Func<TMetadata, bool>> constraint)
+        private void CreateMetadataImpl(Type interfaceType)
+        {
+            if (!interfaceType.IsInterface)
+                throw new ArgumentException("Not an interface.", "interfaceType");
+
+            AssemblyName assemblyName =
+                new AssemblyName(string.Format("LBi.LostDoc.Composition.MetadataContractBuilder`2____<{0}>{1}",
+                                               Interlocked.Increment(ref _counter),
+                                               interfaceType.Name));
+
+            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName,
+                                                                                            AssemblyBuilderAccess.RunAndCollect);
+
+            ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("RunTimeCompiled");
+
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(interfaceType.Name.Substring(1) + "Proxy",
+                                                               TypeAttributes.Public |
+                                                               TypeAttributes.Sealed |
+                                                               TypeAttributes.Class,
+                                                               typeof(object),
+                                                               new[] { interfaceType });
+
+            this._interfaceProperties = interfaceType.GetProperties();
+            FieldBuilder[] fields = new FieldBuilder[this._interfaceProperties.Length];
+            PropertyBuilder[] realProperties = new PropertyBuilder[this._interfaceProperties.Length];
+
+
+            for (int i = 0; i < this._interfaceProperties.Length; i++)
+            {
+                // 1. create one field per property
+                fields[i] = typeBuilder.DefineField("_" + this._interfaceProperties[i].Name,
+                                                    this._interfaceProperties[i].PropertyType,
+                                                    FieldAttributes.Public);
+
+
+                // 2. create property getter
+                realProperties[i] = typeBuilder.DefineProperty(this._interfaceProperties[i].Name,
+                                                                PropertyAttributes.HasDefault,
+                                                                CallingConventions.ExplicitThis,
+                                                                this._interfaceProperties[i].PropertyType,
+                                                                Type.EmptyTypes);
+
+
+                MethodBuilder getMethod = typeBuilder.DefineMethod("get_" + this._interfaceProperties[i].Name,
+                                                                   MethodAttributes.Public
+                                                                   | MethodAttributes.Final
+                                                                   | MethodAttributes.Virtual
+                                                                   | MethodAttributes.HideBySig
+                                                                   | MethodAttributes.VtableLayoutMask
+                                                                   | MethodAttributes.SpecialName,
+                                                                   CallingConventions.HasThis,
+                                                                   this._interfaceProperties[i].PropertyType,
+                                                                   Type.EmptyTypes);
+
+
+                ILGenerator ilGen = getMethod.GetILGenerator();
+                ilGen.Emit(OpCodes.Ldloc_0);
+                ilGen.Emit(OpCodes.Ldfld, fields[i]);
+                ilGen.Emit(OpCodes.Ret);
+
+                realProperties[i].SetGetMethod(getMethod);
+            }
+
+            // 3. create a CTOR
+            ConstructorInfo defaultCtor = typeBuilder.DefineDefaultConstructor(MethodAttributes.Public);
+
+            this._metadataType = typeBuilder.CreateType();
+
+            this._metadataCtor = Expression.Lambda<Func<TMetadata>>(Expression.New(this._metadataType)).Compile();
+            this._propSetters = new Action<TMetadata, object>[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
+            {
+                ParameterExpression instanceParam = Expression.Parameter(interfaceType, "this");
+                ParameterExpression valueParam = Expression.Parameter(typeof(object), "value");
+                this._propSetters[i] =
+                    Expression.Lambda<Action<TMetadata, object>>(
+                        Expression.Assign(Expression.Field(Expression.Convert(instanceParam, this._metadataType),
+                                                           fields[i].Name),
+                                          Expression.Convert(valueParam, fields[i].FieldType)), instanceParam,
+                        valueParam).Compile();
+            }
+        }
+
+        public void Add(Expression<Func<TMetadata, TMetadata, bool>> constraint)
         {
             // hold on to for usage later
             this._constraints.Add(constraint);
@@ -99,12 +196,14 @@ namespace LBi.LostDoc.Composition
 
         private class MetadataContract : ContractBasedImportDefinition
         {
-            private readonly Func<ExportDefinition, bool> _constraint;
+            private readonly Func<TMetadata, ExportDefinition, bool> _constraint;
+            private readonly TMetadata _contract;
 
             public MetadataContract(IEnumerable<KeyValuePair<string, Type>> metadata,
-                                    Func<ExportDefinition, bool> constraint,
+                                    Func<TMetadata, ExportDefinition, bool> constraint,
                                     ImportCardinality importCardinality,
-                                    CreationPolicy creationPolicy)
+                                    CreationPolicy creationPolicy,
+                TMetadata contract)
                 : base(AttributedModelServices.GetContractName(typeof(T)),
                        null,
                        metadata,
@@ -114,6 +213,7 @@ namespace LBi.LostDoc.Composition
                        creationPolicy)
             {
                 this._constraint = constraint;
+                this._contract = contract;
             }
 
 
@@ -122,7 +222,7 @@ namespace LBi.LostDoc.Composition
                 bool ret = base.IsConstraintSatisfiedBy(exportDefinition);
 
                 if (ret)
-                    ret = this._constraint(exportDefinition);
+                    ret = this._constraint(_contract, exportDefinition);
 
                 return ret;
             }
@@ -173,6 +273,63 @@ namespace LBi.LostDoc.Composition
 
                 return base.VisitParameter(node);
             }
+        }
+
+        public class MetadataValueBuilder
+        {
+            private readonly MetadataContractBuilder<T, TMetadata> _owner;
+            private TMetadata _instance;
+
+            public MetadataValueBuilder(MetadataContractBuilder<T, TMetadata> owner)
+            {
+                this._owner = owner;
+                this._instance = this._owner._metadataCtor();
+            }
+
+            public MetadataValueBuilder WithValue<TReturn>(Expression<Func<TMetadata, TReturn>> propertyAccessor, TReturn value)
+            {
+                MemberExpression mexpr = propertyAccessor.Body as MemberExpression;
+                if (mexpr == null)
+                    throw new ArgumentException("Only property access is allowed.", "propertyAccessor");
+
+                PropertyInfo propInfo = mexpr.Member as PropertyInfo;
+                if (propInfo == null)
+                    throw new ArgumentException("Only property access is allowed.", "propertyAccessor");
+
+
+                this.SetValue(propInfo, value);
+
+
+                return this;
+            }
+
+            private void SetValue<TValue>(PropertyInfo interfacePropInfo, TValue value)
+            {
+                var ix = Array.IndexOf(this._owner._interfaceProperties, interfacePropInfo);
+                this._owner._propSetters[ix](this._instance, value);
+                //this._owner._metadataType.GetMethod({R})
+                // TODO WTF FIX THIS
+            }
+
+            public static implicit operator ImportDefinition(MetadataValueBuilder valueBuilder)
+            {
+                return valueBuilder.GetImportDefinition();
+            }
+
+            public ImportDefinition GetImportDefinition()
+            {
+                return new MetadataContract(this._owner._metadata,
+                                            this._owner._constraint,
+                                            this._owner._cardinality,
+                                            this._owner._creationPolicy,
+                                            this._instance);
+            }
+        }
+
+        public MetadataValueBuilder WithValue<TReturn>(Expression<Func<TMetadata, TReturn>> propertyAccessor, TReturn value)
+        {
+            this.Prepare();
+            return new MetadataValueBuilder(this).WithValue(propertyAccessor, value);
         }
     }
 }
