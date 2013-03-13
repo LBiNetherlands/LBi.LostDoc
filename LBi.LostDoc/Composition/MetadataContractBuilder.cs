@@ -23,6 +23,7 @@ using System.ComponentModel.Composition.Primitives;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 using System.Threading;
 
 namespace LBi.LostDoc.Composition
@@ -212,11 +213,14 @@ namespace LBi.LostDoc.Composition
 
         private class MetadataContract : ContractBasedImportDefinition
         {
+
+            private readonly Expression<Func<TMetadata, TMetadata, bool>>[] _constraints;
             private readonly Func<TMetadata, ExportDefinition, bool> _constraint;
             private readonly TMetadata _contract;
 
             public MetadataContract(string contractName,
                                     IEnumerable<KeyValuePair<string, Type>> metadata,
+                                    List<Expression<Func<TMetadata, TMetadata, bool>>> constraints,
                                     Func<TMetadata, ExportDefinition, bool> constraint,
                                     ImportCardinality importCardinality,
                                     CreationPolicy creationPolicy,
@@ -229,6 +233,7 @@ namespace LBi.LostDoc.Composition
                        false,
                        creationPolicy)
             {
+                this._constraints = constraints.ToArray();
                 this._constraint = constraint;
                 this._contract = contract;
             }
@@ -241,6 +246,32 @@ namespace LBi.LostDoc.Composition
                     ret = this._constraint(_contract, exportDefinition);
 
                 return ret;
+            }
+
+            public override string ToString()
+            {
+                StringBuilder ret = new StringBuilder(base.ToString());
+
+                ret.AppendLine();
+
+                ret.AppendLine("Constraints");
+
+                foreach (var constraint in this._constraints)
+                {
+                    ret.Append("\t");
+                    PropertyRefFinder finder = new PropertyRefFinder(constraint.Parameters[0]);
+                    finder.Visit(constraint);
+                    Expression newConstraint = constraint;
+                    foreach (PropertyInfo propertyInfo in finder)
+                    {
+                        PropertyRefRewriter rewriter = new PropertyRefRewriter(constraint.Parameters[0], propertyInfo, propertyInfo.GetValue(this._contract));
+                        newConstraint = rewriter.Visit(newConstraint);
+                    }
+
+                    ret.AppendLine(newConstraint.ToString());
+                }
+
+                return ret.ToString();
             }
         }
 
@@ -291,6 +322,29 @@ namespace LBi.LostDoc.Composition
             }
         }
 
+        private class PropertyRefRewriter : ExpressionVisitor
+        {
+            private readonly PropertyInfo _propertyInfo;
+            private readonly Expression _objectExpr;
+            private readonly object _propertyValue;
+
+            public PropertyRefRewriter(Expression objectExpr, PropertyInfo propertyInfo, object value)
+            {
+                this._objectExpr = objectExpr;
+                this._propertyInfo = propertyInfo;
+                this._propertyValue = value;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node.Member == this._propertyInfo && node.Expression == this._objectExpr)
+                {
+                    return Expression.Constant(this._propertyValue, this._propertyInfo.PropertyType);
+                }
+                return base.VisitMember(node);
+            }
+        }
+
         public class MetadataValueBuilder
         {
             private readonly MetadataContractBuilder<T, TMetadata> _owner;
@@ -336,6 +390,7 @@ namespace LBi.LostDoc.Composition
             {
                 return new MetadataContract(this._owner._contractName,
                                             this._owner._metadata,
+                                            this._owner._constraints,
                                             this._owner._constraint,
                                             this._owner._cardinality,
                                             this._owner._creationPolicy,
