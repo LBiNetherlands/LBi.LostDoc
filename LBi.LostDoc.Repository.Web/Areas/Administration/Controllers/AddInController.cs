@@ -21,6 +21,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using LBi.LostDoc.Packaging.Composition;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Repository.Web.Extensibility;
@@ -35,7 +36,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
     }
 
 
-    [AdminController("Add-ins", Group = Groups.Core, Order = 1)]
+    [AdminController("addins", Group = Groups.Core, Order = 1)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class AddInController : Controller
     {

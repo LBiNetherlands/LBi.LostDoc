@@ -15,54 +15,25 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-    public static class ContractNames
-    {
-        public const string AdminController = "AdministrationController";
-    }
-
-    public interface IControllerMetadata
-    {
-        string Name { get; }
-        string Group { get; }
-        double Order { get; }
-    }
-
-
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class AdminActionAttribute : Attribute
-    {
-        public AdminActionAttribute(string name)
-        {
-            this.Name = name;
-        }
-
-        public string Name { get; protected set; }
-        
-        public bool IsDefault { get; set; }
-        public double Order { get; set; }
-    }
-
+    [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class AdminControllerAttribute : ExportAttribute, IControllerMetadata
+    public class AdminControllerAttribute : ExportAttribute
     {
         private readonly string _name;
 
         public AdminControllerAttribute(string name) : base(ContractNames.AdminController, typeof(IController))
         {
             this._name= name;
+            this.Text = name;
         }
 
         public string Name { get { return this._name; } }
-
+        public string Text { get; protected set; }
         public string Group { get; set; }
         public double Order { get; set; }
     }

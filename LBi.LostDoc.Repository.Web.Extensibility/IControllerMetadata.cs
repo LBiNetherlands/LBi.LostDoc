@@ -14,25 +14,20 @@
  * limitations under the License. 
  */
 
-using System.Web.Mvc;
-
-namespace LBi.LostDoc.Repository.Web.Areas.Administration
+namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-    public class AdministrationAreaRegistration : AreaRegistration
+    // TODO is this the way to go?
+    public interface IAddInMetadata
     {
-        public override string AreaName
-        {
-            get { return Name; }
-        }
+        string PackageId { get; }
+        string PackageVersion { get; }
+    }
 
-        public const string Name = "Administration";
-
-        public override void RegisterArea(AreaRegistrationContext context)
-        {
-            context.MapRoute(
-                "Administration_default",
-                "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/{id}",
-                new {action = "Index", id = UrlParameter.Optional});
-        }
+    public interface IControllerMetadata : IAddInMetadata
+    {
+        string Name { get; }
+        string Text { get; }
+        string Group { get; }
+        double Order { get; }
     }
 }

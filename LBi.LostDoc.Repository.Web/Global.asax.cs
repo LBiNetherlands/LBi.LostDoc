@@ -15,8 +15,10 @@
  */
 
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web.Hosting;
 using System.Web.Http;
 using System.Web.Http.WebHost.Routing;
@@ -25,6 +27,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using LBi.LostDoc;
 using LBi.LostDoc.Packaging;
+using LBi.LostDoc.Packaging.Composition;
 using LBi.LostDoc.Repository.Web.Areas.Administration;
 using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Notifications;
@@ -149,7 +152,12 @@ namespace LBi.LostDoc.Repository.Web
                                                         isOfficial: true);
 
             // intialize MEF
-            AggregateCatalog catalog = new AggregateCatalog(new ApplicationCatalog());
+            var currentAssembly = Assembly.GetExecutingAssembly();
+            var assemblyName = currentAssembly.GetName();
+            string corePackageId = assemblyName.Name;
+            string corePackageVersion = assemblyName.Version.ToString();
+            AggregateCatalog catalog =
+                new AggregateCatalog(new AddInCatalog(new ApplicationCatalog(), corePackageId, corePackageVersion));
 
             // load other sources from site-settings (not config)
             AddInRepository repository = new AddInRepository(officalSource);
@@ -157,10 +165,13 @@ namespace LBi.LostDoc.Repository.Web
             
             // hook event so that installed add-ins get registered in the catalog, if composition occurs after this fires
             // or if recomposition is enabled, no restart should be requried
-            addInManager.Installed += (sender, args) => catalog.Catalogs.Add(new DirectoryCatalog(args.InstallationPath));
+            addInManager.Installed +=
+                (sender, args) => catalog.Catalogs.Add(new AddInCatalog(new DirectoryCatalog(args.InstallationPath),
+                                                                        args.Package.Id,
+                                                                        args.Package.Version));
             
             // delete and redeploy all installed packages, this will trigger the Installed event ^
-            // this acts as a crude "remove plugins that were in use when uninstalled" hack
+            // this acts as a crude "remove plugins that were in use when un/installed" hack
             addInManager.Restore();
 
    
@@ -200,10 +211,9 @@ namespace LBi.LostDoc.Repository.Web
             RegisterRoutes(RouteTable.Routes);
 
 
-            //TODO FIX THIS
-            var controllerFactory = ControllerBuilder.Current.GetControllerFactory();
-            ControllerBuilder.Current.SetControllerFactory(new MefControllerFactory(container, controllerFactory));
-            //GlobalConfiguration.Configuration.Services,.
+            IControllerFactory oldControllerFactory = ControllerBuilder.Current.GetControllerFactory();
+            IControllerFactory newControllerFactory = new AddInControllerFactory(AdministrationAreaRegistration.Name, container, oldControllerFactory);
+            ControllerBuilder.Current.SetControllerFactory(newControllerFactory);
         }
 
     }

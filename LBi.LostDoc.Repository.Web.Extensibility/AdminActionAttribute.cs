@@ -14,25 +14,21 @@
  * limitations under the License. 
  */
 
-using System.Web.Mvc;
+using System;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration
+namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-    public class AdministrationAreaRegistration : AreaRegistration
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public class AdminActionAttribute : Attribute
     {
-        public override string AreaName
+        public AdminActionAttribute(string name)
         {
-            get { return Name; }
+            this.Name = name;
         }
 
-        public const string Name = "Administration";
-
-        public override void RegisterArea(AreaRegistrationContext context)
-        {
-            context.MapRoute(
-                "Administration_default",
-                "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/{id}",
-                new {action = "Index", id = UrlParameter.Optional});
-        }
+        public string Name { get; protected set; }
+        
+        public bool IsDefault { get; set; }
+        public double Order { get; set; }
     }
 }

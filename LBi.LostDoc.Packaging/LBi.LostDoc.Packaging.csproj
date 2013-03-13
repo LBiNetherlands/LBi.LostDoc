@@ -35,6 +35,7 @@
       <HintPath>..\packages\Nuget.Core.2.2.0\lib\net40-Client\NuGet.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,6 +49,7 @@
     <Compile Include="AddInPackage.cs" />
     <Compile Include="AddInRepository.cs" />
     <Compile Include="AddInSource.cs" />
+    <Compile Include="Composition\AddInCatalog.cs" />
     <Compile Include="PackageEventArgs.cs" />
     <Compile Include="PackageResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

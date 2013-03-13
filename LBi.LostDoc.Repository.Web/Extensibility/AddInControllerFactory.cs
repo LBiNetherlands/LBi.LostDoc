@@ -28,43 +28,56 @@ using LBi.LostDoc.Composition;
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
 
-    public class MefControllerFactory : IControllerFactory
+    public class AddInControllerFactory : IControllerFactory
     {
         private readonly object _key;
         private readonly CompositionContainer _container;
         private readonly IControllerFactory _nestedFactory;
         private readonly MetadataContractBuilder<IController, IControllerMetadata> _importBuilder;
+        private readonly string _areaName;
 
-        public MefControllerFactory(CompositionContainer container, IControllerFactory controllerFactory)
+        public AddInControllerFactory(string areaName, CompositionContainer container, IControllerFactory controllerFactory)
         {
+            this._areaName = areaName;
             this._key = new object();
             this._container = container;
             this._nestedFactory = controllerFactory;
-            this._importBuilder = new MetadataContractBuilder<IController, IControllerMetadata>(ImportCardinality.ExactlyOne, CreationPolicy.NonShared);
+            this._importBuilder =
+                new MetadataContractBuilder<IController, IControllerMetadata>(ContractNames.AdminController,
+                                                                              ImportCardinality.ExactlyOne,
+                                                                              CreationPolicy.NonShared);
+
             this._importBuilder.Add((contract, meta) => StringComparer.OrdinalIgnoreCase.Equals(meta.Name, contract.Name));
+            this._importBuilder.Add((contract, meta) => StringComparer.Ordinal.Equals(meta.PackageId, contract.PackageId));
+            this._importBuilder.Add((contract, meta) => StringComparer.Ordinal.Equals(meta.PackageVersion, contract.PackageVersion));
         }
 
         public IController CreateController(RequestContext requestContext, string controllerName)
         {
-            IController ret;
+            IController ret = null;
 
-            ImportDefinition importDefinition = this._importBuilder.WithValue(c => c.Name, controllerName);
-                                                                   //.WithValue(c => c.OtherMetaData, "SomeValue");
-
-            Export export = this._container.GetExports(importDefinition).SingleOrDefault();
-            if (export != null)
+            if (StringComparer.OrdinalIgnoreCase.Equals(requestContext.RouteData.DataTokens["area"], this._areaName))
             {
-                ret = (IController) export.Value;
-                requestContext.HttpContext.Items[this._key] = this;
+                ImportDefinition importDefinition = this._importBuilder
+                                                        .WithValue(c => c.Name, controllerName)
+                                                        .WithValue(c => c.PackageId, requestContext.RouteData.Values["packageId"])
+                                                        .WithValue(c => c.PackageVersion, requestContext.RouteData.Values["packageVersion"]);
+
+                Export export = this._container.GetExports(importDefinition).SingleOrDefault();
+                if (export != null)
+                {
+                    ret = (IController) export.Value;
+                    requestContext.HttpContext.Items[this._key] = this;
+                }
             }
-            else
+            
+
+            if (ret == null)
             {
                 ret = this._nestedFactory.CreateController(requestContext, controllerName);
                 if (ret != null)
                     requestContext.HttpContext.Items[this._key] = this._nestedFactory;
             }
-
-
 
             return ret;
         }

@@ -27,9 +27,10 @@ using System.Threading;
 
 namespace LBi.LostDoc.Composition
 {
-
+    // TODO this turned into a crazy amount of code just to make the API for using it nicer, is it really worth it?
     public class MetadataContractBuilder<T, TMetadata>
     {
+        // TODO this probably not what I wanted
         private static long _counter = 0;
 
         private readonly List<Expression<Func<TMetadata, TMetadata, bool>>> _constraints;
@@ -41,13 +42,22 @@ namespace LBi.LostDoc.Composition
         private Func<TMetadata> _metadataCtor;
         private Action<TMetadata, object>[] _propSetters;
         private PropertyInfo[] _interfaceProperties;
+        private string _contractName;
 
-        public MetadataContractBuilder(ImportCardinality importCardinality, CreationPolicy creationPolicy)
+
+        public MetadataContractBuilder(string contractName, ImportCardinality importCardinality, CreationPolicy creationPolicy)
         {
+            this._contractName = contractName ?? AttributedModelServices.GetContractName(typeof(T));
             this._cardinality = importCardinality;
             this._creationPolicy = creationPolicy;
             this._constraints = new List<Expression<Func<TMetadata, TMetadata, bool>>>();
             this._metadata = new List<KeyValuePair<string, Type>>();
+        }
+
+        public MetadataContractBuilder(ImportCardinality importCardinality, CreationPolicy creationPolicy)
+            : this(null, importCardinality, creationPolicy)
+        {
+
         }
 
         public void Prepare()
@@ -63,9 +73,9 @@ namespace LBi.LostDoc.Composition
         private Func<TMetadata, ExportDefinition, bool> CompileConstraint(IEnumerable<Expression<Func<TMetadata, TMetadata, bool>>> constraints)
         {
             ParameterExpression exportDefParam = Expression.Parameter(typeof(ExportDefinition), "exportDefinition");
-            ParameterExpression contractParam = Expression.Parameter(typeof(TMetadata), "contract");
+            ParameterExpression contractParam = Expression.Parameter(typeof(TMetadata), "@contract");
 
-            ParameterExpression metadataParam = Expression.Variable(typeof(TMetadata), "metadata");
+            ParameterExpression metadataParam = Expression.Variable(typeof(TMetadata), "@metadata");
 
             MethodInfo convertMethod = typeof(AttributedModelServices).GetMethod("GetMetadataView",
                                                                                  BindingFlags.Static | BindingFlags.Public);
@@ -79,8 +89,8 @@ namespace LBi.LostDoc.Composition
             Expression bodyExpr = null;
             foreach (Expression<Func<TMetadata, TMetadata, bool>> constraint in constraints)
             {
-                Expression newConstraint = new ParameterRewriter(constraint.Parameters[0], metadataParam).Visit(constraint.Body);
-                newConstraint = new ParameterRewriter(constraint.Parameters[1], contractParam).Visit(newConstraint);
+                Expression newConstraint = new ParameterRewriter(constraint.Parameters[1], metadataParam).Visit(constraint.Body);
+                newConstraint = new ParameterRewriter(constraint.Parameters[0], contractParam).Visit(newConstraint);
 
                 if (bodyExpr == null)
                     bodyExpr = newConstraint;
@@ -120,7 +130,13 @@ namespace LBi.LostDoc.Composition
                                                                typeof(object),
                                                                new[] { interfaceType });
 
-            this._interfaceProperties = interfaceType.GetProperties();
+            List<PropertyInfo> interfaceProperties = new List<PropertyInfo>();
+            interfaceProperties.AddRange(interfaceType.GetProperties());
+            foreach (var inheritedInterfaceType in interfaceType.GetInterfaces())
+                interfaceProperties.AddRange(inheritedInterfaceType.GetProperties());
+
+            this._interfaceProperties = interfaceProperties.ToArray();
+
             FieldBuilder[] fields = new FieldBuilder[this._interfaceProperties.Length];
             PropertyBuilder[] realProperties = new PropertyBuilder[this._interfaceProperties.Length];
 
@@ -154,7 +170,7 @@ namespace LBi.LostDoc.Composition
 
 
                 ILGenerator ilGen = getMethod.GetILGenerator();
-                ilGen.Emit(OpCodes.Ldloc_0);
+                ilGen.Emit(OpCodes.Ldarg_0);
                 ilGen.Emit(OpCodes.Ldfld, fields[i]);
                 ilGen.Emit(OpCodes.Ret);
 
@@ -199,13 +215,14 @@ namespace LBi.LostDoc.Composition
             private readonly Func<TMetadata, ExportDefinition, bool> _constraint;
             private readonly TMetadata _contract;
 
-            public MetadataContract(IEnumerable<KeyValuePair<string, Type>> metadata,
+            public MetadataContract(string contractName,
+                                    IEnumerable<KeyValuePair<string, Type>> metadata,
                                     Func<TMetadata, ExportDefinition, bool> constraint,
                                     ImportCardinality importCardinality,
                                     CreationPolicy creationPolicy,
                 TMetadata contract)
-                : base(AttributedModelServices.GetContractName(typeof(T)),
-                       null,
+                : base(contractName,
+                       AttributedModelServices.GetContractName(typeof(T)),
                        metadata,
                        importCardinality,
                        false,
@@ -215,7 +232,6 @@ namespace LBi.LostDoc.Composition
                 this._constraint = constraint;
                 this._contract = contract;
             }
-
 
             public override bool IsConstraintSatisfiedBy(ExportDefinition exportDefinition)
             {
@@ -305,10 +321,10 @@ namespace LBi.LostDoc.Composition
 
             private void SetValue<TValue>(PropertyInfo interfacePropInfo, TValue value)
             {
+                // TODO figure out if this can be made faster, sorted list & binary search, dictionary, based on interfacePropInfo.MetadataToken?
+
                 var ix = Array.IndexOf(this._owner._interfaceProperties, interfacePropInfo);
                 this._owner._propSetters[ix](this._instance, value);
-                //this._owner._metadataType.GetMethod({R})
-                // TODO WTF FIX THIS
             }
 
             public static implicit operator ImportDefinition(MetadataValueBuilder valueBuilder)
@@ -318,7 +334,8 @@ namespace LBi.LostDoc.Composition
 
             public ImportDefinition GetImportDefinition()
             {
-                return new MetadataContract(this._owner._metadata,
+                return new MetadataContract(this._owner._contractName,
+                                            this._owner._metadata,
                                             this._owner._constraint,
                                             this._owner._cardinality,
                                             this._owner._creationPolicy,
