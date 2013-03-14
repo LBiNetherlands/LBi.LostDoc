@@ -27,9 +27,11 @@ using LBi.LostDoc.Composition;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-
     public class AddInControllerFactory : IControllerFactory
     {
+        private static readonly object _metadataKey = new object();
+        public static object MetadataKey { get { return _metadataKey; } }
+
         private readonly object _key;
         private readonly CompositionContainer _container;
         private readonly IControllerFactory _nestedFactory;
@@ -68,12 +70,18 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                 {
                     ret = (IController) export.Value;
                     requestContext.HttpContext.Items[this._key] = this;
+                    // store this for later as we already went throuh the trouble of resolving the Export
+                    requestContext.HttpContext.Items[MetadataKey] = AttributedModelServices.GetMetadataView<IControllerMetadata>(export.Metadata);
+                    
+                    // how bad is this?
+                    ((Controller)ret).ActionInvoker = new AddInActionInvoker();
                 }
             }
             
 
             if (ret == null)
             {
+                // TODO maybe make this throw a 404/return null/something else
                 ret = this._nestedFactory.CreateController(requestContext, controllerName);
                 if (ret != null)
                     requestContext.HttpContext.Items[this._key] = this._nestedFactory;

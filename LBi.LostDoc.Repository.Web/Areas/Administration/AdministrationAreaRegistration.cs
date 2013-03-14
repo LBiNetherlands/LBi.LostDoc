@@ -31,8 +31,8 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
         {
             context.MapRoute(
                 "Administration_default",
-                "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/{id}",
-                new {action = "Index", id = UrlParameter.Optional});
+                "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/",
+                new {action = "Index"});
         }
     }
 }

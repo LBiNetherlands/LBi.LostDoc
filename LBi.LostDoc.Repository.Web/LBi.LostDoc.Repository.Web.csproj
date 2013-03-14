@@ -156,6 +156,7 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SiteController.cs" />
     <Compile Include="DisposableExtensions.cs" />
+    <Compile Include="Extensibility\AddInActionInvoker.cs" />
     <Compile Include="Extensibility\AddInControllerFactory.cs" />
     <Compile Include="Models\AssemblyVersion.cs" />
     <Compile Include="Models\FileDescriptor.cs" />
@@ -236,10 +237,10 @@
   <ItemGroup>
     <Content Include="Areas\Administration\Views\Web.config" />
     <Content Include="Areas\Administration\Views\Shared\_Layout.cshtml" />
-    <Content Include="Areas\Administration\Views\AddIn\Index.cshtml" />
-    <Content Include="Areas\Administration\Views\AddIn\_CompactView.cshtml" />
-    <Content Include="Areas\Administration\Views\AddIn\Repository.cshtml" />
-    <Content Include="Areas\Administration\Views\AddIn\Search.cshtml" />
+    <Content Include="Areas\Administration\Views\AddIns\Installed.cshtml" />
+    <Content Include="Areas\Administration\Views\AddIns\_CompactView.cshtml" />
+    <Content Include="Areas\Administration\Views\AddIns\Repository.cshtml" />
+    <Content Include="Areas\Administration\Views\AddIns\Search.cshtml" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
   </ItemGroup>
   <ItemGroup>

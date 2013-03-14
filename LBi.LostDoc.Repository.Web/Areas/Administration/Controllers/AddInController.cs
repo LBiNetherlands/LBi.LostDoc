@@ -35,14 +35,14 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public const string Core = "__Core";
     }
 
-
-    [AdminController("addins", Group = Groups.Core, Order = 1)]
+    // TODO the TEXT isn't translateable, but it's good enough for now
+    [AdminController("addins", Text = "Add-ins", Group = Groups.Core, Order = 1)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class AddInController : Controller
     {
         // default action is to list all installed add-ins
-        [AdminAction("Installed add-ins", IsDefault = true)]
-        public ActionResult Index()
+        [AdminAction("installed", Text = "Installed", IsDefault = true)]
+        public ActionResult Installed()
         {
 
             return View(new AddInOverviewModel
@@ -62,7 +62,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 
 
 
-        [AdminAction("Repository", IsDefault = true)]
+        [AdminAction("repository", Text = "Repository")]
         public ActionResult Repository()
         {
             const int count = 10;
@@ -78,6 +78,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 
             return View(new SearchResultModel
                             {
+                                Title = "Results",
                                 Results = results,
                                 NextOffset = results.Length == count ? count : (int?)null
                             });
@@ -131,7 +132,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                         NotificationActions.Restart);
                 }
 
-                ret = this.Redirect(Url.Action("Index"));
+                ret = this.Redirect(Url.Action("Installed"));
             }
             return ret;
         }
@@ -163,7 +164,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                       pkg.Id),
                         NotificationActions.Restart);
                 }
-                ret = this.Redirect(Url.Action("Index"));
+                ret = this.Redirect(Url.Action("Installed"));
             }
             return ret;
         }
@@ -195,7 +196,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                       pkg.Id),
                         NotificationActions.Restart);
                 }
-                ret = this.Redirect(Url.Action("Index"));
+                ret = this.Redirect(Url.Action("Installed"));
             }
             return ret;
 

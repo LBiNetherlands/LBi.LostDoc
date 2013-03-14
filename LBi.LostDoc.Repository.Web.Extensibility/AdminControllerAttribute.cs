@@ -16,6 +16,7 @@
 
 using System;
 using System.ComponentModel.Composition;
+using System.Reflection;
 using System.Web.Mvc;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
@@ -33,8 +34,24 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
         }
 
         public string Name { get { return this._name; } }
-        public string Text { get; protected set; }
+        public string Text { get; set; }
         public string Group { get; set; }
         public double Order { get; set; }
+    }
+
+
+    public static class AdminAttributeServices
+    {
+        public static string GetText(Type controllerType)
+        {
+            // TODO maybe cache this?
+            return controllerType.GetCustomAttribute<AdminControllerAttribute>().Text;
+        }
+
+        public static string GetName(Type controllerType)
+        {
+            // TODO maybe cache this?
+            return controllerType.GetCustomAttribute<AdminControllerAttribute>().Name;
+        }
     }
 }

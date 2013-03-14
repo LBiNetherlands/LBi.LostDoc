@@ -25,5 +25,6 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
         public int? NextOffset { get; set; }
         public string Terms { get; set; }
         public AddInModel[] Results { get; set; }
+        public string Title { get; set; }
     }
 }
