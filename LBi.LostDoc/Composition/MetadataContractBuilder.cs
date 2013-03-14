@@ -31,21 +31,18 @@ namespace LBi.LostDoc.Composition
     // TODO this turned into a crazy amount of code just to make the API for using it nicer, is it really worth it?
     public class MetadataContractBuilder<T, TMetadata>
     {
-        // TODO this probably not what I wanted
-        private static long _counter = 0;
-
         private readonly List<Expression<Func<TMetadata, TMetadata, bool>>> _constraints;
         private readonly List<KeyValuePair<string, Type>> _metadata;
         private readonly ImportCardinality _cardinality;
         private readonly CreationPolicy _creationPolicy;
+        private readonly string _contractName;
+
         private Func<TMetadata, ExportDefinition, bool> _constraint;
         private Type _metadataType;
         private Func<TMetadata> _metadataCtor;
         private Action<TMetadata, object>[] _propSetters;
         private PropertyInfo[] _interfaceProperties;
-        private string _contractName;
-
-
+        
         public MetadataContractBuilder(string contractName, ImportCardinality importCardinality, CreationPolicy creationPolicy)
         {
             this._contractName = contractName ?? AttributedModelServices.GetContractName(typeof(T));
@@ -115,8 +112,8 @@ namespace LBi.LostDoc.Composition
                 throw new ArgumentException("Not an interface.", "interfaceType");
 
             AssemblyName assemblyName =
-                new AssemblyName(string.Format("LBi.LostDoc.Composition.MetadataContractBuilder`2____<{0}>{1}",
-                                               Interlocked.Increment(ref _counter),
+                new AssemblyName(string.Format("LBi.LostDoc.Composition.MetadataContractBuilder`2____<{0:n}>{1}",
+                                               Guid.NewGuid(),
                                                interfaceType.Name));
 
             AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName,
@@ -254,21 +251,26 @@ namespace LBi.LostDoc.Composition
 
                 ret.AppendLine();
 
-                ret.AppendLine("Constraints");
-
                 foreach (var constraint in this._constraints)
                 {
+                    ret.AppendLine("Expression");
+
                     ret.Append("\t");
                     PropertyRefFinder finder = new PropertyRefFinder(constraint.Parameters[0]);
                     finder.Visit(constraint);
-                    Expression newConstraint = constraint;
-                    foreach (PropertyInfo propertyInfo in finder)
-                    {
-                        PropertyRefRewriter rewriter = new PropertyRefRewriter(constraint.Parameters[0], propertyInfo, propertyInfo.GetValue(this._contract));
-                        newConstraint = rewriter.Visit(newConstraint);
-                    }
+                    
+                    ret.AppendLine(constraint.ToString());
 
-                    ret.AppendLine(newConstraint.ToString());
+                    ret.AppendLine("With Values");
+
+                    foreach (PropertyInfo propInfo in finder)
+                    {
+                        ret.Append("\t")
+                           .AppendLine(string.Format("{0}.{1} {2}",
+                                                     constraint.Parameters[0].Name,
+                                                     propInfo.Name,
+                                                     propInfo.GetValue(this._contract)));
+                    }
                 }
 
                 return ret.ToString();
@@ -322,29 +324,6 @@ namespace LBi.LostDoc.Composition
             }
         }
 
-        private class PropertyRefRewriter : ExpressionVisitor
-        {
-            private readonly PropertyInfo _propertyInfo;
-            private readonly Expression _objectExpr;
-            private readonly object _propertyValue;
-
-            public PropertyRefRewriter(Expression objectExpr, PropertyInfo propertyInfo, object value)
-            {
-                this._objectExpr = objectExpr;
-                this._propertyInfo = propertyInfo;
-                this._propertyValue = value;
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node.Member == this._propertyInfo && node.Expression == this._objectExpr)
-                {
-                    return Expression.Constant(this._propertyValue, this._propertyInfo.PropertyType);
-                }
-                return base.VisitMember(node);
-            }
-        }
-
         public class MetadataValueBuilder
         {
             private readonly MetadataContractBuilder<T, TMetadata> _owner;
@@ -366,9 +345,7 @@ namespace LBi.LostDoc.Composition
                 if (propInfo == null)
                     throw new ArgumentException("Only property access is allowed.", "propertyAccessor");
 
-
                 this.SetValue(propInfo, value);
-
 
                 return this;
             }
@@ -376,7 +353,6 @@ namespace LBi.LostDoc.Composition
             private void SetValue<TValue>(PropertyInfo interfacePropInfo, TValue value)
             {
                 // TODO figure out if this can be made faster, sorted list & binary search, dictionary, based on interfacePropInfo.MetadataToken?
-
                 var ix = Array.IndexOf(this._owner._interfaceProperties, interfacePropInfo);
                 this._owner._propSetters[ix](this._instance, value);
             }
