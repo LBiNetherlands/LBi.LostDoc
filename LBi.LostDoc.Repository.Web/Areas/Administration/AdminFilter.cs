@@ -32,27 +32,25 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                 // this was populated by the AddInControllerFactory
                 IControllerMetadata metadata = (IControllerMetadata)filterContext.RequestContext.HttpContext.Items[AddInControllerFactory.MetadataKey];
 
-                // TODO FIX THIS SOMEHOW
 
-                //Type controllerType = filterContext.Controller.GetType();
+                
+                // TODO FIX THIS SOMEHOW, this is pretty crappy
+                var allControllerExports =
+                    App.Instance.Container.GetExports(
+                        new ContractBasedImportDefinition(
+                            Extensibility.ContractNames.AdminController,
+                            AttributedModelServices.GetTypeIdentity(typeof(IController)),
+                            Enumerable.Empty<KeyValuePair<string, Type>>(), ImportCardinality.ZeroOrMore, false, false,
+                            CreationPolicy.NonShared));
 
-                //// this wont be super fast, but it will be good enough for the admin system (and I'm lazy)
-                //MetadataContractBuilder<IController, IControllerMetadata> contractBuilder =
-                //    new MetadataContractBuilder<IController, IControllerMetadata>(ImportCardinality.ZeroOrMore,
-                //                                                                  CreationPolicy.NonShared);
+                foreach (Export export in allControllerExports)
+                {
+                    IControllerMetadata controllerMetadata = AttributedModelServices.GetMetadataView<IControllerMetadata>(export.Metadata);
+                    ReflectedControllerDescriptor descriptor = new ReflectedControllerDescriptor(export.Value.GetType());
 
-                //contractBuilder.Add((m, c) => StringComparer.OrdinalIgnoreCase.Equals(m.Name, c.Name));
-
-                //var allControllerExports = App.Instance.Container.GetExports(contractBuilder.WithValue(c => c.Name,
-                //                                                            AdminAttributeServices.GetName(controllerType)));
-
-                ////foreach (Export allControllerExport in allControllerExports)
-                ////{
-                ////    IControllerMetadata controllerMetadata = AttributedModelServices.GetMetadataView<IControllerMetadata>(allControllerExport.Metadata);
-
-                ////    allControllerExport.Value
-                ////}
-
+                    // create navigation object
+                }
+                // (create) and assign it to model.Navigation
 
                 model.PageTitle = string.Format("LostDoc Administration {0} - {1}",
                                                 metadata.Name,

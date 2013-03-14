@@ -23,6 +23,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     public class AddInActionInvoker : ControllerActionInvoker
     {
+
         protected override ActionDescriptor FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, string actionName)
         {
             ActionDescriptor[] actionDescriptors = controllerDescriptor.GetCanonicalActions();
@@ -36,6 +37,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                     
                     if (StringComparer.OrdinalIgnoreCase.Equals("Index", actionName) && attr.IsDefault)
                     {
+                        // reset the name, otherwise the View wont be picked up correctly
                         controllerContext.RouteData.Values["Action"] = attr.Name;
                         return actionDescriptors[i];
                     }
