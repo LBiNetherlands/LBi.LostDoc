@@ -24,5 +24,6 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
     {
         public string PageTitle { get; set; }
         public IEnumerable<Notification> Notifications { get; set; }
+        public Navigation[] Navigation { get; set; }
     }
 }

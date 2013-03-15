@@ -14,8 +14,44 @@
  * limitations under the License. 
  *@
 @using LBi.LostDoc.Repository
+@using LBi.LostDoc.Repository.Web.Extensibility
 @using LBi.LostDoc.Repository.Web.Views
 @model LBi.LostDoc.Repository.Web.Areas.Administration.Models.ModelBase
+
+@functions {
+    private string GetButtonClass(Navigation navigation)
+    {
+        if (navigation.IsActive)
+            return "button active";
+
+        return "button";
+    }
+
+}
+
+@helper RenderNavigation(Navigation[] navigation)
+{
+    <ul>
+        @foreach (var nav in navigation)
+        {
+            @RenderNavigation(nav)
+        }
+    </ul>
+}
+
+@helper RenderNavigation(Navigation navigation)
+{
+    <li>
+        <a class="@this.GetButtonClass(navigation)" href="@navigation.Target" title="@navigation.Text">@navigation.Text</a>
+        @if (navigation.Children.Length > 0)
+        {
+            @RenderNavigation(navigation.Children)
+        }
+    </li>
+}
+
+
+
 
 <!DOCTYPE html>
 
@@ -51,6 +87,8 @@
             </header>
             <!-- /header -->
             <span class="handle"></span>
+
+            @RenderNavigation(Model.Navigation)
         </nav>
         <!-- / Main navigation -->
 

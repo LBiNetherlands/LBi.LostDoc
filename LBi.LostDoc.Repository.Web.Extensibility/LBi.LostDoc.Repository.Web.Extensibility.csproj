@@ -73,6 +73,7 @@
     <Compile Include="ContractNames.cs" />
     <Compile Include="IAdminModel.cs" />
     <Compile Include="IControllerMetadata.cs" />
+    <Compile Include="Navigation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
