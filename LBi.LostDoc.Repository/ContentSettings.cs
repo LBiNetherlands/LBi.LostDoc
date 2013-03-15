@@ -21,6 +21,7 @@ namespace LBi.LostDoc.Repository
 {
     public class ContentSettings
     {
+        public IVersionedFileSystem FileSystem { get; set; }
         public string RepositoryPath { get; set; }
         public string ContentPath { get; set; }
         public Template Template { get; set; }
