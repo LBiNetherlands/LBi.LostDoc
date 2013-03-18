@@ -28,6 +28,7 @@ namespace LBi.LostDoc.Templating
         XPathNavigator Document { get; }
 
         IAssetUriResolver[] AssetUriResolvers { get; }
-        IReadOnlyFileProvider FileProvider { get; }
+        IFileProvider TemplateFileProvider { get; }
+        IFileProvider OutputFileProvider { get; }
     }
 }

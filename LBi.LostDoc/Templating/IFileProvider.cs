@@ -18,9 +18,10 @@ using System.IO;
 
 namespace LBi.LostDoc.Templating
 {
-    public interface IReadOnlyFileProvider
+    public interface IFileProvider
     {
         bool FileExists(string path);
-        Stream OpenFile(string path);
+        Stream OpenFile(string path, FileMode mode);
     }
+
 }

@@ -14,12 +14,13 @@
  * limitations under the License. 
  */
 
+using System;
 using System.IO;
 using System.Reflection;
 
 namespace LBi.LostDoc.Templating.FileProviders
 {
-    public class ResourceFileProvider : IReadOnlyFileProvider
+    public class ResourceFileProvider : IFileProvider
     {
         private Assembly _asm;
         private string _ns;
@@ -50,8 +51,11 @@ namespace LBi.LostDoc.Templating.FileProviders
             return this._asm.GetManifestResourceInfo(this.ConvertPath(path)) != null;
         }
 
-        public Stream OpenFile(string path)
+        public Stream OpenFile(string path, FileMode mode)
         {
+            if (mode != FileMode.Open)
+                throw new ArgumentOutOfRangeException("mode", "Only FileMode.Open is supported.");
+
             var ret = this._asm.GetManifestResourceStream(this.ConvertPath(path.TrimStart('/')));
             if (ret == null)
                 throw new FileNotFoundException(string.Format("Resource not found: {0} (Was: {1})", this.ConvertPath(path), path), path);

@@ -22,7 +22,7 @@ using System.Net.Http;
 
 namespace LBi.LostDoc.Templating.FileProviders
 {
-    public class HttpFileProvider : IReadOnlyFileProvider
+    public class HttpFileProvider : IFileProvider
     {
         public bool FileExists(string path)
         {
@@ -41,8 +41,11 @@ namespace LBi.LostDoc.Templating.FileProviders
             }
         }
 
-        public Stream OpenFile(string path)
+        public Stream OpenFile(string path, FileMode mode)
         {
+            if (mode != FileMode.Open)
+                throw new ArgumentOutOfRangeException("mode", "Only FileMode.Open is supported.");
+
             Uri uri = new Uri(path, UriKind.RelativeOrAbsolute);
             if (!uri.IsAbsoluteUri || !uri.Scheme.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                 throw new ArgumentException("Must be absolute http or https Uri.", "path");

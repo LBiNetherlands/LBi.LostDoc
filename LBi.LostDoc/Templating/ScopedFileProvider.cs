@@ -18,15 +18,15 @@ using System.IO;
 
 namespace LBi.LostDoc.Templating
 {
-    public class ScopedFileProvider : IReadOnlyFileProvider
+    public class ScopedFileProvider : IFileProvider
     {
-        public ScopedFileProvider(IReadOnlyFileProvider fileProvider, string basePath)
+        public ScopedFileProvider(IFileProvider fileProvider, string basePath)
         {
             this.FileProvider = fileProvider;
             this.BasePath = basePath;
         }
 
-        public IReadOnlyFileProvider FileProvider { get; protected set; }
+        public IFileProvider FileProvider { get; protected set; }
 
         public string BasePath { get; protected set; }
 
@@ -35,9 +35,9 @@ namespace LBi.LostDoc.Templating
             return this.FileProvider.FileExists(Path.Combine(this.BasePath, path));
         }
 
-        public Stream OpenFile(string path)
+        public Stream OpenFile(string path, FileMode mode)
         {
-            return this.FileProvider.OpenFile(Path.Combine(this.BasePath, path));
+            return this.FileProvider.OpenFile(Path.Combine(this.BasePath, path), mode);
         }
     }
 }

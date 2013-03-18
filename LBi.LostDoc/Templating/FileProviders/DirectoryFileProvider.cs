@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -23,8 +24,8 @@ using LBi.LostDoc.Composition;
 
 namespace LBi.LostDoc.Templating.FileProviders
 {
-    [Export(ContractNames.TemplateProvider, typeof(IReadOnlyFileProvider))]
-    public class DirectoryFileProvider : IReadOnlyFileProvider
+    [Export(ContractNames.TemplateProvider, typeof(IFileProvider))]
+    public class DirectoryFileProvider : IFileProvider
     {
         public DirectoryFileProvider()
             : this(Enumerable.Empty<string>())
@@ -62,8 +63,11 @@ namespace LBi.LostDoc.Templating.FileProviders
                        .FirstOrDefault(File.Exists) != null;
         }
 
-        public virtual Stream OpenFile(string path)
+        public virtual Stream OpenFile(string path, FileMode mode)
         {
+            if (mode != FileMode.Open)
+                throw new ArgumentOutOfRangeException("mode", "Only FileMode.Open is supported.");
+
             string filePath = this.GeneratePaths(path)
                                   .FirstOrDefault(File.Exists);
             if (filePath != null)

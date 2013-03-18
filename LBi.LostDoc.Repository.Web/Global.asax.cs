@@ -179,7 +179,7 @@ namespace LBi.LostDoc.Repository.Web
             CompositionContainer container = new CompositionContainer(catalog);
 
             // set up template resolver
-            var lazyProviders = container.GetExports<IReadOnlyFileProvider>(ContractNames.TemplateProvider);
+            var lazyProviders = container.GetExports<IFileProvider>(ContractNames.TemplateProvider);
             var realProviders = lazyProviders.Select(lazy => lazy.Value);
             TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
 

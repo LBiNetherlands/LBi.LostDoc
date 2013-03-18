@@ -127,7 +127,7 @@
     <Compile Include="Templating\XPathVariable.cs" />
     <Compile Include="Templating\XPath\XPathNavigatorIterator.cs" />
     <Compile Include="Templating\XPath\CustomXsltContext.cs" />
-    <Compile Include="Templating\IReadOnlyFileProvider.cs" />
+    <Compile Include="Templating\IFileProvider.cs" />
     <Compile Include="Templating\ITemplatingContext.cs" />
     <Compile Include="Templating\Template.cs" />
     <Compile Include="Templating\TemplateXsltExtensions.cs" />

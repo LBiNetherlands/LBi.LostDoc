@@ -18,7 +18,7 @@ namespace LBi.LostDoc.Templating
 {
     public class Resource
     {
-        public Resource(string conditional, XPathVariable[] variables,  IReadOnlyFileProvider fileProvider, string source, string output, ResourceTransform[] transformers)
+        public Resource(string conditional, XPathVariable[] variables,  IFileProvider fileProvider, string source, string output, ResourceTransform[] transformers)
         {
             this.ConditionExpression = conditional;
             this.FileProvider = fileProvider;
@@ -28,7 +28,7 @@ namespace LBi.LostDoc.Templating
             this.Transforms = transformers;
         }
 
-        public IReadOnlyFileProvider FileProvider { get; set; }
+        public IFileProvider FileProvider { get; set; }
         public string ConditionExpression { get; set; }
         public string Source { get; set; }
         public string Output { get; set; }

@@ -26,13 +26,13 @@ namespace LBi.LostDoc.Templating
 {
     public class TemplatingContext : ITemplatingContext
     {
-        public TemplatingContext(ObjectCache cache, CompositionContainer container, string basePath, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IReadOnlyFileProvider fileProvider)
+        public TemplatingContext(ObjectCache cache, CompositionContainer container, IFileProvider outputFileProvider, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IFileProvider templateFileProvider)
         {
             this.Container = container;
-            this.BasePath = basePath;
+            this.OutputFileProvider = outputFileProvider;
             this.TemplateData = data;
             this.AssetUriResolvers = resolvers.ToArray();
-            this.FileProvider = fileProvider;
+            this.TemplateFileProvider = templateFileProvider;
             this.Cache = cache;
 
             XPathDocument xpathDoc;
@@ -52,7 +52,8 @@ namespace LBi.LostDoc.Templating
 
         public IAssetUriResolver[] AssetUriResolvers { get; protected set; }
 
-        public IReadOnlyFileProvider FileProvider { get; protected set; }
+        public IFileProvider TemplateFileProvider { get; protected set; }
+        public IFileProvider OutputFileProvider { get; private set; }
 
         #endregion
 

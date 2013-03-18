@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D33599EE-D7C4-47E6-A69B-210ED737D951}</ProjectGuid>
+    <ProjectGuid>{B5E79DC4-DAD3-4418-BADB-79E6CC8E2B41}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LBi.LostDoc.Repository.Storage</RootNamespace>

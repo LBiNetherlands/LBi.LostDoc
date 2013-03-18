@@ -53,7 +53,7 @@ namespace LBi.LostDoc.Templating
         private readonly List<IAssetUriResolver> _resolvers;
         private string _basePath;
         private XDocument _templateDefinition;
-        private IReadOnlyFileProvider _fileProvider;
+        private IFileProvider _fileProvider;
         private TemplateResolver _templateResolver;
         private string _templateSourcePath;
         
@@ -85,7 +85,7 @@ namespace LBi.LostDoc.Templating
             string path;
             if (resolver.Resolve(name, out this._fileProvider, out path))
             {
-                using (Stream str = this._fileProvider.OpenFile(path))
+                using (Stream str = this._fileProvider.OpenFile(path, FileMode.Open))
                     _templateDefinition = XDocument.Load(str, LoadOptions.SetLineInfo);
 
                 this._basePath = Path.GetDirectoryName(path);
@@ -97,7 +97,7 @@ namespace LBi.LostDoc.Templating
             }
         }
 
-        protected virtual IReadOnlyFileProvider GetScopedFileProvider()
+        protected virtual IFileProvider GetScopedFileProvider()
         {
             return new ScopedFileProvider(this._fileProvider, this._basePath);
         }
@@ -167,7 +167,7 @@ namespace LBi.LostDoc.Templating
         /// </param>
         /// <returns>
         /// </returns>
-        private XslCompiledTransform LoadStylesheet(Stack<IReadOnlyFileProvider> resourceProvider, string name)
+        private XslCompiledTransform LoadStylesheet(Stack<IFileProvider> resourceProvider, string name)
         {
             XslCompiledTransform ret = new XslCompiledTransform(true);
 
@@ -175,7 +175,7 @@ namespace LBi.LostDoc.Templating
             {
                 if (provider.FileExists(name))
                 {
-                    using (Stream str = provider.OpenFile(name))
+                    using (Stream str = provider.OpenFile(name, FileMode.Open))
                     {
                         XmlReader reader = XmlReader.Create(str, new XmlReaderSettings {CloseInput = true,});
                         XsltSettings settings = new XsltSettings(false, true);
@@ -333,7 +333,7 @@ namespace LBi.LostDoc.Templating
             }
         }
 
-        protected virtual ParsedTemplate PrepareTemplate(TemplateData templateData, Stack<IReadOnlyFileProvider> providers = null)
+        protected virtual ParsedTemplate PrepareTemplate(TemplateData templateData, Stack<IFileProvider> providers = null)
         {
             // set up temp file container
             TempFileCollection tempFiles = new TempFileCollection(templateData.TemporaryFilesPath,
@@ -343,7 +343,7 @@ namespace LBi.LostDoc.Templating
                 Directory.CreateDirectory(tempFiles.TempDir);
 
             if (providers == null)
-                providers = new Stack<IReadOnlyFileProvider>();
+                providers = new Stack<IFileProvider>();
 
             // clone orig doc
             XDocument workingDoc;
@@ -459,11 +459,11 @@ namespace LBi.LostDoc.Templating
             return tempFileName;
         }
 
-        private Resource ParseResouceDefinition(Stack<IReadOnlyFileProvider> providers, XElement elem)
+        private Resource ParseResouceDefinition(Stack<IFileProvider> providers, XElement elem)
         {
             var source = this.GetAttributeValue(elem, "path");
 
-            IReadOnlyFileProvider resourceProvider;
+            IFileProvider resourceProvider;
             Uri sourceUri;
             if (Uri.TryCreate(source, UriKind.Absolute, out sourceUri) && sourceUri.Scheme.StartsWith("http"))
             {
@@ -505,7 +505,7 @@ namespace LBi.LostDoc.Templating
             return resource;
         }
 
-        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc, CustomXsltContext customContext, Stack<IReadOnlyFileProvider> providers, TempFileCollection tempFiles)
+        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc, CustomXsltContext customContext, Stack<IFileProvider> providers, TempFileCollection tempFiles)
         {
             // check for meta-template directives and expand
             int metaCount = 0;
@@ -614,7 +614,7 @@ namespace LBi.LostDoc.Templating
             return shouldApply;
         }
 
-        private Stylesheet ParseStylesheet(Stack<IReadOnlyFileProvider> providers, IEnumerable<Stylesheet> stylesheets, XElement elem)
+        private Stylesheet ParseStylesheet(Stack<IFileProvider> providers, IEnumerable<Stylesheet> stylesheets, XElement elem)
         {
 
             var nameAttr = elem.Attribute("name");
@@ -729,7 +729,7 @@ namespace LBi.LostDoc.Templating
             // create context
             ITemplatingContext context = new TemplatingContext(this._cache,
                                                                this._container,
-                                                               this._basePath,
+                                                               null, // TODO fix this (this._basePath)
                                                                templateData,
                                                                this._resolvers,
                                                                this._fileProvider);
@@ -994,7 +994,7 @@ namespace LBi.LostDoc.Templating
                     yield return
                         new ResourceDeployment(resources[i].FileProvider,
                                                resources[i].Source,
-                                               resources[i].Output,
+                                               resources[i].Output, // TODO this needs a 'writable' file provider
                                                transforms.ToArray());
                 }
                 xpathContext.PopVariableScope();

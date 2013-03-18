@@ -23,31 +23,31 @@ namespace LBi.LostDoc.Templating
 {
     public class TemplateResolver
     {
-        public TemplateResolver(params IReadOnlyFileProvider[] fileProviders)
+        public TemplateResolver(params IFileProvider[] fileProviders)
             : this(fileProviders.AsEnumerable())
         {
         }
 
-        public TemplateResolver(IEnumerable<IReadOnlyFileProvider> fileProviders)
+        public TemplateResolver(IEnumerable<IFileProvider> fileProviders)
         {
             this.Providers = fileProviders.ToArray();
         }
 
-        protected IReadOnlyFileProvider[] Providers { get; set; }
+        protected IFileProvider[] Providers { get; set; }
 
 
-        public bool Resolve(string name, out IReadOnlyFileProvider fileProvider, out string path)
+        public bool Resolve(string name, out IFileProvider fileProvider, out string path)
         {
             path = Path.Combine(name, Template.TemplateDefinitionFileName);
             return this.FileExists(path, out fileProvider);
         }
 
-        private bool FileExists(string path, out IReadOnlyFileProvider fileProvider)
+        private bool FileExists(string path, out IFileProvider fileProvider)
         {
             bool ret = false;
             fileProvider = null;
 
-            foreach (IReadOnlyFileProvider provider in this.Providers)
+            foreach (IFileProvider provider in this.Providers)
             {
                 if (provider.FileExists(path))
                 {
@@ -62,7 +62,7 @@ namespace LBi.LostDoc.Templating
         public override string ToString()
         {
             StringBuilder ret = new StringBuilder();
-            foreach (IReadOnlyFileProvider provider in this.Providers)
+            foreach (IFileProvider provider in this.Providers)
             {
                 ret.Append("Provider: ").AppendLine(provider.GetType().Name);
                 ret.AppendLine(provider.ToString());

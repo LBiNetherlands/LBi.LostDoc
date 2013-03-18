@@ -24,7 +24,7 @@ namespace LBi.LostDoc.Templating
     public class ResourceDeployment : UnitOfWork
     {
         
-        public ResourceDeployment(IReadOnlyFileProvider fileProvider, string path, string destination, IResourceTransform[] transforms)
+        public ResourceDeployment(IFileProvider fileProvider, string path, string destination, IResourceTransform[] transforms)
         {
             this.FileProvider = fileProvider;
             this.ResourcePath = path;
@@ -36,7 +36,7 @@ namespace LBi.LostDoc.Templating
 
         public string Destination { get; protected set; }
 
-        public IReadOnlyFileProvider FileProvider { get; protected set; }
+        public IFileProvider FileProvider { get; protected set; }
 
         public string ResourcePath { get; protected set; }
 
@@ -61,7 +61,7 @@ namespace LBi.LostDoc.Templating
             if (!Directory.Exists(targetDir))
                 Directory.CreateDirectory(targetDir);
 
-            using (Stream streamSrc = this.FileProvider.OpenFile(this.ResourcePath))
+            using (Stream streamSrc = this.FileProvider.OpenFile(this.ResourcePath, FileMode.Open))
             using (Stream streamDest = File.Create(target))
             {
                 Stream outStream = streamSrc;

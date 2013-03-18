@@ -15,6 +15,7 @@
  */
 
 using LBi.LostDoc;
+using LBi.LostDoc.Repository.Storage;
 using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Repository

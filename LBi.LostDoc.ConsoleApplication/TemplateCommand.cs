@@ -133,7 +133,7 @@ namespace LBi.LostDoc.ConsoleApplication
                     bundle.Add(fileDoc);
                 }
 
-                var lazyProviders = container.GetExports<IReadOnlyFileProvider>(ContractNames.TemplateProvider);
+                var lazyProviders = container.GetExports<IFileProvider>(ContractNames.TemplateProvider);
                 var realProviders = lazyProviders.Select(lazy => lazy.Value);
                 TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
 

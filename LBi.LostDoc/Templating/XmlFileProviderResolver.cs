@@ -25,10 +25,10 @@ namespace LBi.LostDoc.Templating
     public class XmlFileProviderResolver : XmlResolver
     {
         private readonly string _basePath;
-        private readonly Stack<IReadOnlyFileProvider> _fileProviders;
+        private readonly Stack<IFileProvider> _fileProviders;
 
         // TODO investigate whether basePath can be deleted entirely
-        public XmlFileProviderResolver(Stack<IReadOnlyFileProvider> fileProviders, string basePath = null)
+        public XmlFileProviderResolver(Stack<IFileProvider> fileProviders, string basePath = null)
         {
             this._fileProviders = fileProviders;
             this._basePath = basePath;
@@ -76,10 +76,10 @@ namespace LBi.LostDoc.Templating
         {
             string uri = absoluteUri.ToString();
 
-            foreach (IReadOnlyFileProvider fileProvider in this._fileProviders)
+            foreach (IFileProvider fileProvider in this._fileProviders)
             {
                 if (fileProvider.FileExists(uri))
-                    return fileProvider.OpenFile(uri);
+                    return fileProvider.OpenFile(uri, FileMode.Open);
             }
 
             throw new FileNotFoundException("File not found: " + uri, uri);
