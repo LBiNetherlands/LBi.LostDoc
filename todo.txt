@@ -38,9 +38,7 @@ repository
 * add ability down view/select & download templates (as zip package from)
 
 * add ability to upload zip template packages?
-
-* investigate git backend for storing content (since most content is the same it would save on disk space)
-
+   
 * add db/storage for local edits
 
 * implement single-page render for local edit preview/saving
