@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,2013 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,9 @@ namespace LBi.LostDoc.Templating
         public override WorkUnitResult Execute(ITemplatingContext context)
         {
             Stopwatch localTimer = new Stopwatch();
-            string rootPath = Path.GetFullPath(context.TemplateData.TargetDirectory);
-            // copy resources to output dir
 
-            string target = Path.Combine(rootPath, this.Destination ?? this.ResourcePath);
-            string targetDir = Path.GetDirectoryName(target);
+            // copy resources to output dir
+            string target = this.Destination ?? this.ResourcePath;
 
             if (this.Destination != null)
             {
@@ -58,11 +56,9 @@ namespace LBi.LostDoc.Templating
             else
                 TraceSources.TemplateSource.TraceInformation("Copying resource: {0}", this.ResourcePath);
             
-            if (!Directory.Exists(targetDir))
-                Directory.CreateDirectory(targetDir);
 
             using (Stream streamSrc = this.FileProvider.OpenFile(this.ResourcePath, FileMode.Open))
-            using (Stream streamDest = File.Create(target))
+            using (Stream streamDest = context.OutputFileProvider.OpenFile(target, FileMode.Create))
             {
                 Stream outStream = streamSrc;
                 for (int i = 0; i < this.Transforms.Length; i++)

@@ -41,24 +41,13 @@ namespace LBi.LostDoc.Templating
         {
             Stopwatch localTimer = Stopwatch.StartNew();
 
-            string targetPath = Path.Combine(context.TemplateData.TargetDirectory, this.SaveAs);
-
-            string targetDir = Path.GetDirectoryName(targetPath);
-            if (targetDir != null && !Directory.Exists(targetDir))
-            {
-                TraceSources.TemplateSource.TraceVerbose("Creating directory: {0}", targetDir);
-
-                // noop if exists
-                Directory.CreateDirectory(targetDir);
-            }
-
             Uri newUri = new Uri(this.SaveAs, UriKind.RelativeOrAbsolute);
-
+            FileMode mode = FileMode.CreateNew;
             bool exists;
-            if (!(exists = File.Exists(targetPath)) || context.TemplateData.OverwriteExistingFiles)
+            if (!(exists = context.TemplateData.OutputFileProvider.FileExists(this.SaveAs)) || context.TemplateData.OverwriteExistingFiles)
             {
                 if (exists)
-                    File.Delete(targetPath);
+                    mode = FileMode.Create;
 
                 // register xslt params
                 XsltArgumentList argList = new XsltArgumentList();
@@ -71,7 +60,7 @@ namespace LBi.LostDoc.Templating
                 // and custom extensions
                 argList.AddExtensionObject(Namespaces.TemplateExtensions, new TemplateXsltExtensions(context, newUri));
 
-                using (FileStream stream = File.Create(targetPath))
+                using (Stream stream = context.TemplateData.OutputFileProvider.OpenFile(this.SaveAs, mode))
                 using (XmlWriter xmlWriter = XmlWriter.Create(stream,
                                                               new XmlWriterSettings
                                                               {

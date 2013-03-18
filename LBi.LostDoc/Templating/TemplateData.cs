@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,2013 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace LBi.LostDoc.Templating
         public Func<UnitOfWork, bool> Filter { get; set; } 
         public VersionComponent? IgnoredVersionComponent { get; set; }
         public Dictionary<string, object> Arguments { get; set; }
-        public string TargetDirectory { get; set; }
+        public IFileProvider OutputFileProvider { get; set; }
         public bool OverwriteExistingFiles { get; set; }
         public bool KeepTemporaryFiles { get; set; }
         public string TemporaryFilesPath { get; set; }

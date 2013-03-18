@@ -24,6 +24,7 @@ using System.Xml.Linq;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Templating;
 using LBi.LostDoc.Repository.Lucene;
+using LBi.LostDoc.Templating.FileProviders;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
@@ -128,7 +129,8 @@ namespace LBi.LostDoc.Repository
                                        {
                                            AssetRedirects = assetRedirects,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
-                                           TargetDirectory = htmlDir.FullName,
+                                           OutputFileProvider = new ScopedFileProvider(new DirectoryFileProvider(), htmlDir.FullName),
+                                           //TargetDirectory = htmlDir.FullName,
                                            Arguments = new Dictionary<string, object> {{"SearchUri", "/search/"}},
                                            KeepTemporaryFiles = true,
                                            TemporaryFilesPath = Path.Combine(logDir.FullName, "temp")

@@ -153,7 +153,7 @@ namespace LBi.LostDoc.ConsoleApplication
                                            OverwriteExistingFiles = this.Force.IsPresent,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            Arguments = this.Arguments,
-                                           TargetDirectory = outputDir
+                                           OutputFileProvider = new ScopedFileProvider(new DirectoryFileProvider(), outputDir)
                                        };
 
                 template.Generate(templateData);

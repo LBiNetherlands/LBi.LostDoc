@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,2013 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,65 +28,22 @@ namespace LBi.LostDoc.Templating.FileProviders
     public class DirectoryFileProvider : IFileProvider
     {
         public DirectoryFileProvider()
-            : this(Enumerable.Empty<string>())
         {
-        }
-
-        public DirectoryFileProvider(params string[] paths)
-            : this(paths.AsEnumerable())
-        {
-        }
-
-        private DirectoryFileProvider(IEnumerable<string> paths)
-        {
-            this.SearchPaths = paths;
-        }
-
-        protected IEnumerable<string> SearchPaths { get; set; }
-
-        protected virtual IEnumerable<string> GeneratePaths(string path)
-        {
-            yield return path;
-
-            if (!Path.IsPathRooted(path))
-            {
-                foreach (string basePath in this.SearchPaths)
-                    yield return Path.Combine(basePath, path);
-            }
         }
 
         #region IReadOnlyFileProvider Members
 
         public virtual bool FileExists(string path)
         {
-            return this.GeneratePaths(path)
-                       .FirstOrDefault(File.Exists) != null;
+            return File.Exists(path);
         }
 
         public virtual Stream OpenFile(string path, FileMode mode)
         {
-            if (mode != FileMode.Open)
-                throw new ArgumentOutOfRangeException("mode", "Only FileMode.Open is supported.");
-
-            string filePath = this.GeneratePaths(path)
-                                  .FirstOrDefault(File.Exists);
-            if (filePath != null)
-            {
-                throw new FileNotFoundException("Tried the following paths: {0}",
-                                                string.Join(", ", this.GeneratePaths(path)));
-            }
-
-            return File.Open(path, FileMode.Open);
+            return File.Open(path, mode);
         }
 
         #endregion
 
-        public override string ToString()
-        {
-            StringBuilder ret = new StringBuilder();
-            foreach (var searchPath in this.SearchPaths)
-                ret.AppendLine(searchPath);
-            return ret.ToString();
-        }
     }
 }
