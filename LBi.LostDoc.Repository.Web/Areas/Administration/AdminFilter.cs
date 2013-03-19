@@ -29,6 +29,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                 // this was populated by the AddInControllerFactory
                 IControllerMetadata metadata = (IControllerMetadata)filterContext.RequestContext.HttpContext.Items[AddInControllerFactory.MetadataKey];
 
+                string actionText = "";
 
 
                 // TODO FIX THIS SOMEHOW, this is pretty crappy
@@ -78,7 +79,11 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                             defaultTargetUrl = target;
 
                         bool isActive = filterContext.ActionDescriptor.ActionName == actionDescriptor.ActionName &&
-                                        filterContext.ActionDescriptor.ControllerDescriptor.ControllerType == descriptor.ControllerType; 
+                                        filterContext.ActionDescriptor.ControllerDescriptor.ControllerType == descriptor.ControllerType;
+
+                        if (isActive)
+                            actionText = actionAttr.Text;
+
 
                         Navigation navigation = new Navigation(null, actionAttr.Order, actionAttr.Text, target, isActive, Enumerable.Empty<Navigation>());
 
@@ -102,9 +107,11 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                 }
                 model.Navigation = menu.OrderBy(n => n.Order).ToArray();
 
-                model.PageTitle = string.Format("LostDoc Administration {0} - {1}",
-                                                metadata.Name,
-                                                "action");
+                model.PageTitle = "LostDoc Administration "  + metadata.Text;
+
+                if (!string.IsNullOrWhiteSpace(actionText))
+                    model.PageTitle += string.Format(" - {0}", actionText);
+
             }
         }
     }

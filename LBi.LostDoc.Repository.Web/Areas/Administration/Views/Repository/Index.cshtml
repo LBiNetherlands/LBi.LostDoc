@@ -57,53 +57,12 @@
     </table>
 }
 
-@*<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Uploaded</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var fileInfo in Model.LostDocFiles)
-        {
-            <tr>
-                <td>
-                    <a href="@Url.Action("Download", new { id = fileInfo.Name })" title="Download ldoc file">@fileInfo.Name</a> 
-                    <form action="@Url.Action("Delete")" method="POST">
-                        <input type="submit" value="Delete"/>
-                    </form>
-                </td>
-                <td>@fileInfo.Created</td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Version</th>
-                                <th>Filename</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var assemblyModel in fileInfo.Assemblies.OrderBy(am => am.Phase))
-                            {
-                                <tr class="@if (assemblyModel.Phase == 0) {<text>primary</text>} else {<text>dependency</text>}">
-                                    <td>@assemblyModel.Name</td>
-                                    <td>@assemblyModel.Version</td>
-                                    <td>@assemblyModel.Filename</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>*@
+@if (Model.Assemblies.Length == 0)
+{
+    <p>There are no LostDoc files in the repository, you can upload some:</p>
+}
 
-<form action="@Url.Action("Upload")" method="POST">
+<form action="@Url.Action("Upload")" method="POST" enctype="multipart/form-data">
     <label for="package">Manually upload</label>
     <input type="file" name="file" />
     <input type="submit" name="upload" value="Upload" />

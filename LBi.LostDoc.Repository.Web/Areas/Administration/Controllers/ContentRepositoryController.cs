@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -82,34 +81,72 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult Delete(string id)
         {
             // TODO this security check might not be good enough
-            if (Directory.GetFiles(App.Instance.Content.RepositoryPath, id, SearchOption.TopDirectoryOnly).Length == 1)
+            if (Directory.GetFiles(App.Instance.Content.RepositoryPath, id, SearchOption.TopDirectoryOnly).Length > 0)
             {
                 System.IO.File.Delete(Path.Combine(App.Instance.Content.RepositoryPath, id));
 
                 App.Instance.Notifications.Add(Severity.Information,
-                                           Lifetime.Page,
-                                           Scope.User,
-                                           this.User,
-                                           "File removed",
-                                           string.Format("Successfully deleted file: '{0}'.", id));
-
-                return this.RedirectToAction("Index");
+                                               Lifetime.Page,
+                                               Scope.User,
+                                               this.User,
+                                               "File removed",
+                                               string.Format("Successfully deleted file: '{0}'.", id));
             }
-
-            App.Instance.Notifications.Add(Severity.Error,
-                                           Lifetime.Page,
-                                           Scope.User,
-                                           this.User,
-                                           "File not found",
-                                           string.Format("Unable to delete file '{0}' as it was not found.", id));
+            else
+            {
+                App.Instance.Notifications.Add(Severity.Error,
+                                               Lifetime.Page,
+                                               Scope.User,
+                                               this.User,
+                                               "File not found",
+                                               string.Format("Unable to delete file '{0}' as it was not found.", id));
+            }
 
             return this.RedirectToAction("Index");
         }
 
         [HttpPost]
-        public ActionResult Upload()
+        public ActionResult Upload(HttpPostedFileBase file)
         {
-            return null;
+            string filename = Path.GetFileName(file.FileName);
+
+            LostDocFileInfo fileInfo;
+            using (TempDir tempDir = new TempDir())
+            {
+                string tempLocation = Path.Combine(tempDir.Path, filename);
+                file.SaveAs(tempLocation);
+
+                fileInfo = new LostDocFileInfo(tempLocation);
+
+                string targetFile = string.Format("{0}_{1}.ldoc", fileInfo.PrimaryAssembly.Filename,
+                                                  fileInfo.PrimaryAssembly.AssetId.Version);
+
+                if (System.IO.File.Exists(Path.Combine(AppConfig.RepositoryPath, targetFile)))
+                {
+                    App.Instance.Notifications.Add(Severity.Error,
+                                                   Lifetime.Page,
+                                                   Scope.User,
+                                                   this.User,
+                                                   "Failed to upload file",
+                                                   string.Format("Unable to add file '{0}' as it already exists.", targetFile));
+                }
+                else
+                {
+                    System.IO.File.Move(tempLocation, Path.Combine(AppConfig.RepositoryPath, targetFile));
+
+                    App.Instance.Notifications.Add(
+                        Severity.Information,
+                        Lifetime.Page,
+                        Scope.User,
+                        this.User,
+                        "File uploaded",
+                        string.Format("Successfully added file '{0}' (as '{1}') to repository.",
+                                      filename,
+                                      targetFile));
+                }
+            }
+
+            return this.RedirectToAction("Index");
         }
 
     }
