@@ -19,6 +19,7 @@ using System.Linq;
 using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
+using LBi.LostDoc.Repository.Web.Areas.Api.Models;
 using LBi.LostDoc.Repository.Web.Models;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers

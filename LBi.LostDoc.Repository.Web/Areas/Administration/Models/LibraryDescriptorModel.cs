@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,13 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System;
 
-namespace LBi.LostDoc.Repository.Web.Models
+namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
 {
-    [DataContract]
-    public class LibraryModel
+    public class LibraryDescriptorModel
     {
-        [DataMember]
-        public string Current { get; set; }
-
-        [DataMember]
-        public IEnumerable<LibraryDescriptor> Libraries { get; set; }
+        public string Id { get; set; }
+        public DateTime Created { get; set; }
     }
 }

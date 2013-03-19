@@ -114,7 +114,7 @@ namespace LBi.LostDoc.Repository
             this._workProcess = new TaskFactory().StartNew(this.WorkerMethod);
             string contentRefPath = Path.Combine(this._contentPath, CONTENT_REF_NAME);
             if (File.Exists(contentRefPath))
-                this._currentContentRef = File.ReadAllText(contentRefPath);
+                this._currentContentRef = File.ReadAllText(contentRefPath).Trim();
             else
                 this._currentContentRef = null;
         }

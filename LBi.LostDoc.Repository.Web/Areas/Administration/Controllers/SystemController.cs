@@ -35,5 +35,11 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             return View();
         }
 
+        [AdminAction("logs", Text = "Logs")]
+        public ActionResult Logs()
+        {
+            return View();
+        }
+
     }
 }
