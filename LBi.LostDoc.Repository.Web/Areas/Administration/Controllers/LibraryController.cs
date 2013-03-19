@@ -56,5 +56,15 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                      Current = App.Instance.Content.ContentFolder
                                  });
         }
+
+        public ActionResult Delete(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ActionResult SetCurrent(string id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
