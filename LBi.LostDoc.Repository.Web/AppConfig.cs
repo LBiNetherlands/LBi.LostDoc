@@ -72,6 +72,16 @@ namespace LBi.LostDoc.Repository.Web
             }
         }
 
+        public static string LogPath
+        {
+            get
+            {
+                return
+                    Path.Combine(_basePath,
+                                 System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.LogPath"]);
+            }
+        }
+
         /// <summary>
         /// Gets the path where the generated content will be stored.
         /// </summary>

@@ -60,8 +60,6 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                             });
         }
 
-
-
         [AdminAction("repository", Text = "Repository")]
         public ActionResult Repository()
         {

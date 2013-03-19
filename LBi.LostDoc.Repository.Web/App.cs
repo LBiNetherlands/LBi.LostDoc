@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using LBi.LostDoc.Packaging;
@@ -27,21 +28,23 @@ namespace LBi.LostDoc.Repository.Web
 {
     public class App
     {
-        private App(CompositionContainer container, ContentManager contentManager, AddInManager addInManager, NotificationManager notifications)
+        private App(CompositionContainer container, ContentManager contentManager, AddInManager addInManager, NotificationManager notifications, TraceListener listener)
         {
             this.Container = container;
             this.Content = contentManager;
             this.AddIns = addInManager;
             this.Notifications = notifications;
+            this.TraceListner = listener;
         }
 
         public static App Instance { get; protected set; }
 
-        public static void Initialize(CompositionContainer container, ContentManager contentManager, AddInManager addInManager, NotificationManager notifications)
+        public static void Initialize(CompositionContainer container, ContentManager contentManager, AddInManager addInManager, NotificationManager notifications, TraceListener listener)
         {
-            Instance = new App(container, contentManager, addInManager, notifications);
+            Instance = new App(container, contentManager, addInManager, notifications, listener);
         }
 
+        public TraceListener TraceListner { get; protected set; }
         public CompositionContainer Container { get; protected set; }
         public ContentManager Content { get; protected set; }
         public AddInManager AddIns { get; protected set; }

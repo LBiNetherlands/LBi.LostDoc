@@ -38,7 +38,7 @@ repository
 * add ability down view/select & download templates (as zip package from)
 
 * add ability to upload zip template packages?
-   
+
 * add db/storage for local edits
 
 * implement single-page render for local edit preview/saving

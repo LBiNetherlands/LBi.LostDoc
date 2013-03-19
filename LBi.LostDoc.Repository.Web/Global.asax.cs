@@ -14,8 +14,10 @@
  * limitations under the License. 
  */
 
+using System;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -141,10 +143,17 @@ namespace LBi.LostDoc.Repository.Web
 
         protected void Application_Start()
         {
+            // TODO maybe put this somewhere else (not in global.asax)
+            // TODO maybe move all of this into the App class with "IAppConfig"
+
+            // initialize logger
+            TraceListener traceListener = new TextWriterTraceListener(Path.Combine(AppConfig.LogPath, string.Format("repository_{0:yyyy'-'MM'-'dd}.log", DateTime.Now)));
+            Web.TraceSources.RepositoryControllerSource.Listeners.Add(traceListener);
+            Repository.TraceSources.ContentManagerSource.Listeners.Add(traceListener);
+            Repository.TraceSources.ContentSearcherSource.Listeners.Add(traceListener);
+
             // this might be stupid, but it fixes things for iisexpress
             Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
-
-            // TODO maybe move all of this into the App class with "IAppConfig"
 
             // set up add-in system
             AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed",
@@ -152,6 +161,8 @@ namespace LBi.LostDoc.Repository.Web
                                                         isOfficial: true);
 
             // intialize MEF
+
+            // core 'add-ins'
             var currentAssembly = Assembly.GetExecutingAssembly();
             var assemblyName = currentAssembly.GetName();
             string corePackageId = assemblyName.Name;
@@ -171,7 +182,7 @@ namespace LBi.LostDoc.Repository.Web
                                                                         args.Package.Version));
             
             // delete and redeploy all installed packages, this will trigger the Installed event ^
-            // this acts as a crude "remove plugins that were in use when un/installed" hack
+            // this acts as a crude "remove/overwrite plugins that were in use when un/installed" hack
             addInManager.Restore();
 
    
@@ -202,7 +213,7 @@ namespace LBi.LostDoc.Repository.Web
             NotificationManager notifications = new NotificationManager();
 
             // initialize app-singleton
-            App.Initialize(container, contentManager, addInManager, notifications);
+            App.Initialize(container, contentManager, addInManager, notifications, traceListener);
 
 
             // MVC init

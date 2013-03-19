@@ -198,6 +198,7 @@
   <ItemGroup>
     <Folder Include="App_Data\AddIns\" />
     <Folder Include="App_Data\Content\" />
+    <Folder Include="App_Data\Logs\" />
     <Folder Include="App_Data\Packages\" />
     <Folder Include="App_Data\Repository\temp\" />
     <Folder Include="Images\" />
