@@ -18,19 +18,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
+namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
 {
-    public class RepositoryController : Controller
+    public class ContentRepositoryModel : ModelBase
     {
-        //
-        // GET: /Administration/Repository/
+        public AssemblyModel[] Assemblies { get; set; }
+    }
 
-        public ActionResult Index()
-        {
-            return View();
-        }
+    public class AssemblyModel
+    {
+        public string Name { get; set; }
+        public VersionModel[] Versions { get; set; }
+    }
 
+    public class VersionModel
+    {
+        public string Filename { get; set; }
+        public Version Version { get; set; }
+        public DateTime Created { get; set; }
     }
 }

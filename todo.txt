@@ -29,7 +29,11 @@ repository
 
 // * create site-wide admin notifications
 
-* set up app logging
+// * set up app logging
+
+* set up API-controllers through MEF/add-ins as well
+
+* extract ContentRepositoryController logic into LBi.LostDoc.Repository.Xxx
 
 * capture nuget logging and redirect to app log
 

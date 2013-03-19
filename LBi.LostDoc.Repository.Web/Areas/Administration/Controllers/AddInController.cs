@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -60,7 +61,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                             });
         }
 
-        [AdminAction("repository", Text = "Repository")]
+        [AdminAction("repository", Text = "Online")]
         public ActionResult Repository()
         {
             const int count = 10;
@@ -80,6 +81,15 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                 Results = results,
                                 NextOffset = results.Length == count ? count : (int?)null
                             });
+        }
+
+        [HttpPost]
+        public ActionResult UploadPackage(HttpPostedFileBase package)
+        {
+            //string target = Path.Combine(AppConfig.AddInPackagePath, Path.GetFileName(package.FileName));
+            //package.SaveAs(target);
+            //App.Instance.Container
+            return null;
         }
 
         public ActionResult Search(string terms, int offset = 0)

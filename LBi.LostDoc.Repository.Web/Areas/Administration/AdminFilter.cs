@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using LBi.LostDoc.Composition;
-using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Extensibility;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration
@@ -38,7 +35,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                 var allControllerExports =
                     App.Instance.Container.GetExports(
                         new ContractBasedImportDefinition(
-                            Extensibility.ContractNames.AdminController,
+                            ContractNames.AdminController,
                             AttributedModelServices.GetTypeIdentity(typeof(IController)),
                             Enumerable.Empty<KeyValuePair<string, Type>>(), ImportCardinality.ZeroOrMore, false, false,
                             CreationPolicy.NonShared));
@@ -88,11 +85,17 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                         children.Add(navigation);
                     }
 
+                    bool isAnyChildActive = children.Any(n => n.IsActive);
+
+                    // if there's only one child, ignore it
+                    if (children.Count == 1)
+                        children.Clear();
+
                     menu.Add(new Navigation(controllerAttr.Group,
                                             controllerAttr.Order,
                                             controllerAttr.Text,
                                             defaultTargetUrl,
-                                            children.Any(n => n.IsActive),
+                                            isAnyChildActive,
                                             children));
 
 

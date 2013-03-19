@@ -22,7 +22,7 @@ using System.Text;
 
 namespace LBi.LostDoc
 {
-    public class AssetIdentifier : IEquatable<AssetIdentifier>
+    public class AssetIdentifier : IEquatable<AssetIdentifier>, IComparable<AssetIdentifier>
     {
         private readonly string _assetId;
         private readonly AssetType _type;
@@ -412,15 +412,26 @@ namespace LBi.LostDoc
 
         public override bool Equals(object obj)
         {
-            if (obj is AssetIdentifier)
-                return this.Equals((AssetIdentifier)obj);
-
-            return false;
+            AssetIdentifier other = obj as AssetIdentifier;
+            return other != null && this.Equals(other);
         }
 
         public override int GetHashCode()
         {
             return this._assetId.GetHashCode();
+        }
+
+        public int CompareTo(AssetIdentifier other)
+        {
+            if (other == null)
+                return -1;
+
+            int ret = StringComparer.Ordinal.Compare(this.AssetId, other.AssetId);
+
+            if (ret == 0)
+                ret = this.Version.CompareTo(other.Version);
+
+            return ret;
         }
 
         public override string ToString()

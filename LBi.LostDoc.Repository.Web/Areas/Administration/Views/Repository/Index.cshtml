@@ -1,0 +1,110 @@
+﻿@*
+ * Copyright 2013 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ *@
+
+@using LBi.LostDoc.Repository.Web.Areas.Administration.Models
+@model LBi.LostDoc.Repository.Web.Areas.Administration.Models.ContentRepositoryModel
+
+<h2>Content repository</h2>
+
+
+
+@foreach (var assembly in Model.Assemblies.OrderBy(am => am.Name))
+{
+    <h3>@assembly.Name</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Version</th>
+                <th>Created</th>
+                <th>Filename</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var version in assembly.Versions.OrderByDescending(v => v.Version))
+            {
+                <tr>
+                    <td>@version.Version</td>
+                    <td>@version.Created</td>
+                    <td>
+                        @version.Filename
+
+                        @*<a href="@Url.Action("Download", new { id = version.Filename })" title="Download ldoc file">Download</a>*@
+                        
+                        <form action="@Url.Action("Download", new { id = version.Filename })" method="GET">
+                            <input type="submit" value="Download" />
+                        </form>
+
+                        <form action="@Url.Action("Delete", new { id = version.Filename })" method="POST">
+                            <input type="submit" value="Delete" />
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@*<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Uploaded</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var fileInfo in Model.LostDocFiles)
+        {
+            <tr>
+                <td>
+                    <a href="@Url.Action("Download", new { id = fileInfo.Name })" title="Download ldoc file">@fileInfo.Name</a> 
+                    <form action="@Url.Action("Delete")" method="POST">
+                        <input type="submit" value="Delete"/>
+                    </form>
+                </td>
+                <td>@fileInfo.Created</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Version</th>
+                                <th>Filename</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assemblyModel in fileInfo.Assemblies.OrderBy(am => am.Phase))
+                            {
+                                <tr class="@if (assemblyModel.Phase == 0) {<text>primary</text>} else {<text>dependency</text>}">
+                                    <td>@assemblyModel.Name</td>
+                                    <td>@assemblyModel.Version</td>
+                                    <td>@assemblyModel.Filename</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>*@
+
+<form action="@Url.Action("Upload")" method="POST">
+    <label for="package">Manually upload</label>
+    <input type="file" name="file" />
+    <input type="submit" name="upload" value="Upload" />
+</form>

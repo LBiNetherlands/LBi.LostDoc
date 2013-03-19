@@ -28,7 +28,7 @@ namespace LBi.LostDoc.Repository
     /// <summary>
     /// This acts as the main content manager for the repository.
     /// </summary>
-    // TODO enable different (git?) storage backend
+    // TODO enable different storage backend
     public class ContentManager
     {
         private const string CONTENT_REF_NAME = ".latest";
@@ -130,8 +130,11 @@ namespace LBi.LostDoc.Repository
                     Trigger discardedTrigger;
 
                     while (this._workQueue.TryTake(out discardedTrigger))
-                        TraceSources.ContentManagerSource.TraceInformation("Skipping redundant rebuild trigger: {0}",
-                                                                           discardedTrigger.Reason);
+                    {
+                        TraceSources.ContentManagerSource.TraceInformation(
+                            "Skipping redundant rebuild trigger: {0}",
+                            discardedTrigger.Reason);
+                    }
 
                     TraceSources.ContentManagerSource.TraceInformation("Rebuilding content: {0}", trigger.Reason);
 
@@ -143,6 +146,7 @@ namespace LBi.LostDoc.Repository
                         builder.IgnoreVersionComponent = this._ignoreVersionComponent;
                         string folder = Guid.NewGuid().ToBase36String();
                         string tmpDir = Path.Combine(this._contentPath, folder);
+                        // TODO maybe pass in a ScopedFileProvider wrapping a DirectoryFileProvider here (instead of tmpdir)
                         builder.Build(this._repositoryPath, tmpDir);
 
                         // this acts as the "commit"
@@ -163,9 +167,9 @@ namespace LBi.LostDoc.Repository
                     catch (Exception ex)
                     {
                         TraceSources.ContentManagerSource.TraceError(
-                                                                     "An unhandled exception of type {0} occured while rebuilding content: {1}",
-                                                                     ex.GetType().Name,
-                                                                     ex.ToString());
+                            "An unhandled exception of type {0} occured while rebuilding content: {1}",
+                            ex.GetType().Name,
+                            ex.ToString());
                     }
                 }
             }
@@ -200,5 +204,7 @@ namespace LBi.LostDoc.Repository
 
             return ret;
         }
+
+        public string RepositoryPath { get { return this._repositoryPath; } }
     }
 }

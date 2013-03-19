@@ -32,7 +32,7 @@ See todo.txt for more details and information.
 
 Contribute
 ----------
-All pull requests must now include the following line in the pull request comments (using your full name and email address), which indicates your contribution complies to the LostDoc Developer's Certificate of Origin v1.1:
+All pull requests must now include the following line in the pull request comments (using your full name and email address), which indicates your contribution complies to the LostDoc Developer's Certificate of Origin v1.0:
 
 ```LostDoc-DCO-1.0-Signed-off-by: Joe Smith <joe@example.com>```
 

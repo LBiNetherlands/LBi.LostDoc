@@ -19,14 +19,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using LBi.LostDoc.Repository.Web.Extensibility;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
+    [AdminController("system", Group = Groups.Core, Order = 3000, Text = "System")]
     public class SystemController : Controller
     {
         //
         // GET: /Administration/System/
 
+        [AdminAction("status", IsDefault = true, Text = "Status")]
         public ActionResult Index()
         {
             return View();

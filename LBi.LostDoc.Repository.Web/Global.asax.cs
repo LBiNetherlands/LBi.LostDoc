@@ -147,7 +147,7 @@ namespace LBi.LostDoc.Repository.Web
             // TODO maybe move all of this into the App class with "IAppConfig"
 
             // initialize logger
-            TraceListener traceListener = new TextWriterTraceListener(Path.Combine(AppConfig.LogPath, string.Format("repository_{0:yyyy'-'MM'-'dd}.log", DateTime.Now)));
+            TraceListener traceListener = new TextWriterTraceListener(Path.Combine(AppConfig.LogPath, string.Format("repository_{0:yyyy'-'MM'-'dd__HHmmss}.log", DateTime.Now)));
             Web.TraceSources.RepositoryControllerSource.Listeners.Add(traceListener);
             Repository.TraceSources.ContentManagerSource.Listeners.Add(traceListener);
             Repository.TraceSources.ContentSearcherSource.Listeners.Add(traceListener);

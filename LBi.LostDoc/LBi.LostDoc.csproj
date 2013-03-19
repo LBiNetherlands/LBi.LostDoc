@@ -75,6 +75,8 @@
     <Compile Include="IAssetResolver.cs" />
     <Compile Include="IContextBase.cs" />
     <Compile Include="IFilterContext.cs" />
+    <Compile Include="LostDocFileInfo.cs" />
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="MemberInfoFilter.cs" />
     <Compile Include="DocGenerator.cs" />
     <Compile Include="Filters\LogicalMemberInfoVisibilityFilter.cs" />

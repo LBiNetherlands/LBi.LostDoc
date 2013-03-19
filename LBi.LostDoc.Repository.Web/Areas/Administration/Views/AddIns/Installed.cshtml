@@ -28,5 +28,11 @@
     {
         <span>No add-ins installed.</span>
     }
+    
+    <form action="@Url.Action("UploadPackage")">
+        <label for="package">Manually upload & install package</label>
+        <input type="file" name="package"/>
+        <input type="submit" name="upload" value="Install"/>
+    </form>
 </section>
 
