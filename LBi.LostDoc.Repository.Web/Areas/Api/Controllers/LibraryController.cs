@@ -14,17 +14,14 @@
  * limitations under the License. 
  */
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
 using LBi.LostDoc.Repository.Web.Models;
 
-namespace LBi.LostDoc.Repository.Web.Controllers
+namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
 {
 
     public class LibraryController : ApiController

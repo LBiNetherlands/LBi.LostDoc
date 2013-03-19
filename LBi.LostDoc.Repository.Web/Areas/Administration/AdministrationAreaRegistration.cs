@@ -30,7 +30,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
         public override void RegisterArea(AreaRegistrationContext context)
         {
             context.MapRoute(
-                "Administration_default",
+                "Administration",
                 "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/{id}",
                 new {action = "Index", id = UrlParameter.Optional});
         }

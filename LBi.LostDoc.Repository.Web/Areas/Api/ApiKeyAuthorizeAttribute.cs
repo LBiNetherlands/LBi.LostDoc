@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.Filters;
 
-namespace LBi.LostDoc.Repository.Web.Security
+namespace LBi.LostDoc.Repository.Web.Areas.Api
 {
     public class ApiKeyAuthorizeAttribute : AuthorizeAttribute
     {

@@ -15,11 +15,8 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace LBi.LostDoc.Repository.Web.Views
+namespace LBi.LostDoc.Repository.Web.Areas.Administration
 {
     public static class Extensions
     {

@@ -14,47 +14,36 @@
  * limitations under the License. 
  */
 
-using System.Json;
-using System.Web.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Web.Http;
+using LBi.LostDoc.Repository.Web.Areas.Api;
 
 namespace LBi.LostDoc.Repository.Web.Controllers
 {
-    public class AdminController : Controller
+    public class SiteController : ApiController
     {
         [HttpGet]
-        public ActionResult Login()
+        public string GetStatus()
         {
-            return this.View();
-        }
-
-        [HttpGet]
-        public ActionResult History()
-        {
-            return this.View();
-        }
-
-        [HttpGet]
-        public ActionResult Content()
-        {
-            return this.View();
-        }
-
-        [HttpGet]
-        public ActionResult Status()
-        {
-            return this.View();
+            return App.Instance.Content.CurrentState.ToString();
         }
 
         [HttpPost]
-        public ActionResult Login(string username, string password)
+        [ApiKeyAuthorize]
+        public bool Rebuild()
         {
-            return this.Json(new JsonPrimitive(true));
-        }
-
-        [HttpGet]
-        public ActionResult Logout()
-        {
-            return this.View();
+            try
+            {
+                App.Instance.Content.QueueRebuild("");
+                return true;
+            } 
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

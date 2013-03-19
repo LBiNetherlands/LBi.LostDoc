@@ -25,13 +25,9 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Repository.Web.Models;
-using LBi.LostDoc.Repository.Web.Security;
 
-namespace LBi.LostDoc.Repository.Web.Controllers
+namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
 {
-    /// <summary>
-    /// This is the main LostDoc <see cref="ApiController"/>. It handles basic CRUD operations.
-    /// </summary>
     [ApiKeyAuthorize]
     public class RepositoryController : ApiController
     {
@@ -95,7 +91,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                             fileName,
                             ex.ToString(),
                             ex.GetType().Name);
-                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
+                        return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
                     }
 
                     fi.Delete();
@@ -117,7 +113,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
             if (ret.Count > 0)
                 App.Instance.Content.QueueRebuild("Added assemblies: " + reason);
 
-            return Request.CreateResponse(HttpStatusCode.Accepted, ret.AsEnumerable());
+            return this.Request.CreateResponse(HttpStatusCode.Accepted, ret.AsEnumerable());
 
         }
 
