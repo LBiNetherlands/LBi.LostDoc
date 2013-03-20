@@ -154,6 +154,7 @@
     <Compile Include="Areas\Administration\Models\ModelBase.cs" />
     <Compile Include="Areas\Administration\Models\ContentRepositoryModel.cs" />
     <Compile Include="Areas\Administration\Models\SearchResultModel.cs" />
+    <Compile Include="Areas\Administration\Models\SystemModel.cs" />
     <Compile Include="Areas\Api\ApiAreaRegistration.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Areas\Api\Controllers\LibraryController.cs" />
@@ -165,6 +166,7 @@
     <Compile Include="Areas\Api\Models\AssemblyVersion.cs" />
     <Compile Include="Areas\Api\Models\FileDescriptor.cs" />
     <Compile Include="Areas\Api\Controllers\RepositoryController.cs" />
+    <Compile Include="Extensibility\AddInHttpControllerFactory.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -181,6 +183,8 @@
     <Compile Include="Areas\Administration\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Administration\Static\Lib\less-1.3.0.min.js" />
+    <Content Include="Areas\Administration\Static\lostdoc.admin.js" />
     <Content Include="Global.asax" />
     <Content Include="ManualUpload.html" />
     <Content Include="Static\css\codemirror.css" />
@@ -261,6 +265,9 @@
     <Content Include="Areas\Administration\Views\AddIns\Search.cshtml" />
     <Content Include="Areas\Administration\Views\Repository\Index.cshtml" />
     <Content Include="Areas\Administration\Views\Library\Index.cshtml" />
+    <Content Include="Areas\Administration\Views\Library\Details.cshtml" />
+    <Content Include="Areas\Administration\Views\System\Index.cshtml" />
+    <Content Include="Areas\Administration\Static\lostdoc.admin.less" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
     <Content Include="Static\less\components.less" />
     <Content Include="Static\less\header.less" />

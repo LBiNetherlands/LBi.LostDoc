@@ -26,7 +26,6 @@
 
         return "button";
     }
-
 }
 
 @helper RenderNavigation(Navigation[] navigation)
@@ -50,9 +49,6 @@
     </li>
 }
 
-
-
-
 <!DOCTYPE html>
 
 <html>
@@ -68,16 +64,15 @@
             }
         }
     </script>
-    <link rel="stylesheet/less" href="~/static/less/style.less" />
-    <link rel="stylesheet" href="~/static/css/codemirror.css">
-    <link rel="stylesheet" href="~/static/css/simple-hint.css">
-    <script src="~/static/js/lib/less-1.3.0.min.js"></script>
+    <link rel="stylesheet/less" href="~/Areas/Administration/Static/lostdoc.admin.less" />
+    <script src="~/Areas/Administration/Static/Lib/less-1.3.0.min.js"></script>
 </head>
 <body>
     <div id="wrapper">
-        <nav role="main-navigation">
-            <header role="logo">
+        <nav role="navigation">
+            <header role="banner">
                 <div class="logo">
+                    <!-- TODO fix this logo/country thing -->
                     <a href="/" title="LBi" rel="home">
                         <img src="~/static/img/logo_LBi.gif" alt="LBi"></a>
                     <div id="country">
@@ -92,7 +87,7 @@
         </nav>
         <!-- / Main navigation -->
 
-        <section role="content">
+        <section role="main">
             @this.RenderBody()
         </section>
         <!-- / content section -->
@@ -102,14 +97,14 @@
         <ul>
             @foreach (var notification in Model.Notifications)
             {
-                <li id="@notification.Id.ToBase36String()">
+                <li role="alert" id="alert-@notification.Id.ToBase36String()">
                     <strong>@notification.Title <span>@((DateTime.UtcNow - notification.Created).ToHumanReadableString()) ago</span></strong>
 
                     <p>@notification.Message</p>
 
                     @foreach (var action in notification.Actions)
                     {
-                        <a href="@action.Target" class="action">@action.Text</a>
+                        <a role="button" href="@action.Target" class="action">@action.Text</a>
                     }
                 </li>
             }
@@ -118,15 +113,15 @@
     </section>
 
     <!-- Generic libraries -->
-    <script src="~/static/js/lib/zepto.js"></script>
-    <script src="~/static/js/lib/zepto.data.js"></script>
+@*    <script src="~/static/js/lib/zepto.js"></script>
+    <script src="~/static/js/lib/zepto.data.js"></script>*@
 
-    <!-- Init -->
+@*    <!-- Init -->
     <script src="~/static/js/lostdoc.js"></script>
     <script src="~/static/js/lib/codemirror.js"></script>
     <script src="~/static/js/lib/simple-hint.js"></script>
     <script src="~/static/js/lib/closetag.js"></script>
     <script src="~/static/js/lib/xml-hint.js"></script>
-    <script src="~/static/js/lib/xml.js"></script>
+    <script src="~/static/js/lib/xml.js"></script>*@
 </body>
 </html>

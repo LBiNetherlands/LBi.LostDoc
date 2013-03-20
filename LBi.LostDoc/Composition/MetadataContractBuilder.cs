@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
@@ -28,8 +29,12 @@ using System.Threading;
 
 namespace LBi.LostDoc.Composition
 {
+    public class MetadataContractBuilder
+    {
+    }
+
     // TODO this turned into a crazy amount of code just to make the API for using it nicer, is it really worth it?
-    public class MetadataContractBuilder<T, TMetadata>
+    public class MetadataContractBuilder<T, TMetadata> : MetadataContractBuilder
     {
         private readonly List<Expression<Func<TMetadata, TMetadata, bool>>> _constraints;
         private readonly List<KeyValuePair<string, Type>> _metadata;

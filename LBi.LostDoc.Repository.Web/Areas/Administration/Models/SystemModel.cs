@@ -14,33 +14,15 @@
  * limitations under the License. 
  */
 
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
-using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
-using LBi.LostDoc.Repository.Web.Extensibility;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
+namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
 {
-    [AdminController("system", Group = Groups.Core, Order = 3000, Text = "System")]
-    public class SystemController : Controller
+    public class SystemModel : ModelBase
     {
-        //
-        // GET: /Administration/System/
-
-        [AdminAction("index", IsDefault = true, Text = "Status")]
-        public ActionResult Index()
-        {
-            return View(new SystemModel());
-        }
-
-        //[AdminAction("logs", Text = "Logs")]
-        //public ActionResult Logs()
-        //{
-        //    return View();
-        //}
-
     }
 }

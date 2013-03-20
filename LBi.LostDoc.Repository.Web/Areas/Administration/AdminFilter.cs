@@ -17,11 +17,11 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
         public void OnActionExecuted(ActionExecutedContext filterContext)
         {
             ViewResult viewResult = filterContext.Result as ViewResult;
-            if (viewResult != null)
+            if (viewResult != null && viewResult.Model != null)
             {
                 IAdminModel model = viewResult.Model as IAdminModel;
                 if (model == null)
-                    throw new InvalidOperationException("Model has to inherit ModelBase");
+                    throw new InvalidOperationException(string.Format("Model ({0}) does not implement IAdminModel", viewResult.GetType().Name));
 
 
                 model.Notifications = App.Instance.Notifications.Get(filterContext.HttpContext.User);

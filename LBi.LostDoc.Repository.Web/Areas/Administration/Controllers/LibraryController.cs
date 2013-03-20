@@ -15,25 +15,19 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Extensibility;
-using LBi.LostDoc.Repository.Web.Models;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
     [AdminController("library", Group = Groups.Core, Order = 2500, Text = "Library")]
     public class LibraryController : Controller
     {
-        //
-        // GET: /Administration/System/
-
         [AdminAction("index", IsDefault = true)]
         public ActionResult Index()
         {
@@ -55,6 +49,13 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                                                   }).ToArray(),
                                      Current = App.Instance.Content.ContentFolder
                                  });
+        }
+
+        public ActionResult Details(string id)
+        {
+            string path = Path.Combine(AppConfig.ContentPath, id);
+
+            return this.View();
         }
 
         public ActionResult Delete(string id)
