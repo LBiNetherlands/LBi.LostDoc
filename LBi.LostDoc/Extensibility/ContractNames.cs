@@ -14,27 +14,10 @@
  * limitations under the License. 
  */
 
-using System;
-
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Extensibility
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class AdminActionAttribute : Attribute
+    public static class ContractNames
     {
-        public AdminActionAttribute(string name)
-        {
-            this.Name = name;
-            this.IsDefault = false;
-        }
-
-        public string Name { get; protected set; }
-
-        public string Text { get; set; }
-        
-        public bool IsDefault { get; set; }
-        public double Order { get; set; }
+        public const string TemplateProvider = "TemplateProvider";
     }
-
-
-
 }

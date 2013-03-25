@@ -19,5 +19,9 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     public static class ContractNames
     {
         public const string AdminController = "AdministrationController";
+
+        public const string ApiController = "ApiController";
+
+        public const string ApiAction = "ApiAction";
     }
 }

@@ -55,7 +55,7 @@
     <Compile Include="AssetResolver.cs" />
     <Compile Include="AssetType.cs" />
     <Compile Include="Bundle.cs" />
-    <Compile Include="Composition\ContractNames.cs" />
+    <Compile Include="Extensibility\ContractNames.cs" />
     <Compile Include="Composition\MetadataContractBasedImportDefinition.cs" />
     <Compile Include="Composition\MetadataContractBuilder.cs" />
     <Compile Include="Diagnostics\TraceActivity.cs" />

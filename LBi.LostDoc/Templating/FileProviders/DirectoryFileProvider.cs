@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using LBi.LostDoc.Composition;
+using LBi.LostDoc.Extensibility;
 
 namespace LBi.LostDoc.Templating.FileProviders
 {

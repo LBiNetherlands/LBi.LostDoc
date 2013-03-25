@@ -16,26 +16,18 @@
 
 using System;
 using System.ComponentModel.Composition;
-using System.Reflection;
-using System.Web.Mvc;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class AdminControllerAttribute : ExportAttribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public class ApiActionAttribute  : ExportAttribute
     {
-        private readonly string _name;
-
-        public AdminControllerAttribute(string name) : base(ContractNames.AdminController, typeof(IController))
+        public ApiActionAttribute(string urlFragment) : base(ContractNames.ApiAction, null)
         {
-            this._name= name;
-            this.Text = name;
+            this.UrlFragment = urlFragment;
         }
 
-        public string Name { get { return this._name; } }
-        public string Text { get; set; }
-        public string Group { get; set; }
-        public double Order { get; set; }
+        public string UrlFragment { get; protected set; }
     }
 }

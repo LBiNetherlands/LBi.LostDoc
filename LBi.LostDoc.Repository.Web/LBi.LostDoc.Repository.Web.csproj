@@ -167,6 +167,7 @@
     <Compile Include="Areas\Api\Models\FileDescriptor.cs" />
     <Compile Include="Areas\Api\Controllers\RepositoryController.cs" />
     <Compile Include="Extensibility\AddInHttpControllerFactory.cs" />
+    <Compile Include="Extensibility\ApiServices.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

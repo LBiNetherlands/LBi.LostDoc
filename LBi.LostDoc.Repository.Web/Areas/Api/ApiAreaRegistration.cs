@@ -14,10 +14,10 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api
 
         public override void RegisterArea(AreaRegistrationContext context)
         {
-            context.MapRoute(
-                "Api",
-                "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/{id}",
-                new {action = "Index", id = UrlParameter.Optional});
+            //context.MapRoute(
+            //    "Api",
+            //    "api/{packageId}/{packageVersion}/{controller}/{action}/{id}",
+            //    new {action = "Index", id = UrlParameter.Optional});
         }
     }
 }

@@ -15,17 +15,16 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Web.Http;
-using LBi.LostDoc.Repository.Web.Areas.Api;
+using LBi.LostDoc.Repository.Web.Extensibility;
 
-namespace LBi.LostDoc.Repository.Web.Controllers
+namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
 {
+    [ApiController("site/")]
     public class SiteController : ApiController
     {
         [HttpGet]
+        [ApiAction("status")]
         public string GetStatus()
         {
             return App.Instance.Content.CurrentState.ToString();
@@ -33,6 +32,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 
         [HttpPost]
         [ApiKeyAuthorize]
+        [ApiAction("rebuild")]
         public bool Rebuild()
         {
             try

@@ -14,87 +14,41 @@
  * limitations under the License. 
  */
 
-
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.ReflectionModel;
 using System.Linq;
-using System.Web;
-using System.Web.Http.Dependencies;
+using System.Web.Http.Dispatcher;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-    public class AddInHttpDependencyScope : IDependencyScope
+    public class AddInHttpControllerTypeResolver : DefaultHttpControllerTypeResolver
     {
-        object IDependencyScope.GetService(Type serviceType)
+        private readonly CompositionContainer _container;
+
+        public AddInHttpControllerTypeResolver(CompositionContainer container)
         {
-            throw new NotImplementedException();
+            this._container = container;
         }
 
-        IEnumerable<object> IDependencyScope.GetServices(Type serviceType)
+        public override ICollection<Type> GetControllerTypes(IAssembliesResolver assembliesResolver)
         {
-            throw new NotImplementedException();
-        }
+            var ret = base.GetControllerTypes(assembliesResolver);
 
+            var parts = _container.Catalog.Parts.Where(
+                partDef =>
+                partDef.ExportDefinitions.Any(
+                    p => string.Equals(p.ContractName, ContractNames.ApiController, StringComparison.Ordinal)));
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool isDisposing)
-        {
-            if (isDisposing)
+            foreach (var composablePartDefinition in parts)
             {
-                // managed 
+                // TODO this isn't fantastic as it makes a lot of assumption about the CPD
+                var lazyType = ReflectionModelServices.GetPartType(composablePartDefinition);
+                ret.Add(lazyType.Value);
             }
 
-            // non-managed
-        }
-
-        ~AddInHttpDependencyScope()
-        {
-            this.Dispose(false);
-        }
-
-    }
-
-    public class AddInHttpDependencyResolver : IDependencyResolver
-    {
-        object IDependencyScope.GetService(Type serviceType)
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerable<object> IDependencyScope.GetServices(Type serviceType)
-        {
-            throw new NotImplementedException();
-        }
-
-        IDependencyScope IDependencyResolver.BeginScope()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool isDisposing)
-        {
-            if (isDisposing)
-            {
-                // managed 
-            }
-
-            // non-managed
-        }
-
-        ~AddInHttpDependencyResolver()
-        {
-            this.Dispose(false);
+            return ret;
         }
     }
 }
