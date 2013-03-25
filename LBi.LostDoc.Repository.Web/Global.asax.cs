@@ -276,12 +276,13 @@ namespace LBi.LostDoc.Repository.Web
 
                     IApiControllerMetadata controllerMetadata = AttributedModelServices.GetMetadataView<IApiControllerMetadata>(apiExport.Metadata);
 
+                    Type controllerType = AddInModelServices.GetPartType(partDefinition).Value;
 
-                    Type controllerType = ReflectionModelServices.GetPartType(partDefinition).Value;
+                    var methods = controllerType.GetMethods(BindingFlags.Instance | BindingFlags.Public); 
 
                     string urlTemplatePrefix = string.Format("api/{0}/{1}/", controllerMetadata.PackageId, controllerMetadata.UrlFragment.Trim('/'));
 
-                    foreach (var export in exports)
+                    foreach (ExportDefinition export in exports)
                     {
                         if (!StringComparer.Ordinal.Equals(export.ContractName, Extensibility.ContractNames.ApiAction))
                             continue;
@@ -294,6 +295,7 @@ namespace LBi.LostDoc.Repository.Web
                         {
                             urlTemplate += actionMetadata.UrlFragment.Trim('/');
                         }
+
 
 
                         RouteTable.Routes.MapHttpRoute(

@@ -15,85 +15,12 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
-using System.ComponentModel.Composition.ReflectionModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LBi.LostDoc.Packaging.Composition
 {
-    public class AddInComposablePartDefinition : ComposablePartDefinition
-    {
-        private readonly ComposablePartDefinition _composablePartDefinition;
-        //private readonly IDictionary<string, object> _metadata;
-        private readonly ExportDefinition[] _exportDefinitions;
-
-        public AddInComposablePartDefinition(AddInCatalog catalog, ComposablePartDefinition composablePartDefinition)
-        {
-            this._composablePartDefinition = composablePartDefinition;
-
-            //// TODO is this actually the right place for this? NO, doesn't seem like it is
-            //this._metadata = new Dictionary<string, object>(composablePartDefinition.Metadata);
-            //this._metadata.Add(AddInCatalog.PackageIdMetadataName, catalog.PackageId);
-            //this._metadata.Add(AddInCatalog.PackageVersionMetadataName, catalog.PackageVersion);
-
-            // maybe here
-            List<KeyValuePair<string, object>> injectedMetadata = new List<KeyValuePair<string, object>>();
-            injectedMetadata.Add(new KeyValuePair<string, object>(AddInCatalog.PackageIdMetadataName, catalog.PackageId));
-            injectedMetadata.Add(new KeyValuePair<string, object>(AddInCatalog.PackageVersionMetadataName, catalog.PackageVersion));
-
-            List<ExportDefinition> interceptedExports = new List<ExportDefinition>();
-            
-            foreach (ExportDefinition export in composablePartDefinition.ExportDefinitions)
-            {
-                ICompositionElement compositionElement = export as ICompositionElement;
-                if (compositionElement == null)
-                    throw new InvalidOperationException("ExportDefinition doesn't implement ICompositionElement");
-
-                Dictionary<string, object> metadata = injectedMetadata.Concat(export.Metadata)
-                                                                      .ToDictionary(kvp => kvp.Key,
-                                                                                    kvp => kvp.Value);
-
-                // TODO this will fail if export isn't a ReflectionMemberExportDefinition (Internal, so I can't check)
-                LazyMemberInfo lazyMember = ReflectionModelServices.GetExportingMember(export);
-
-                ExportDefinition interceptedExport =
-                    ReflectionModelServices.CreateExportDefinition(lazyMember,
-                                                                   export.ContractName,
-                                                                   new Lazy<IDictionary<string, object>>(() => metadata),
-                                                                   compositionElement.Origin);
-                interceptedExports.Add(interceptedExport);
-            }
-
-            this._exportDefinitions = interceptedExports.ToArray();
-        }
-
-        public override ComposablePart CreatePart()
-        {
-            return this._composablePartDefinition.CreatePart();
-        }
-
-        public override IEnumerable<ExportDefinition> ExportDefinitions
-        {
-            get { return this._exportDefinitions; }
-        }
-
-        public override IEnumerable<ImportDefinition> ImportDefinitions
-        {
-            get { return this._composablePartDefinition.ImportDefinitions; }
-        }
-
-        public override IDictionary<string, object> Metadata
-        {
-            get { return this._composablePartDefinition.Metadata; }
-        }
-    }
-
-
     public class AddInCatalog : ComposablePartCatalog, INotifyComposablePartCatalogChanged
     {
         public const string PackageIdMetadataName = "PackageId";

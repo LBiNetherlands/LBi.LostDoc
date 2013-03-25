@@ -14,12 +14,23 @@
  * limitations under the License. 
  */
 
+using System;
+using System.ComponentModel.Composition.Primitives;
+using System.ComponentModel.Composition.ReflectionModel;
+using LBi.LostDoc.Packaging.Composition;
+
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-    public static class ContractNames
+    public static class AddInModelServices
     {
-        public const string AdminController = "AdministrationController";
+        public static Lazy<Type> GetPartType(ComposablePartDefinition partDefinition)
+        {
+            AddInComposablePartDefinition addinPartDef = partDefinition as AddInComposablePartDefinition;
+            
+            if (addinPartDef == null)
+                throw new ArgumentException("Must be of type AddInComposablePartDefinition", "partDefinition");
 
-        public const string ApiController = "ApiController";
+            return ReflectionModelServices.GetPartType(addinPartDef.Definition);
+        }
     }
 }

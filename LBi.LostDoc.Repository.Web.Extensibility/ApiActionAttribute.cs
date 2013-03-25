@@ -19,11 +19,10 @@ using System.ComponentModel.Composition;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-    [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class ApiActionAttribute  : ExportAttribute
+    public class ApiActionAttribute  
     {
-        public ApiActionAttribute(string urlFragment) : base(ContractNames.ApiAction, null)
+        public ApiActionAttribute(string urlFragment)
         {
             this.UrlFragment = urlFragment;
         }

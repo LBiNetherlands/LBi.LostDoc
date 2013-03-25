@@ -50,6 +50,7 @@
     <Compile Include="AddInRepository.cs" />
     <Compile Include="AddInSource.cs" />
     <Compile Include="Composition\AddInCatalog.cs" />
+    <Compile Include="Composition\AddInComposablePartDefinition.cs" />
     <Compile Include="PackageEventArgs.cs" />
     <Compile Include="PackageResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
