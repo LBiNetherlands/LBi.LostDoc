@@ -35,16 +35,10 @@ namespace LBi.LostDoc.Repository.Web.Notifications
                 new ConcurrentDictionary<string, ConcurrentDictionary<Guid, Notification>>(StringComparer.Ordinal);
         }
 
-        public void Add(Severity severity, 
-                        Lifetime lifeTime, 
-                        Scope scope, 
-                        string title, 
-                        string message, 
-                        params NotificationAction[] actions)
+        public void Add(Severity severity, Lifetime lifeTime, Scope scope, string title, string message, params NotificationAction[] actions)
         {
             if (scope == Scope.User)
-                throw new ArgumentException(
-                    "Scope 'User' is not allowed for this overload as no IPrincipal is provided.", "scope");
+                throw new ArgumentException("Scope 'User' is not allowed for this overload as no IPrincipal is provided.", "scope");
 
             this.Add(severity, lifeTime, scope, null, title, message, actions);
         }
@@ -71,8 +65,7 @@ namespace LBi.LostDoc.Repository.Web.Notifications
             if (scope == Scope.User)
             {
                 var userNotifications = this._userNotifications.GetOrAdd(principal.Identity.Name, 
-                                                                         s =>
-                                                                         new ConcurrentDictionary<Guid, Notification>());
+                                                                         s => new ConcurrentDictionary<Guid, Notification>());
 
                 if (!userNotifications.TryAdd(note.Id, note))
                     throw new ReadOnlyException("Failed to add notifications.");
