@@ -26,31 +26,51 @@ namespace LBi.LostDoc.Repository.Web.Notifications
     public class NotificationManager
     {
         private readonly ConcurrentDictionary<Guid, Notification> _notifications;
-        private readonly ConcurrentDictionary<string, ConcurrentDictionary<Guid, Notification>> _userNotifications; 
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<Guid, Notification>> _userNotifications;
 
         public NotificationManager()
         {
-            this._notifications =new ConcurrentDictionary<Guid, Notification>();
-            this._userNotifications = new ConcurrentDictionary<string, ConcurrentDictionary<Guid, Notification>>(StringComparer.Ordinal);
+            this._notifications = new ConcurrentDictionary<Guid, Notification>();
+            this._userNotifications =
+                new ConcurrentDictionary<string, ConcurrentDictionary<Guid, Notification>>(StringComparer.Ordinal);
         }
 
-        public void Add(Severity severity, Lifetime lifeTime, Scope scope, string title, string message, params NotificationAction[] actions)
+        public void Add(Severity severity, 
+                        Lifetime lifeTime, 
+                        Scope scope, 
+                        string title, 
+                        string message, 
+                        params NotificationAction[] actions)
         {
             if (scope == Scope.User)
-                throw new ArgumentException("Scope 'User' is not allowed for this overload as no IPrincipal is provided.", "scope");
+                throw new ArgumentException(
+                    "Scope 'User' is not allowed for this overload as no IPrincipal is provided.", "scope");
 
             this.Add(severity, lifeTime, scope, null, title, message, actions);
         }
 
-        public void Add(Severity severity, Lifetime lifeTime, Scope scope, IPrincipal principal, string title, string message, params NotificationAction[] actions)
+        public void Add(Severity severity, 
+                        Lifetime lifeTime, 
+                        Scope scope, 
+                        IPrincipal principal, 
+                        string title, 
+                        string message, 
+                        params NotificationAction[] actions)
         {
             if (scope == Scope.User && principal == null)
                 throw new ArgumentNullException("principal", "Argument cannot be null when Scope is 'User'.");
 
-            var note = new Notification(Guid.NewGuid(), DateTime.UtcNow, severity, lifeTime, scope, title, message, actions);
+            var note = new Notification(Guid.NewGuid(), 
+                                        DateTime.UtcNow, 
+                                        severity, 
+                                        lifeTime, 
+                                        scope, 
+                                        title, 
+                                        message, 
+                                        actions);
             if (scope == Scope.User)
             {
-                var userNotifications = this._userNotifications.GetOrAdd(principal.Identity.Name,
+                var userNotifications = this._userNotifications.GetOrAdd(principal.Identity.Name, 
                                                                          s =>
                                                                          new ConcurrentDictionary<Guid, Notification>());
 
@@ -64,16 +84,11 @@ namespace LBi.LostDoc.Repository.Web.Notifications
             }
         }
 
-        public void Remove(Guid id)
-        {
-            Notification oldVal;
-            this._notifications.TryRemove(id, out oldVal);
-        }
-
         public IEnumerable<Notification> Get(IPrincipal principal)
         {
             IEnumerable<Notification> ret;
             ConcurrentDictionary<Guid, Notification> userNotifications;
+
             // TODO somwhere we need to filter for the right scope
             if (this._userNotifications.TryGetValue(principal.Identity.Name, out userNotifications))
                 ret = userNotifications.Values;
@@ -92,6 +107,12 @@ namespace LBi.LostDoc.Repository.Web.Notifications
 
                 yield return note;
             }
+        }
+
+        public void Remove(Guid id)
+        {
+            Notification oldVal;
+            this._notifications.TryRemove(id, out oldVal);
         }
     }
 }

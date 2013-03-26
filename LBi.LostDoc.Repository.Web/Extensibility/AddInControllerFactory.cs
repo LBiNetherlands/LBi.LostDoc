@@ -30,28 +30,37 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     public class AddInControllerFactory : IControllerFactory
     {
         private static readonly object _metadataKey = new object();
-        public static object MetadataKey { get { return _metadataKey; } }
-
-        private readonly object _key;
-        private readonly CompositionContainer _container;
-        private readonly IControllerFactory _nestedFactory;
-        private readonly MetadataContractBuilder<IController, IControllerMetadata> _importBuilder;
         private readonly string _areaName;
 
-        public AddInControllerFactory(string areaName, CompositionContainer container, IControllerFactory controllerFactory)
+        private readonly CompositionContainer _container;
+        private readonly MetadataContractBuilder<IController, IControllerMetadata> _importBuilder;
+        private readonly object _key;
+        private readonly IControllerFactory _nestedFactory;
+
+        public AddInControllerFactory(string areaName, 
+                                      CompositionContainer container, 
+                                      IControllerFactory controllerFactory)
         {
             this._areaName = areaName;
             this._key = new object();
             this._container = container;
             this._nestedFactory = controllerFactory;
             this._importBuilder =
-                new MetadataContractBuilder<IController, IControllerMetadata>(ContractNames.AdminController,
-                                                                              ImportCardinality.ExactlyOne,
+                new MetadataContractBuilder<IController, IControllerMetadata>(ContractNames.AdminController, 
+                                                                              ImportCardinality.ExactlyOne, 
                                                                               CreationPolicy.NonShared);
 
-            this._importBuilder.Add((contract, meta) => StringComparer.OrdinalIgnoreCase.Equals(meta.Name, contract.Name));
-            this._importBuilder.Add((contract, meta) => StringComparer.Ordinal.Equals(meta.PackageId, contract.PackageId));
-            this._importBuilder.Add((contract, meta) => StringComparer.Ordinal.Equals(meta.PackageVersion, contract.PackageVersion));
+            this._importBuilder.Add(
+                (contract, meta) => StringComparer.OrdinalIgnoreCase.Equals(meta.Name, contract.Name));
+            this._importBuilder.Add(
+                (contract, meta) => StringComparer.Ordinal.Equals(meta.PackageId, contract.PackageId));
+            this._importBuilder.Add(
+                (contract, meta) => StringComparer.Ordinal.Equals(meta.PackageVersion, contract.PackageVersion));
+        }
+
+        public static object MetadataKey
+        {
+            get { return _metadataKey; }
         }
 
         public IController CreateController(RequestContext requestContext, string controllerName)
@@ -62,22 +71,25 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
             {
                 ImportDefinition importDefinition = this._importBuilder
                                                         .WithValue(c => c.Name, controllerName)
-                                                        .WithValue(c => c.PackageId, requestContext.RouteData.Values["packageId"])
-                                                        .WithValue(c => c.PackageVersion, requestContext.RouteData.Values["packageVersion"]);
+                                                        .WithValue(c => c.PackageId, 
+                                                                   requestContext.RouteData.Values["packageId"])
+                                                        .WithValue(c => c.PackageVersion, 
+                                                                   requestContext.RouteData.Values["packageVersion"]);
 
                 Export export = this._container.GetExports(importDefinition).SingleOrDefault();
                 if (export != null)
                 {
-                    ret = (IController) export.Value;
+                    ret = (IController)export.Value;
                     requestContext.HttpContext.Items[this._key] = this;
+
                     // store this for later as we already went throuh the trouble of resolving the Export
-                    requestContext.HttpContext.Items[MetadataKey] = AttributedModelServices.GetMetadataView<IControllerMetadata>(export.Metadata);
-                    
+                    requestContext.HttpContext.Items[MetadataKey] =
+                        AttributedModelServices.GetMetadataView<IControllerMetadata>(export.Metadata);
+
                     // how bad is this?
                     ((Controller)ret).ActionInvoker = new AddInActionInvoker();
                 }
             }
-            
 
             if (ret == null)
             {

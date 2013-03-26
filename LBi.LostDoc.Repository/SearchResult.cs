@@ -19,18 +19,14 @@ using LBi.LostDoc;
 
 namespace LBi.LostDoc.Repository
 {
-    public class SearchResultSet
-    {
-        public int HitCount { get; set; }
-        public SearchResult[] Results { get; set; }
-    }
-
-
     public class SearchResult
     {
         public string Title { get; set; }
+
         public Uri Url { get; set; }
+
         public AssetIdentifier AssetId { get; set; }
+
         public string Blurb { get; set; }
     }
 }

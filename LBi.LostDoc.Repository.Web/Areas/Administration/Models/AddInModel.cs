@@ -21,7 +21,9 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
     public class AddInModel : ModelBase
     {
         public bool CanInstall { get; set; }
+
         public bool CanUpdate { get; set; }
+
         public bool CanUninstall { get; set; }
 
         public AddInPackage Package { get; set; }

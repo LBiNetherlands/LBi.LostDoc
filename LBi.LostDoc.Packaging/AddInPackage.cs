@@ -21,9 +21,19 @@ namespace LBi.LostDoc.Packaging
 {
     public class AddInPackage
     {
-
         // TODO clean this up
-        internal AddInPackage(IPackage pkg, string id, bool isReleaseVersion, DateTimeOffset? published, Uri iconUrl, string title, string summary, string description, Uri projectUrl)
+
+        #region Constructors and Destructors
+
+        internal AddInPackage(IPackage pkg, 
+                              string id, 
+                              bool isReleaseVersion, 
+                              DateTimeOffset? published, 
+                              Uri iconUrl, 
+                              string title, 
+                              string summary, 
+                              string description, 
+                              Uri projectUrl)
         {
             this.NuGetPackage = pkg;
             this.Id = id;
@@ -43,36 +53,62 @@ namespace LBi.LostDoc.Packaging
             this.LicenseUrl = pkg.LicenseUrl;
         }
 
-        internal static AddInPackage Create(IPackage pkg)
-        {   
-            return new AddInPackage(pkg, pkg.Id, pkg.IsReleaseVersion(), pkg.Published, pkg.IconUrl, pkg.Title, pkg.Summary, pkg.Description, pkg.ProjectUrl);
-        }
+        #endregion
 
-        public DateTimeOffset? Published { get; protected set; }
+        #region Public Properties
+
+        public string Description { get; protected set; }
 
         public Uri IconUrl { get; protected set; }
 
+        public string Id { get; protected set; }
+
+        public bool IsReleaseVersion { get; protected set; }
+
+        public Uri LicenseUrl { get; set; }
+
         public Uri ProjectUrl { get; protected set; }
 
-        public string Description { get; protected set; }
+        public DateTimeOffset? Published { get; protected set; }
 
         public string Summary { get; protected set; }
 
         public string Title { get; protected set; }
 
-        public bool IsReleaseVersion { get; protected set; }
-
         public string Version { get; protected set; }
 
-        public string Id { get; protected set; }
+        #endregion
+
+        #region Properties
 
         internal IPackage NuGetPackage { get; set; }
 
-        public Uri LicenseUrl { get; set; }
+        #endregion
+
+        #region Public Methods and Operators
 
         public override string ToString()
         {
             return string.Format("{0}.{1}", this.Id, this.Version);
         }
+
+        #endregion
+
+        #region Methods
+
+        internal static AddInPackage Create(IPackage pkg)
+        {
+            return new AddInPackage(pkg, 
+                                    pkg.Id, 
+                                    pkg.IsReleaseVersion(), 
+                                    pkg.Published, 
+                                    pkg.IconUrl, 
+                                    pkg.Title, 
+                                    pkg.Summary, 
+                                    pkg.Description, 
+                                    pkg.ProjectUrl);
+        }
+
+        #endregion
     }
 }

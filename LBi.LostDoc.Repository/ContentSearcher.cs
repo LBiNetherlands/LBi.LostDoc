@@ -15,27 +15,23 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using LBi.LostDoc;
 using LBi.LostDoc.Diagnostics;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
-using Lucene.Net.Search.Payloads;
 using Lucene.Net.Store;
 
 namespace LBi.LostDoc.Repository
 {
     public class ContentSearcher : IDisposable
     {
+        private readonly StandardAnalyzer _analyzer;
         private readonly FSDirectory _directory;
+        private readonly string _indexPath;
         private readonly IndexReader _indexReader;
         private readonly IndexSearcher _indexSearcher;
-        private readonly StandardAnalyzer _analyzer;
-        private readonly string _indexPath;
 
         public ContentSearcher(string indexPath)
         {
@@ -44,6 +40,11 @@ namespace LBi.LostDoc.Repository
             this._indexReader = IndexReader.Open(this._directory, readOnly: true);
             this._analyzer = new StandardAnalyzer(global::Lucene.Net.Util.Version.LUCENE_29);
             this._indexSearcher = new IndexSearcher(this._indexReader);
+        }
+
+        ~ContentSearcher()
+        {
+            this.Dispose(false);
         }
 
         public string IndexPath
@@ -57,11 +58,6 @@ namespace LBi.LostDoc.Repository
             GC.SuppressFinalize(this);
         }
 
-        ~ContentSearcher()
-        {
-            this.Dispose(false);
-        }
-
         public SearchResultSet Search(string query, int offset = 0, int count = 20)
         {
             using (TraceSources.ContentSearcherSource.TraceActivity("Search [{1}-{2}]: {0}", query, offset, offset + count))
@@ -70,8 +66,7 @@ namespace LBi.LostDoc.Repository
 
                 //Query q = new QueryParser(Lucene.Net.Util.Version.LUCENE_29, "body", this._analyzer).Parse(query);
 
-                string[] rawTerms = query.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-
+                string[] rawTerms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                 BooleanQuery titleQuery = new BooleanQuery();
                 BooleanQuery summaryQuery = new BooleanQuery();
@@ -100,7 +95,7 @@ namespace LBi.LostDoc.Repository
 
                 titleQuery.Boost = 8f;
                 contentQuery.Boost = 0.7f;
-                
+
                 q.Add(titleQuery, Occur.SHOULD);
                 q.Add(summaryQuery, Occur.SHOULD);
                 q.Add(contentQuery, Occur.SHOULD);
@@ -117,15 +112,15 @@ namespace LBi.LostDoc.Repository
                 for (int i = 0; i < ret.Results.Length; i++)
                 {
                     var scoreDoc = docs.ScoreDocs[offset + i];
-                    
+
                     Document doc = this._indexSearcher.Doc(scoreDoc.Doc);
 
                     ret.Results[i] = new SearchResult
                                          {
-                                             AssetId = AssetIdentifier.Parse(doc.GetField("aid").StringValue),
-                                             Title = doc.GetField("title").StringValue,
-                                             Url = new Uri(doc.GetField("uri").StringValue, UriKind.RelativeOrAbsolute),
-                                             Blurb = doc.GetField("summary").StringValue,
+                                             AssetId = AssetIdentifier.Parse(doc.GetField("aid").StringValue), 
+                                             Title = doc.GetField("title").StringValue, 
+                                             Url = new Uri(doc.GetField("uri").StringValue, UriKind.RelativeOrAbsolute), 
+                                             Blurb = doc.GetField("summary").StringValue, 
                                          };
                 }
 

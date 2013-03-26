@@ -24,6 +24,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
     public class AddInOverviewModel : ModelBase
     {
         public string Title { get; set; }
+
         public AddInModel[] AddIns { get; set; }
     }
 }

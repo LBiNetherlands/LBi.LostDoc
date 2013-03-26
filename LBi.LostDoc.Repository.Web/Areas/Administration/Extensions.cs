@@ -23,7 +23,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
         public static string ToHumanReadableString(this TimeSpan timeSpan)
         {
             if (timeSpan.TotalDays > 7)
-                return string.Format("{0:N0} weeks", timeSpan.TotalDays/7);
+                return string.Format("{0:N0} weeks", timeSpan.TotalDays / 7);
 
             if (timeSpan.TotalDays >= 1)
                 return string.Format("{0:N0} days", timeSpan.TotalDays);

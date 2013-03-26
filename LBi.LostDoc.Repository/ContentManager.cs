@@ -19,30 +19,48 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using LBi.LostDoc;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Repository
 {
     /// <summary>
-    /// This acts as the main content manager for the repository.
+    ///     This acts as the main content manager for the repository.
     /// </summary>
     // TODO enable different storage backend
     public class ContentManager
     {
-        private const string CONTENT_REF_NAME = ".latest";
-        // private const string CONTENT_HISTORY_NAME = ".history";
-        private readonly string _contentPath;
-        private readonly string _repositoryPath;
+        private const string _CONTENT_REF_NAME = ".latest";
         private readonly ConcurrentQueue<Trigger> _buildQueue;
-        private readonly BlockingCollection<Trigger> _workQueue;
-        private readonly Task _workProcess;
-        private readonly Template _template;
-        private readonly VersionComponent? _ignoreVersionComponent;
         private readonly ReaderWriterLockSlim _contentLock;
+
+// private const string CONTENT_HISTORY_NAME = ".history";
+        private readonly string _contentPath;
+        private readonly VersionComponent? _ignoreVersionComponent;
+        private readonly string _repositoryPath;
+        private readonly Template _template;
+        private readonly Task _workProcess;
+        private readonly BlockingCollection<Trigger> _workQueue;
         private string _currentContentRef;
         private volatile State _state;
+
+        public ContentManager(ContentSettings settings)
+        {
+            this._state = State.Idle;
+            this._repositoryPath = settings.RepositoryPath;
+            this._contentPath = settings.ContentPath;
+            this._ignoreVersionComponent = settings.IgnoreVersionComponent;
+            this._buildQueue = new ConcurrentQueue<Trigger>();
+            this._workQueue = new BlockingCollection<Trigger>(this._buildQueue);
+            this._template = settings.Template;
+            this._contentLock = new ReaderWriterLockSlim();
+            this._workProcess = new TaskFactory().StartNew(this.WorkerMethod);
+            string contentRefPath = Path.Combine(this._contentPath, _CONTENT_REF_NAME);
+            if (File.Exists(contentRefPath))
+                this._currentContentRef = File.ReadAllText(contentRefPath).Trim();
+            else
+                this._currentContentRef = null;
+        }
 
         public string ContentFolder
         {
@@ -93,30 +111,38 @@ namespace LBi.LostDoc.Repository
             get { return this._state; }
         }
 
-
-        protected class Trigger
+        public string RepositoryPath
         {
-            public string Reason { get; set; }
-
-            public DateTime Created { get; set; }
+            get { return this._repositoryPath; }
         }
 
-        public ContentManager(ContentSettings settings)
+        public string GetContentRoot(string id)
         {
-            this._state = State.Idle;
-            this._repositoryPath = settings.RepositoryPath;
-            this._contentPath = settings.ContentPath;
-            this._ignoreVersionComponent = settings.IgnoreVersionComponent;
-            this._buildQueue = new ConcurrentQueue<Trigger>();
-            this._workQueue = new BlockingCollection<Trigger>(this._buildQueue);
-            this._template = settings.Template;
-            this._contentLock = new ReaderWriterLockSlim();
-            this._workProcess = new TaskFactory().StartNew(this.WorkerMethod);
-            string contentRefPath = Path.Combine(this._contentPath, CONTENT_REF_NAME);
-            if (File.Exists(contentRefPath))
-                this._currentContentRef = File.ReadAllText(contentRefPath).Trim();
-            else
-                this._currentContentRef = null;
+            string ret = Path.Combine(this._contentPath, id);
+            if (!Directory.Exists(ret))
+                throw new DirectoryNotFoundException();
+
+            return ret;
+        }
+
+        public void QueueRebuild(string reason)
+        {
+            this._workQueue.Add(new Trigger { Created = DateTime.UtcNow, Reason = reason });
+        }
+
+        public void SetCurrentContentFolder(string contentPath)
+        {
+            try
+            {
+                this._contentLock.EnterWriteLock();
+                string currentPath = Path.Combine(this._contentPath, _CONTENT_REF_NAME);
+                File.WriteAllText(currentPath, contentPath);
+                this._currentContentRef = contentPath;
+            }
+            finally
+            {
+                this._contentLock.ExitWriteLock();
+            }
         }
 
         private void WorkerMethod()
@@ -124,7 +150,6 @@ namespace LBi.LostDoc.Repository
             Thread.CurrentThread.Name = "ContentManager.WorkerMethod";
             using (TraceSources.ContentManagerSource.TraceActivity("Worker starting"))
             {
-
                 foreach (Trigger trigger in this._workQueue.GetConsumingEnumerable())
                 {
                     Trigger discardedTrigger;
@@ -132,7 +157,7 @@ namespace LBi.LostDoc.Repository
                     while (this._workQueue.TryTake(out discardedTrigger))
                     {
                         TraceSources.ContentManagerSource.TraceInformation(
-                            "Skipping redundant rebuild trigger: {0}",
+                            "Skipping redundant rebuild trigger: {0}", 
                             discardedTrigger.Reason);
                     }
 
@@ -146,6 +171,7 @@ namespace LBi.LostDoc.Repository
                         builder.IgnoreVersionComponent = this._ignoreVersionComponent;
                         string folder = Guid.NewGuid().ToBase36String();
                         string tmpDir = Path.Combine(this._contentPath, folder);
+
                         // TODO maybe pass in a ScopedFileProvider wrapping a DirectoryFileProvider here (instead of tmpdir)
                         builder.Build(this._repositoryPath, tmpDir);
 
@@ -157,54 +183,27 @@ namespace LBi.LostDoc.Repository
                         catch (Exception ex)
                         {
                             TraceSources.ContentManagerSource.TraceCritical(
-                                "An unhandled exception of type {0} occured while setting current content folder: {1}",
-                                ex.GetType().Name,
+                                "An unhandled exception of type {0} occured while setting current content folder: {1}", 
+                                ex.GetType().Name, 
                                 ex.ToString());
                             throw;
-
                         }
                     }
                     catch (Exception ex)
                     {
                         TraceSources.ContentManagerSource.TraceError(
-                            "An unhandled exception of type {0} occured while rebuilding content: {1}",
-                            ex.GetType().Name,
+                            "An unhandled exception of type {0} occured while rebuilding content: {1}", 
+                            ex.GetType().Name, 
                             ex.ToString());
                     }
                 }
             }
         }
 
-        public void SetCurrentContentFolder(string contentPath)
+        protected class Trigger
         {
-            try
-            {
-                this._contentLock.EnterWriteLock();
-                string currentPath = Path.Combine(this._contentPath, CONTENT_REF_NAME);
-                File.WriteAllText(currentPath, contentPath);
-                this._currentContentRef = contentPath;
-            }
-            finally
-            {
-                this._contentLock.ExitWriteLock();
-            }
+            public DateTime Created { get; set; }
+            public string Reason { get; set; }
         }
-
-        public void QueueRebuild(string reason)
-        {
-            this._workQueue.Add(new Trigger { Created = DateTime.UtcNow, Reason = reason });
-        }
-
-
-        public string GetContentRoot(string id)
-        {
-            string ret = Path.Combine(this._contentPath, id);
-            if (!Directory.Exists(ret))
-                throw new DirectoryNotFoundException();
-
-            return ret;
-        }
-
-        public string RepositoryPath { get { return this._repositoryPath; } }
     }
 }

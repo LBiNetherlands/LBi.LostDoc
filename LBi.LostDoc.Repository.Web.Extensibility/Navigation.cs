@@ -20,9 +20,14 @@ using System.Linq;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
-    public class Navigation 
+    public class Navigation
     {
-        public Navigation(string group, double order, string text, Uri target, bool isActive, IEnumerable<Navigation> children)
+        public Navigation(string group, 
+                          double order, 
+                          string text, 
+                          Uri target, 
+                          bool isActive, 
+                          IEnumerable<Navigation> children)
         {
             this.Group = group;
             this.Order = order;
@@ -32,12 +37,16 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
             this.Children = children.ToArray();
         }
 
-        public string Group { get; protected set; }
-        public double Order { get; protected set; }
-        public string Text { get; protected set; }
-        public Uri Target { get; protected set; }
-        public bool IsActive { get; protected set; }
         public Navigation[] Children { get; protected set; }
-    }
 
+        public string Group { get; protected set; }
+
+        public bool IsActive { get; protected set; }
+
+        public double Order { get; protected set; }
+
+        public Uri Target { get; protected set; }
+
+        public string Text { get; protected set; }
+    }
 }

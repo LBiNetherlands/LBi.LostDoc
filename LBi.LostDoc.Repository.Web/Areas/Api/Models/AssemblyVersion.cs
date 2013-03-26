@@ -17,10 +17,8 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace LBi.LostDoc.Repository.Web.Models
+namespace LBi.LostDoc.Repository.Web.Areas.Api.Models
 {
-    /// <summary>
-    /// </summary>
     [DataContract]
     public class AssemblyVersion
     {

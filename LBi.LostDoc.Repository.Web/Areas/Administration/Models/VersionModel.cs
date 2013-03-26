@@ -1,5 +1,5 @@
-/*
- * Copyright 2012 LBi Netherlands B.V.
+﻿/*
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License. 
  */
 
-using LBi.LostDoc.Templating;
+using System;
 
-namespace LBi.LostDoc.Repository
+namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
 {
-    public class ContentSettings
+    public class VersionModel
     {
-        public string RepositoryPath { get; set; }
+        public string Filename { get; set; }
 
-        public string ContentPath { get; set; }
+        public Version Version { get; set; }
 
-        public Template Template { get; set; }
-
-        public VersionComponent? IgnoreVersionComponent { get; set; }
+        public DateTime Created { get; set; }
     }
 }

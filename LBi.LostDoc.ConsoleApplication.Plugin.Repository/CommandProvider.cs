@@ -25,7 +25,7 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
     {
         public Type[] GetCommands()
         {
-            return new[] {typeof(PushCommand)};
+            return new[] { typeof(PushCommand) };
         }
     }
 }

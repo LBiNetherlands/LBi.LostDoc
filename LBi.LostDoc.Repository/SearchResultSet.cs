@@ -1,5 +1,5 @@
-﻿/*
- * Copyright 2013 LBi Netherlands B.V.
+/*
+ * Copyright 2012 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,12 @@
  * limitations under the License. 
  */
 
-using System;
-using System.ComponentModel.Composition;
-
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class ApiActionAttribute  
+    public class SearchResultSet
     {
-        public ApiActionAttribute(string urlFragment)
-        {
-            this.UrlFragment = urlFragment;
-        }
+        public int HitCount { get; set; }
 
-        public string UrlFragment { get; protected set; }
+        public SearchResult[] Results { get; set; }
     }
 }

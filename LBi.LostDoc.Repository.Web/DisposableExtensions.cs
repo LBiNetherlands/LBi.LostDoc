@@ -15,49 +15,26 @@
  */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace LBi.LostDoc.Repository.Web
 {
     public static class DisposableExtensions
     {
-        /// <summary>
-        /// Values in a ConditionalWeakTable need to be a reference type,
-        /// so box the refcount int in a class.
-        /// </summary>
-        private class RefCount
-        {
-            public int refCount;
-        }
-
         private static ConditionalWeakTable<IDisposable, RefCount> refCounts =
             new ConditionalWeakTable<IDisposable, RefCount>();
 
         /// <summary>
         /// Extension method for IDisposable.
-        /// Increments the refCount for the given IDisposable object.
-        /// Note: newly instantiated objects don't automatically have a refCount of 1!
-        /// If you wish to use ref-counting, always call retain() whenever you want
-        /// to take ownership of an object.
+        ///     Decrements the refCount for the given disposable.
         /// </summary>
-        /// <remarks>This method is thread-safe.</remarks>
-        /// <param name="disposable">The disposable that should be retained.</param>
-        public static T Retain<T>(this T disposable) where  T : IDisposable
-        {
-            lock (refCounts)
-            {
-                RefCount refCount = refCounts.GetOrCreateValue(disposable);
-                refCount.refCount++;
-            }
-            return disposable;
-        }
-
-        /// <summary>
-        /// Extension method for IDisposable.
-        /// Decrements the refCount for the given disposable.
-        /// </summary>
-        /// <remarks>This method is thread-safe.</remarks>
-        /// <param name="disposable">The disposable to release.</param>
+        /// <remarks>
+        /// This method is thread-safe.
+        /// </remarks>
+        /// <param name="disposable">
+        /// The disposable to release.
+        /// </param>
         public static void Release(this IDisposable disposable)
         {
             lock (refCounts)
@@ -79,6 +56,43 @@ namespace LBi.LostDoc.Repository.Web
                     disposable.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Extension method for IDisposable.
+        ///     Increments the refCount for the given IDisposable object.
+        ///     Note: newly instantiated objects don't automatically have a refCount of 1!
+        ///     If you wish to use ref-counting, always call retain() whenever you want
+        ///     to take ownership of an object.
+        /// </summary>
+        /// <remarks>
+        /// This method is thread-safe.
+        /// </remarks>
+        /// <param name="disposable">
+        /// The disposable that should be retained.
+        /// </param>
+        /// <returns>
+        /// The <see cref="T"/>.
+        /// </returns>
+        public static T Retain<T>(this T disposable) where T : IDisposable
+        {
+            lock (refCounts)
+            {
+                RefCount refCount = refCounts.GetOrCreateValue(disposable);
+                refCount.refCount++;
+            }
+
+            return disposable;
+        }
+
+        /// <summary>
+        ///     Values in a ConditionalWeakTable need to be a reference type,
+        ///     so box the refcount int in a class.
+        /// </summary>
+        private class RefCount
+        {
+            [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is OK here.")] 
+            public int refCount;
         }
     }
 }

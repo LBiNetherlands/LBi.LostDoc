@@ -20,19 +20,19 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
 {
     public class AdministrationAreaRegistration : AreaRegistration
     {
+        public const string Name = "Administration";
+
         public override string AreaName
         {
             get { return Name; }
         }
 
-        public const string Name = "Administration";
-
         public override void RegisterArea(AreaRegistrationContext context)
         {
             context.MapRoute(
-                "Administration",
-                "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/{id}",
-                new {action = "Index", id = UrlParameter.Optional});
+                "Administration", 
+                "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/{id}", 
+                new { action = "Index", id = UrlParameter.Optional });
         }
     }
 }

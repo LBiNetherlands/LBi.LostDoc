@@ -24,7 +24,6 @@ using LBi.LostDoc.Repository.Web.Models;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
 {
-
     public class LibraryController : ApiController
     {
         public LibraryModel Get()

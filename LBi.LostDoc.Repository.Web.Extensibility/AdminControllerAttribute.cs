@@ -16,7 +16,6 @@
 
 using System;
 using System.ComponentModel.Composition;
-using System.Reflection;
 using System.Web.Mvc;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
@@ -29,13 +28,16 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
         public AdminControllerAttribute(string name) : base(ContractNames.AdminController, typeof(IController))
         {
-            this._name= name;
+            this._name = name;
             this.Text = name;
         }
 
         public string Name { get { return this._name; } }
+
         public string Text { get; set; }
+
         public string Group { get; set; }
+
         public double Order { get; set; }
     }
 }

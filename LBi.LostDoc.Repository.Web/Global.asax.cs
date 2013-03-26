@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,26 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
-using System.ComponentModel.Composition.ReflectionModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web.Hosting;
 using System.Web.Http;
-using System.Web.Http.Dispatcher;
-using System.Web.Http.WebHost.Routing;
 using System.Web.Mvc;
-using System.Web.Optimization;
 using System.Web.Routing;
-using LBi.LostDoc;
+using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Packaging.Composition;
 using LBi.LostDoc.Repository.Web.Areas.Administration;
 using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
-using LBi.LostDoc.Templating.FileProviders;
 using ContractNames = LBi.LostDoc.Extensibility.ContractNames;
 
 namespace LBi.LostDoc.Repository.Web
 {
-    // Note: For instructions on enabling IIS6 or IIS7 classic mode, 
+// Note: For instructions on enabling IIS6 or IIS7 classic mode, 
     // visit http://go.microsoft.com/?LinkId=9394801
 
     public class WebApiApplication : System.Web.HttpApplication
@@ -51,7 +46,7 @@ namespace LBi.LostDoc.Repository.Web
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
-            
+
             // this filter injects Notifications into the IBaseModel
             filters.Add(new AdminFilter());
         }
@@ -60,89 +55,29 @@ namespace LBi.LostDoc.Repository.Web
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            //routes.MapHttpRoute(
-            //                    name: "Repository",
-            //                    routeTemplate: "site/repository/{assembly}/{version}",
-            //                    defaults: new
-            //                                  {
-            //                                      controller = "Repository",
-            //                                      assembly = RouteParameter.Optional,
-            //                                      version = RouteParameter.Optional
-            //                                  });
-
-
-            //routes.MapHttpRoute(
-            //                    name: "Admin",
-            //                    routeTemplate: "site/library",
-            //                    defaults: new
-            //                                  {
-            //                                      controller = "Library",
-            //                                  });
-
-            //routes.MapHttpRoute(
-            //                    name: "Rebuild",
-            //                    routeTemplate: "site/rebuild",
-            //                    defaults: new
-            //                                  {
-            //                                      controller = "Site",
-            //                                      action = "Rebuild",
-            //                                  });
-
-            //routes.MapHttpRoute(
-            //                    name: "Status",
-            //                    routeTemplate: "site/status",
-            //                    defaults: new
-            //                                  {
-            //                                      controller = "Site",
-            //                                      action = "GetStatus"
-            //                                  });
-
-
-            //routes.MapHttpRoute(
-            //                    name: "Search",
-            //                    routeTemplate: "archive/{id}/search/{searchTerms}",
-            //                    defaults: new
-            //                                  {
-            //                                      controller = "Search",
-            //                                      action = "Get"
-            //                                  });
-
-
-            //routes.MapHttpRoute(
-            //                    name: "DefaultSearch",
-            //                    routeTemplate: "library/search/{searchTerms}",
-            //                    defaults: new
-            //                                  {
-            //                                      controller = "Search",
-            //                                      id = "current",
-            //                                      action = "Get"
-            //                                  });
-
+            routes.MapRoute(
+                name: "Archive", 
+                url: "archive/{id}/{*path}", 
+                defaults: new
+                              {
+                                  controller = "Content", 
+                                  id = "current", 
+                                  action = "GetContent", 
+                                  path = "Library.html"
+                              });
 
             routes.MapRoute(
-                            name: "Archive",
-                            url: "archive/{id}/{*path}",
-                            defaults: new
-                                          {
-                                              controller = "Content",
-                                              id = "current",
-                                              action = "GetContent",
-                                              path = "Library.html"
-                                          });
+                name: "Library", 
+                url: "library/{*path}", 
+                defaults: new
+                              {
+                                  controller = "Content", 
+                                  id = "current", 
+                                  path = "Library.html", 
+                                  action = "GetContent"
+                              });
 
-            routes.MapRoute(
-                            name: "Library",
-                            url: "library/{*path}",
-                            defaults: new
-                                          {
-                                              controller = "Content",
-                                              id = "current",
-                                              path = "Library.html",
-                                              action = "GetContent"
-                                          });
-
-
-            routes.Add("Redirect", new Route("", new RedirectRouteHandler("Library")));
+            routes.Add("Redirect", new Route(string.Empty, new RedirectRouteHandler("Library")));
         }
 
         protected void Application_Start()
@@ -151,8 +86,18 @@ namespace LBi.LostDoc.Repository.Web
             // TODO maybe move all of this into the App class with "IAppConfig"
 
             // initialize logger
-            TraceListener traceListener = new TextWriterTraceListener(Path.Combine(AppConfig.LogPath, string.Format("repository_{0:yyyy'-'MM'-'dd__HHmmss}.log", DateTime.Now)));
-            Web.TraceSources.RepositoryControllerSource.Listeners.Add(traceListener);
+            TraceListener traceListener =
+                new TextWriterTraceListener(Path.Combine(AppConfig.LogPath, 
+                                                         string.Format("repository_{0:yyyy'-'MM'-'dd__HHmmss}.log", 
+                                                                       DateTime.Now)));
+
+            // TODO introduce flags/settings for controlling logging levels, but for now include everything
+            traceListener.Filter = new EventTypeFilter(SourceLevels.All);
+
+            traceListener.TraceOutputOptions = TraceOptions.ThreadId | TraceOptions.DateTime;
+
+            Web.TraceSources.Content.Listeners.Add(traceListener);
+            Web.TraceSources.AddInManager.Listeners.Add(traceListener);
             Repository.TraceSources.ContentManagerSource.Listeners.Add(traceListener);
             Repository.TraceSources.ContentSearcherSource.Listeners.Add(traceListener);
 
@@ -160,8 +105,8 @@ namespace LBi.LostDoc.Repository.Web
             Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
 
             // set up add-in system
-            AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed",
-                                                        AppConfig.AddInRepository,
+            AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed", 
+                                                        AppConfig.AddInRepository, 
                                                         isOfficial: true);
 
             // intialize MEF
@@ -175,34 +120,31 @@ namespace LBi.LostDoc.Repository.Web
 
             // load other sources from site-settings (not config)
             AddInRepository repository = new AddInRepository(officalSource);
-            AddInManager addInManager = new AddInManager(repository, AppConfig.AddInInstallPath, AppConfig.AddInPackagePath);
+            AddInManager addInManager = new AddInManager(repository, 
+                                                         AppConfig.AddInInstallPath, 
+                                                         AppConfig.AddInPackagePath);
 
             // when the catalog changes, discover and route all ApiControllers
-            catalog.Changed += (sender, args) => UpdateWebApiRegistry(args);
+            catalog.Changed += (sender, args) => this.UpdateWebApiRegistry(args);
 
-
-
-
-            // TODO for debugging only
-            Debugger.Break();
-            Debugger.Launch();
+            //// TODO for debugging only
+            //Debugger.Break();
+            //Debugger.Launch();
 
             // now register core libs
             catalog.Catalogs.Add(new AddInCatalog(new ApplicationCatalog(), corePackageId, corePackageVersion));
-            
+
             // hook event so that installed add-ins get registered in the catalog, if composition occurs after this fires
             // or if recomposition is enabled, no restart should be requried
             addInManager.Installed +=
-                (sender, args) => catalog.Catalogs.Add(new AddInCatalog(new DirectoryCatalog(args.InstallationPath),
-                                                                        args.Package.Id,
+                (sender, args) => catalog.Catalogs.Add(new AddInCatalog(new DirectoryCatalog(args.InstallationPath), 
+                                                                        args.Package.Id, 
                                                                         args.Package.Version));
 
-            
             // delete and redeploy all installed packages, this will trigger the Installed event ^
             // this acts as a crude "remove/overwrite plugins that were in use when un/installed" hack
             addInManager.Restore();
 
-   
             // create container
             CompositionContainer container = new CompositionContainer(catalog);
 
@@ -217,21 +159,19 @@ namespace LBi.LostDoc.Repository.Web
 
             // set up content manager
             ContentManager contentManager = new ContentManager(new ContentSettings
-                                          {
-                                              ContentPath = AppConfig.ContentPath,
-                                              // TODO make this configurable
-                                              IgnoreVersionComponent = VersionComponent.Patch,
-                                              RepositoryPath = AppConfig.RepositoryPath,
-                                              Template = template
-                                          });
-
+                                                                   {
+                                                                       ContentPath = AppConfig.ContentPath, 
+                                                                       // TODO make this configurable
+                                                                       IgnoreVersionComponent = VersionComponent.Patch, 
+                                                                       RepositoryPath = AppConfig.RepositoryPath, 
+                                                                       Template = template
+                                                                   });
 
             // set up notifaction system
             NotificationManager notifications = new NotificationManager();
 
             // initialize app-singleton
             App.Initialize(container, contentManager, addInManager, notifications, traceListener);
-
 
             // MVC init
             AreaRegistration.RegisterAllAreas();
@@ -240,77 +180,92 @@ namespace LBi.LostDoc.Repository.Web
 
             // inject our custom IControllerFactory for the Admin interface
             IControllerFactory oldControllerFactory = ControllerBuilder.Current.GetControllerFactory();
-            IControllerFactory newControllerFactory = new AddInControllerFactory(AdministrationAreaRegistration.Name, container, oldControllerFactory);
+            IControllerFactory newControllerFactory = new AddInControllerFactory(AdministrationAreaRegistration.Name, 
+                                                                                 container, 
+                                                                                 oldControllerFactory);
             ControllerBuilder.Current.SetControllerFactory(newControllerFactory);
 
-
             // TODO figure out if we actually need this
-            //// hook in our MEF based IHttpController instead of the default one
+            // hook in our MEF based IHttpController instead of the default one
             //GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerTypeResolver), new AddInHttpControllerTypeResolver(App.Instance.Container));
         }
 
         private void UpdateWebApiRegistry(ComposablePartCatalogChangeEventArgs eventArg)
         {
-            // not sure if this is required, but it seems reasonable
-            using (RouteTable.Routes.GetWriteLock())
+            using (TraceSources.AddInManager.TraceActivity("Updating WebApi routes."))
             {
+                // TODO this could be cleaned up a bit
+
                 foreach (var partDefinition in eventArg.RemovedDefinitions)
                 {
-                    //var controllerMetadata = AttributedModelServices.GetMetadataView<IApiControllerMetadata>(partDefinition.Metadata);
+                    IEnumerable<ExportDefinition> exports = partDefinition.ExportDefinitions;
+                    var apiExport = exports.SingleOrDefault(export => StringComparer.Ordinal.Equals(export.ContractName, 
+                                                                                                    Extensibility.ContractNames.ApiController));
+                    if (apiExport == null)
+                        continue;
 
-                    //string urlTemplatePrefix = "api/" + controllerMetadata.UrlFragment.Trim('/') + '/';
-                    
-                    ////Lazy<Type> partType = ReflectionModelServices.GetPartType(partDefinition);
-                    
+                    IApiControllerMetadata controllerMetadata =
+                        AttributedModelServices.GetMetadataView<IApiControllerMetadata>(apiExport.Metadata);
+
+                    Type controllerType = AddInModelServices.GetPartType(partDefinition).Value;
+
+                    string routeName = string.Format("{0}_{1}", 
+                                                     controllerMetadata.PackageId, 
+                                                     controllerType.FullName.Replace('.', '_'));
+
+                    TraceSources.AddInManager.TraceInformation("Removing route: {0} (Source: {1}, Version: {2})", 
+                                                               routeName, 
+                                                               controllerMetadata.PackageId, 
+                                                               controllerMetadata.PackageVersion);
+
+                    RouteBase route = RouteTable.Routes[routeName];
+                    using (RouteTable.Routes.GetWriteLock())
+                    {
+                        RouteTable.Routes.Remove(route);
+                    }
                 }
-
-
 
                 foreach (var partDefinition in eventArg.AddedDefinitions)
                 {
                     IEnumerable<ExportDefinition> exports = partDefinition.ExportDefinitions;
-                    var apiExport = exports.SingleOrDefault(export => StringComparer.Ordinal.Equals(export.ContractName,
+                    var apiExport = exports.SingleOrDefault(export => StringComparer.Ordinal.Equals(export.ContractName, 
                                                                                                     Extensibility.ContractNames.ApiController));
-                    if (apiExport == null) 
+                    if (apiExport == null)
                         continue;
 
-                    IApiControllerMetadata controllerMetadata = AttributedModelServices.GetMetadataView<IApiControllerMetadata>(apiExport.Metadata);
+                    IApiControllerMetadata controllerMetadata =
+                        AttributedModelServices.GetMetadataView<IApiControllerMetadata>(apiExport.Metadata);
 
                     Type controllerType = AddInModelServices.GetPartType(partDefinition).Value;
 
-                    var methods = controllerType.GetMethods(BindingFlags.Instance | BindingFlags.Public); 
+                    // Pacakge version explicitly ignored in order to remain backwards compatible
+                    string urlTemplate = string.Format("api/{0}/{1}/", 
+                                                       controllerMetadata.PackageId, 
+                                                       controllerMetadata.UrlFragment.Trim('/'));
 
-                    string urlTemplatePrefix = string.Format("api/{0}/{1}/", controllerMetadata.PackageId, controllerMetadata.UrlFragment.Trim('/'));
+                    string routeName = string.Format("{0}_{1}", 
+                                                     controllerMetadata.PackageId, 
+                                                     controllerType.FullName.Replace('.', '_'));
 
-                    foreach (ExportDefinition export in exports)
+                    string controllerName = controllerType.Name.Substring(0, controllerType.Name.Length - "Controller".Length);
+
+                    TraceSources.AddInManager.TraceInformation(
+                        "Adding route: {0} (Template: '{1}', Controller: {2}, Source: {3}, Version: {4})", 
+                        routeName, 
+                        urlTemplate, 
+                        controllerName, 
+                        controllerMetadata.PackageId, 
+                        controllerMetadata.PackageVersion);
+
+                    using (RouteTable.Routes.GetWriteLock())
                     {
-                        if (!StringComparer.Ordinal.Equals(export.ContractName, Extensibility.ContractNames.ApiAction))
-                            continue;
-
-                        IApiActionMetadata actionMetadata = AttributedModelServices.GetMetadataView<IApiActionMetadata>(export.Metadata);
-
-                        string urlTemplate = urlTemplatePrefix;
-
-                        if (!string.IsNullOrWhiteSpace(actionMetadata.UrlFragment))
-                        {
-                            urlTemplate += actionMetadata.UrlFragment.Trim('/');
-                        }
-
-
-
                         RouteTable.Routes.MapHttpRoute(
-                            string.Format("{0}_{1}_{2}", controllerMetadata.PackageId, controllerMetadata.UrlFragment,
-                                            actionMetadata.UrlFragment),
-                            urlTemplate, new
-                                                {
-                                                    Controller =
-                                                controllerType.Name.Substring(0,
-                                                                            controllerType.Name.Length -
-                                                                            "Controller".Length),
-                                                });
-
-                        Debug.WriteLine(export.ToString());
-
+                            routeName, 
+                            urlTemplate, 
+                            new
+                                {
+                                    Controller = controllerName, 
+                                });
                     }
                 }
             }

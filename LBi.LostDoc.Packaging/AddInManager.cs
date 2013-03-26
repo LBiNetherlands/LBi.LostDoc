@@ -36,61 +36,45 @@ namespace LBi.LostDoc.Packaging
             this._packageManager = new PackageManager(repository.NuGetRepository, packageDirectory);
         }
 
-
-        public void Restore()
-        {
-            foreach (var dir in Directory.EnumerateDirectories(this.InstallDirectory))
-                Directory.Delete(dir, true);
-
-            foreach (AddInPackage addInPackage in this)
-                this.DeployAddIn(addInPackage);
-        }
-
         public event EventHandler<AddInInstalledEventArgs> Installed;
-
-        protected virtual void OnInstalled(AddInPackage package, PackageResult result)
-        {
-            var handler = this.Installed;
-            if (handler != null)
-            {
-                var installationPath =
-                    Path.GetFullPath(Path.Combine(this.InstallDirectory,
-                                                  this._packageManager.PathResolver
-                                                      .GetPackageDirectory(package.NuGetPackage)));
-                var packagePath =
-                    Path.GetFullPath(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage));
-
-                handler(this,
-                        new AddInInstalledEventArgs(package,
-                                                    result,
-                                                    installationPath,
-                                                    packagePath));
-            }
-        }
 
         public event EventHandler<AddInInstalledEventArgs> Uninstalled;
 
-        protected virtual void OnUninstalled(AddInPackage package, PackageResult result)
-        {
-            var handler = this.Uninstalled;
-            if (handler != null)
-            {
-                var installationPath =
-                    Path.GetFullPath(Path.Combine(this.InstallDirectory,
-                                                  this._packageManager.PathResolver
-                                                      .GetPackageDirectory(package.NuGetPackage)));
-
-                handler(this,
-                        new AddInInstalledEventArgs(package,
-                                                    result,
-                                                    installationPath,
-                                                    null));
-            }
-        }
+        public string InstallDirectory { get; protected set; }
 
         public string PackageDirectory { get; protected set; }
-        public string InstallDirectory { get; protected set; }
+
         public AddInRepository Repository { get; protected set; }
+
+        public bool Contains(AddInPackage package)
+        {
+            return
+                this._packageManager.LocalRepository.GetPackages()
+                    .SingleOrDefault(
+                        p =>
+                        StringComparer.Ordinal.Equals(p.Id, package.Id) &&
+                        StringComparer.Ordinal.Equals(p.Version.Version, package.Version)) != null;
+        }
+
+        public AddInPackage Get(string id, string version)
+        {
+            SemanticVersion ver = SemanticVersion.Parse(version);
+            IPackage pkg =
+                this._packageManager.LocalRepository.GetPackages()
+                    .SingleOrDefault(ip => StringComparer.Ordinal.Equals(id, ip.Id) && ip.Version == ver);
+
+            if (pkg == null)
+                return null;
+
+            return AddInPackage.Create(pkg);
+        }
+
+        public IEnumerator<AddInPackage> GetEnumerator()
+        {
+            return this._packageManager.LocalRepository.GetPackages()
+                       .Select(AddInPackage.Create)
+                       .GetEnumerator();
+        }
 
         public PackageResult Install(AddInPackage package)
         {
@@ -108,43 +92,13 @@ namespace LBi.LostDoc.Packaging
             return ret;
         }
 
-        private bool DeployAddIn(AddInPackage package)
+        public void Restore()
         {
-            bool ret = true;
-            string targetdir = Path.Combine(Path.GetFullPath(this.InstallDirectory),
-                                            this._packageManager.PathResolver
-                                                .GetPackageDirectory(package.NuGetPackage));
+            foreach (var dir in Directory.EnumerateDirectories(this.InstallDirectory))
+                Directory.Delete(dir, true);
 
-            if (!Directory.Exists(targetdir))
-            {
-                Directory.CreateDirectory(targetdir);
-                foreach (var assemblyReference in package.NuGetPackage.AssemblyReferences)
-                {
-                    string sourcePath =
-                        Path.Combine(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage),
-                                     assemblyReference.Path);
-
-
-                    File.Copy(sourcePath,
-                              Path.Combine(targetdir,
-                                           assemblyReference.EffectivePath));
-                }
-            }
-            else
-                ret = false;
-
-            return ret;
-        }
-
-
-        public bool Contains(AddInPackage package)
-        {
-            return
-                this._packageManager.LocalRepository.GetPackages()
-                    .SingleOrDefault(
-                        p =>
-                        StringComparer.Ordinal.Equals(p.Id, package.Id) &&
-                        StringComparer.Ordinal.Equals(p.Version.Version, package.Version)) != null;
+            foreach (AddInPackage addInPackage in this)
+                this.DeployAddIn(addInPackage);
         }
 
         public PackageResult Uninstall(AddInPackage package)
@@ -156,16 +110,10 @@ namespace LBi.LostDoc.Packaging
             return ret;
         }
 
-        public IEnumerator<AddInPackage> GetEnumerator()
-        {
-            return this._packageManager.LocalRepository.GetPackages()
-                                                       .Select(AddInPackage.Create)
-                                                       .GetEnumerator();
-        }
-
         public PackageResult Update(AddInPackage package)
         {
             PackageResult ret = PackageResult.PendingRestart;
+
             // TODO fix the deps & prerelease hack
             this._packageManager.UpdatePackage(package.NuGetPackage, true, !package.IsReleaseVersion);
             return ret;
@@ -176,18 +124,63 @@ namespace LBi.LostDoc.Packaging
             return this.GetEnumerator();
         }
 
-
-        public AddInPackage Get(string id, string version)
+        protected virtual void OnInstalled(AddInPackage package, PackageResult result)
         {
-            SemanticVersion ver = SemanticVersion.Parse(version);
-            IPackage pkg =
-                this._packageManager.LocalRepository.GetPackages()
-                    .SingleOrDefault(ip => StringComparer.Ordinal.Equals(id, ip.Id) && ip.Version == ver);
+            var handler = this.Installed;
+            if (handler != null)
+            {
+                string packageDirectory = this._packageManager.PathResolver.GetPackageDirectory(package.NuGetPackage);
+                var installationPath = Path.GetFullPath(Path.Combine(this.InstallDirectory, packageDirectory));
+                var packagePath =
+                    Path.GetFullPath(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage));
 
-            if (pkg == null)
-                return null;
+                handler(this, 
+                        new AddInInstalledEventArgs(package, 
+                                                    result, 
+                                                    installationPath, 
+                                                    packagePath));
+            }
+        }
 
-            return AddInPackage.Create(pkg);
+        protected virtual void OnUninstalled(AddInPackage package, PackageResult result)
+        {
+            var handler = this.Uninstalled;
+            if (handler != null)
+            {
+                string packageDirectory = this._packageManager.PathResolver.GetPackageDirectory(package.NuGetPackage);
+                var installationPath = Path.GetFullPath(Path.Combine(this.InstallDirectory, packageDirectory));
+
+                handler(this, 
+                        new AddInInstalledEventArgs(package, 
+                                                    result, 
+                                                    installationPath, 
+                                                    null));
+            }
+        }
+
+        private bool DeployAddIn(AddInPackage package)
+        {
+            bool ret = true;
+            string packageDirectory = this._packageManager.PathResolver.GetPackageDirectory(package.NuGetPackage);
+            string targetdir = Path.Combine(Path.GetFullPath(this.InstallDirectory), packageDirectory);
+
+            if (!Directory.Exists(targetdir))
+            {
+                Directory.CreateDirectory(targetdir);
+                foreach (var assemblyReference in package.NuGetPackage.AssemblyReferences)
+                {
+                    string sourcePath =
+                        Path.Combine(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage), 
+                                     assemblyReference.Path);
+
+                    File.Copy(sourcePath, 
+                              Path.Combine(targetdir, assemblyReference.EffectivePath));
+                }
+            }
+            else
+                ret = false;
+
+            return ret;
         }
     }
 }

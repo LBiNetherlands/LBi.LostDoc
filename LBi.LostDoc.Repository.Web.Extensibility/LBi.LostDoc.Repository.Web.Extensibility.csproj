@@ -82,9 +82,9 @@
   <ItemGroup>
     <Compile Include="AdminActionAttribute.cs" />
     <Compile Include="AdminControllerAttribute.cs" />
-    <Compile Include="ApiActionAttribute.cs" />
     <Compile Include="ApiControllerAttribute.cs" />
     <Compile Include="ContractNames.cs" />
+    <Compile Include="IAddInMetadata.cs" />
     <Compile Include="IApiActionMetadata.cs" />
     <Compile Include="IApiControllerMetadata.cs" />
     <Compile Include="IAdminModel.cs" />

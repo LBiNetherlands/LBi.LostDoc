@@ -245,7 +245,7 @@ namespace LBi.LostDoc.Composition
                 bool ret = base.IsConstraintSatisfiedBy(exportDefinition);
 
                 if (ret)
-                    ret = this._constraint(_contract, exportDefinition);
+                    ret = this._constraint(this._contract, exportDefinition);
 
                 return ret;
             }

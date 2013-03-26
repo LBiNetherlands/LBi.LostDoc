@@ -25,7 +25,7 @@ namespace LBi.LostDoc.Packaging.Composition
     public class AddInComposablePartDefinition : ComposablePartDefinition
     {
         private readonly ComposablePartDefinition _composablePartDefinition;
-        //private readonly IDictionary<string, object> _metadata;
+
         private readonly ExportDefinition[] _exportDefinitions;
 
         public AddInComposablePartDefinition(AddInCatalog catalog, ComposablePartDefinition composablePartDefinition)
@@ -34,10 +34,11 @@ namespace LBi.LostDoc.Packaging.Composition
 
             List<KeyValuePair<string, object>> injectedMetadata = new List<KeyValuePair<string, object>>();
             injectedMetadata.Add(new KeyValuePair<string, object>(AddInCatalog.PackageIdMetadataName, catalog.PackageId));
-            injectedMetadata.Add(new KeyValuePair<string, object>(AddInCatalog.PackageVersionMetadataName, catalog.PackageVersion));
+            injectedMetadata.Add(new KeyValuePair<string, object>(AddInCatalog.PackageVersionMetadataName, 
+                                                                  catalog.PackageVersion));
 
             List<ExportDefinition> interceptedExports = new List<ExportDefinition>();
-            
+
             foreach (ExportDefinition export in composablePartDefinition.ExportDefinitions)
             {
                 ICompositionElement compositionElement = export as ICompositionElement;
@@ -45,16 +46,16 @@ namespace LBi.LostDoc.Packaging.Composition
                     throw new InvalidOperationException("ExportDefinition doesn't implement ICompositionElement");
 
                 Dictionary<string, object> metadata = injectedMetadata.Concat(export.Metadata)
-                                                                      .ToDictionary(kvp => kvp.Key,
+                                                                      .ToDictionary(kvp => kvp.Key, 
                                                                                     kvp => kvp.Value);
 
                 // TODO this will fail if export isn't a ReflectionMemberExportDefinition (Internal, so I can't check)
                 LazyMemberInfo lazyMember = ReflectionModelServices.GetExportingMember(export);
 
                 ExportDefinition interceptedExport =
-                    ReflectionModelServices.CreateExportDefinition(lazyMember,
-                                                                   export.ContractName,
-                                                                   new Lazy<IDictionary<string, object>>(() => metadata),
+                    ReflectionModelServices.CreateExportDefinition(lazyMember, 
+                                                                   export.ContractName, 
+                                                                   new Lazy<IDictionary<string, object>>(() => metadata), 
                                                                    compositionElement.Origin);
                 interceptedExports.Add(interceptedExport);
             }
@@ -62,9 +63,9 @@ namespace LBi.LostDoc.Packaging.Composition
             this._exportDefinitions = interceptedExports.ToArray();
         }
 
-        public override ComposablePart CreatePart()
+        public ComposablePartDefinition Definition
         {
-            return this._composablePartDefinition.CreatePart();
+            get { return this._composablePartDefinition; }
         }
 
         public override IEnumerable<ExportDefinition> ExportDefinitions
@@ -82,9 +83,9 @@ namespace LBi.LostDoc.Packaging.Composition
             get { return this._composablePartDefinition.Metadata; }
         }
 
-        public ComposablePartDefinition Definition
+        public override ComposablePart CreatePart()
         {
-            get { return _composablePartDefinition; }
+            return this._composablePartDefinition.CreatePart();
         }
     }
 }

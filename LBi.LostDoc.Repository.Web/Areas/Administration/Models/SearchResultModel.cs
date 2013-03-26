@@ -14,17 +14,16 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using System.Web.Mvc;
-using LBi.LostDoc.Packaging;
-
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
 {
     public class SearchResultModel : ModelBase
     {
         public int? NextOffset { get; set; }
-        public string Terms { get; set; }
+
         public AddInModel[] Results { get; set; }
+
+        public string Terms { get; set; }
+
         public string Title { get; set; }
     }
 }

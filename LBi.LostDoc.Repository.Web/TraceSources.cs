@@ -14,17 +14,15 @@
  * limitations under the License. 
  */
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Web;
 
 namespace LBi.LostDoc.Repository.Web
 {
     public class TraceSources
     {
-        public static readonly TraceSource RepositoryControllerSource =
-            new TraceSource("LBi.Lostdoc.Repository.Controllers.RepositoryController", SourceLevels.All);
+        public static readonly TraceSource Content =
+            new TraceSource("LBi.Lostdoc.Repository.Web.Content", SourceLevels.All);
+
+        public static readonly TraceSource AddInManager = new TraceSource("LBi.Lostdoc.Repository.Web.Extensibility", SourceLevels.All);
     }
 }

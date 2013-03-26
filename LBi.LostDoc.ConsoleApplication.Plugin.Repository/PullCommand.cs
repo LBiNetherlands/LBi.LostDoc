@@ -24,7 +24,7 @@ using LBi.LostDoc.ConsoleApplication.Extensibility;
 
 namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
 {
-    [ParameterSet("Pull ldoc or xml file to repository", Command = "Pull", HelpMessage= "Downloads ldoc file from repository.")]
+    [ParameterSet("Pull ldoc or xml file to repository", Command = "Pull", HelpMessage = "Downloads ldoc file from repository.")]
     public class PullCommand : ICommand
     {
         [Parameter(HelpMessage = "Include verbose output.")]

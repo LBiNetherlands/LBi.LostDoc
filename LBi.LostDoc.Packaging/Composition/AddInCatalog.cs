@@ -38,30 +38,27 @@ namespace LBi.LostDoc.Packaging.Composition
                 notify.Changed += (sender, args) => this.OnChanged(args);
                 notify.Changing += (sender, args) => this.OnChanging(args);
             }
-
         }
 
-        protected ComposablePartCatalog InnerCatalog { get; set; }
+        public event EventHandler<ComposablePartCatalogChangeEventArgs> Changed;
 
-        public string PackageVersion { get; protected set; }
+        public event EventHandler<ComposablePartCatalogChangeEventArgs> Changing;
 
         public string PackageId { get; protected set; }
 
+        public string PackageVersion { get; protected set; }
 
         public override IQueryable<ComposablePartDefinition> Parts
         {
-            get
-            {
-                return this.InnerCatalog.Parts.Select(this.InjectMetadata).AsQueryable();
-            }
+            get { return this.InnerCatalog.Parts.Select(this.InjectMetadata).AsQueryable(); }
         }
+
+        protected ComposablePartCatalog InnerCatalog { get; set; }
 
         protected virtual ComposablePartDefinition InjectMetadata(ComposablePartDefinition arg)
         {
             return new AddInComposablePartDefinition(this, arg);
         }
-
-        public event EventHandler<ComposablePartCatalogChangeEventArgs> Changed;
 
         protected virtual void OnChanged(ComposablePartCatalogChangeEventArgs e)
         {
@@ -69,14 +66,10 @@ namespace LBi.LostDoc.Packaging.Composition
             if (handler != null) handler(this, e);
         }
 
-        public event EventHandler<ComposablePartCatalogChangeEventArgs> Changing;
-
         protected virtual void OnChanging(ComposablePartCatalogChangeEventArgs e)
         {
             EventHandler<ComposablePartCatalogChangeEventArgs> handler = this.Changing;
             if (handler != null) handler(this, e);
         }
-
-
     }
 }

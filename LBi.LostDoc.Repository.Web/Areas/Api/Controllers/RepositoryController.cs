@@ -24,6 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Repository.Web.Areas.Api.Models;
 using LBi.LostDoc.Repository.Web.Models;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
@@ -32,18 +33,42 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
     public class RepositoryController : ApiController
     {
         // GET /repository/
+        public void Delete(string assembly, string version)
+        {
+            AssemblyVersion realVersion = Version.Parse(version);
+            var file = Directory.EnumerateFiles(AppConfig.RepositoryPath, "*.ldoc")
+                                .SingleOrDefault(ld =>
+                                                     {
+                                                         var fd = FileDescriptor.Load(new FileInfo(ld));
+                                                         return
+                                                             string.Equals(fd.Assembly, 
+                                                                           assembly, 
+                                                                           StringComparison.OrdinalIgnoreCase) &&
+                                                             fd.Version == realVersion;
+                                                     });
+
+            if (file == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            File.Delete(file);
+
+            App.Instance.Content.QueueRebuild(string.Format("Deleted assembly: {{A:{0}, V:{1}}}", 
+                                                            assembly, 
+                                                            realVersion.ToString()));
+        }
+
         public IEnumerable<FileDescriptor> Get()
         {
             return Directory.EnumerateFiles(AppConfig.RepositoryPath, "*.ldoc")
-                .Select(ldocFile => FileDescriptor.Load(new FileInfo(ldocFile)));
+                            .Select(ldocFile => FileDescriptor.Load(new FileInfo(ldocFile)));
         }
 
         // GET /repository/LBi.Test
         public IEnumerable<FileDescriptor> Get(string assembly)
         {
             return Directory.EnumerateFiles(AppConfig.RepositoryPath, "*.ldoc")
-                .Select(ldocFile => FileDescriptor.Load(new FileInfo(ldocFile)))
-                .Where(ld => string.Equals(ld.Assembly, assembly, StringComparison.OrdinalIgnoreCase));
+                            .Select(ldocFile => FileDescriptor.Load(new FileInfo(ldocFile)))
+                            .Where(ld => string.Equals(ld.Assembly, assembly, StringComparison.OrdinalIgnoreCase));
         }
 
         // GET /repository/LBi.Test/1.0.5.4
@@ -51,9 +76,10 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
         {
             AssemblyVersion realVersion = Version.Parse(version);
             return Directory.EnumerateFiles(AppConfig.RepositoryPath, "*.ldoc")
-                .Select(ldocFile => FileDescriptor.Load(new FileInfo(ldocFile)))
-                .SingleOrDefault(ld => string.Equals(ld.Assembly, assembly, StringComparison.OrdinalIgnoreCase) &&
-                                       ld.Version == realVersion);
+                            .Select(ldocFile => FileDescriptor.Load(new FileInfo(ldocFile)))
+                            .SingleOrDefault(
+                                ld => string.Equals(ld.Assembly, assembly, StringComparison.OrdinalIgnoreCase) &&
+                                      ld.Version == realVersion);
         }
 
         // POST /repository
@@ -61,7 +87,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
         {
             if (!this.Request.Content.IsMimeMultipartContent("form-data"))
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            
+
             List<FileDescriptor> ret = new List<FileDescriptor>();
 
             using (var tmp = new TempDir())
@@ -78,67 +104,46 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
                         var fd = FileDescriptor.Load(fi);
 
                         File.Copy(
-                            fi.FullName,
-                            Path.Combine(AppConfig.RepositoryPath, fileName.Headers.ContentDisposition.FileName.Trim('"')));
+                            fi.FullName, 
+                            Path.Combine(AppConfig.RepositoryPath, 
+                                         fileName.Headers.ContentDisposition.FileName.Trim('"')));
 
                         ret.Add(fd);
                     }
                     catch (Exception ex)
                     {
                         // log
-                        TraceSources.RepositoryControllerSource.TraceError(
-                            "An exception of type {2} occured while processing '{0}': {1}",
-                            fileName,
-                            ex.ToString(),
+                        TraceSources.Content.TraceError(
+                            "An exception of type {2} occured while processing '{0}': {1}", 
+                            fileName, 
+                            ex.ToString(), 
                             ex.GetType().Name);
                         return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
                     }
 
                     fi.Delete();
                 }
-
             }
+
             string reason = ret.Aggregate(
-                                          new StringBuilder(),
-                                          (builder, descriptor) =>
-                                          (builder.Length == 0
-                                               ? builder
-                                               : builder.Append(", "))
-                                              .AppendFormat(
-                                                            "{{A:{0}, V:{1}}}",
-                                                            descriptor.Assembly,
-                                                            descriptor.Version),
-                                          builder => builder.ToString());
+                new StringBuilder(), 
+                (builder, descriptor) =>
+                (builder.Length == 0
+                     ? builder
+                     : builder.Append(", "))
+                    .AppendFormat(
+                        "{{A:{0}, V:{1}}}", 
+                        descriptor.Assembly, 
+                        descriptor.Version), 
+                builder => builder.ToString());
 
             if (ret.Count > 0)
                 App.Instance.Content.QueueRebuild("Added assemblies: " + reason);
 
             return this.Request.CreateResponse(HttpStatusCode.Accepted, ret.AsEnumerable());
-
         }
-
 
         // DELETE /repository/LBi.Test/1.0.5.4
-        public void Delete(string assembly, string version)
-        {
-            AssemblyVersion realVersion = Version.Parse(version);
-            var file = Directory.EnumerateFiles(AppConfig.RepositoryPath, "*.ldoc")
-                .SingleOrDefault(ld =>
-                                     {
-                                         var fd = FileDescriptor.Load(new FileInfo(ld));
-                                         return
-                                             string.Equals(fd.Assembly, assembly, StringComparison.OrdinalIgnoreCase) &&
-                                             fd.Version == realVersion;
-                                     });
-
-            if (file == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            File.Delete(file);
-
-            App.Instance.Content.QueueRebuild(String.Format("Deleted assembly: {{A:{0}, V:{1}}}", assembly, realVersion.ToString()));
-        }
-
 
         [HttpGet]
         public string State()

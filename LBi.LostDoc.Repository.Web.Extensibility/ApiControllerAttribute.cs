@@ -24,7 +24,6 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class ApiControllerAttribute : ExportAttribute
     {
-
         public ApiControllerAttribute(string urlFragment)
             : base(ContractNames.ApiController, typeof(IHttpController))
         {

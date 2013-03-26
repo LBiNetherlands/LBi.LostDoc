@@ -39,7 +39,8 @@ namespace Company.Project.AnotherLibrary
         /// <param name="inputThree">
         /// Third 
         /// </param>
-        public override void AnotherGeneric<M>(IEnumerable<M> inputOne, IEnumerable<RegularClass> inputTwo,
+        public override void AnotherGeneric<M>(IEnumerable<M> inputOne,
+                                               IEnumerable<RegularClass> inputTwo,
                                                IEnumerable<int> inputThree)
         {
             base.AnotherGeneric<M>(inputOne, inputTwo, inputThree);

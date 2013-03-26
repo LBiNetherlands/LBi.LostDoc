@@ -38,12 +38,19 @@ namespace LBi.LostDoc.Repository.Web.Notifications
         }
 
         public DateTime Created { get; protected set; }
+
         public Scope Scope { get; protected set; }
+
         public Severity Type { get; protected set; }
+
         public Guid Id { get; protected set; }
+
         public Lifetime LifeTime { get; protected set; }
+
         public string Title { get; protected set; }
+
         public string Message { get; protected set; }
+
         public NotificationAction[] Actions { get; protected set; }
     }
 }

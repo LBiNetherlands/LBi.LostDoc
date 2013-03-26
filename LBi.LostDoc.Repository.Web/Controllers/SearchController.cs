@@ -15,7 +15,6 @@
  */
 
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
@@ -27,39 +26,11 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 {
     public class SearchController : ApiController
     {
-        protected static System.Runtime.Caching.ObjectCache _cache;
+        protected static ObjectCache _cache;
 
         static SearchController()
         {
             _cache = new MemoryCache("SearchController.ContentSearchers");
-        }
-
-
-
-        private ContentSearcher GetSearcher(string contentFolder)
-        {
-            var lazyObj =
-                new Lazy<ContentSearcher>(
-                    () => new ContentSearcher(Path.Combine(AppConfig.ContentPath, contentFolder, "Index")).Retain(),
-                    LazyThreadSafetyMode.ExecutionAndPublication);
-
-            object obj = _cache.AddOrGetExisting(contentFolder,
-                                                 lazyObj,
-                                                 new CacheItemPolicy
-                                                     {
-                                                         RemovedCallback = arguments => ((Lazy<ContentSearcher>)arguments.CacheItem.Value).Value.Release(),
-                                                         SlidingExpiration = TimeSpan.FromMinutes(5)
-                                                     });
-
-            if (obj != null)
-                lazyObj = (Lazy<ContentSearcher>)obj;
-
-            return lazyObj.Value.Retain();
-        }
-
-        private void ReleaseSeracher(ContentSearcher searcher)
-        {
-            searcher.Release();
         }
 
         public ResultSet Get(string id, string searchTerms)
@@ -76,12 +47,12 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 
                 return new ResultSet
                            {
-                               HitCount = res.HitCount,
+                               HitCount = res.HitCount, 
                                Results = res.Results.Select(r => new Result
                                                                      {
-                                                                         AssetId = r.AssetId.ToString(),
-                                                                         Title = r.Title,
-                                                                         Url = r.Url,
+                                                                         AssetId = r.AssetId.ToString(), 
+                                                                         Title = r.Title, 
+                                                                         Url = r.Url, 
                                                                          Blurb = r.Blurb
                                                                      }).ToArray()
                            };
@@ -91,11 +62,35 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                 if (search != null)
                     this.ReleaseSeracher(search);
             }
-
-
-
         }
 
+        private ContentSearcher GetSearcher(string contentFolder)
+        {
+            var lazyObj =
+                new Lazy<ContentSearcher>(
+                    () => new ContentSearcher(Path.Combine(AppConfig.ContentPath, contentFolder, "Index")).Retain(), 
+                    LazyThreadSafetyMode.ExecutionAndPublication);
 
+            object obj = _cache.AddOrGetExisting(contentFolder, 
+                                                 lazyObj, 
+                                                 new CacheItemPolicy
+                                                     {
+                                                         RemovedCallback =
+                                                             arguments =>
+                                                             ((Lazy<ContentSearcher>)arguments.CacheItem.Value).Value
+                                                                                                               .Release(), 
+                                                         SlidingExpiration = TimeSpan.FromMinutes(5)
+                                                     });
+
+            if (obj != null)
+                lazyObj = (Lazy<ContentSearcher>)obj;
+
+            return lazyObj.Value.Retain();
+        }
+
+        private void ReleaseSeracher(ContentSearcher searcher)
+        {
+            searcher.Release();
+        }
     }
 }

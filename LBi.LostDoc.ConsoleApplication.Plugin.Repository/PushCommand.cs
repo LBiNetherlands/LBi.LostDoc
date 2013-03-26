@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-
 using System;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
@@ -25,7 +24,7 @@ using LBi.LostDoc.ConsoleApplication.Extensibility;
 
 namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
 {
-    [ParameterSet("Push ldoc file to repository", Command = "Push", HelpMessage= "Uploads ldoc file to repository.")]
+    [ParameterSet("Push ldoc file to repository", Command = "Push", HelpMessage = "Uploads ldoc file to repository.")]
     public class PushCommand : ICommand
     {
         [Parameter(HelpMessage = "Include verbose output.")]

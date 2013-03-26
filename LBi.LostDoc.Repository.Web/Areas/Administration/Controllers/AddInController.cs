@@ -14,73 +14,187 @@
  * limitations under the License. 
  */
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using LBi.LostDoc.Packaging.Composition;
-using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Packaging;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Notifications;
 
-
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
-    public static class Groups
-    {
-        public const string Core = "__Core";
-    }
-
     // TODO the TEXT isn't translateable, but it's good enough for now
     [AdminController("addins", Text = "Add-ins", Group = Groups.Core, Order = 1)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class AddInController : Controller
     {
         // default action is to list all installed add-ins
+        [HttpPost]
+        public ActionResult Install([Bind(Prefix = "package-id")] string id, 
+                                    [Bind(Prefix = "package-version")] string version)
+        {
+            ActionResult ret;
+            var pkg = App.Instance.AddIns.Repository.Get(id, version);
+            if (pkg == null)
+            {
+                string message = string.Format("Package (Id: '{0}', Version: '{1}') not found.", id, version);
+                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound, message);
+            }
+            else
+            {
+                // TODO handle errors
+                PackageResult result = App.Instance.AddIns.Install(pkg);
+                if (result == PackageResult.PendingRestart)
+                {
+                    string message =
+                        string.Format("Package {0} failed to install, another attempt will be made upon site restart.", 
+                                      pkg.Id);
+                    App.Instance.Notifications.Add(Severity.Warning, 
+                                                   Lifetime.Application, 
+                                                   Scope.Administration, 
+                                                   "Pending restart", 
+                                                   message, 
+                                                   NotificationActions.Restart);
+                }
+
+                ret = this.Redirect(this.Url.Action("Installed"));
+            }
+
+            return ret;
+        }
+
         [AdminAction("installed", Text = "Installed", IsDefault = true)]
         public ActionResult Installed()
         {
-
-            return View(new AddInOverviewModel
-                            {
-                                Title = "Installed Add-ins",
-                                AddIns = App.Instance.AddIns
-                                            .Select(pkg =>
-                                                    new AddInModel
-                                                        {
-                                                            CanInstall = false,
-                                                            CanUninstall = true,
-                                                            CanUpdate = CheckForUpdates(pkg),
-                                                            Package = pkg
-                                                        }).ToArray()
-                            });
+            return this.View(new AddInOverviewModel
+                                 {
+                                     Title = "Installed Add-ins", 
+                                     AddIns = App.Instance.AddIns
+                                                 .Select(pkg =>
+                                                         new AddInModel
+                                                             {
+                                                                 CanInstall = false, 
+                                                                 CanUninstall = true, 
+                                                                 CanUpdate = this.CheckForUpdates(pkg), 
+                                                                 Package = pkg
+                                                             }).ToArray()
+                                 });
         }
 
         [AdminAction("repository", Text = "Online")]
         public ActionResult Repository()
         {
-            const int count = 10;
-            AddInModel[] results = App.Instance.AddIns.Repository.Search(null, true, 0, count)
+            const int COUNT = 10;
+            AddInModel[] results = App.Instance.AddIns.Repository.Search(null, true, 0, COUNT)
                                       .Select(pkg =>
                                               new AddInModel
                                                   {
-                                                      CanInstall = !CheckInstalled(pkg),
-                                                      CanUninstall = CheckInstalled(pkg),
-                                                      CanUpdate = CheckInstalled(pkg) && this.CheckForUpdates(pkg),
+                                                      CanInstall = !this.CheckInstalled(pkg), 
+                                                      CanUninstall = this.CheckInstalled(pkg), 
+                                                      CanUpdate = this.CheckInstalled(pkg) && this.CheckForUpdates(pkg), 
                                                       Package = pkg
                                                   }).ToArray();
 
-            return View(new SearchResultModel
-                            {
-                                Title = "Results",
-                                Results = results,
-                                NextOffset = results.Length == count ? count : (int?)null
-                            });
+            return this.View(new SearchResultModel
+                                 {
+                                     Title = "Results", 
+                                     Results = results, 
+                                     NextOffset = results.Length == COUNT ? COUNT : (int?)null
+                                 });
+        }
+
+        public ActionResult Search(string terms, int offset = 0)
+        {
+            const int COUNT = 10;
+            AddInModel[] results = App.Instance.AddIns.Repository.Search(terms, true, offset, COUNT)
+                                      .Select(pkg =>
+                                              new AddInModel
+                                                  {
+                                                      CanInstall = !this.CheckInstalled(pkg), 
+                                                      CanUninstall = this.CheckInstalled(pkg), 
+                                                      CanUpdate = this.CheckInstalled(pkg) && this.CheckForUpdates(pkg), 
+                                                      Package = pkg
+                                                  }).ToArray();
+
+            return this.View(new SearchResultModel
+                                 {
+                                     Results = results, 
+                                     NextOffset = results.Length == COUNT ? offset + results.Length : (int?)null
+                                 });
+        }
+
+        [HttpPost]
+        public ActionResult Uninstall([Bind(Prefix = "package-id")] string id, 
+                                      [Bind(Prefix = "package-version")] string version)
+        {
+            ActionResult ret;
+            var pkg = App.Instance.AddIns.Get(id, version);
+            if (pkg == null)
+            {
+                string message = string.Format("Package (Id: '{0}', Version: '{1}') not found.", id, version);
+                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound, message);
+            }
+            else
+            {
+                // TODO handle errors
+                PackageResult result = App.Instance.AddIns.Uninstall(pkg);
+                if (result == PackageResult.PendingRestart)
+                {
+                    string message =
+                        string.Format(
+                            "Package {0} failed to uninstall, another attempt will be made upon site restart.", pkg.Id);
+                    App.Instance.Notifications.Add(
+                        Severity.Warning, 
+                        Lifetime.Application, 
+                        Scope.Administration, 
+                        "Pending restart", 
+                        message, 
+                        NotificationActions.Restart);
+                }
+
+                ret = this.Redirect(this.Url.Action("Installed"));
+            }
+
+            return ret;
+        }
+
+        [HttpPost]
+        public ActionResult Update([Bind(Prefix = "package-id")] string id, 
+                                   [Bind(Prefix = "package-version")] string version)
+        {
+            ActionResult ret;
+            var pkg = App.Instance.AddIns.Repository.Get(id, version);
+            if (pkg == null)
+            {
+                string message = string.Format("Package (Id: '{0}', Version: '{1}') not found.", id, version);
+                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound, 
+                                               message);
+            }
+            else
+            {
+                // TODO handle errors
+                PackageResult result = App.Instance.AddIns.Update(pkg);
+                if (result == PackageResult.PendingRestart)
+                {
+                    string message =
+                        string.Format("Package {0} failed to update, another attempt will be made upon site restart.", 
+                                      pkg.Id);
+                    App.Instance.Notifications.Add(
+                        Severity.Warning, 
+                        Lifetime.Application, 
+                        Scope.Administration, 
+                        "Pending restart", 
+                        message, 
+                        NotificationActions.Restart);
+                }
+
+                ret = this.Redirect(this.Url.Action("Installed"));
+            }
+
+            return ret;
         }
 
         [HttpPost]
@@ -92,133 +206,15 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             return null;
         }
 
-        public ActionResult Search(string terms, int offset = 0)
+        private bool CheckForUpdates(AddInPackage pkg)
         {
-            const int count = 10;
-            AddInModel[] results = App.Instance.AddIns.Repository.Search(terms, true, offset, count)
-                                      .Select(pkg =>
-                                              new AddInModel
-                                                  {
-                                                      CanInstall = !CheckInstalled(pkg),
-                                                      CanUninstall = CheckInstalled(pkg),
-                                                      CanUpdate = CheckInstalled(pkg) && this.CheckForUpdates(pkg),
-                                                      Package = pkg
-                                                  }).ToArray();
-
-            return View(new SearchResultModel
-                            {
-                                Results = results,
-                                NextOffset = results.Length == count ? offset + results.Length : (int?)null
-                            });
-        }
-
-        [HttpPost]
-        public ActionResult Install([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
-        {
-            ActionResult ret;
-            var pkg = App.Instance.AddIns.Repository.Get(id, version);
-            if (pkg == null)
-            {
-                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
-                                               string.Format("Package (Id: '{0}', Version: '{1}') not found.",
-                                                             id,
-                                                             version));
-            }
-            else
-            {
-                // TODO handle errors
-                PackageResult result = App.Instance.AddIns.Install(pkg);
-                if (result == PackageResult.PendingRestart)
-                {
-                    App.Instance.Notifications.Add(
-                        Severity.Warning,
-                        Lifetime.Application,
-                        Scope.Administration,
-                        "Pending restart",
-                        string.Format("Package {0} failed to install, another attempt will be made upon site restart.",
-                                      pkg.Id),
-                        NotificationActions.Restart);
-                }
-
-                ret = this.Redirect(Url.Action("Installed"));
-            }
-            return ret;
-        }
-
-        [HttpPost]
-        public ActionResult Uninstall([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
-        {
-            ActionResult ret;
-            var pkg = App.Instance.AddIns.Get(id, version);
-            if (pkg == null)
-            {
-                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
-                                               string.Format("Package (Id: '{0}', Version: '{1}') not found.",
-                                                             id,
-                                                             version));
-            }
-            else
-            {
-                // TODO handle errors
-                PackageResult result = App.Instance.AddIns.Uninstall(pkg);
-                if (result == PackageResult.PendingRestart)
-                {
-                    App.Instance.Notifications.Add(
-                        Severity.Warning,
-                        Lifetime.Application,
-                        Scope.Administration,
-                        "Pending restart",
-                        string.Format("Package {0} failed to uninstall, another attempt will be made upon site restart.",
-                                      pkg.Id),
-                        NotificationActions.Restart);
-                }
-                ret = this.Redirect(Url.Action("Installed"));
-            }
-            return ret;
-        }
-
-        [HttpPost]
-        public ActionResult Update([Bind(Prefix = "package-id")]string id, [Bind(Prefix = "package-version")]string version)
-        {
-            ActionResult ret;
-            var pkg = App.Instance.AddIns.Repository.Get(id, version);
-            if (pkg == null)
-            {
-                ret = new HttpStatusCodeResult(HttpStatusCode.NotFound,
-                                               string.Format("Package (Id: '{0}', Version: '{1}') not found.",
-                                                             id,
-                                                             version));
-            }
-            else
-            {
-                // TODO handle errors
-                PackageResult result = App.Instance.AddIns.Update(pkg);
-                if (result == PackageResult.PendingRestart)
-                {
-                    App.Instance.Notifications.Add(
-                        Severity.Warning,
-                        Lifetime.Application,
-                        Scope.Administration,
-                        "Pending restart",
-                        string.Format("Package {0} failed to update, another attempt will be made upon site restart.",
-                                      pkg.Id),
-                        NotificationActions.Restart);
-                }
-                ret = this.Redirect(Url.Action("Installed"));
-            }
-            return ret;
-
+            // TODO fix prerelase hack
+            return App.Instance.AddIns.Repository.GetUpdate(pkg, true) != null;
         }
 
         private bool CheckInstalled(AddInPackage pkg)
         {
             return App.Instance.AddIns.Contains(pkg);
-        }
-
-        private bool CheckForUpdates(AddInPackage pkg)
-        {
-            // TODO fix prerelase hack
-            return App.Instance.AddIns.Repository.GetUpdate(pkg, true) != null;
         }
     }
 }

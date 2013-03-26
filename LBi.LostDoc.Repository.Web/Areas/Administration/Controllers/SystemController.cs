@@ -27,9 +27,6 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
     [AdminController("system", Group = Groups.Core, Order = 3000, Text = "System")]
     public class SystemController : Controller
     {
-        //
-        // GET: /Administration/System/
-
         [AdminAction("index", IsDefault = true, Text = "Status")]
         public ActionResult Index()
         {
@@ -41,6 +38,5 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         //{
         //    return View();
         //}
-
     }
 }

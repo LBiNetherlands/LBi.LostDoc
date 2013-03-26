@@ -26,7 +26,9 @@ namespace LBi.LostDoc.Packaging
         }
 
         public bool IsOfficial { get; protected set; }
+
         public string Name { get; protected set; }
+
         public string Source { get; protected set; }
     }
 }

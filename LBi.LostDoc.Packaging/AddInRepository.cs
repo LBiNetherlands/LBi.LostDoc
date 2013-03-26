@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using NuGet;
 
 namespace LBi.LostDoc.Packaging
@@ -26,59 +25,44 @@ namespace LBi.LostDoc.Packaging
     {
         private readonly IPackageRepository _repository;
 
-        internal IPackageRepository NuGetRepository { get { return this._repository; } }
-
         public AddInRepository(params AddInSource[] sources)
         {
             List<PackageSource> packageSources = new List<PackageSource>();
 
             foreach (AddInSource source in sources)
             {
-                PackageSource packageSource = new PackageSource(source.Source,
-                                                                        source.Name,
-                                                                        isEnabled: true,
-                                                                        isOfficial: source.IsOfficial);
+                PackageSource packageSource = new PackageSource(source.Source, 
+                                                                source.Name, 
+                                                                isEnabled: true, 
+                                                                isOfficial: source.IsOfficial);
 
                 packageSources.Add(packageSource);
             }
 
             PackageSourceProvider packageSourceProvider = new PackageSourceProvider(new NullSettings(), packageSources);
             IPackageRepositoryFactory packageRepositoryFactory = new PackageRepositoryFactory();
-            
+
             // TODO probably turn this off and report proper errors
-            this._repository = packageSourceProvider.GetAggregate(packageRepositoryFactory, ignoreFailingRepositories: true);
+            this._repository = packageSourceProvider.GetAggregate(packageRepositoryFactory, 
+                                                                  ignoreFailingRepositories: true);
         }
 
-        public IEnumerable<AddInPackage> Search(string terms, bool includePrerelease, int offset, int count)
+        internal IPackageRepository NuGetRepository
         {
-            IQueryable<IPackage> packages;
-            if (string.IsNullOrWhiteSpace(terms))
-            {
-                packages = this._repository.GetPackages();
-                if (!includePrerelease)
-                    packages = packages.Where(pkg => pkg.IsReleaseVersion());
-            }
-            else
-                packages = this._repository.Search(terms, includePrerelease);
-
-            return packages.Skip(offset)
-                           .Take(count)
-                           .Select(AddInPackage.Create);
+            get { return this._repository; }
         }
-
 
         public AddInPackage Get(string id, string version)
         {
             SemanticVersion ver = SemanticVersion.Parse(version);
-           
+
             IPackage pkg = this._repository.FindPackage(id, ver);
-            
+
             if (pkg == null)
                 return null;
 
             return AddInPackage.Create(pkg);
         }
-
 
         public AddInPackage Get(string id, bool includePrerelease)
         {
@@ -101,11 +85,29 @@ namespace LBi.LostDoc.Packaging
 
         public AddInPackage GetUpdate(AddInPackage package, bool includePrerelease)
         {
-            var pkg = this._repository.GetUpdates(new[] {package.NuGetPackage}, includePrerelease, true).FirstOrDefault();
+            var pkg =
+                this._repository.GetUpdates(new[] { package.NuGetPackage }, includePrerelease, true).FirstOrDefault();
             if (pkg == null)
                 return null;
 
             return AddInPackage.Create(pkg);
+        }
+
+        public IEnumerable<AddInPackage> Search(string terms, bool includePrerelease, int offset, int count)
+        {
+            IQueryable<IPackage> packages;
+            if (string.IsNullOrWhiteSpace(terms))
+            {
+                packages = this._repository.GetPackages();
+                if (!includePrerelease)
+                    packages = packages.Where(pkg => pkg.IsReleaseVersion());
+            }
+            else
+                packages = this._repository.Search(terms, includePrerelease);
+
+            return packages.Skip(offset)
+                           .Take(count)
+                           .Select(AddInPackage.Create);
         }
     }
 }

@@ -14,61 +14,60 @@
  * limitations under the License. 
  */
 
+using System.Collections.Specialized;
 using System.IO;
 using System.Web;
 
 namespace LBi.LostDoc.Repository.Web
 {
     /// <summary>
-    /// Contains basic app settings.
+    ///     Contains basic app settings.
     /// </summary>
     public static class AppConfig
     {
-        private static readonly string _basePath;
+        private static readonly string _BasePath;
 
         /// <summary>
-        /// Initializes static members of the <see cref="AppConfig"/> class.
+        ///     Initializes static members of the <see cref="AppConfig" /> class.
         /// </summary>
         static AppConfig()
         {
-            _basePath = HttpRuntime.AppDomainAppPath;
+            _BasePath = HttpRuntime.AppDomainAppPath;
         }
 
+        public static string AddInInstallPath
+        {
+            get { return AppSettings["LBi.LostDoc.Repository.Extensibility.InstallPath"]; }
+        }
+
+        public static string AddInPackagePath
+        {
+            get { return AppSettings["LBi.LostDoc.Repository.Extensibility.PackagePath"]; }
+        }
+
+        public static string AddInRepository
+        {
+            get { return AppSettings["LBi.LostDoc.Repository.Extensibility.Repository"]; }
+        }
 
         /// <summary>
-        /// The Api Key
+        ///     Gets the Api Key
         /// </summary>
         public static string ApiKey
         {
-            get
-            {
-                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.ApiKey"];
-            }
+            get { return AppSettings["LBi.LostDoc.Repository.ApiKey"]; }
         }
 
         /// <summary>
-        /// Gets the path where all ldoc files are stored.
+        ///     Gets the path where the generated content will be stored.
         /// </summary>
-        public static string RepositoryPath
+        public static string ContentPath
         {
             get
             {
                 return
-                    Path.Combine(_basePath,
-                                 System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.RepositoryPath"]);
-            }
-        }
-
-        /// <summary>
-        /// Gets the path where temporary files and folders will be created.
-        /// </summary>
-        public static string TempPath
-        {
-            get
-            {
-                return
-                    Path.Combine(_basePath,
-                                 System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.TempPath"]);
+                    Path.Combine(_BasePath, 
+                                 AppSettings["LBi.LostDoc.Repository.ContentPath"]);
             }
         }
 
@@ -77,55 +76,45 @@ namespace LBi.LostDoc.Repository.Web
             get
             {
                 return
-                    Path.Combine(_basePath,
-                                 System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.LogPath"]);
+                    Path.Combine(_BasePath, 
+                                 AppSettings["LBi.LostDoc.Repository.LogPath"]);
             }
         }
 
         /// <summary>
-        /// Gets the path where the generated content will be stored.
+        ///     Gets the path where all ldoc files are stored.
         /// </summary>
-        public static string ContentPath
+        public static string RepositoryPath
         {
             get
             {
                 return
-                    Path.Combine(_basePath,
-                                 System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.ContentPath"]);
+                    Path.Combine(_BasePath, 
+                                 AppSettings["LBi.LostDoc.Repository.RepositoryPath"]);
             }
         }
 
+        /// <summary>
+        ///     Gets the path where temporary files and folders will be created.
+        /// </summary>
+        public static string TempPath
+        {
+            get
+            {
+                return
+                    Path.Combine(_BasePath, 
+                                 AppSettings["LBi.LostDoc.Repository.TempPath"]);
+            }
+        }
 
         public static string Template
         {
-            get
-            {
-                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.Template"];
-            }
+            get { return AppSettings["LBi.LostDoc.Repository.Template"]; }
         }
 
-        public static string AddInInstallPath
+        private static NameValueCollection AppSettings
         {
-            get
-            {
-                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.Extensibility.InstallPath"];
-            }
-        }
-
-        public static string AddInPackagePath
-        {
-            get
-            {
-                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.Extensibility.PackagePath"];
-            }
-        }
-
-        public static string AddInRepository
-        {
-            get
-            {
-                return System.Configuration.ConfigurationManager.AppSettings["LBi.LostDoc.Repository.Extensibility.Repository"];
-            }
+            get { return System.Configuration.ConfigurationManager.AppSettings; }
         }
     }
 }

@@ -14,21 +14,20 @@
  * limitations under the License. 
  */
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
-using System.Linq;
-using System.Web;
 using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Repository.Web.Notifications;
-using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Repository.Web
 {
     public class App
     {
-        private App(CompositionContainer container, ContentManager contentManager, AddInManager addInManager, NotificationManager notifications, TraceListener listener)
+        private App(CompositionContainer container, 
+                    ContentManager contentManager, 
+                    AddInManager addInManager, 
+                    NotificationManager notifications, 
+                    TraceListener listener)
         {
             this.Container = container;
             this.Content = contentManager;
@@ -39,17 +38,23 @@ namespace LBi.LostDoc.Repository.Web
 
         public static App Instance { get; protected set; }
 
-        public static void Initialize(CompositionContainer container, ContentManager contentManager, AddInManager addInManager, NotificationManager notifications, TraceListener listener)
+        public AddInManager AddIns { get; protected set; }
+
+        public CompositionContainer Container { get; protected set; }
+
+        public ContentManager Content { get; protected set; }
+
+        public NotificationManager Notifications { get; protected set; }
+
+        public TraceListener TraceListner { get; protected set; }
+
+        public static void Initialize(CompositionContainer container, 
+                                      ContentManager contentManager, 
+                                      AddInManager addInManager, 
+                                      NotificationManager notifications, 
+                                      TraceListener listener)
         {
             Instance = new App(container, contentManager, addInManager, notifications, listener);
         }
-
-        public TraceListener TraceListner { get; protected set; }
-        public CompositionContainer Container { get; protected set; }
-        public ContentManager Content { get; protected set; }
-        public AddInManager AddIns { get; protected set; }
-        public NotificationManager Notifications { get; protected set; }
-        
-
     }
 }

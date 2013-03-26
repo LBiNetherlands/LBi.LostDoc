@@ -26,7 +26,6 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 {
     public class ContentController : Controller
     {
-
         public ActionResult GetContent(string id, string path)
         {
             try
@@ -48,6 +47,5 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                 return new HttpNotFoundResult();
             }
         }
-
     }
 }

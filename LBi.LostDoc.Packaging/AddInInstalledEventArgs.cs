@@ -31,7 +31,9 @@ namespace LBi.LostDoc.Packaging
         public PackageResult Result { get; protected set; }
 
         public AddInPackage Package { get; protected set; }
+
         public string InstallationPath { get; protected set; }
+
         public string PackagePath { get; protected set; }
     }
 }

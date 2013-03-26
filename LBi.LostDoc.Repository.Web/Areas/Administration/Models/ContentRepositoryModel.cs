@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -24,18 +23,5 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
     public class ContentRepositoryModel : ModelBase
     {
         public AssemblyModel[] Assemblies { get; set; }
-    }
-
-    public class AssemblyModel
-    {
-        public string Name { get; set; }
-        public VersionModel[] Versions { get; set; }
-    }
-
-    public class VersionModel
-    {
-        public string Filename { get; set; }
-        public Version Version { get; set; }
-        public DateTime Created { get; set; }
     }
 }

@@ -20,6 +20,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
 using LBi.LostDoc;
+using LBi.LostDoc.Repository.Web.Areas.Api.Models;
 
 namespace LBi.LostDoc.Repository.Web.Models
 {

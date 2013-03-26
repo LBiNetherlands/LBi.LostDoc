@@ -62,7 +62,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public XPathNavigatorIterator()
         {
-            _navigators = new List<XPathNavigator>();
+            this._navigators = new List<XPathNavigator>();
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public XPathNavigatorIterator(int capacity)
         {
-            _navigators = new List<XPathNavigator>(capacity);
+            this._navigators = new List<XPathNavigator>(capacity);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace LBi.LostDoc.Templating.XPath
         public XPathNavigatorIterator(XPathNavigator navigator)
             : this()
         {
-            _navigators.Add(navigator);
+            this._navigators.Add(navigator);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public XPathNavigatorIterator(List<XPathNavigator> navigators)
         {
-            _navigators = navigators;
+            this._navigators = navigators;
         }
 
         #endregion Fields & Ctors
@@ -133,10 +133,10 @@ namespace LBi.LostDoc.Templating.XPath
         /// <param name="navigator">The navigator to add. It's cloned automatically.</param>
         public void Add(XPathNavigator navigator)
         {
-            if (_position != -1)
+            if (this._position != -1)
                 throw new InvalidOperationException("Properties.Resources.XPathNavigatorIterator_CantAddAfterMove");
 
-            _navigators.Add(navigator.Clone());
+            this._navigators.Add(navigator.Clone());
         }
 
         /// <summary>
@@ -145,13 +145,13 @@ namespace LBi.LostDoc.Templating.XPath
         /// <param name="iterator">The set of navigators to add. Each one is cloned automatically.</param>
         public void Add(XPathNodeIterator iterator)
         {
-            if (_position != -1)
+            if (this._position != -1)
                 throw new InvalidOperationException(
                     "Properties.Resources.XPathNavigatorIterator_CantAddAfterMove");
 
             while (iterator.MoveNext())
             {
-                _navigators.Add(iterator.Current.Clone());
+                this._navigators.Add(iterator.Current.Clone());
             }
         }
 
@@ -161,26 +161,26 @@ namespace LBi.LostDoc.Templating.XPath
         /// <param name="navigators">The set of navigators to add. Each one is cloned automatically.</param>
         public void Add(IEnumerable<XPathNavigator> navigators)
         {
-            if (_position != -1)
+            if (this._position != -1)
                 throw new InvalidOperationException(
                     "Properties.Resources.XPathNavigatorIterator_CantAddAfterMove");
 
             foreach (XPathNavigator navigator in navigators)
             {
-                _navigators.Add(navigator.Clone());
+                this._navigators.Add(navigator.Clone());
             }
         }
 
         /// <summary>
         /// Determines whether the list contains a navigator positioned at the same 
         /// location as the specified XPathNavigator. This 
-        /// method relies on the IsSamePositon() method of the XPathNavightor. 
+        /// method relies on the IsSamePositon() method of the XPathNavigtor. 
         /// </summary>
         /// <param name="value">The object to locate in the list.</param>
         /// <returns>true if the object is found in the list; otherwise, false.</returns>
         public bool Contains(XPathNavigator value)
         {
-            foreach (XPathNavigator nav in _navigators)
+            foreach (XPathNavigator nav in this._navigators)
             {
                 if (nav.IsSamePosition(value))
                 {
@@ -199,7 +199,7 @@ namespace LBi.LostDoc.Templating.XPath
         public bool ContainsValue(string value)
         {
 
-            foreach (XPathNavigator nav in _navigators)
+            foreach (XPathNavigator nav in this._navigators)
             {
                 if (nav.Value.Equals(value))
                 {
@@ -215,8 +215,8 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public XPathNavigator this[int index]
         {
-            get { return _navigators[index]; }
-            set { _navigators[index] = value; }
+            get { return this._navigators[index]; }
+            set { this._navigators[index] = value; }
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// <param name="index">The zero-based index of the item to remove.</param>
         public void RemoveAt(int index)
         {
-            _navigators.RemoveAt(index);
+            this._navigators.RemoveAt(index);
         }
 
 
@@ -234,7 +234,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public void Reset()
         {
-            _position = -1;
+            this._position = -1;
         }
 
         #endregion Public Methods
@@ -247,7 +247,7 @@ namespace LBi.LostDoc.Templating.XPath
         public override XPathNodeIterator Clone()
         {
             return new XPathNavigatorIterator(
-                new List<XPathNavigator>(_navigators));
+                new List<XPathNavigator>(this._navigators));
         }
 
         /// <summary>
@@ -255,7 +255,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public override int Count
         {
-            get { return _navigators.Count; }
+            get { return this._navigators.Count; }
         }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public override XPathNavigator Current
         {
-            get { return _position == -1 ? null : _navigators[_position]; }
+            get { return this._position == -1 ? null : this._navigators[this._position]; }
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public override int CurrentPosition
         {
-            get { return _position + 1; }
+            get { return this._position + 1; }
         }
 
         /// <summary>
@@ -279,10 +279,10 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public override bool MoveNext()
         {
-            if (_navigators.Count == 0) return false;
+            if (this._navigators.Count == 0) return false;
 
-            _position++;
-            if (_position < _navigators.Count) return true;
+            this._position++;
+            if (this._position < this._navigators.Count) return true;
 
             return false;
         }

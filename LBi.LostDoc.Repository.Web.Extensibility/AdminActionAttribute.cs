@@ -27,14 +27,12 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
             this.IsDefault = false;
         }
 
+        public bool IsDefault { get; set; }
+
         public string Name { get; protected set; }
 
-        public string Text { get; set; }
-        
-        public bool IsDefault { get; set; }
         public double Order { get; set; }
+
+        public string Text { get; set; }
     }
-
-
-
 }

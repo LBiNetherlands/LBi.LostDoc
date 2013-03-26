@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-
 using System;
 using System.Linq;
 using System.Web.Mvc;
@@ -23,7 +22,6 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     public class AddInActionInvoker : ControllerActionInvoker
     {
-
         protected override ActionDescriptor FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, string actionName)
         {
             ActionDescriptor[] actionDescriptors = controllerDescriptor.GetCanonicalActions();
@@ -43,6 +41,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                     }
                 }
             }
+
             return base.FindAction(controllerContext, controllerDescriptor, actionName);
         }
     }

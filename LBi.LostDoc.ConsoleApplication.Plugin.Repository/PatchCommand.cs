@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-
 using System;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
@@ -39,8 +38,6 @@ namespace LBi.LostDoc.ConsoleApplication.Plugin.Repository
         {
             if (!this.Source.Exists)
                 Console.WriteLine("Source dir '{0}' does not exist.", this.Source.FullName);
-
-            
         }
     }
 }

@@ -17,17 +17,15 @@
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     // TODO is this the way to go?
-    public interface IAddInMetadata
-    {
-        string PackageId { get; }
-        string PackageVersion { get; }
-    }
 
     public interface IControllerMetadata : IAddInMetadata
     {
         string Name { get; }
+
         string Text { get; }
+
         string Group { get; }
+
         double Order { get; }
     }
 }

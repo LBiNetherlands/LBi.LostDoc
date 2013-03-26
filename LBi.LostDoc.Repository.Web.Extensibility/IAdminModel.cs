@@ -22,7 +22,9 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     public interface IAdminModel
     {
         string PageTitle { get; set; }
+
         IEnumerable<Notification> Notifications { get; set; }
+
         Navigation[] Navigation { get; set; }
     }
 }

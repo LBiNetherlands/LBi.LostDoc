@@ -23,24 +23,20 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
     [ApiController("site/")]
     public class SiteController : ApiController
     {
-        [HttpGet]
-        [ApiAction("status")]
-        public string GetStatus()
+        public string Get()
         {
             return App.Instance.Content.CurrentState.ToString();
         }
 
-        [HttpPost]
         [ApiKeyAuthorize]
-        [ApiAction("rebuild")]
-        public bool Rebuild()
+        public bool Post()
         {
             try
             {
-                App.Instance.Content.QueueRebuild("");
+                App.Instance.Content.QueueRebuild(String.Empty);
                 return true;
             } 
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
