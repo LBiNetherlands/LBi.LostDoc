@@ -26,11 +26,11 @@ namespace LBi.LostDoc.Repository.Web.Controllers
 {
     public class SearchController : ApiController
     {
-        protected static ObjectCache _cache;
+        protected static ObjectCache _Cache;
 
         static SearchController()
         {
-            _cache = new MemoryCache("SearchController.ContentSearchers");
+            _Cache = new MemoryCache("SearchController.ContentSearchers");
         }
 
         public ResultSet Get(string id, string searchTerms)
@@ -71,7 +71,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                     () => new ContentSearcher(Path.Combine(AppConfig.ContentPath, contentFolder, "Index")).Retain(), 
                     LazyThreadSafetyMode.ExecutionAndPublication);
 
-            object obj = _cache.AddOrGetExisting(contentFolder, 
+            object obj = _Cache.AddOrGetExisting(contentFolder, 
                                                  lazyObj, 
                                                  new CacheItemPolicy
                                                      {

@@ -103,10 +103,8 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
                     {
                         var fd = FileDescriptor.Load(fi);
 
-                        File.Copy(
-                            fi.FullName, 
-                            Path.Combine(AppConfig.RepositoryPath, 
-                                         fileName.Headers.ContentDisposition.FileName.Trim('"')));
+                        string destFileName = Path.Combine(AppConfig.RepositoryPath, fileName.Headers.ContentDisposition.FileName.Trim('"'));
+                        File.Copy(fi.FullName, destFileName);
 
                         ret.Add(fd);
                     }

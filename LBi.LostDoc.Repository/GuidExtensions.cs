@@ -32,6 +32,7 @@ namespace LBi.LostDoc.Repository
                 num = num / 36;
                 ret = CLIST[val] + ret;
             }
+
             return ret;
         }
     }

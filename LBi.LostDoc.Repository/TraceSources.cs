@@ -24,13 +24,28 @@ namespace LBi.LostDoc.Repository
 {
     public static class TraceSources
     {
-        public static TraceSource ContentBuilderSource = new TraceSource("LBi.LostDoc.Repository.ContentBuilder",
+        private static readonly TraceSource _ContentBuilderSource = new TraceSource("LBi.LostDoc.Repository.ContentBuilder",
                                                                          SourceLevels.All);
 
-        public static TraceSource ContentManagerSource = new TraceSource("LBi.LostDoc.Repository.ContentManager",
+        private static readonly TraceSource _ContentManagerSource = new TraceSource("LBi.LostDoc.Repository.ContentManager",
                                                                          SourceLevels.All);
 
-        public static TraceSource ContentSearcherSource = new TraceSource("LBi.LostDoc.Repository.ContentSearcher",
+        private static readonly TraceSource _ContentSearcherSource = new TraceSource("LBi.LostDoc.Repository.ContentSearcher",
                                                                           SourceLevels.All);
+
+        public static TraceSource ContentBuilderSource
+        {
+            get { return _ContentBuilderSource; }
+        }
+
+        public static TraceSource ContentManagerSource
+        {
+            get { return _ContentManagerSource; }
+        }
+
+        public static TraceSource ContentSearcherSource
+        {
+            get { return _ContentSearcherSource; }
+        }
     }
 }

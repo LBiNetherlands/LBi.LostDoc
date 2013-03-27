@@ -16,12 +16,12 @@
 
 using System.Runtime.Serialization;
 
-namespace LBi.LostDoc.Repository.Web.Models
+namespace LBi.LostDoc.Repository.Web.Areas.Api.Models
 {
     [DataContract]
     public class SearchResult
     {
         [DataMember]
-        public  int Count { get; set; }
+        public int Count { get; set; }
     }
 }

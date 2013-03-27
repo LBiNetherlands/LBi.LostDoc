@@ -33,7 +33,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
         {
             try
             {
-                App.Instance.Content.QueueRebuild(String.Empty);
+                App.Instance.Content.QueueRebuild(string.Empty);
                 return true;
             } 
             catch (Exception)

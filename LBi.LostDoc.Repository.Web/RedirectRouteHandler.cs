@@ -21,11 +21,16 @@ namespace LBi.LostDoc.Repository.Web
 {
     public class RedirectRouteHandler : IRouteHandler, IHttpHandler
     {
-        private string _routeName;
+        private readonly string _routeName;
 
         public RedirectRouteHandler(string routeName)
         {
             this._routeName = routeName;
+        }
+
+        public bool IsReusable
+        {
+            get { return false; }
         }
 
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
@@ -36,11 +41,6 @@ namespace LBi.LostDoc.Repository.Web
         public void ProcessRequest(HttpContext context)
         {
             context.Response.RedirectToRoute(this._routeName);
-        }
-
-        public bool IsReusable
-        {
-            get { return false; }
         }
     }
 }

@@ -29,6 +29,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
         public LibraryModel Get()
         {
             string root = Path.GetFullPath(AppConfig.ContentPath);
+            // TODO fix the raw xml access
             return new LibraryModel
                        {
                            Libraries = Directory.EnumerateDirectories(AppConfig.ContentPath)
@@ -37,10 +38,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
                                        new LibraryDescriptor
                                            {
                                                Id = d.Substring(root.Length + 1),
-                                               Created =
-                                                   XmlConvert.ToDateTime(
-                                                                         XDocument.Load(Path.Combine(d, "info.xml")).
-                                                                          Element("content").Attribute("created").Value)
+                                               Created = XmlConvert.ToDateTime(XDocument.Load(Path.Combine(d, "info.xml")).Element("content").Attribute("created").Value)
                                            }),
                            Current = App.Instance.Content.ContentFolder
                        };

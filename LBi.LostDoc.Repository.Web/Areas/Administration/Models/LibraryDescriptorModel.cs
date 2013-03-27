@@ -21,6 +21,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
     public class LibraryDescriptorModel
     {
         public string Id { get; set; }
+
         public DateTime Created { get; set; }
     }
 }

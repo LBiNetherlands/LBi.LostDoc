@@ -30,7 +30,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         [AdminAction("index", IsDefault = true, Text = "Status")]
         public ActionResult Index()
         {
-            return View(new SystemModel());
+            return this.View(new SystemModel());
         }
 
         //[AdminAction("logs", Text = "Logs")]
