@@ -14,3 +14,75 @@
  * limitations under the License. 
  */
 
+nav {
+	font-family: Segoe UI, Arial, Sans serif;
+
+	ul, li {
+		padding: 0;
+		list-style-type: none;
+	}
+
+	li {
+		&.container {
+			//background-color: #ECF0F1;
+			//display: inline-block;
+			//border: 0.1rem solid #2980B9;
+		}
+
+		margin-top: .6rem;
+		
+		li {
+			margin-top: .3rem;
+			margin-bottom: .3rem;
+		}
+	}
+
+	/*
+
+	> ul li:first-child:hover {
+		transition-property: opacity, height;
+		transition-duration: 250ms;
+		opacity: 1;
+		height: auto;
+		overflow: hidden;
+	}
+
+
+	li > ul {
+		transition-property: opacity, height;
+		transition-duration: 250ms;
+
+		height: 0;
+		overflow: hidden;
+		opacity: 0;
+	}
+	*/
+
+	li li a.button {
+		width: 9rem;
+		margin-left: 0.5rem;
+		margin-top: 0;
+		
+	}
+
+	a.button {
+		transition-property: background-color;
+		transition-duration: 250ms;
+
+		display: inline-block;
+		padding: 1rem;
+		width: 10rem;
+		background-color: #2980B9;
+		color: #fff;
+		text-decoration: none;
+		text-align: center;
+
+		&.active {
+			font-weight: bold;
+		}
+
+		&:hover {
+			background-color: #3498db
+		}
+	}
+}

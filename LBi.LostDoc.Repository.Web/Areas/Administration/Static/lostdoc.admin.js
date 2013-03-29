@@ -14,3 +14,43 @@
  * limitations under the License. 
  */
 
+$(".tilt").each(function() {
+    $(this).mousedown(function(event) {
+        // Does the click reside in the center of the object 
+        if (event.pageX > $(this).offset().left + ($(this).outerWidth() / 2) - (0.1 * $(this).outerWidth()) &&
+            event.pageX < $(this).offset().left + ($(this).outerWidth() / 2) + (0.1 * $(this).outerWidth()) &&
+            event.pageY > $(this).offset().top + ($(this).outerHeight() / 2) - (0.1 * $(this).outerHeight()) &&
+            event.pageY < $(this).offset().top + ($(this).outerHeight() / 2) + (0.1 * $(this).outerHeight())) {
+            $(this).css("transform", "perspective(500px) translateZ(-15px)");
+        } else {
+            var slope = $(this).outerHeight() / $(this).outerWidth(),
+                descendingY = (slope * (event.pageX - $(this).offset().left)) + $(this).offset().top,
+                ascendingY = (-slope * (event.pageX - $(this).offset().left)) + $(this).offset().top + $(this).outerHeight();
+
+            if (event.pageY < descendingY) {
+                if (event.pageY < ascendingY) {
+                    // top region
+                    $(this).css("transform", "perspective(500px) rotateX(8deg)");
+                } else {
+                    // right region
+                    $(this).css("transform", "perspective(500px) rotateY(8deg)");
+                }
+            } else {
+                if (event.pageY > ascendingY) {
+                    // bottom region
+                    $(this).css("transform", "perspective(500px) rotateX(-8deg)");
+                } else {
+                    // left region
+                    $(this).css("transform", "perspective(500px) rotateY(-8deg)");
+                }
+            }
+        }
+    });
+
+    // TOD this is super flaky/weird, ask Pim
+    var link = $(this);
+    var container = link.parent();
+    container.mouseout(function (event) {
+        link.css("transform", "");
+    });
+});
