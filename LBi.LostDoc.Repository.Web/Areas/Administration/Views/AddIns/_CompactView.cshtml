@@ -42,56 +42,62 @@
     <a href="#" class="button delete">Uninstall</a>
 </details>*@
 
-<details class="package">
-    <summary>
-        <ul>
-            <li>@Model.Package.Title <span>@Model.Package.Version</span></li>
-            <li>Last updated:
-                @if (Model.Package.Published.HasValue)
-                {
-                    <em>@Model.Package.Published.Value.ToString("yyyy-MM-dd")</em>
-                }
-                else
-                {
-                    <em>&lt;unknown&gt;</em>
-                }
-            </li>
-        </ul>
-    </summary>
+<article class="package">
     <figure>
         <img src="@Model.Package.IconUrl" alt="120x90" width="120" height="90" />
     </figure>
-    <p>@Model.Package.Description</p>
-    <p>@Model.Package.Summary</p>
 
-    @if (Model.CanInstall)
-    {
-        <form action="@Url.Action("Install")" method="POST">
-            <input type="hidden" name="package-id" value="@Model.Package.Id"/>
-            <input type="hidden" name="package-version" value="@Model.Package.Version"/>
-            <input type="submit" value="Install" />
-        </form>
-    }
-    @if (Model.CanUpdate)
-    {
-        <form action="@Url.Action("Update")" method="POST">
-            <input type="hidden" name="package-id" value="@Model.Package.Id"/>
-            <input type="hidden" name="package-version" value="@Model.Package.Version"/>
-            <input type="submit" value="Update" />
-        </form>
-    }
-    @if (Model.CanUninstall)
-    {
-        <form action="@Url.Action("Uninstall")" method="POST">
-            <input type="hidden" name="package-id" value="@Model.Package.Id"/>
-            <input type="hidden" name="package-version" value="@Model.Package.Version"/>
-            <input type="submit" value="Uninstall" />
-        </form>
-    }
-    
-    <a href="@Model.Package.ProjectUrl" class="license">Project site</a>
-    @if (Model.Package.LicenseUrl != null || true)
-    {
-        <a href="@Model.Package.LicenseUrl" class="license">License</a>
-    }
-</details>
+    <ul class="package-details">
+        <li>@Model.Package.Title <span>@Model.Package.Version</span></li>
+        <li>Last updated:
+            @if (Model.Package.Published.HasValue)
+            {
+                <em>@Model.Package.Published.Value.ToString("yyyy-MM-dd")</em>
+            }
+            else
+            {
+                <em>&lt;unknown&gt;</em>
+            }
+        </li>
+
+        <li>@Model.Package.Description</li>
+        <li>@Model.Package.Summary</li>
+
+        <li><a href="@Model.Package.ProjectUrl" class="license">Project site</a></li>
+        @if (Model.Package.LicenseUrl != null || true)
+        {
+            <li><a href="@Model.Package.LicenseUrl" class="license">License</a></li>
+        }
+
+    </ul>
+
+
+    <div class="actions">
+        @if (Model.CanInstall)
+        {
+            <form action="@Url.Action("Install")" method="POST">
+                <input type="hidden" name="package-id" value="@Model.Package.Id"/>
+                <input type="hidden" name="package-version" value="@Model.Package.Version"/>
+                <input type="submit" value="Install" />
+            </form>
+        }
+        @if (Model.CanUpdate)
+        {
+            <form action="@Url.Action("Update")" method="POST">
+                <input type="hidden" name="package-id" value="@Model.Package.Id"/>
+                <input type="hidden" name="package-version" value="@Model.Package.Version"/>
+                <input type="submit" value="Update" />
+            </form>
+        }
+        @if (Model.CanUninstall)
+        {
+            <form action="@Url.Action("Uninstall")" method="POST">
+                <input type="hidden" name="package-id" value="@Model.Package.Id"/>
+                <input type="hidden" name="package-version" value="@Model.Package.Version"/>
+                <input type="submit" value="Uninstall" />
+            </form>
+        }
+    </div>
+
+
+</article>

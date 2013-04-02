@@ -18,7 +18,9 @@
 @model AddInOverviewModel
 
 <section class="package-list">
-    <h2>@Model.Title</h2>
+    <h1>@Model.Title</h1>
+    
+    <h2>Installed</h2>
     @foreach (var addIn in Model.AddIns)
     {
         Html.RenderPartial("_CompactView", addIn);
@@ -29,8 +31,8 @@
         <span>No add-ins installed.</span>
     }
     
+    <h2>Manually upload & install package</h2>
     <form action="@Url.Action("UploadPackage")">
-        <label for="package">Manually upload & install package</label>
         <input type="file" name="package"/>
         <input type="submit" name="upload" value="Install"/>
     </form>

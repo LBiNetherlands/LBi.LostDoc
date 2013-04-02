@@ -71,7 +71,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         {
             return this.View(new AddInOverviewModel
                                  {
-                                     Title = "Installed Add-ins", 
+                                     Title = "Manage Add-ins", 
                                      AddIns = App.Instance.AddIns
                                                  .Select(pkg =>
                                                          new AddInModel
@@ -100,7 +100,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 
             return this.View(new SearchResultModel
                                  {
-                                     Title = "Results", 
+                                     Title = "Online Add-ins", 
                                      Results = results, 
                                      NextOffset = results.Length == COUNT ? COUNT : (int?)null
                                  });

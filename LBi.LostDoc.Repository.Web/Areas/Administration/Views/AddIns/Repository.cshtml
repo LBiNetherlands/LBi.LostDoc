@@ -18,6 +18,9 @@
 @model SearchResultModel
 
 
+<h1>@Model.Title</h1>
+
+<h2>Search</h2>
 <form method="GET" action="@Url.Action("Search")" data-target="#results">
     <input type="search" name="terms"placeholder="Search repository"/>
     <input type="submit" value="Search"/>
@@ -25,8 +28,8 @@
     <label for="cbIncludePrerelease">Include prerelease packages</label>
 </form>
 
+<h2>Results</h2>
 <section class="package-list">
-    <h2>@Model.Title</h2>
     
     
     @Html.Partial("Search", Model)

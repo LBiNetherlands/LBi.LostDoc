@@ -68,7 +68,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
         {
             var lazyObj =
                 new Lazy<ContentSearcher>(
-                    () => new ContentSearcher(Path.Combine(AppConfig.ContentPath, contentFolder, "Index")).Retain(), 
+                    () => new ContentSearcher(Path.Combine(AppConfig.ContentPath, contentFolder, "Index")).Retain(),
                     LazyThreadSafetyMode.ExecutionAndPublication);
 
             object obj = _Cache.AddOrGetExisting(contentFolder, 
