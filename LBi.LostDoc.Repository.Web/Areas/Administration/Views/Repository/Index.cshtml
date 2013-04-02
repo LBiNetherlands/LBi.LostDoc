@@ -17,10 +17,10 @@
 @using LBi.LostDoc.Repository.Web.Areas.Administration.Models
 @model LBi.LostDoc.Repository.Web.Areas.Administration.Models.ContentRepositoryModel
 
-<h2>Content repository</h2>
+<h1>Content repository</h1>
 
 
-
+<h2>Available files</h2>
 @foreach (var assembly in Model.Assemblies.OrderBy(am => am.Name))
 {
     <h3>@assembly.Name</h3>
@@ -62,8 +62,8 @@
     <p>There are no LostDoc files in the repository, you can upload some:</p>
 }
 
+<h2>Upload LostDoc file</h2>
 <form action="@Url.Action("Upload")" method="POST" enctype="multipart/form-data">
-    <label for="package">Manually upload</label>
     <input type="file" name="file" />
     <input type="submit" name="upload" value="Upload" />
 </form>
