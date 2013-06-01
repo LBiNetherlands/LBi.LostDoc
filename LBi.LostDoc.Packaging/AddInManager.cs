@@ -52,8 +52,13 @@ namespace LBi.LostDoc.Packaging
                 this._packageManager.LocalRepository.GetPackages()
                     .SingleOrDefault(
                         p =>
-                        StringComparer.Ordinal.Equals(p.Id, package.Id) &&
-                        StringComparer.Ordinal.Equals(p.Version.Version, package.Version)) != null;
+                        PackageEquals(package, p)) != null;
+        }
+
+        private static bool PackageEquals(AddInPackage package, IPackage p)
+        {
+            return StringComparer.Ordinal.Equals(p.Id, package.Id) &&
+                   StringComparer.Ordinal.Equals(p.Version.ToString(), package.Version);
         }
 
         public AddInPackage Get(string id, string version)
