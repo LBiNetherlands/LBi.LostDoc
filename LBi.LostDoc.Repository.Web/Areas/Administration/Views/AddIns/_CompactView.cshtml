@@ -47,9 +47,17 @@
         <img src="@Model.Package.IconUrl" alt="120x90" width="120" height="90" />
     </figure>
 
-    <ul class="package-details">
-        <li>@Model.Package.Title <span>@Model.Package.Version</span></li>
-        <li>Last updated:
+    <div class="information">
+        <h3>@Model.Package.Title <span>@Model.Package.Version</span></h3>
+
+        <details>
+            <summary>@Model.Package.Summary</summary>
+            <p>@Model.Package.Description</p>
+        </details>
+
+        <ul class="package-details">
+
+            <li>Last updated:
             @if (Model.Package.Published.HasValue)
             {
                 <em>@Model.Package.Published.Value.ToString("yyyy-MM-dd")</em>
@@ -58,18 +66,16 @@
             {
                 <em>&lt;unknown&gt;</em>
             }
-        </li>
+            </li>
 
-        <li>@Model.Package.Description</li>
-        <li>@Model.Package.Summary</li>
+            <li><a href="@Model.Package.ProjectUrl" class="license">Project site</a></li>
+            @if (Model.Package.LicenseUrl != null || true)
+            {
+                <li><a href="@Model.Package.LicenseUrl#" class="license">License information</a></li>
+            }
 
-        <li><a href="@Model.Package.ProjectUrl" class="license">Project site</a></li>
-        @if (Model.Package.LicenseUrl != null || true)
-        {
-            <li><a href="@Model.Package.LicenseUrl" class="license">License</a></li>
-        }
-
-    </ul>
+        </ul>
+    </div>
 
 
     <div class="actions">
