@@ -100,38 +100,36 @@
         </section>
         <!-- / content section -->
     </div>
+    
+    @if (Model.Notifications.Any())
+    {
+        <section role="alert">
+            <div class="handle">
+                <span class="icon"></span>
+                <span class="count">
+                    @Model.Notifications.Count().ToString("N0")
+                </span>
+            </div>
+            <div class="pusher"></div>
+            <ul>
+                @foreach (var notification in Model.Notifications)
+                {
+                    <li role="alert" id="alert-@notification.Id.ToBase36String()">
+                        <strong>@notification.Title <span>@((DateTime.UtcNow - notification.Created).ToHumanReadableString()) ago</span></strong>
 
-    <section>
-        <ul>
-            @foreach (var notification in Model.Notifications)
-            {
-                <li role="alert" id="alert-@notification.Id.ToBase36String()">
-                    <strong>@notification.Title <span>@((DateTime.UtcNow - notification.Created).ToHumanReadableString()) ago</span></strong>
+                        <p>@notification.Message</p>
 
-                    <p>@notification.Message</p>
+                        @foreach (var action in notification.Actions)
+                        {
+                            <a role="button" href="@action.Target" class="action">@action.Text</a>
+                        }
+                    </li>
+                }
 
-                    @foreach (var action in notification.Actions)
-                    {
-                        <a role="button" href="@action.Target" class="action">@action.Text</a>
-                    }
-                </li>
-            }
-
-        </ul>
-    </section>
-
-    <!-- Generic libraries -->
-    @*    <script src="~/static/js/lib/zepto.js"></script>
-    <script src="~/static/js/lib/zepto.data.js"></script>*@
-
-    @*    <!-- Init -->
-    <script src="~/static/js/lostdoc.js"></script>
-    <script src="~/static/js/lib/codemirror.js"></script>
-    <script src="~/static/js/lib/simple-hint.js"></script>
-    <script src="~/static/js/lib/closetag.js"></script>
-    <script src="~/static/js/lib/xml-hint.js"></script>
-    <script src="~/static/js/lib/xml.js"></script>*@
-
+            </ul>
+        </section>
+    }
+    <script src="~/Areas/Administration/Static/lostdoc.notifications.js"></script>
     <script src="~/Areas/Administration/Static/lostdoc.admin.js"></script>
 </body>
 </html>

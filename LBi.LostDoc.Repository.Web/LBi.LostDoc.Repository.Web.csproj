@@ -187,6 +187,7 @@
     <Compile Include="Areas\Administration\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Administration\Static\lostdoc.notifications.js" />
     <Content Include="Areas\Administration\Static\Lib\less-1.3.0.min.js" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.js" />
     <Content Include="Global.asax" />
