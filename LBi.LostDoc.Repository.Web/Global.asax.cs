@@ -112,8 +112,8 @@ namespace LBi.LostDoc.Repository.Web
             // intialize MEF
 
             // core 'add-ins'
-            var currentAssembly = Assembly.GetExecutingAssembly();
-            var assemblyName = currentAssembly.GetName();
+            Assembly currentAssembly = Assembly.GetExecutingAssembly();
+            AssemblyName assemblyName = currentAssembly.GetName();
             string corePackageId = assemblyName.Name;
             string corePackageVersion = assemblyName.Version.ToString();
             AggregateCatalog catalog = new AggregateCatalog();
@@ -170,6 +170,7 @@ namespace LBi.LostDoc.Repository.Web
             // set up notifaction system
             NotificationManager notifications = new NotificationManager();
 
+            // TODO replace this with MEF based injection
             // initialize app-singleton
             App.Initialize(container, contentManager, addInManager, notifications, traceListener);
 
@@ -198,20 +199,13 @@ namespace LBi.LostDoc.Repository.Web
 
                 foreach (var partDefinition in eventArg.RemovedDefinitions)
                 {
-                    IEnumerable<ExportDefinition> exports = partDefinition.ExportDefinitions;
-                    var apiExport = exports.SingleOrDefault(export => StringComparer.Ordinal.Equals(export.ContractName, 
-                                                                                                    Extensibility.ContractNames.ApiController));
-                    if (apiExport == null)
+                    IApiControllerMetadata controllerMetadata;
+                    if (!TryGetMetadata(partDefinition, out controllerMetadata))
                         continue;
-
-                    IApiControllerMetadata controllerMetadata =
-                        AttributedModelServices.GetMetadataView<IApiControllerMetadata>(apiExport.Metadata);
 
                     Type controllerType = AddInModelServices.GetPartType(partDefinition).Value;
 
-                    string routeName = string.Format("{0}_{1}", 
-                                                     controllerMetadata.PackageId, 
-                                                     controllerType.FullName.Replace('.', '_'));
+                    string routeName = CreateRouteName(controllerMetadata, controllerType);
 
                     TraceSources.AddInManager.TraceInformation("Removing route: {0} (Source: {1}, Version: {2})", 
                                                                routeName, 
@@ -227,14 +221,9 @@ namespace LBi.LostDoc.Repository.Web
 
                 foreach (var partDefinition in eventArg.AddedDefinitions)
                 {
-                    IEnumerable<ExportDefinition> exports = partDefinition.ExportDefinitions;
-                    var apiExport = exports.SingleOrDefault(export => StringComparer.Ordinal.Equals(export.ContractName, 
-                                                                                                    Extensibility.ContractNames.ApiController));
-                    if (apiExport == null)
+                    IApiControllerMetadata controllerMetadata;
+                    if (!TryGetMetadata(partDefinition, out controllerMetadata)) 
                         continue;
-
-                    IApiControllerMetadata controllerMetadata =
-                        AttributedModelServices.GetMetadataView<IApiControllerMetadata>(apiExport.Metadata);
 
                     Type controllerType = AddInModelServices.GetPartType(partDefinition).Value;
 
@@ -243,9 +232,7 @@ namespace LBi.LostDoc.Repository.Web
                                                        controllerMetadata.PackageId, 
                                                        controllerMetadata.UrlFragment.Trim('/'));
 
-                    string routeName = string.Format("{0}_{1}", 
-                                                     controllerMetadata.PackageId, 
-                                                     controllerType.FullName.Replace('.', '_'));
+                    string routeName = CreateRouteName(controllerMetadata, controllerType);
 
                     string controllerName = controllerType.Name.Substring(0, controllerType.Name.Length - "Controller".Length);
 
@@ -269,6 +256,28 @@ namespace LBi.LostDoc.Repository.Web
                     }
                 }
             }
+        }
+
+        private static string CreateRouteName(IApiControllerMetadata controllerMetadata, Type controllerType)
+        {
+            return string.Format("{0}_{1}", 
+                                 controllerMetadata.PackageId, 
+                                 controllerType.FullName.Replace('.', '_'));
+        }
+
+        private static bool TryGetMetadata(ComposablePartDefinition partDefinition, out IApiControllerMetadata controllerMetadata)
+        {
+            IEnumerable<ExportDefinition> exports = partDefinition.ExportDefinitions;
+            var apiExport = exports.SingleOrDefault(export => StringComparer.Ordinal.Equals(export.ContractName,
+                                                                                            Extensibility.ContractNames.ApiController));
+            if (apiExport == null)
+            {
+                controllerMetadata = null;
+                return false;
+            }
+
+            controllerMetadata = AttributedModelServices.GetMetadataView<IApiControllerMetadata>(apiExport.Metadata);
+            return true;
         }
     }
 }
