@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
@@ -32,23 +33,26 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult Index()
         {
             string root = Path.GetFullPath(AppConfig.ContentPath);
+            IEnumerable<string> directories = Directory.EnumerateDirectories(AppConfig.ContentPath);
+            var libraries = directories.Where(p => System.IO.File.Exists(Path.Combine(p, "info.xml")))
+                                       .Select(d => CreateLibraryModel(d, root));
+
             return this.View(new LibraryModel
                                  {
-                                     Libraries = Directory.EnumerateDirectories(AppConfig.ContentPath)
-                                                          .Select(
-                                                              d =>
-                                                              new LibraryDescriptorModel
-                                                                  {
-                                                                      Id = d.Substring(root.Length),
-                                                                      Created =
-                                                                          XmlConvert.ToDateTime(
-                                                                              XDocument.Load(Path.Combine(d, "info.xml"))
-                                                                                       .Element("content")
-                                                                                       .Attribute("created")
-                                                                                       .Value, XmlDateTimeSerializationMode.Local)
-                                                                  }).ToArray(),
+                                     Libraries = libraries.ToArray(),
                                      Current = App.Instance.Content.ContentFolder
                                  });
+        }
+
+        private static LibraryDescriptorModel CreateLibraryModel(string d, string root)
+        {
+            string value = XDocument.Load(Path.Combine(d, "info.xml")).Element("content").Attribute("created").Value;
+            return new LibraryDescriptorModel
+                       {
+                           Id = d.Substring(root.Length),
+                           Created = XmlConvert.ToDateTime(value,
+                                                           XmlDateTimeSerializationMode.Local)
+                       };
         }
 
         public ActionResult Details(string id)
