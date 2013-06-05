@@ -20,7 +20,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                     throw new InvalidOperationException(string.Format("Model ({0}) does not implement IAdminModel", 
                                                                       viewResult.GetType().Name));
 
-                model.Notifications = App.Instance.Notifications.Get(filterContext.HttpContext.User);
+                model.Notifications = App.Instance.Notifications.Get(filterContext.HttpContext.User).ToArray();
 
                 // this was populated by the AddInControllerFactory
                 IControllerMetadata metadata =

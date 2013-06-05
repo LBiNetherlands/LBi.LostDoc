@@ -23,7 +23,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
     {
         string PageTitle { get; set; }
 
-        IEnumerable<Notification> Notifications { get; set; }
+        Notification[] Notifications { get; set; }
 
         Navigation[] Navigation { get; set; }
     }

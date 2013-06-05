@@ -39,7 +39,7 @@
 
     private string GetNotificationState()
     {
-        if (Model.Notifications.Any())
+        if (Model.Notifications.Length > 0)
             return "closed";
 
         return "hidden";
