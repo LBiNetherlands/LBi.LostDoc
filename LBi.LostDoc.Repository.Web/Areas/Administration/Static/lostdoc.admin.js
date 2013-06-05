@@ -47,7 +47,7 @@ $(".tilt").each(function() {
         }
     });
 
-    // TOD this is super flaky/weird, ask Pim
+    // TODO this is super flaky/weird, ask Pim
     var link = $(this);
     var container = link.parent();
     container.mouseout(function (event) {
