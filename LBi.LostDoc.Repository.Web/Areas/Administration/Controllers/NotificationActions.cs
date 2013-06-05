@@ -33,5 +33,15 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                 // TODO fix hardcoded URL ^
             }
         }
+
+        public static NotificationAction Refresh
+        {
+            get
+            {
+                return new NotificationAction("Refresh page",
+                                              new Uri("javascipt:alert('yeah');",
+                                                      UriKind.RelativeOrAbsolute));
+            }
+        }
     }
 }

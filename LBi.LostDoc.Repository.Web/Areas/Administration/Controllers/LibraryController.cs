@@ -23,6 +23,7 @@ using System.Xml;
 using System.Xml.Linq;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Notifications;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
@@ -64,12 +65,30 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 
         public ActionResult Delete(string id)
         {
-            throw new NotImplementedException();
+            string contentRoot = App.Instance.Content.GetContentRoot(id);
+            Directory.Delete(contentRoot, true);
+            App.Instance.Notifications.Add(Severity.Information,
+                                           Lifetime.Page,
+                                           Scope.User,
+                                           this.User,
+                                           "Library Deleted",
+                                           string.Format("The library with id {0} has been deleted.", id));
+
+            return Redirect(Url.Action("Index"));
         }
 
         public ActionResult SetCurrent(string id)
         {
-            throw new NotImplementedException();
+            App.Instance.Content.SetCurrentContentFolder(id);
+            App.Instance.Notifications.Add(Severity.Information,
+                                           Lifetime.Page,
+                                           Scope.User,
+                                           this.User,
+                                           "New Library Content",
+                                           "The library content has changed",
+                                           NotificationActions.Refresh);
+
+            return Redirect(Url.Action("Index"));
         }
     }
 }
