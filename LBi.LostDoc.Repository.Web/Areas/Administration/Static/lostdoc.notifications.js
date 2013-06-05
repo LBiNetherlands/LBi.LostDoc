@@ -17,7 +17,7 @@
 function Notifications(section, handle){
     this.handle = handle;
     this.section = section;
-    this.section.className = "closed";
+
     this.handle.addEventListener('click', function (evt) {
         if (this.section.className == 'open') {
             this.section.className = "closed";
@@ -27,9 +27,4 @@ function Notifications(section, handle){
         // alert(this.section.className);
     }.bind(this));
 }
-
-// Add methods like this.  All Person objects will be able to invoke this
-Notifications.prototype.speak = function() {
-    alert("Howdy, my name is" + this.name);
-};
 

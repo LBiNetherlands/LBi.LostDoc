@@ -79,7 +79,7 @@
 }
 
 section[role=alert] {
-	position: absolute;
+	position: fixed;
 	left: 0;
 	top: 0;
 	padding: 0;
@@ -114,12 +114,19 @@ section[role=alert] {
 		}
 	}
 	background-color: #2980B9;
-	overflow: hidden;
+	// overflow: hidden;
+
+	&.hidden {
+		height: 0px;
+		div.handle {
+			top: -48px;
+		}
+	}
 
 	&.open {
 		height: auto;
 		div.handle {
-			top: -48px;
+			//top: -48px;
 		}
 
 		.pusher { margin-top: 0; }
@@ -133,6 +140,10 @@ section[role=alert] {
 
 		ul {
 
+		}
+
+		.pusher {
+			margin-top:-100%;
 		}
 	}
 

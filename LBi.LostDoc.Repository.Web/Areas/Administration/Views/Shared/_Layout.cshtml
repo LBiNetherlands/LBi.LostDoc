@@ -36,6 +36,15 @@
 
         return cssClass;
     }
+
+    private string GetNotificationState()
+    {
+        if (Model.Notifications.Any())
+            return "closed";
+
+        return "hidden";
+    }
+
 }
 
 @helper RenderNavigation(Navigation[] navigation)
@@ -100,35 +109,37 @@
         </section>
         <!-- / content section -->
     </div>
-    
-    @if (Model.Notifications.Any())
-    {
-        <section role="alert">
-            <div class="handle">
-                <span class="icon"></span>
-                <span class="count">
-                    @Model.Notifications.Count().ToString("N0")
-                </span>
-            </div>
-            <div class="pusher"></div>
-            <ul>
-                @foreach (var notification in Model.Notifications)
-                {
-                    <li role="alert" id="alert-@notification.Id.ToBase36String()">
-                        <strong>@notification.Title <span>@((DateTime.UtcNow - notification.Created).ToHumanReadableString()) ago</span></strong>
 
-                        <p>@notification.Message</p>
 
-                        @foreach (var action in notification.Actions)
-                        {
-                            <a role="button" href="@action.Target" class="action">@action.Text</a>
-                        }
-                    </li>
-                }
+    <section role="alert" class="@GetNotificationState()">
+        <div class="handle">
+            <span class="icon"></span>
+            <span class="count">
+                @Model.Notifications.Count().ToString("N0")
+            </span>
+        </div>
+        <div class="pusher"></div>
+        <ul>
+            @foreach (var notification in Model.Notifications)
+            {
+                <li role="alert" id="alert-@notification.Id.ToBase36String()">
+                    <strong>@notification.Title <span>@((DateTime.UtcNow - notification.Created).ToHumanReadableString()) ago</span></strong>
 
-            </ul>
-        </section>
-    }
+                    <p>@notification.Message</p>
+
+                    @foreach (var action in notification.Actions)
+                    {
+                        <a role="button" href="@action.Target" class="action">@action.Text</a>
+                    }
+                </li>
+            }
+
+        </ul>
+        <div class="close">
+            <span class="icon"></span>
+        </div>
+    </section>
+
     <script src="~/Areas/Administration/Static/lostdoc.notifications.js"></script>
     <script src="~/Areas/Administration/Static/lostdoc.admin.js"></script>
 </body>
