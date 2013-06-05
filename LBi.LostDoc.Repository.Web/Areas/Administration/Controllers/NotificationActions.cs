@@ -25,7 +25,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         {
             get
             {
-                return new NotificationAction("Restart",
+                return new NotificationAction("Restart now",
                                               new Uri("/lostdoc/system/restart?auth=" +
                                                       Uri.EscapeDataString(Guid.NewGuid().ToBase36String()),
                                                       UriKind.Relative));
