@@ -39,7 +39,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             get
             {
                 return new NotificationAction("Refresh page",
-                                              new Uri("javascipt:alert('yeah');",
+                                              new Uri("javascript:document.location.reload(true);",
                                                       UriKind.RelativeOrAbsolute));
             }
         }

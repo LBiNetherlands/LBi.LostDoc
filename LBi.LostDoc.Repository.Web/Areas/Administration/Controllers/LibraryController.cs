@@ -58,7 +58,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 
         public ActionResult Details(string id)
         {
-            string path = Path.Combine(AppConfig.ContentPath, id);
+            string contentRoot = App.Instance.Content.GetContentRoot(id);
 
             return this.View();
         }
@@ -87,6 +87,19 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                            "New Library Content",
                                            "The library content has changed",
                                            NotificationActions.Refresh);
+
+            return Redirect(Url.Action("Index"));
+        }
+
+        public ActionResult Build()
+        {
+            App.Instance.Content.QueueRebuild("Requested by " + this.User.Identity.Name);
+            App.Instance.Notifications.Add(Severity.Information,
+                                           Lifetime.Page,
+                                           Scope.User,
+                                           this.User,
+                                           "Rebuilding Content",
+                                           "A new content rebuild request has been added to the processing queue.");
 
             return Redirect(Url.Action("Index"));
         }

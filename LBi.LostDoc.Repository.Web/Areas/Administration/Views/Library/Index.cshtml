@@ -16,7 +16,14 @@
 
 @model LBi.LostDoc.Repository.Web.Areas.Administration.Models.LibraryModel
 
-<h2>Library</h2>
+<h1>Library</h1>
+
+<h2>Control</h2>
+<form action="@Url.Action("Build")" method="POST">
+    <input type="submit" value="Queue Rebuild" />
+</form>
+
+<h2>History</h2>
 
 <table>
     <thead>
@@ -37,11 +44,13 @@
                     @library.Created
 
                     <form action="@Url.Action("SetCurrent", new { id = library.Id })" method="POST">
-                        <input type="submit" value="Set current" @if(isCurrent) {<text>disabled="disabled"</text>}/>
+                        <input type="submit" value="Set current" @if (isCurrent)
+                                                                 {<text>disabled="disabled"</text>}/>
                     </form>
 
                     <form action="@Url.Action("Delete", new { id = library.Id })" method="POST">
-                        <input type="submit" value="Delete" @if(isCurrent) {<text>disabled="disabled"</text>}/>
+                        <input type="submit" value="Delete" @if (isCurrent)
+                                                            {<text>disabled="disabled"</text>}/>
                     </form>
                 </td>
             </tr>

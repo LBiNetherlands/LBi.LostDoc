@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <template xmlns:var="urn:lost-doc:template.variable"
-          inherts="Library">
+          inherits="Library">
   
   <parameter name="SearchUri"  />
 
