@@ -14,18 +14,12 @@
  * limitations under the License. 
  */
 
-function Notifications(section, handle){
-    this.handle = handle;
-    this.section = section;
-    this.section.className = "closed";
-    this.handle.addEventListener('click', function (evt) {
-        if (this.section.className == 'open') {
-            this.section.className = "closed";
-        } else {
-            this.section.className = "open";
-        }
-        // alert(this.section.className);
-    }.bind(this));
+function Notifications(section, handle) {
+    //http://www.jquery4u.com/plugins/10-jquery-panel-slider-plugins/
+    $(handle).click(function () {
+        $(section).slideToggle("slow");
+        $(this).toggleClass("active"); return false;
+    });
 }
 
 // Add methods like this.  All Person objects will be able to invoke this

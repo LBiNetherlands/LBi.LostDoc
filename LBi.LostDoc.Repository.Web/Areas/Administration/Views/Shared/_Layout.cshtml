@@ -100,33 +100,34 @@
         </section>
         <!-- / content section -->
     </div>
-    
+
     @if (Model.Notifications.Any())
     {
         <section role="alert">
+            <div class="alert-panel" style="display: none;">
+                <ul>
+                    @foreach (var notification in Model.Notifications)
+                    {
+                        <li role="alert" id="alert-@notification.Id.ToBase36String()">
+                            <strong>@notification.Title <span>@((DateTime.UtcNow - notification.Created).ToHumanReadableString()) ago</span></strong>
+
+                            <p>@notification.Message</p>
+
+                            @foreach (var action in notification.Actions)
+                            {
+                                <a role="button" href="@action.Target" class="action">@action.Text</a>
+                            }
+                        </li>
+                    }
+
+                </ul>
+            </div>
             <div class="handle">
                 <span class="icon"></span>
                 <span class="count">
                     @Model.Notifications.Count().ToString("N0")
                 </span>
             </div>
-            <div class="pusher"></div>
-            <ul>
-                @foreach (var notification in Model.Notifications)
-                {
-                    <li role="alert" id="alert-@notification.Id.ToBase36String()">
-                        <strong>@notification.Title <span>@((DateTime.UtcNow - notification.Created).ToHumanReadableString()) ago</span></strong>
-
-                        <p>@notification.Message</p>
-
-                        @foreach (var action in notification.Actions)
-                        {
-                            <a role="button" href="@action.Target" class="action">@action.Text</a>
-                        }
-                    </li>
-                }
-
-            </ul>
         </section>
     }
     <script src="~/Areas/Administration/Static/lostdoc.notifications.js"></script>

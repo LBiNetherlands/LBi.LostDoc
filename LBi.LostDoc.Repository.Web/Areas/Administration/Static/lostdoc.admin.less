@@ -79,93 +79,70 @@
 }
 
 section[role=alert] {
-	position: absolute;
-	left: 0;
-	top: 0;
-	padding: 0;
-	width: 100%;
-	
-	div.handle {
-		background-color: #2980B9;
-		right: 2rem;
-		left: auto;
-		height: 48px;
-		position: fixed;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0;
+    width: 100%;
+    background-color: #2980B9;
+    overflow: hidden;
 
-		transition-property: background-color, top;
-		transition-duration: 250ms;
-		&:hover {
-			background-color: #3498db
-		}
+    div.handle {
+        background-color: #2980B9;
+        right: 2rem;
+        left: auto;
+        height: 48px;
+        position: fixed;
 
-		span.icon {
-			background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAVCAYAAAC+NTVfAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAa9JREFUSEvFlc9HBGEYx+cUEdEpIiIiIqJTROwpYk+xdOoPiOi0p4iI6BoREZ0iIrpGRKeIiIiIiIgllun7eXtmzDS/sjPbfvnYndfaz7vP+zzvej2P7/uL4kP8R1qiYWonXxDj4k50M49iStRM7eRfYlP0i2PRjZyJAdEUbVM7eZALMSTWBBuqIm2BcFCcs0BMHZOTJzEj5sQrCyXyLmqCUlPyMKZOyAlNsSqGxRULHeRWjIqG4PtiMXWqPMi+4Jx23dPfcyAo8557Sompc+XkRvALlsUnCzkJKjYirlnIiqkL5eRI9IlJETu7SJ4FvcLnDlnIi6kL5cw+dwDSdcExMDbRXIpgSmjYMZF7Z5g6V/4m+LXRpjsV4byKLcH5Ru8HjooNZ06LqTPlzPm8SCvhg2BTTAOSe/E7bGZWJDqdmDpTTuNs/LxNDc23ba9ZoTqMWiKmTpXviCVBWcumLri6YzF1Qk4zTYuq/uUoO9934p4spo7Jg86mY6vMi2ACaEQXU4dyOntCdHqdFiWYADYSk9PZ/JEUXg4lwwRwBC1TO/mKyOvsKsME1E3dq3jeN2FuUxhiMWRUAAAAAElFTkSuQmCC");
-			width: 31px;
-			height: 21px;
-			display: inline-block;
-			margin-top: .8rem;
-			margin-left: .7rem;
-		}
-		span.count {
-			margin-right: .7rem;
-			font-size: 1.5rem;
-			font-family: Segoe UI Light, Arial, Sans serif;
-			color: #ffffff;
-		}
-	}
-	background-color: #2980B9;
-	overflow: hidden;
+        &:hover {
+            background-color: #3498db;
+        }
 
-	&.open {
-		height: auto;
-		div.handle {
-			top: -48px;
-		}
+        span.icon {
+            display: inline-block;
+            margin-left: .7rem;
+            width: 31px;
+            height: 21px;
+            margin-top: .8rem;
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAVCAYAAAC+NTVfAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAa9JREFUSEvFlc9HBGEYx+cUEdEpIiIiIqJTROwpYk+xdOoPiOi0p4iI6BoREZ0iIrpGRKeIiIiIiIgllun7eXtmzDS/sjPbfvnYndfaz7vP+zzvej2P7/uL4kP8R1qiYWonXxDj4k50M49iStRM7eRfYlP0i2PRjZyJAdEUbVM7eZALMSTWBBuqIm2BcFCcs0BMHZOTJzEj5sQrCyXyLmqCUlPyMKZOyAlNsSqGxRULHeRWjIqG4PtiMXWqPMi+4Jx23dPfcyAo8557Sompc+XkRvALlsUnCzkJKjYirlnIiqkL5eRI9IlJETu7SJ4FvcLnDlnIi6kL5cw+dwDSdcExMDbRXIpgSmjYMZF7Z5g6V/4m+LXRpjsV4byKLcH5Ru8HjooNZ06LqTPlzPm8SCvhg2BTTAOSe/E7bGZWJDqdmDpTTuNs/LxNDc23ba9ZoTqMWiKmTpXviCVBWcumLri6YzF1Qk4zTYuq/uUoO9934p4spo7Jg86mY6vMi2ACaEQXU4dyOntCdHqdFiWYADYSk9PZ/JEUXg4lwwRwBC1TO/mKyOvsKsME1E3dq3jeN2FuUxhiMWRUAAAAAElFTkSuQmCC");
+        }
 
-		.pusher { margin-top: 0; }
-	}
+        span.count {
+            margin-right: .7rem;
+            font-size: 1.5rem;
+            font-family: Segoe UI Light, Arial, Sans serif;
+            color: #ffffff;
+        }        
+    }  
+    
+    div.alert-panel {
+        display:none;
+    }
 
-	&.closed {
-		height: 0px;
-		div.handle {
-			top: 0;
-		}
+    ul {
+        padding-left: 0;
+        margin: 0;
 
-		ul {
+        li {
+            color: #ddd;
+            padding: .3rem;
+            padding-left: .6rem;
+            list-style: none;
 
-		}
-	}
+            p {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
 
-	.pusher { 
-		margin-top:-100%; 
-		transition:margin-top .3s ease-out; 
-	}
+            a {
+                color: #fff;
+            }
 
-	ul {
-
-		padding-left: 0;
-		margin: 0;
-
-		li {
-			color: #ddd;
-			padding: .3rem;
-			padding-left: .6rem;
-			list-style: none;
-			p {
-				margin-top: 0;
-				margin-bottom: 0;
-			}
-
-			a {
-				color: #fff;
-			}
-
-			&:hover {
-				background-color: #3498db;
-			}
-		}
-	}
-
+            &:hover {
+                background-color: #3498db;
+            }
+        }
+    }
 }
 
 article.package {

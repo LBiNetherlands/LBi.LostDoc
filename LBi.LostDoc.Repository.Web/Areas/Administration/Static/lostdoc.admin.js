@@ -57,6 +57,6 @@ $(".tilt").each(function() {
 
 
 $(function() {
-    n = new Notifications($('section[role=alert]').get(0), $('div.handle').get(0));
+    n = new Notifications($('div.alert-panel').get(0), $('div.handle').get(0));
     
 });
