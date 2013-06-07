@@ -31,7 +31,10 @@
       <xsl:apply-templates select="@* | node()"/>
     </xsl:copy>
   </xsl:template>
-  <!-- TODO THIS IS BROKEN, CAUSES DUPLICATES-->
+
+  <xsl:template match="/template/apply-stylesheet">
+    <!-- remove original -->
+  </xsl:template>
 
   <xsl:template match="meta-template[@stylesheet='GlobalParameter.xslt' and position() = 1]">
     <xsl:apply-templates select="/template/apply-stylesheet" mode="inject">
