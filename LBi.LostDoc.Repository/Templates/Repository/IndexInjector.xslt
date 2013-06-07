@@ -45,11 +45,10 @@
 
     <apply-stylesheet name="Index"
                       stylesheet="CreateIndex.xslt"
-                      select="//*[doc:*]"
+                      select="/"
                       assetId="'IX:*'"
                       version="'0.0.0.0'"
                       output="'index.xml'">
-      <with-param name="assetId" select="@assetId" />
     </apply-stylesheet>
   </xsl:template>
 

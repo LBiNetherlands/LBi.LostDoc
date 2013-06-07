@@ -24,37 +24,37 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc hrc ld">
   <xsl:output method="xml"/>
-  
+
   <xsl:include href="Naming.xslt"/>
   <xsl:include href="DocComments.xslt"/>
-  <xsl:param name="assetId"/>
 
   <xsl:template match="/">
-    <index assetId="{$assetId}">
-      <xsl:apply-templates select="ld:key('aid', $assetId)" mode="index"/>
+    <index>
+      <xsl:apply-templates select="//*[@assetId and @phase='0']" mode="index"/>
     </index>
   </xsl:template>
 
-  <xsl:template match="*"
-                mode="index">
-    <title>
-      <xsl:apply-templates select="ld:key('aid', @assetId)" mode="title"/>
-    </title>
-    <summary>
-      <xsl:variable name="resultSet">
-        <xsl:apply-templates select="doc:summary" mode="doc"/>
-      </xsl:variable>
+  <xsl:template match="*[@assetId]" mode="index">
+    <document assetId="{@assetId}">
+      <title>
+        <xsl:apply-templates select="ld:key('aid', @assetId)" mode="title"/>
+      </title>
+      <summary>
+        <xsl:variable name="resultSet">
+          <xsl:apply-templates select="doc:summary" mode="doc"/>
+        </xsl:variable>
 
-      <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
-    </summary>
-    
-    <text>
-      <xsl:variable name="resultSet"> 
-        <xsl:apply-templates select=".//doc:*" mode="doc" />
-      </xsl:variable>
+        <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
+      </summary>
 
-      <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
-    </text>
+      <text>
+        <xsl:variable name="resultSet">
+          <xsl:apply-templates select=".//doc:*" mode="doc" />
+        </xsl:variable>
+
+        <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
+      </text>
+    </document>
   </xsl:template>
 </xsl:stylesheet>
 

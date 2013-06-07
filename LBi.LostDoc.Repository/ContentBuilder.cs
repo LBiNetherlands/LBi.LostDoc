@@ -175,7 +175,7 @@ namespace LBi.LostDoc.Repository
                         var saResults =
                             templateOutput.Results.Select(wur => wur.WorkUnit).OfType<StylesheetApplication>();
 
-                        var saDict = saResults.ToDictionary(sa => sa.Asset);
+                        Dictionary<AssetIdentifier, StylesheetApplication> saDict = saResults.ToDictionary(sa => sa.Asset);
 
                         var indexResults = saDict.Values.Where(sa => sa.SaveAs.EndsWith(".xml"));
 
@@ -185,36 +185,44 @@ namespace LBi.LostDoc.Repository
 
                             XDocument indexDoc = XDocument.Load(absPath);
 
-                            string assetId = indexDoc.Root.Attribute("assetId").Value;
-                            string title = indexDoc.Root.Element("title").Value.Trim();
-                            string summary = indexDoc.Root.Element("summary").Value.Trim();
-                            string text = indexDoc.Root.Element("text").Value.Trim();
-
-                            var ssApplication = saDict[AssetIdentifier.Parse(assetId)];
-
-                            var doc = new Document();
-
-                            doc.Add(new Field("uri", 
-                                              new Uri(ssApplication.SaveAs, UriKind.Relative).ToString(), 
-                                              Field.Store.YES, 
-                                              Field.Index.NO));
-                            doc.Add(new Field("aid", ssApplication.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                            foreach (AssetIdentifier aid in ssApplication.Aliases)
-                                doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
-
-                            foreach (var section in ssApplication.Sections)
+                            foreach (var docElement in indexDoc.Root.Elements())
                             {
-                                doc.Add(new Field("section", 
-                                                  section.AssetIdentifier, 
-                                                  Field.Store.NO, 
-                                                  Field.Index.NOT_ANALYZED));
-                            }
 
-                            doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED));
-                            doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED));
-                            doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED));
-                            TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
-                            writer.AddDocument(doc);
+                                string assetId = docElement.Attribute("assetId").Value;
+                                string title = docElement.Element("title").Value.Trim();
+                                string summary = docElement.Element("summary").Value.Trim();
+                                string text = docElement.Element("text").Value.Trim();
+
+                                StylesheetApplication ssApplication;
+
+                                // TODO we blindly generate index data for everything with an assetId which means that sometiems we get misses here
+                                if (!saDict.TryGetValue(AssetIdentifier.Parse(assetId), out ssApplication))
+                                    continue;
+
+                                var doc = new Document();
+
+                                doc.Add(new Field("uri",
+                                                  new Uri(ssApplication.SaveAs, UriKind.Relative).ToString(),
+                                                  Field.Store.YES,
+                                                  Field.Index.NO));
+                                doc.Add(new Field("aid", ssApplication.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                                foreach (AssetIdentifier aid in ssApplication.Aliases)
+                                    doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
+
+                                foreach (var section in ssApplication.Sections)
+                                {
+                                    doc.Add(new Field("section",
+                                                      section.AssetIdentifier,
+                                                      Field.Store.NO,
+                                                      Field.Index.NOT_ANALYZED));
+                                }
+
+                                doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED));
+                                doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED));
+                                doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED));
+                                TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
+                                writer.AddDocument(doc);
+                            }
                         }
 
                         writer.Optimize();
