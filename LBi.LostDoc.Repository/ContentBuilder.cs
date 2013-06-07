@@ -102,7 +102,7 @@ namespace LBi.LostDoc.Repository
             TemplateOutput templateOutput;
 
             // wire up logging
-            string templateLogFile = Path.Combine(logDir.FullName, 
+            string templateLogFile = Path.Combine(logDir.FullName,
                                                   string.Format("template_{0:yyyy'_'MM'_'dd'__'HH'_'mm'_'ss}.log", DateTime.Now));
             using (TextWriterTraceListener traceListener = new TextWriterTraceListener(templateLogFile))
             {
@@ -123,14 +123,14 @@ namespace LBi.LostDoc.Repository
                 // generate output
                 var templateData = new TemplateData(mergedDoc)
                                        {
-                                           AssetRedirects = assetRedirects, 
-                                           IgnoredVersionComponent = this.IgnoreVersionComponent, 
+                                           AssetRedirects = assetRedirects,
+                                           IgnoredVersionComponent = this.IgnoreVersionComponent,
                                            OutputFileProvider =
-                                               new ScopedFileProvider(new DirectoryFileProvider(), htmlDir.FullName), 
-                                           
+                                               new ScopedFileProvider(new DirectoryFileProvider(), htmlDir.FullName),
+
                                            //TargetDirectory = htmlDir.FullName,
-                                           Arguments = new Dictionary<string, object> { { "SearchUri", "/search/" } }, 
-                                           KeepTemporaryFiles = true, 
+                                           Arguments = new Dictionary<string, object> { { "SearchUri", "/search/" } },
+                                           KeepTemporaryFiles = true,
                                            TemporaryFilesPath = Path.Combine(logDir.FullName, "temp")
                                        };
 
@@ -144,7 +144,7 @@ namespace LBi.LostDoc.Repository
 
             this.OnStateChanged(State.Indexing);
 
-            string indexLogFile = Path.Combine(logDir.FullName, 
+            string indexLogFile = Path.Combine(logDir.FullName,
                                                string.Format("index_{0:yyyy'_'MM'_'dd'__'HH'_'mm'_'ss}.log", DateTime.Now));
             using (TextWriterTraceListener traceListener = new TextWriterTraceListener(indexLogFile))
             {
@@ -161,10 +161,13 @@ namespace LBi.LostDoc.Repository
                 using (stopWordsReader)
                 {
                     Analyzer analyzer = new StandardAnalyzer(global::Lucene.Net.Util.Version.LUCENE_30, stopWordsReader);
+
                     Analyzer titleAnalyzer = new TitleAnalyzer();
+                    Analyzer nameAnalyzer = new NameAnalyzer();
                     IDictionary<string, Analyzer> fieldAnalyzers = new Dictionary<string, Analyzer>
                                                                        {
-                                                                           { "title", titleAnalyzer }
+                                                                           { "title", titleAnalyzer },
+                                                                           {"name", nameAnalyzer }
                                                                        };
 
                     PerFieldAnalyzerWrapper analyzerWrapper = new PerFieldAnalyzerWrapper(analyzer, fieldAnalyzers);
@@ -189,6 +192,7 @@ namespace LBi.LostDoc.Repository
                             {
 
                                 string assetId = docElement.Attribute("assetId").Value;
+                                string name = docElement.Element("name").Value.Trim();
                                 string title = docElement.Element("title").Value.Trim();
                                 string summary = docElement.Element("summary").Value.Trim();
                                 string text = docElement.Element("text").Value.Trim();
@@ -217,6 +221,7 @@ namespace LBi.LostDoc.Repository
                                                       Field.Index.NOT_ANALYZED));
                                 }
 
+                                doc.Add(new Field("name", name, Field.Store.YES, Field.Index.ANALYZED));
                                 doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED));
                                 doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED));
                                 doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED));
@@ -239,9 +244,9 @@ namespace LBi.LostDoc.Repository
             this.OnStateChanged(State.Finalizing);
 
             var infoDoc = new XDocument(
-                new XElement("content", 
-                             new XAttribute("created", 
-                                            XmlConvert.ToString(DateTime.UtcNow, XmlDateTimeSerializationMode.Utc)), 
+                new XElement("content",
+                             new XAttribute("created",
+                                            XmlConvert.ToString(DateTime.UtcNow, XmlDateTimeSerializationMode.Utc)),
                              templateOutput.Results.Select(this.ConvertToXml)));
 
             infoDoc.Save(Path.Combine(targetDirectory, "info.xml"));
@@ -258,32 +263,32 @@ namespace LBi.LostDoc.Repository
 
         private static XElement ResourceToXml(WorkUnitResult wu)
         {
-            return new XElement("resource", 
+            return new XElement("resource",
                                 new XAttribute("path", ((ResourceDeployment)wu.WorkUnit).ResourcePath));
         }
 
         private static XElement StylesheetToXml(WorkUnitResult wu)
         {
             StylesheetApplication ssWu = (StylesheetApplication)wu.WorkUnit;
-            return new XElement("document", 
-                                new XAttribute("assetId", ssWu.Asset), 
-                                new XAttribute("output", ssWu.SaveAs), 
+            return new XElement("document",
+                                new XAttribute("assetId", ssWu.Asset),
+                                new XAttribute("output", ssWu.SaveAs),
                                 ssWu.Aliases.Select(
                                     wual =>
-                                    new XElement("alias", new XAttribute("assetId", wual))), 
+                                    new XElement("alias", new XAttribute("assetId", wual))),
                                 ssWu.Sections.Select(
                                     wuse =>
-                                    new XElement("section", 
-                                                 new XAttribute("name", wuse.Name), 
-                                                 new XAttribute("assetId", wuse.AssetIdentifier))), 
-                                new XElement("template", 
+                                    new XElement("section",
+                                                 new XAttribute("name", wuse.Name),
+                                                 new XAttribute("assetId", wuse.AssetIdentifier))),
+                                new XElement("template",
                                              new XAttribute("name", ssWu.StylesheetName)));
         }
 
         private XElement ConvertToXml(WorkUnitResult wu)
         {
-            return new XElement("result", 
-                                new XAttribute("duration", XmlConvert.ToString(Math.Round(wu.Duration / 1000.0, 2))), 
+            return new XElement("result",
+                                new XAttribute("duration", XmlConvert.ToString(Math.Round(wu.Duration / 1000.0, 2))),
                                 wu.WorkUnit is ResourceDeployment ? ResourceToXml(wu) : StylesheetToXml(wu));
         }
     }

@@ -36,6 +36,9 @@
 
   <xsl:template match="*[@assetId]" mode="index">
     <document assetId="{@assetId}">
+      <name>
+        <xsl:apply-templates select="ld:key('aid', @assetId)" mode="displayText"/>
+      </name>
       <title>
         <xsl:apply-templates select="ld:key('aid', @assetId)" mode="title"/>
       </title>

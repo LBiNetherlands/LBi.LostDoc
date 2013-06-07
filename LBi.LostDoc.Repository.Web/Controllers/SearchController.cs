@@ -33,7 +33,7 @@ namespace LBi.LostDoc.Repository.Web.Controllers
             _Cache = new MemoryCache("SearchController.ContentSearchers");
         }
 
-        public ResultSet Get(string id, string searchTerms)
+        public ResultSet Get(string id, string searchTerms, int offset = 0, int count = 200)
         {
             ContentSearcher search = null;
             try
@@ -43,16 +43,16 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                 else
                     search = this.GetSearcher(id);
 
-                var res = search.Search(searchTerms);
+                var res = search.Search(searchTerms, offset, count);
 
                 return new ResultSet
                            {
-                               HitCount = res.HitCount, 
+                               HitCount = res.HitCount,
                                Results = res.Results.Select(r => new Result
                                                                      {
-                                                                         AssetId = r.AssetId.ToString(), 
-                                                                         Title = r.Title, 
-                                                                         Url = r.Url, 
+                                                                         AssetId = r.AssetId.ToString(),
+                                                                         Title = r.Title,
+                                                                         Url = r.Url,
                                                                          Blurb = r.Blurb
                                                                      }).ToArray()
                            };
@@ -71,14 +71,14 @@ namespace LBi.LostDoc.Repository.Web.Controllers
                     () => new ContentSearcher(Path.Combine(AppConfig.ContentPath, contentFolder, "Index")).Retain(),
                     LazyThreadSafetyMode.ExecutionAndPublication);
 
-            object obj = _Cache.AddOrGetExisting(contentFolder, 
-                                                 lazyObj, 
+            object obj = _Cache.AddOrGetExisting(contentFolder,
+                                                 lazyObj,
                                                  new CacheItemPolicy
                                                      {
                                                          RemovedCallback =
                                                              arguments =>
                                                              ((Lazy<ContentSearcher>)arguments.CacheItem.Value).Value
-                                                                                                               .Release(), 
+                                                                                                               .Release(),
                                                          SlidingExpiration = TimeSpan.FromMinutes(5)
                                                      });
 

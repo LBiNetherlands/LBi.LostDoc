@@ -97,6 +97,7 @@
     <Compile Include="ContentSearcher.cs" />
     <Compile Include="ContentSettings.cs" />
     <Compile Include="GuidExtensions.cs" />
+    <Compile Include="Lucene\NameAnalyzer.cs" />
     <Compile Include="Lucene\TitleAnalyzer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchResult.cs" />
