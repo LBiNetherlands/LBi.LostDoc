@@ -67,7 +67,20 @@ namespace LBi.LostDoc.Templating.FileProviders
 
         public IEnumerable<string> GetDirectories(string path)
         {
-            return this._asm.GetManifestResourceNames().Where(n => this.ConvertPath(n).StartsWith(path + '.'));
+            if (path == ".")
+                path = "";
+
+            path = this.ConvertPath(path);
+
+            if (!path.EndsWith("."))
+                path += ".";
+
+            var ret = this._asm.GetManifestResourceNames().Where(n => n.StartsWith(path))
+                          .Select(n => n.Substring(path.Length))
+                          .Select(n => n.Substring(0, n.IndexOf('.')))
+                          .Distinct(StringComparer.Ordinal);
+
+            return ret;
         }
 
         #endregion

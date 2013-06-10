@@ -39,7 +39,7 @@ namespace LBi.LostDoc.Templating
         {
             foreach (var fileProvider in this.Providers)
             {
-                foreach (string directory in fileProvider.GetDirectories(""))
+                foreach (string directory in fileProvider.GetDirectories("."))
                 {
                     if (fileProvider.FileExists(Path.Combine(directory, Template.TemplateDefinitionFileName)))
                         yield return directory;
