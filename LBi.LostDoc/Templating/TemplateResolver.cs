@@ -35,6 +35,17 @@ namespace LBi.LostDoc.Templating
 
         protected IFileProvider[] Providers { get; set; }
 
+        public IEnumerable<string> GetTemplates()
+        {
+            foreach (var fileProvider in this.Providers)
+            {
+                foreach (string directory in fileProvider.GetDirectories(""))
+                {
+                    if (fileProvider.FileExists(Path.Combine(directory, Template.TemplateDefinitionFileName)))
+                        yield return directory;
+                }
+            }
+        }
 
         public bool Resolve(string name, out IFileProvider fileProvider, out string path)
         {
@@ -55,7 +66,7 @@ namespace LBi.LostDoc.Templating
                     ret = true;
                     break;
                 }
-             }
+            }
             return ret;
         }
 

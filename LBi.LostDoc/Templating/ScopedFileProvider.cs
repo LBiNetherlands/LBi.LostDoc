@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System.Collections.Generic;
 using System.IO;
 
 namespace LBi.LostDoc.Templating
@@ -38,6 +39,11 @@ namespace LBi.LostDoc.Templating
         public Stream OpenFile(string path, FileMode mode)
         {
             return this.FileProvider.OpenFile(Path.Combine(this.BasePath, path), mode);
+        }
+
+        public IEnumerable<string> GetDirectories(string path)
+        {
+            return this.FileProvider.GetDirectories(Path.Combine(this.BasePath, path));
         }
     }
 }

@@ -20,6 +20,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using LBi.LostDoc.Composition;
 using LBi.LostDoc.Extensibility;
 
@@ -46,6 +47,11 @@ namespace LBi.LostDoc.Templating.FileProviders
                 Directory.CreateDirectory(dir);
 
             return File.Open(path, mode);
+        }
+
+        public IEnumerable<string> GetDirectories(string path)
+        {
+            return Directory.EnumerateDirectories(path);
         }
 
         #endregion
