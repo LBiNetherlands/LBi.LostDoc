@@ -40,7 +40,9 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                     continue;
 
                 if (controllerAttr.Order >= lowestOrder)
-                    continue;                
+                    continue;
+
+                lowestOrder = controllerAttr.Order;
 
                 Uri defaultTargetUrl = null;
 
