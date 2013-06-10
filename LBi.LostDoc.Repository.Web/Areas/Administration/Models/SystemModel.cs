@@ -23,5 +23,6 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
 {
     public class SystemModel : ModelBase
     {
+        public string[] Templates { get; set; }
     }
 }

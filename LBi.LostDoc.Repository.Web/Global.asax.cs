@@ -27,6 +27,7 @@ using System.Web.Hosting;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using LBi.LostDoc.Composition;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Packaging.Composition;
@@ -43,15 +44,15 @@ namespace LBi.LostDoc.Repository.Web
 
     public class WebApiApplication : System.Web.HttpApplication
     {
-        public static void RegisterGlobalFilters(GlobalFilterCollection filters)
+        public static void RegisterGlobalFilters(CompositionContainer container, GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
 
             // this filter injects Notifications into the IBaseModel
-            filters.Add(new AdminFilter());
+            filters.Add(new AdminFilter(container.GetExportedValue<NotificationManager>()));
         }
 
-        public static void RegisterRoutes(RouteCollection routes)
+        public static void RegisterRoutes(CompositionContainer container, RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
@@ -172,14 +173,25 @@ namespace LBi.LostDoc.Repository.Web
             // set up notifaction system
             NotificationManager notifications = new NotificationManager();
 
+            // register application services in composition container
+            CompositionBatch batch = new CompositionBatch();
+
+            AddExport(batch, notifications);
+            AddExport(batch, contentManager);
+            AddExport(batch, addInManager);
+            AddExport(batch, traceListener);
+            AddExport(batch, container);
+
+            container.Compose(batch);
+
             // TODO replace this with MEF based injection
             // initialize app-singleton
             App.Initialize(container, contentManager, addInManager, notifications, traceListener);
 
             // MVC init
             AreaRegistration.RegisterAllAreas();
-            RegisterGlobalFilters(GlobalFilters.Filters);
-            RegisterRoutes(RouteTable.Routes);
+            RegisterGlobalFilters(container, GlobalFilters.Filters);
+            RegisterRoutes(container, RouteTable.Routes);
 
             // inject our custom IControllerFactory for the Admin interface
             IControllerFactory oldControllerFactory = ControllerBuilder.Current.GetControllerFactory();
@@ -191,6 +203,16 @@ namespace LBi.LostDoc.Repository.Web
             // TODO figure out if we actually need this
             // hook in our MEF based IHttpController instead of the default one
             //GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerTypeResolver), new AddInHttpControllerTypeResolver(App.Instance.Container));
+
+        }
+
+        private void AddExport<T>(CompositionBatch batch, T instance)
+        {
+            var metadata = new Dictionary<string, object>();
+            metadata.Add("ExportTypeIdentity", AttributedModelServices.GetTypeIdentity(typeof(T)));
+            batch.AddExport(new Export(AttributedModelServices.GetContractName(typeof(T)),
+                                       metadata,
+                                       () => instance));
         }
 
         private void UpdateWebApiRegistry(ComposablePartCatalogChangeEventArgs eventArg)

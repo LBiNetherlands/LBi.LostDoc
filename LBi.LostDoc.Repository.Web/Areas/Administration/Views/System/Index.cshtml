@@ -17,4 +17,12 @@
 
 @model LBi.LostDoc.Repository.Web.Areas.Administration.Models.SystemModel
 
-<h2>System</h2>
+<h1>System</h1>
+
+<h2>Template settings</h2>
+<select>
+    @foreach (var template in Model.Templates)
+    {
+        <option value="@template">@template</option>
+    }
+</select>

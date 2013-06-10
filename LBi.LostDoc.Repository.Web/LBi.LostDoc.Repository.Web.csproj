@@ -143,6 +143,7 @@
     <Compile Include="Areas\Administration\AdminFilter.cs" />
     <Compile Include="Areas\Administration\AdministrationAreaRegistration.cs" />
     <Compile Include="Areas\Administration\Controllers\AddInController.cs" />
+    <Compile Include="Areas\Administration\Controllers\DefaultController.cs" />
     <Compile Include="Areas\Administration\Controllers\Groups.cs" />
     <Compile Include="Areas\Administration\Controllers\LibraryController.cs" />
     <Compile Include="Areas\Administration\Controllers\NotificationActions.cs" />

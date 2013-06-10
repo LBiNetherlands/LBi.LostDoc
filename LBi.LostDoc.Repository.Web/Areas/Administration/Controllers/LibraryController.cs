@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
@@ -30,6 +31,17 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
     [AdminController("library", Group = Groups.Core, Order = 2500, Text = "Library")]
     public class LibraryController : Controller
     {
+        [ImportingConstructor]
+        public LibraryController(NotificationManager notificationManager)
+        {
+            this.Notifications = notificationManager;
+        }
+
+        protected NotificationManager Notifications { get; set; }
+        
+        [Import]
+        protected new ContentManager Content { get; set; }
+
         [AdminAction("index", IsDefault = true)]
         public ActionResult Index()
         {
@@ -68,12 +80,12 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         {
             string contentRoot = App.Instance.Content.GetContentRoot(id);
             Directory.Delete(contentRoot, true);
-            App.Instance.Notifications.Add(Severity.Information,
-                                           Lifetime.Page,
-                                           Scope.User,
-                                           this.User,
-                                           "Library Deleted",
-                                           string.Format("The library with id {0} has been deleted.", id));
+            this.Notifications.Add(Severity.Information,
+                                   Lifetime.Page,
+                                   Scope.User,
+                                   this.User,
+                                   "Library Deleted",
+                                   string.Format("The library with id {0} has been deleted.", id));
 
             return Redirect(Url.Action("Index"));
         }
@@ -81,13 +93,13 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult SetCurrent(string id)
         {
             App.Instance.Content.SetCurrentContentFolder(id);
-            App.Instance.Notifications.Add(Severity.Information,
-                                           Lifetime.Page,
-                                           Scope.User,
-                                           this.User,
-                                           "New Library Content",
-                                           "The library content has changed",
-                                           NotificationActions.Refresh);
+            this.Notifications.Add(Severity.Information,
+                                   Lifetime.Page,
+                                   Scope.User,
+                                   this.User,
+                                   "New Library Content",
+                                   "The library content has changed",
+                                   NotificationActions.Refresh);
 
             return Redirect(Url.Action("Index"));
         }
@@ -95,12 +107,12 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult Build()
         {
             App.Instance.Content.QueueRebuild("Requested by " + this.User.Identity.Name);
-            App.Instance.Notifications.Add(Severity.Information,
-                                           Lifetime.Page,
-                                           Scope.User,
-                                           this.User,
-                                           "Rebuilding Content",
-                                           "A new content rebuild request has been added to the processing queue.");
+            this.Notifications.Add(Severity.Information,
+                                   Lifetime.Page,
+                                   Scope.User,
+                                   this.User,
+                                   "Rebuilding Content",
+                                   "A new content rebuild request has been added to the processing queue.");
 
             return Redirect(Url.Action("Index"));
         }

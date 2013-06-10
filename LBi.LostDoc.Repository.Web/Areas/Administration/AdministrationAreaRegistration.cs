@@ -15,6 +15,7 @@
  */
 
 using System.Web.Mvc;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Controllers;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration
 {
@@ -29,10 +30,22 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
 
         public override void RegisterArea(AreaRegistrationContext context)
         {
+            
             context.MapRoute(
                 "Administration", 
                 "lostdoc/{packageId}/{packageVersion}/{controller}/{action}/{id}", 
                 new { action = "Index", id = UrlParameter.Optional });
+
+            var asmName = typeof (DefaultController).Assembly.GetName();
+            context.MapRoute("AdministrationDefault",
+                             "lostdoc",
+                             new
+                                 {
+                                     controller = "Default",
+                                     action = "Redirect",
+                                     packageId = asmName.Name,
+                                     packageVersion = asmName.Version.ToString()
+                                 });
         }
     }
 }

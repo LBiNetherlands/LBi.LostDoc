@@ -15,18 +15,35 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
 using System.ComponentModel.Composition.ReflectionModel;
+using System.Linq;
 using LBi.LostDoc.Packaging.Composition;
 
 namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     public static class AddInModelServices
     {
+        public static IEnumerable<Lazy<Type, TMetadata>> FindExports<TMetadata>(this ComposablePartCatalog catalog, string contractName)
+        {
+            var allParts = catalog.Parts;
+            var controllerParts = allParts.Where(part => part.ExportDefinitions.Any(ed => ed.ContractName == contractName));
+
+            foreach (var partDefinition in controllerParts)
+            {
+                var exportDefinition = partDefinition.ExportDefinitions.Single(ed => ed.ContractName == contractName);
+                TMetadata controllerMetadata = AttributedModelServices.GetMetadataView<TMetadata>(exportDefinition.Metadata);
+
+                yield return new Lazy<Type, TMetadata>(() => AddInModelServices.GetPartType(partDefinition).Value, controllerMetadata);
+            }
+        }
+
         public static Lazy<Type> GetPartType(ComposablePartDefinition partDefinition)
         {
             AddInComposablePartDefinition addinPartDef = partDefinition as AddInComposablePartDefinition;
-            
+
             if (addinPartDef == null)
                 throw new ArgumentException("Must be of type AddInComposablePartDefinition", "partDefinition");
 

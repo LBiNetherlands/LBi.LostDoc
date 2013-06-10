@@ -16,21 +16,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Templating;
+using ContractNames = LBi.LostDoc.Extensibility.ContractNames;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
     [AdminController("system", Group = Groups.Core, Order = 3000, Text = "System")]
     public class SystemController : Controller
     {
+        [ImportMany(ContractNames.TemplateProvider)]
+        public IFileProvider[] FileProviders { get; set; }
+
         [AdminAction("index", IsDefault = true, Text = "Status")]
         public ActionResult Index()
         {
-            return this.View(new SystemModel());
+            TemplateResolver resolver = new TemplateResolver(this.FileProviders);
+            return this.View(new SystemModel() {Templates = resolver.GetTemplates().ToArray()});
         }
 
         //[AdminAction("logs", Text = "Logs")]

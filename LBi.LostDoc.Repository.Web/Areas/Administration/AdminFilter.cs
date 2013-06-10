@@ -5,11 +5,19 @@ using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Notifications;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration
 {
     public class AdminFilter : IActionFilter
     {
+        public AdminFilter(NotificationManager notifications)
+        {
+            this.Notifications = notifications;
+        }
+
+        protected NotificationManager Notifications { get; set; }
+
         public void OnActionExecuted(ActionExecutedContext filterContext)
         {
             ViewResult viewResult = filterContext.Result as ViewResult;
@@ -20,7 +28,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                     throw new InvalidOperationException(string.Format("Model ({0}) does not implement IAdminModel", 
                                                                       viewResult.GetType().Name));
 
-                model.Notifications = App.Instance.Notifications.Get(filterContext.HttpContext.User).ToArray();
+                model.Notifications = this.Notifications.Get(filterContext.HttpContext.User).ToArray();
 
                 // this was populated by the AddInControllerFactory
                 IControllerMetadata metadata =
@@ -28,29 +36,16 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                     filterContext.RequestContext.HttpContext.Items[AddInControllerFactory.MetadataKey];
 
                 string actionText = string.Empty;
-
-                // TODO FIX THIS SOMEHOW, this is pretty crappy
-                var allControllerExports =
-                    App.Instance.Container.GetExports(
-                        new ContractBasedImportDefinition(
-                            ContractNames.AdminController, 
-                            AttributedModelServices.GetTypeIdentity(typeof(IController)), 
-                            Enumerable.Empty<KeyValuePair<string, Type>>(), 
-                            ImportCardinality.ZeroOrMore, 
-                            false, 
-                            false, 
-                            CreationPolicy.NonShared));
+                var catalog = App.Instance.Container.Catalog;
 
                 List<Navigation> menu = new List<Navigation>();
-                foreach (Export export in allControllerExports)
+                foreach (var exportInfo in catalog.FindExports<IControllerMetadata>(ContractNames.AdminController)) 
                 {
-                    IControllerMetadata controllerMetadata =
-                        AttributedModelServices.GetMetadataView<IControllerMetadata>(export.Metadata);
-                    ReflectedControllerDescriptor descriptor = new ReflectedControllerDescriptor(export.Value.GetType());
+                    ReflectedControllerDescriptor descriptor = new ReflectedControllerDescriptor(exportInfo.Value);
 
                     var controllerAttr =
-                        descriptor.GetCustomAttributes(typeof(AdminControllerAttribute), true).FirstOrDefault() as
-                        AdminControllerAttribute;
+                        descriptor.GetCustomAttributes(typeof (AdminControllerAttribute), true).FirstOrDefault()
+                        as AdminControllerAttribute;
 
                     if (controllerAttr == null)
                         continue;
@@ -67,13 +62,13 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                             continue;
 
                         // TODO replace anon class with concrete type?
-                        string targetUrl = urlHelper.Action(actionAttr.Name, 
-                                                            controllerAttr.Name, 
+                        string targetUrl = urlHelper.Action(actionAttr.Name,
+                                                            controllerAttr.Name,
                                                             new
-                                                                {
-                                                                    packageId = controllerMetadata.PackageId, 
-                                                                    packageVersion = controllerMetadata.PackageVersion
-                                                                });
+                                                            {
+                                                                packageId = exportInfo.Metadata.PackageId,
+                                                                packageVersion = exportInfo.Metadata.PackageVersion
+                                                            });
 
                         Uri target = new Uri(targetUrl, UriKind.RelativeOrAbsolute);
 
@@ -87,11 +82,11 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                         if (isActive)
                             actionText = actionAttr.Text;
 
-                        Navigation navigation = new Navigation(null, 
-                                                               actionAttr.Order, 
-                                                               actionAttr.Text, 
-                                                               target, 
-                                                               isActive, 
+                        Navigation navigation = new Navigation(null,
+                                                               actionAttr.Order,
+                                                               actionAttr.Text,
+                                                               target,
+                                                               isActive,
                                                                Enumerable.Empty<Navigation>());
 
                         children.Add(navigation);
@@ -103,15 +98,16 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                     if (children.Count == 1)
                         children.Clear();
 
-                    menu.Add(new Navigation(controllerAttr.Group, 
-                                            controllerAttr.Order, 
-                                            controllerAttr.Text, 
-                                            defaultTargetUrl, 
-                                            isAnyChildActive, 
+                    menu.Add(new Navigation(controllerAttr.Group,
+                                            controllerAttr.Order,
+                                            controllerAttr.Text,
+                                            defaultTargetUrl,
+                                            isAnyChildActive,
                                             children));
                 }
 
-                model.Navigation = menu.OrderBy(n => n.Order).ToArray();
+                var navigations = menu.OrderBy(n => n.Order).ToArray();
+                model.Navigation = navigations;
 
                 model.PageTitle = "LostDoc Administration " + metadata.Text;
 
