@@ -40,6 +40,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 
             return this.View(new LibraryModel
                                  {
+                                     SystemState = App.Instance.Content.CurrentState,
                                      Libraries = libraries.ToArray(),
                                      Current = App.Instance.Content.ContentFolder
                                  });

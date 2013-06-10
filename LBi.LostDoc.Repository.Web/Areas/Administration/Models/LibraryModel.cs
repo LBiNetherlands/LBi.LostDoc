@@ -21,5 +21,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
         public string Current { get; set; }
 
         public LibraryDescriptorModel[] Libraries { get; set; }
+
+        public State SystemState { get; set; }
     }
 }
