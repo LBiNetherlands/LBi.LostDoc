@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Composition\ControllerFactory.cs" />
     <Compile Include="Configuration\AppConfig.cs" />
     <Compile Include="DisposableExtensions.cs" />
     <Compile Include="Extensibility\AddInActionInvoker.cs" />

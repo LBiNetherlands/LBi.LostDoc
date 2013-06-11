@@ -17,9 +17,6 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
     [ExportMetadata("Order", 0.0)]
     public class DefaultController : Controller
     {
-        //
-        // GET: /Administration/Default/
-
         [Import]
         public CompositionContainer Container { get; set; }
 

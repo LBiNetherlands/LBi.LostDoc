@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,40 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Web;
-using System.Web.Hosting;
 using System.Web.Mvc;
-using Microsoft.Web.Administration;
+using LBi.LostDoc.Repository.Web.Host.Models;
 
-namespace LBi.LostDoc.Repository.Web.Controllers
+namespace LBi.LostDoc.Repository.Web.Host.Controllers
 {
+    [Export]
     public class ContentController : Controller
     {
+        private ContentManager _content;
+
+        [ImportingConstructor]
+        public ContentController(ContentManager contentManager)
+        {
+            this._content = contentManager;
+        }
         public ActionResult GetContent(string id, string path)
         {
             try
             {
+                if (this._content.ContentRoot == null)
+                    return View("NoContent", new NoContentModel {IsBuilding = this._content.CurrentState != State.Idle});
+
                 if (path[0] == '/')
                     path = path.Substring(1);
 
                 string contentPath;
                 if (id == "current")
-                    contentPath = Path.Combine(App.Instance.Content.ContentRoot, "Html", path);
+                    contentPath = Path.Combine(this._content.ContentRoot, "Html", path);
                 else
-                    contentPath = Path.Combine(App.Instance.Content.GetContentRoot(id), "Html", path);
+                    contentPath = Path.Combine(this._content.GetContentRoot(id), "Html", path);
 
                 string contentType = MimeMapping.GetMimeMapping(Path.GetExtension(contentPath));
                 return this.File(contentPath, contentType);

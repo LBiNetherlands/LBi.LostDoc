@@ -93,7 +93,6 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
             if (ret == null)
             {
-                // TODO maybe make this throw a 404/return null/something else
                 ret = this._nestedFactory.CreateController(requestContext, controllerName);
                 if (ret != null)
                     requestContext.HttpContext.Items[this._key] = this._nestedFactory;

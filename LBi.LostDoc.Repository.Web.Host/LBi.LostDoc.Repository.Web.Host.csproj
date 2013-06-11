@@ -183,6 +183,7 @@
     <Compile Include="Areas\Api\Models\Result.cs" />
     <Compile Include="Areas\Api\Models\ResultSet.cs" />
     <Compile Include="Areas\Api\Models\SearchResult.cs" />
+    <Compile Include="Models\NoContentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TraceSources.cs" />
     <Compile Include="Areas\Administration\Extensions.cs" />
@@ -227,7 +228,6 @@
     <Folder Include="App_Data\Packages\" />
     <Folder Include="App_Data\Repository\temp\" />
     <Folder Include="Images\" />
-    <Folder Include="Models\" />
     <Folder Include="Security\" />
   </ItemGroup>
   <ItemGroup>
@@ -290,6 +290,8 @@
     <Content Include="Static\less\tags.less" />
     <Content Include="Static\less\type.less" />
     <Content Include="Static\less\var.less" />
+    <Content Include="Views\Content\NoContent.cshtml" />
+    <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj">

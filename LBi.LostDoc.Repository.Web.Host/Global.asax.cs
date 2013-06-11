@@ -31,6 +31,7 @@ using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Packaging.Composition;
 using LBi.LostDoc.Repository.Web.Areas.Administration;
+using LBi.LostDoc.Repository.Web.Composition;
 using LBi.LostDoc.Repository.Web.Configuration;
 using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Notifications;
@@ -194,10 +195,11 @@ namespace LBi.LostDoc.Repository.Web.Host
             RegisterRoutes(container, RouteTable.Routes);
 
             // inject our custom IControllerFactory for the Admin interface
-            IControllerFactory oldControllerFactory = ControllerBuilder.Current.GetControllerFactory();
-            IControllerFactory newControllerFactory = new AddInControllerFactory(AdministrationAreaRegistration.Name, 
-                                                                                 container, 
-                                                                                 oldControllerFactory);
+            //IControllerFactory oldControllerFactory = ControllerBuilder.Current.GetControllerFactory();
+            IControllerFactory innerFactory = new ControllerFactory(container);
+            IControllerFactory newControllerFactory = new AddInControllerFactory(AdministrationAreaRegistration.Name,
+                                                                                 container,
+                                                                                 innerFactory);
             ControllerBuilder.Current.SetControllerFactory(newControllerFactory);
 
             // TODO figure out if we actually need this
