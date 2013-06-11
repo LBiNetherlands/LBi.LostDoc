@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
-using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Notifications;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration
+namespace LBi.LostDoc.Repository.Web.Extensibility
 {
     public class AdminFilter : IActionFilter
     {
@@ -24,10 +23,10 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
             if (viewResult == null || viewResult.Model == null)
                 return;
 
+            HttpContextBase httpContext = filterContext.RequestContext.HttpContext;
+            
             // this was populated by the AddInControllerFactory
-            IControllerMetadata metadata =
-                (IControllerMetadata)
-                filterContext.RequestContext.HttpContext.Items[AddInControllerFactory.MetadataKey];
+            IControllerMetadata metadata = (IControllerMetadata)httpContext.Items[AddInControllerFactory.MetadataKey];
 
             if (metadata == null)
                 return;
@@ -43,8 +42,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
             var catalog = App.Instance.Container.Catalog;
 
             Navigation active;
-            var navigations = BuildMenu(filterContext, catalog, out active);
-            model.Navigation = navigations;
+            model.Navigation = BuildMenu(filterContext, catalog, out active);
 
             model.PageTitle = "LostDoc Administration - " + metadata.Text;
 

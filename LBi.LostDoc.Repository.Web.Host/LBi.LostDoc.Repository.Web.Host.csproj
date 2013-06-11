@@ -149,7 +149,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>LostDoc.Settings</DependentUpon>
     </Compile>
-    <Compile Include="Areas\Administration\AdminFilter.cs" />
     <Compile Include="Areas\Administration\AdministrationAreaRegistration.cs" />
     <Compile Include="Areas\Administration\Controllers\AddInController.cs" />
     <Compile Include="Areas\Administration\Controllers\DefaultController.cs" />

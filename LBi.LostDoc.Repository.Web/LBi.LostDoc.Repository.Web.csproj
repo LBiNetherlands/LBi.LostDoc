@@ -97,6 +97,7 @@
     <Compile Include="Extensibility\AddInModelServices.cs" />
     <Compile Include="Extensibility\AdminActionAttribute.cs" />
     <Compile Include="Extensibility\AdminControllerAttribute.cs" />
+    <Compile Include="Extensibility\AdminFilter.cs" />
     <Compile Include="Extensibility\ApiControllerAttribute.cs" />
     <Compile Include="Extensibility\ContractNames.cs" />
     <Compile Include="Extensibility\IAddInMetadata.cs" />
