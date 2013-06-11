@@ -14,5 +14,10 @@
  * limitations under the License. 
  *@
 
+@model LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models.LibraryDetailsModel
 
-<h2>title</h2>
+@{
+    Layout = null;
+}
+<h2>Source</h2>
+@Html.Partial("_ContentRepository", Model.Input)

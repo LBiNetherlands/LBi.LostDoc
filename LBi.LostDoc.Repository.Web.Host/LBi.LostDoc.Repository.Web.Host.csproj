@@ -161,6 +161,7 @@
     <Compile Include="Areas\Administration\Models\AddInOverviewModel.cs" />
     <Compile Include="Areas\Administration\Models\AssemblyModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryDescriptorModel.cs" />
+    <Compile Include="Areas\Administration\Models\LibraryDetailsModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryModel.cs" />
     <Compile Include="Areas\Administration\Models\ModelBase.cs" />
     <Compile Include="Areas\Administration\Models\ContentRepositoryModel.cs" />
@@ -189,6 +190,14 @@
     <Compile Include="Areas\Administration\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\colorbox.css" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\images\border.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\images\controls.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\images\loading.gif" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\images\loading_background.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\images\overlay.png" />
+    <Content Include="Areas\Administration\Static\lostdoc.admin.library.js" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.colorbox-min.js" />
     <Content Include="Areas\Administration\Static\lostdoc.notifications.js" />
     <Content Include="Areas\Administration\Static\Lib\less-1.3.0.min.js" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.js" />
@@ -277,6 +286,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>LostDoc.Designer.cs</LastGenOutput>
     </Content>
+    <Content Include="Areas\Administration\Views\Shared\_ContentRepository.cshtml" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
     <Content Include="Static\less\components.less" />
     <Content Include="Static\less\header.less" />

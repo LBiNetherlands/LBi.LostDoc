@@ -33,8 +33,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
             IAdminModel model = viewResult.Model as IAdminModel;
             if (model == null)
-                throw new InvalidOperationException(string.Format("Model ({0}) does not implement IAdminModel",
-                                                                  viewResult.GetType().Name));
+                return;
 
             model.Notifications = this.Notifications.Get(filterContext.HttpContext.User).ToArray();
 

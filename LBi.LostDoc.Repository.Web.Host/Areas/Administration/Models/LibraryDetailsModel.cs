@@ -14,15 +14,12 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 {
-    public class ContentRepositoryModel : ModelBase
+    public class LibraryDetailsModel //: ModelBase
     {
-        public AssemblyModel[] Assemblies { get; set; }
-        public bool IsReadOnly { get; set; }
+        public ContentRepositoryModel Input { get; set; }
     }
 }

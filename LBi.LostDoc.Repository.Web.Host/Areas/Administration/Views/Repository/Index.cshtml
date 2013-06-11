@@ -21,41 +21,7 @@
 
 
 <h2>Available files</h2>
-@foreach (var assembly in Model.Assemblies.OrderBy(am => am.Name))
-{
-    <h3>@assembly.Name</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Version</th>
-                <th>Created</th>
-                <th>Filename</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var version in assembly.Versions.OrderByDescending(v => v.Version))
-            {
-                <tr>
-                    <td>@version.Version</td>
-                    <td>@version.Created</td>
-                    <td>
-                        @version.Filename
-
-                        @*<a href="@Url.Action("Download", new { id = version.Filename })" title="Download ldoc file">Download</a>*@
-                        
-                        <form action="@Url.Action("Download", new { id = version.Filename })" method="GET">
-                            <input type="submit" value="Download" />
-                        </form>
-
-                        <form action="@Url.Action("Delete", new { id = version.Filename })" method="POST">
-                            <input type="submit" value="Delete" />
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+@Html.Partial("_ContentRepository")
 
 @if (Model.Assemblies.Length == 0)
 {

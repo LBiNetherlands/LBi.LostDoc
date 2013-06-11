@@ -16,6 +16,16 @@
 
 @model LBi.LostDoc.Repository.Web.Areas.Administration.Models.LibraryModel
 
+@section ScriptIncludes {
+    <script src="~/Areas/Administration/Static/Lib/jquery.colorbox-min.js"></script>
+}
+@section PageScripts {
+    <script src="~/Areas/Administration/Static/lostdoc.admin.library.js"></script>
+}
+@section CssIncludes {
+    <link rel="stylesheet/less" href="~/Areas/Administration/Static/Lib/jquery.colorbox/colorbox.css" />
+}
+
 <h1>Library</h1>
 
 <h2>Control</h2>
@@ -40,7 +50,7 @@ Current state: @Model.SystemState
             string cssClass = isCurrent ? "current" : "";
                 
             <tr class="@cssClass">
-                <td>@library.Id</td>
+                <td><a class="overlay" href="@Url.Action("Details", new { id = library.Id })">@library.Id</a></td>
                 <td>
                     @library.Created
 

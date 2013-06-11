@@ -24,56 +24,58 @@
 	margin: 0px auto;
  }
 
- section[role=main] {
-	float: left;
+h1, h2, h3, h4, h5, h6, h7 {
+	color: #34495E;
+	font-weight: normal;
+}
 
-	h1, h2, h3, h4, h5, h6, h7 {
-		color: #34495E;
-		font-weight: normal;
-	}
+h1 {
+	font-family: Segoe UI Light, Arial, Sans serif;
+	font-size: 2.5rem;
+	margin-top: .5rem;
+}
 
-	h1 {
-		font-family: Segoe UI Light, Arial, Sans serif;
-		font-size: 2.5rem;
-		margin-top: .5rem;
-	}
+table {
+	border-spacing: 0;
 
-	table {
-		border-spacing: 0;
+	width: 100%;
+	border: 1px solid #BDC3C7;
 
-		width: 100%;
-		border: 1px solid #BDC3C7;
+	thead {
+		tr {
+			background-color: #ECF0F1;
 
-		thead {
-			tr {
-				background-color: #ECF0F1;
-
-				th {
-					background-color: #ededed;
-					color: #707070;
-					padding: .4rem;
-					text-align: left;
-				}
+			th {
+				background-color: #ededed;
+				color: #707070;
+				padding: .4rem;
+				text-align: left;
 			}
 		}
+	}
 
-		tbody {
-			tr {
-				td {
-					padding: .4rem;
+	tbody {
+		tr {
+			td {
+				padding: .4rem;
 
-					form {
+				form {
 						
+					float: right;
+					input[type=submit] {
+						display: inline-block;
 						float: right;
-						input[type=submit] {
-							display: inline-block;
-							float: right;
-						}
 					}
 				}
 			}
 		}
 	}
+}
+
+
+ section[role=main] {
+	float: left;
+
 
 	width: 945px;
 }

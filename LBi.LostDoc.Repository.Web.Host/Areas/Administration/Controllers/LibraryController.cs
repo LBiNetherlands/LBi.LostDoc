@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -22,12 +21,14 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Controllers;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Configuration;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Notifications;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 {
     [AdminController("library", Group = Groups.Core, Order = 2500, Text = "Library")]
     public class LibraryController : Controller
@@ -74,7 +75,36 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         {
             string contentRoot = App.Instance.Content.GetContentRoot(id);
 
-            return this.View();
+            var files = Directory.GetFiles(Path.Combine(contentRoot, "Source"), "*.ldoc");
+            var ldocs = files.Select(f => new LostDocFileInfo(f));
+            var groups = ldocs.GroupBy(ld => ld.PrimaryAssembly.AssetId);
+
+            List<AssemblyModel> assemblies = new List<AssemblyModel>();
+
+            foreach (var group in groups)
+            {
+                assemblies.Add(new AssemblyModel
+                {
+                    Name = group.First().PrimaryAssembly.Name,
+                    Versions = group.Select(ld =>
+                                            new VersionModel
+                                            {
+                                                Filename = Path.GetFileName(ld.Path),
+                                                Created = System.IO.File.GetCreationTime(ld.Path),
+                                                Version = ld.PrimaryAssembly.AssetId.Version
+                                            }).ToArray()
+                });
+            }
+
+
+            return this.View(new LibraryDetailsModel
+                                 {
+                                     Input = new ContentRepositoryModel
+                                                 {
+                                                     IsReadOnly = true,
+                                                     Assemblies = assemblies.ToArray()
+                                                 }
+                                 });
         }
 
         public ActionResult Delete(string id)

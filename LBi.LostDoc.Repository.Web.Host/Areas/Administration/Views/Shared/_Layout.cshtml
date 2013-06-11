@@ -85,7 +85,9 @@
     </script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <link rel="stylesheet/less" href="~/Areas/Administration/Static/lostdoc.admin.less" />
+    @RenderSection("CssIncludes", false)
     <script src="~/Areas/Administration/Static/Lib/less-1.3.0.min.js"></script>
+    @RenderSection("ScriptIncludes", false)
 </head>
 <body>
     <div id="wrapper">
@@ -142,5 +144,6 @@
 
     <script src="~/Areas/Administration/Static/lostdoc.notifications.js"></script>
     <script src="~/Areas/Administration/Static/lostdoc.admin.js"></script>
+    @RenderSection("PageScripts", false)
 </body>
 </html>
