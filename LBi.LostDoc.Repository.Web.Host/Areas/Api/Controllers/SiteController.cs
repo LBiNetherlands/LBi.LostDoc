@@ -15,34 +15,32 @@
  */
 
 using System;
-using System.IO;
+using System.Web.Http;
+using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Security;
 
-namespace LBi.LostDoc.Repository.Web
+namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
 {
-    /// <summary>
-    /// A temporary dir wrapper
-    /// </summary>
-    public class TempDir : IDisposable
+    [ApiController("site/")]
+    public class SiteController : ApiController
     {
-        private readonly DirectoryInfo _dir;
-
-        public TempDir(string basePath)
+        public string Get()
         {
-            string path = System.IO.Path.Combine(basePath, Guid.NewGuid().ToString());
-            if (Directory.Exists(path))
-                throw new ArgumentException("Directoy already exists: " + path);
-
-            this._dir = Directory.CreateDirectory(path);
+            return App.Instance.Content.CurrentState.ToString();
         }
 
-        public string Path
+        [ApiKeyAuthorize]
+        public bool Post()
         {
-            get { return this._dir.FullName; }
-        }
-
-        public void Dispose()
-        {
-            this._dir.Delete(true);
+            try
+            {
+                App.Instance.Content.QueueRebuild(string.Empty);
+                return true;
+            } 
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }
