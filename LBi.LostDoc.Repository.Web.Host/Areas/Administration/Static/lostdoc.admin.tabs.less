@@ -15,6 +15,7 @@
  */
 
 div.tabs {
+	height: 100%;
 	padding: .5rem;
 	&>ul {
 		padding: 0;
@@ -38,5 +39,9 @@ div.tabs {
 				text-decoration: none;
 			}
 		}
+	}
+	&>div {
+		overflow: auto;
+		height: 100%;
 	}
 }

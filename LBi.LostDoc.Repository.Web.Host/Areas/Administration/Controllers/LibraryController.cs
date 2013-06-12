@@ -155,6 +155,12 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                                  });
         }
 
+
+        public ActionResult LogFile(string id, string v, string d)
+        {
+            return this.DownloadFile(id, "Logs", v ?? d, v == null);
+        }
+
         public ActionResult LibraryHtmlFiles(string id, string dir)
         {
             return DirectoryListing(id, "Html", dir);
@@ -165,14 +171,15 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             return DirectoryListing(id, "Logs", dir);
         }
 
-
-
         public ActionResult DownloadHtmlFile(string id, string path)
         {
             return DownloadFile(id, "Html", path);
         }
 
-
+        public ActionResult DownloadSourceFile(string id, string path)
+        {
+            return DownloadFile(id, "Source", path);
+        }
 
         public ActionResult Delete(string id)
         {
@@ -215,9 +222,5 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             return Redirect(Url.Action("Index"));
         }
 
-        public ActionResult LogFile(string id, string v, string d)
-        {
-            return this.DownloadFile(id, "Logs", v ?? d, v == null);
-        }
     }
 }

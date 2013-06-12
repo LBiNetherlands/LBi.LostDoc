@@ -16,6 +16,7 @@
 
 $(function () {
     $("a.overlay").colorbox({
+        scrolling: false,
         rel: 'g1',
         width: '70%',
         opacity: 0.7,
