@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
@@ -40,7 +42,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
         }
 
         protected NotificationManager Notifications { get; set; }
-        
+
         [Import]
         protected new ContentManager Content { get; set; }
 
@@ -96,6 +98,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                 });
             }
 
+            string htmlRoot = Path.Combine(contentRoot, "Html");
 
             return this.View(new LibraryDetailsModel
                                  {
@@ -103,8 +106,41 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                                                  {
                                                      IsReadOnly = true,
                                                      Assemblies = assemblies.ToArray()
-                                                 }
+                                                 },
+                                     OutputDataUrl = this.Url.Action("LibraryHtmlFiles", new { id }),
+                                     OutputDownloadUrl = this.Url.Action("DownloadHtmlFile", new { id }).TrimEnd('/') + "?path=",
+                                     OutputViewUrl = this.Url.RouteUrl("Archive", new { id, path = "" }).TrimEnd('/')
                                  });
+        }
+
+        public ActionResult LibraryHtmlFiles(string id, string dir)
+        {
+            dir = (dir ?? "").TrimStart('/');
+            string contentRoot = App.Instance.Content.GetContentRoot(id);
+            string htmlRoot = Path.Combine(contentRoot, "Html");
+            string contentDir = Path.Combine(htmlRoot, dir);
+
+            DirectoryInfo di = new DirectoryInfo(contentDir);
+
+            return View("_DirectoryListing",
+                        new DirectoryListModel
+                            {
+                                Root = new DirectoryInfo(htmlRoot),
+                                Directories = di.GetDirectories(),
+                                Files = di.GetFiles()
+                            });
+        }
+
+        public ActionResult DownloadHtmlFile(string id, string path)
+        {
+            string contentRoot = App.Instance.Content.GetContentRoot(id);
+            string htmlRoot = Path.Combine(contentRoot, "Html");
+
+            string realPath = Path.Combine(htmlRoot, path.TrimStart('/'));
+            if (realPath.StartsWith(htmlRoot))
+                return new FilePathResult(realPath, "text/text") { FileDownloadName = Path.GetFileName(realPath) };
+
+            throw new HttpException((int)HttpStatusCode.Forbidden, "Forbidden!");
         }
 
         public ActionResult Delete(string id)

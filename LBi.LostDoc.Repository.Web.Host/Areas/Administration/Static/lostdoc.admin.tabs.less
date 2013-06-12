@@ -14,16 +14,29 @@
  * limitations under the License. 
  */
 
-using System.IO;
-using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
+div.tabs {
+	padding: .5rem;
+	&>ul {
+		padding: 0;
+		margin-top: 0;
 
-namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
-{
-    public class LibraryDetailsModel
-    {
-        public ContentRepositoryModel Input { get; set; }
-        public string OutputDataUrl { get; set; }
-        public string OutputViewUrl { get; set; }
-        public string OutputDownloadUrl { get; set; }
-    }
+		&>li {
+			display: inline;
+			margin-right: .5rem;
+
+			&.active {
+				a {
+					color: #34495E;
+				}
+			}
+
+			a {
+				color: #C4C4C4;
+				font-weight: normal;
+				font-family: Segoe UI Light, Arial, Sans serif;
+				font-size: 1.5rem;
+				text-decoration: none;
+			}
+		}
+	}
 }

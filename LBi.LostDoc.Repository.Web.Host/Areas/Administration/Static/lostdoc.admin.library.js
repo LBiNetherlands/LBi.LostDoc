@@ -14,55 +14,49 @@
  * limitations under the License. 
  */
 
-$(function() {
+$(function () {
     $("a.overlay").each(function () {
-        debugger;
-        $(this).colorbox({ width: '70%' });
+        $(this).colorbox({
+            width: '70%',
+            onComplete: function () {
+                LostDoc.Tabs.Init($('div.tabs').get(0));
+                var tree = $('div.output-tree');
+
+                tree.fileTree(
+                    {
+                        script: tree.data('root'),
+                        multiFolder: true,
+                        onComplete: function () {
+                        }
+                    },
+                    function (file) {
+                    });
+            }
+        });
     });
-});
-//$(".tilt").each(function() {
-//    $(this).mousedown(function(event) {
-//        // Does the click reside in the center of the object 
-//        if (event.pageX > $(this).offset().left + ($(this).outerWidth() / 2) - (0.1 * $(this).outerWidth()) &&
-//            event.pageX < $(this).offset().left + ($(this).outerWidth() / 2) + (0.1 * $(this).outerWidth()) &&
-//            event.pageY > $(this).offset().top + ($(this).outerHeight() / 2) - (0.1 * $(this).outerHeight()) &&
-//            event.pageY < $(this).offset().top + ($(this).outerHeight() / 2) + (0.1 * $(this).outerHeight())) {
-//            $(this).css("transform", "perspective(500px) translateZ(-15px)");
-//        } else {
-//            var slope = $(this).outerHeight() / $(this).outerWidth(),
-//                descendingY = (slope * (event.pageX - $(this).offset().left)) + $(this).offset().top,
-//                ascendingY = (-slope * (event.pageX - $(this).offset().left)) + $(this).offset().top + $(this).outerHeight();
 
-//            if (event.pageY < descendingY) {
-//                if (event.pageY < ascendingY) {
-//                    // top region
-//                    $(this).css("transform", "perspective(500px) rotateX(8deg)");
-//                } else {
-//                    // right region
-//                    $(this).css("transform", "perspective(500px) rotateY(8deg)");
-//                }
-//            } else {
-//                if (event.pageY > ascendingY) {
-//                    // bottom region
-//                    $(this).css("transform", "perspective(500px) rotateX(-8deg)");
-//                } else {
-//                    // left region
-//                    $(this).css("transform", "perspective(500px) rotateY(-8deg)");
-//                }
-//            }
-//        }
-//    });
-
-//    // TOD this is super flaky/weird, ask Pim
-//    var link = $(this);
-//    var container = link.parent();
-//    container.mouseout(function (event) {
-//        link.css("transform", "");
-//    });
-//});
-
-
-$(function() {
-    n = new Notifications($('section[role=alert]').get(0), $('div.handle').get(0));
-    
+    $.contextMenu({
+        trigger: "left",
+        selector: 'li.file',
+        items: {
+            view: {
+                name: "View",
+                callback: function (key, opt) {
+                    var base = this.closest('div[data-view]').data('view');
+                    var rel = this.find('a').attr('rel');
+                    var open_link = window.open('', '_blank');
+                    open_link.location = base + rel;
+                }
+            },
+            download: {
+                name: "Download",
+                callback: function (key, opt) {
+                    var base = this.closest('div[data-download]').data('download');
+                    var rel = this.find('a').attr('rel');
+                    var open_link = window.open('', '_blank');
+                    open_link.location = base + rel;
+                }
+            }
+        }
+    });
 });

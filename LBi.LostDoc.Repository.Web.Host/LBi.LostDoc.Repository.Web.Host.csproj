@@ -160,6 +160,7 @@
     <Compile Include="Areas\Administration\Models\AddInModel.cs" />
     <Compile Include="Areas\Administration\Models\AddInOverviewModel.cs" />
     <Compile Include="Areas\Administration\Models\AssemblyModel.cs" />
+    <Compile Include="Areas\Administration\Models\DirectoryListModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryDescriptorModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryDetailsModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryModel.cs" />
@@ -190,6 +191,44 @@
     <Compile Include="Areas\Administration\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\application.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\code.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\css.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\db.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\directory.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\doc.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\file.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\film.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\flash.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\folder_open.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\html.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\java.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\linux.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\music.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\pdf.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\php.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\picture.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\ppt.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\psd.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\ruby.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\script.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\spinner.gif" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\txt.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\xls.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\zip.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.css" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.js" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\images\cut.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\images\door.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_add.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_copy.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_delete.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_edit.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_paste.png" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.css" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.js" />
+    <Content Include="Areas\Administration\Static\Lib\jquery.contextMenu\jquery.ui.position.js" />
+    <Content Include="Areas\Administration\Static\lostdoc.admin.tabs.js" />
     <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\colorbox.css" />
     <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\images\border.png" />
     <Content Include="Areas\Administration\Static\Lib\jquery.colorbox\images\controls.png" />
@@ -287,6 +326,8 @@
       <LastGenOutput>LostDoc.Designer.cs</LastGenOutput>
     </Content>
     <Content Include="Areas\Administration\Views\Shared\_ContentRepository.cshtml" />
+    <Content Include="Areas\Administration\Static\lostdoc.admin.tabs.less" />
+    <Content Include="Areas\Administration\Views\Shared\_DirectoryListing.cshtml" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
     <Content Include="Static\less\components.less" />
     <Content Include="Static\less\header.less" />

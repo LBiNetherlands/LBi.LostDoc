@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +14,29 @@
  * limitations under the License. 
  */
 
-using System.IO;
-using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Markup;
 
-namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Configuration.Xaml
 {
-    public class LibraryDetailsModel
+    [ContentProperty("Entries")]
+    public class Settings
     {
-        public ContentRepositoryModel Input { get; set; }
-        public string OutputDataUrl { get; set; }
-        public string OutputViewUrl { get; set; }
-        public string OutputDownloadUrl { get; set; }
+        public Settings()
+        {
+            this.Entries = new EntryCollection();
+            this.Version = 1;
+        }
+
+        public int Version { get; set; }
+
+        public EntryCollection Entries { get; private set; }
+
+        public Dictionary<string, Entry> ToDictionary()
+        {
+            return this.Entries.ToDictionary(e => e.Key, StringComparer.Ordinal);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +14,11 @@
  * limitations under the License. 
  */
 
-using System.IO;
-using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
+using System.Collections.Generic;
 
-namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Configuration.Xaml
 {
-    public class LibraryDetailsModel
+    public class EntryCollection : List<Entry>
     {
-        public ContentRepositoryModel Input { get; set; }
-        public string OutputDataUrl { get; set; }
-        public string OutputViewUrl { get; set; }
-        public string OutputDownloadUrl { get; set; }
     }
 }

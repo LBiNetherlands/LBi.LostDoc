@@ -32,6 +32,7 @@ namespace LBi.LostDoc.Repository.Web.Composition
         {
             this._container = container;
         }
+
         protected override IController GetControllerInstance(RequestContext requestContext, Type controllerType)
         {
             var contractName = AttributedModelServices.GetContractName(controllerType);
