@@ -15,25 +15,39 @@
  */
 
 $(function () {
-    $("a.overlay").each(function () {
-        $(this).colorbox({
-            width: '70%',
-            onComplete: function () {
-                LostDoc.Tabs.Init($('div.tabs').get(0));
-                var tree = $('div.output-tree');
+    $("a.overlay").colorbox({
+        rel: 'g1',
+        width: '70%',
+        opacity: 0.7,
+        current: "Library {current} of {total}",
+        onComplete: function () {
+            LostDoc.Tabs.Init($('div.tabs').get(0));
+            var tree = $('div.output-tree');
 
-                tree.fileTree(
-                    {
-                        script: tree.data('root'),
-                        multiFolder: true,
-                        onComplete: function () {
-                        }
-                    },
-                    function (file) {
-                    });
-            }
-        });
+            tree.fileTree(
+                {
+                    script: tree.data('root'),
+                    multiFolder: true,
+                    onComplete: function () {
+                    }
+                },
+                function (file) {
+                });
+            
+            tree = $('div.log-tree');
+
+            tree.fileTree(
+                {
+                    script: tree.data('root'),
+                    multiFolder: true,
+                    onComplete: function () {
+                    }
+                },
+                function (file) {
+                });
+        }
     });
+
 
     $.contextMenu({
         trigger: "left",
@@ -53,8 +67,9 @@ $(function () {
                 callback: function (key, opt) {
                     var base = this.closest('div[data-download]').data('download');
                     var rel = this.find('a').attr('rel');
-                    var open_link = window.open('', '_blank');
-                    open_link.location = base + rel;
+                    window.location = base + rel;
+                    //var open_link = window.open('', '_blank');
+                    //open_link.location = base + rel;
                 }
             }
         }

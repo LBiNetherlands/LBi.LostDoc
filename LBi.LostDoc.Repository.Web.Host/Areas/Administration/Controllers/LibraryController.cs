@@ -73,6 +73,43 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                        };
         }
 
+        private ActionResult DirectoryListing(string id, string folder, string path)
+        {
+            path = (path ?? "").TrimStart('/');
+            string contentRoot = App.Instance.Content.GetContentRoot(id);
+            string folderPath = Path.Combine(contentRoot, folder);
+            string contentDir = Path.Combine(folderPath, path);
+
+            DirectoryInfo di = new DirectoryInfo(contentDir);
+
+            return View("_DirectoryListing",
+                        new DirectoryListModel
+                        {
+                            Root = new DirectoryInfo(folderPath),
+                            Directories = di.GetDirectories(),
+                            Files = di.GetFiles()
+                        });
+        }
+
+        private ActionResult DownloadFile(string id, string folder, string path, bool asDownload = true)
+        {
+            string contentRoot = this.Content.GetContentRoot(id);
+            string htmlRoot = Path.Combine(contentRoot, folder);
+
+            string realPath = Path.Combine(htmlRoot, path.TrimStart('/'));
+            if (realPath.StartsWith(htmlRoot))
+            {
+                FilePathResult result = new FilePathResult(realPath, "text/text");
+
+                if (asDownload)
+                    result.FileDownloadName = Path.GetFileName(realPath);
+
+                return result;
+            }
+
+            throw new HttpException((int)HttpStatusCode.Forbidden, "Forbidden!");
+        }
+
         public ActionResult Details(string id)
         {
             string contentRoot = App.Instance.Content.GetContentRoot(id);
@@ -86,16 +123,16 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             foreach (var group in groups)
             {
                 assemblies.Add(new AssemblyModel
-                {
-                    Name = group.First().PrimaryAssembly.Name,
-                    Versions = group.Select(ld =>
-                                            new VersionModel
-                                            {
-                                                Filename = Path.GetFileName(ld.Path),
-                                                Created = System.IO.File.GetCreationTime(ld.Path),
-                                                Version = ld.PrimaryAssembly.AssetId.Version
-                                            }).ToArray()
-                });
+                                   {
+                                       Name = group.First().PrimaryAssembly.Name,
+                                       Versions = group.Select(ld =>
+                                                               new VersionModel
+                                                                   {
+                                                                       Filename = Path.GetFileName(ld.Path),
+                                                                       Created = System.IO.File.GetCreationTime(ld.Path),
+                                                                       Version = ld.PrimaryAssembly.AssetId.Version
+                                                                   }).ToArray()
+                                   });
             }
 
             string htmlRoot = Path.Combine(contentRoot, "Html");
@@ -108,44 +145,38 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                                                      Assemblies = assemblies.ToArray()
                                                  },
                                      OutputDataUrl = this.Url.Action("LibraryHtmlFiles", new { id }),
-                                     OutputDownloadUrl = this.Url.Action("DownloadHtmlFile", new { id }).TrimEnd('/') + "?path=",
-                                     OutputViewUrl = this.Url.RouteUrl("Archive", new { id, path = "" }).TrimEnd('/')
+                                     OutputDownloadUrl =
+                                         this.Url.Action("DownloadHtmlFile", new { id }).TrimEnd('/') + "?path=",
+                                     OutputViewUrl = this.Url.RouteUrl("Archive", new { id, path = "" }).TrimEnd('/'),
+                                     LogDataUrl = this.Url.Action("LibraryLogFiles", new { id }),
+                                     LogDownloadUrl = this.Url.Action("LogFile", new { id }).TrimEnd('/') + "?d=",
+                                     LogViewUrl = this.Url.Action("LogFile", new { id, path = "" }).TrimEnd('/') + "?v=",
+                                     Created = Directory.GetCreationTime(htmlRoot)
                                  });
         }
 
         public ActionResult LibraryHtmlFiles(string id, string dir)
         {
-            dir = (dir ?? "").TrimStart('/');
-            string contentRoot = App.Instance.Content.GetContentRoot(id);
-            string htmlRoot = Path.Combine(contentRoot, "Html");
-            string contentDir = Path.Combine(htmlRoot, dir);
-
-            DirectoryInfo di = new DirectoryInfo(contentDir);
-
-            return View("_DirectoryListing",
-                        new DirectoryListModel
-                            {
-                                Root = new DirectoryInfo(htmlRoot),
-                                Directories = di.GetDirectories(),
-                                Files = di.GetFiles()
-                            });
+            return DirectoryListing(id, "Html", dir);
         }
+
+        public ActionResult LibraryLogFiles(string id, string dir)
+        {
+            return DirectoryListing(id, "Logs", dir);
+        }
+
+
 
         public ActionResult DownloadHtmlFile(string id, string path)
         {
-            string contentRoot = App.Instance.Content.GetContentRoot(id);
-            string htmlRoot = Path.Combine(contentRoot, "Html");
-
-            string realPath = Path.Combine(htmlRoot, path.TrimStart('/'));
-            if (realPath.StartsWith(htmlRoot))
-                return new FilePathResult(realPath, "text/text") { FileDownloadName = Path.GetFileName(realPath) };
-
-            throw new HttpException((int)HttpStatusCode.Forbidden, "Forbidden!");
+            return DownloadFile(id, "Html", path);
         }
+
+
 
         public ActionResult Delete(string id)
         {
-            string contentRoot = App.Instance.Content.GetContentRoot(id);
+            string contentRoot = this.Content.GetContentRoot(id);
             Directory.Delete(contentRoot, true);
             this.Notifications.Add(Severity.Information,
                                    Lifetime.Page,
@@ -159,7 +190,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 
         public ActionResult SetCurrent(string id)
         {
-            App.Instance.Content.SetCurrentContentFolder(id);
+            this.Content.SetCurrentContentFolder(id);
             this.Notifications.Add(Severity.Information,
                                    Lifetime.Page,
                                    Scope.User,
@@ -173,7 +204,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 
         public ActionResult Build()
         {
-            App.Instance.Content.QueueRebuild("Requested by " + this.User.Identity.Name);
+            this.Content.QueueRebuild("Requested by " + this.User.Identity.Name);
             this.Notifications.Add(Severity.Information,
                                    Lifetime.Page,
                                    Scope.User,
@@ -182,6 +213,11 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                                    "A new content rebuild request has been added to the processing queue.");
 
             return Redirect(Url.Action("Index"));
+        }
+
+        public ActionResult LogFile(string id, string v, string d)
+        {
+            return this.DownloadFile(id, "Logs", v ?? d, v == null);
         }
     }
 }

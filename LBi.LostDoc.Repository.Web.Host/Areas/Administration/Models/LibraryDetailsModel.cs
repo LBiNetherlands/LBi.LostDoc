@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.IO;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 
@@ -22,8 +23,17 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
     public class LibraryDetailsModel
     {
         public ContentRepositoryModel Input { get; set; }
+        
         public string OutputDataUrl { get; set; }
+        
         public string OutputViewUrl { get; set; }
+        
         public string OutputDownloadUrl { get; set; }
+
+        public string LogDataUrl { get; set; }
+        public string LogViewUrl { get; set; }
+        public string LogDownloadUrl { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }
