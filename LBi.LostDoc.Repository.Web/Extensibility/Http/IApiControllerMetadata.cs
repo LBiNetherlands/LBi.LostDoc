@@ -14,22 +14,10 @@
  * limitations under the License. 
  */
 
-using System;
-using System.ComponentModel.Composition;
-using System.Web.Http.Controllers;
-
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Extensibility.Http
 {
-    [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class ApiControllerAttribute : ExportAttribute
+    public interface IApiControllerMetadata : IAddInMetadata
     {
-        public ApiControllerAttribute(string urlFragment)
-            : base(ContractNames.ApiController, typeof(IHttpController))
-        {
-            this.UrlFragment = urlFragment;
-        }
-
-        public string UrlFragment { get; protected set; }
+        string UrlFragment { get; }
     }
 }

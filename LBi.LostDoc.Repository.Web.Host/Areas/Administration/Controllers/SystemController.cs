@@ -14,18 +14,20 @@
  * limitations under the License. 
  */
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using LBi.LostDoc.Extensibility;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Controllers;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
-using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Configuration;
+using LBi.LostDoc.Repository.Web.Configuration.Composition;
+using LBi.LostDoc.Repository.Web.Configuration.Xaml;
+using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
 using LBi.LostDoc.Templating;
-using ContractNames = LBi.LostDoc.Extensibility.ContractNames;
+using Settings = LBi.LostDoc.Repository.Web.Configuration.Settings;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 {
     [AdminController("system", Group = Groups.Core, Order = 3000, Text = "System")]
     public class SystemController : Controller
@@ -33,11 +35,19 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         [ImportMany(ContractNames.TemplateProvider)]
         public IFileProvider[] FileProviders { get; set; }
 
+        [Import]
+        public ISettingsProvider SettingsProvider { get; set; }
+
+
         [AdminAction("index", IsDefault = true, Text = "Status")]
         public ActionResult Index()
         {
             TemplateResolver resolver = new TemplateResolver(this.FileProviders);
-            return this.View(new SystemModel() {Templates = resolver.GetTemplates().ToArray()});
+            return this.View(new SystemModel()
+                                 {
+                                     Templates = resolver.GetTemplates().ToArray(),
+                                     CurrentTemplate = this.SettingsProvider.GetValue<string>(Settings.Template)
+                                 });
         }
 
         //[AdminAction("logs", Text = "Logs")]

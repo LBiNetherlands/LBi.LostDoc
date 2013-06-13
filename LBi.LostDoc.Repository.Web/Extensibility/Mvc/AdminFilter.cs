@@ -6,7 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Notifications;
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
 {
     public class AdminFilter : IActionFilter
     {

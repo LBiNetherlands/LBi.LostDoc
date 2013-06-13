@@ -14,18 +14,16 @@
  * limitations under the License. 
  */
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+using LBi.LostDoc.Repository.Web.Notifications;
+
+namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
 {
-    // TODO is this the way to go?
-
-    public interface IControllerMetadata : IAddInMetadata
+    public interface IAdminModel
     {
-        string Name { get; }
+        string PageTitle { get; set; }
 
-        string Text { get; }
+        Notification[] Notifications { get; set; }
 
-        string Group { get; }
-
-        double Order { get; }
+        Navigation[] Navigation { get; set; }
     }
 }

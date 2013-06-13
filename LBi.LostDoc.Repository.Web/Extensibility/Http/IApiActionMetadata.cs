@@ -14,17 +14,10 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using LBi.LostDoc.Repository.Web.Notifications;
-
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Extensibility.Http
 {
-    public interface IAdminModel
+    public interface IApiActionMetadata : IAddInMetadata
     {
-        string PageTitle { get; set; }
-
-        Notification[] Notifications { get; set; }
-
-        Navigation[] Navigation { get; set; }
+        string UrlFragment { get; }
     }
 }

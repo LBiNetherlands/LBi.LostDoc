@@ -80,6 +80,40 @@ namespace LBi.LostDoc.Repository.Web.Configuration.Xaml
             }
         }
 
+        public bool TryGetValue<T>(string key, out T value)
+        {
+            bool ret;
+            value = default(T);
+
+            this._lock.EnterReadLock();
+            try
+            {
+                Entry entry;
+                if (this._lookup.TryGetValue(key, out entry))
+                {
+                    if (typeof(T).IsAssignableFrom(entry.Type))
+                    {
+                        value = (T)entry.GetValue();
+                        ret = true;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Wrong type: " + key);
+                    }
+                }
+                else
+                {
+                    ret = false;
+                }
+            }
+            finally
+            {
+                this._lock.ExitReadLock();
+            }
+
+            return ret;
+        }
+
         public T GetValue<T>(string key)
         {
             this._lock.EnterReadLock();
@@ -95,7 +129,7 @@ namespace LBi.LostDoc.Repository.Web.Configuration.Xaml
                     }
                     else
                     {
-                        throw new Exception("Wrong type: " + key);
+                        throw new InvalidOperationException("Wrong type: " + key);
                     }
                 }
                 else

@@ -18,7 +18,7 @@ using System;
 using System.Linq;
 using System.Web.Mvc;
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
 {
     public class AddInActionInvoker : ControllerActionInvoker
     {
@@ -32,7 +32,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                 {
                     if (StringComparer.OrdinalIgnoreCase.Equals(actionName, attr.Name))
                         return actionDescriptors[i];
-                    
+
                     if (StringComparer.OrdinalIgnoreCase.Equals("Index", actionName) && attr.IsDefault)
                     {
                         // reset the name, otherwise the View wont be picked up correctly

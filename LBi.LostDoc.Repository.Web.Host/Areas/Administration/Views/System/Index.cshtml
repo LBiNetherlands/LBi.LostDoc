@@ -24,6 +24,7 @@
 <select id="templateSelector">
     @foreach (var template in Model.Templates)
     {
-        <option value="@template">@template</option>
+        string selected = template == Model.CurrentTemplate ? "selected" : string.Empty;
+        <option value="@template" @selected>@template</option>
     }
 </select>

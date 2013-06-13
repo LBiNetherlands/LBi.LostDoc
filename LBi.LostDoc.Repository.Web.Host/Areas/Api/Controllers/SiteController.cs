@@ -17,6 +17,7 @@
 using System;
 using System.Web.Http;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Extensibility.Http;
 using LBi.LostDoc.Repository.Web.Security;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers

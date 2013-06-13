@@ -14,10 +14,12 @@
  * limitations under the License. 
  */
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Configuration.Composition
 {
-    public interface IApiControllerMetadata : IAddInMetadata
+    public static class SettingsConstants
     {
-        string UrlFragment { get; }
+        public const string SettingsContract = "SettingsContract";
+
+        public const string SettingsMetadataKey = "SettingsKey";
     }
 }

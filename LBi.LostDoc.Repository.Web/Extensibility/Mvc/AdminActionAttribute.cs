@@ -15,16 +15,24 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
 {
-    public class SystemModel : ModelBase
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public class AdminActionAttribute : Attribute
     {
-        public string[] Templates { get; set; }
+        public AdminActionAttribute(string name)
+        {
+            this.Name = name;
+            this.IsDefault = false;
+        }
 
-        public string CurrentTemplate { get; set; }
+        public bool IsDefault { get; set; }
+
+        public string Name { get; protected set; }
+
+        public double Order { get; set; }
+
+        public string Text { get; set; }
     }
 }

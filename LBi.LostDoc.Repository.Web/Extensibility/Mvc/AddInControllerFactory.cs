@@ -25,7 +25,7 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using LBi.LostDoc.Composition;
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
 {
     public class AddInControllerFactory : IControllerFactory
     {

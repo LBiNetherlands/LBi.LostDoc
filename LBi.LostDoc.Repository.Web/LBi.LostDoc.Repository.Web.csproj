@@ -92,27 +92,32 @@
     <Compile Include="App.cs" />
     <Compile Include="Composition\ControllerFactory.cs" />
     <Compile Include="Configuration\AppConfig.cs" />
+    <Compile Include="Configuration\Composition\ImportSettingAttribute.cs" />
+    <Compile Include="Configuration\Composition\SettingsConstants.cs" />
     <Compile Include="Configuration\ISettingsProvider.cs" />
+    <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Configuration\Composition\SettingsExportProvider.cs" />
     <Compile Include="Configuration\Xaml\Entry.cs" />
     <Compile Include="Configuration\Xaml\EntryCollection.cs" />
     <Compile Include="Configuration\Xaml\Settings.cs" />
     <Compile Include="Configuration\Xaml\XamlSettingsProvider.cs" />
     <Compile Include="DisposableExtensions.cs" />
-    <Compile Include="Extensibility\AddInActionInvoker.cs" />
-    <Compile Include="Extensibility\AddInControllerFactory.cs" />
-    <Compile Include="Extensibility\AddInHttpControllerFactory.cs" />
+    <Compile Include="Extensibility\Mvc\AddInActionInvoker.cs" />
+    <Compile Include="Extensibility\Mvc\AddInControllerFactory.cs" />
+    <Compile Include="Extensibility\Http\AddInHttpControllerFactory.cs" />
     <Compile Include="Extensibility\AddInModelServices.cs" />
-    <Compile Include="Extensibility\AdminActionAttribute.cs" />
-    <Compile Include="Extensibility\AdminControllerAttribute.cs" />
-    <Compile Include="Extensibility\AdminFilter.cs" />
-    <Compile Include="Extensibility\ApiControllerAttribute.cs" />
+    <Compile Include="Extensibility\Mvc\AdminActionAttribute.cs" />
+    <Compile Include="Extensibility\Mvc\AdminControllerAttribute.cs" />
+    <Compile Include="Extensibility\Mvc\AdminFilter.cs" />
+    <Compile Include="Extensibility\Http\ApiControllerAttribute.cs" />
     <Compile Include="Extensibility\ContractNames.cs" />
     <Compile Include="Extensibility\IAddInMetadata.cs" />
-    <Compile Include="Extensibility\IAdminModel.cs" />
-    <Compile Include="Extensibility\IApiActionMetadata.cs" />
-    <Compile Include="Extensibility\IApiControllerMetadata.cs" />
-    <Compile Include="Extensibility\IControllerMetadata.cs" />
-    <Compile Include="Extensibility\Navigation.cs" />
+    <Compile Include="Extensibility\Mvc\IAdminModel.cs" />
+    <Compile Include="Extensibility\Http\IApiActionMetadata.cs" />
+    <Compile Include="Extensibility\Http\IApiControllerMetadata.cs" />
+    <Compile Include="Extensibility\Mvc\IControllerMetadata.cs" />
+    <Compile Include="Extensibility\Mvc\AddInFilterProvider.cs" />
+    <Compile Include="Extensibility\Mvc\Navigation.cs" />
     <Compile Include="Notifications\Lifetime.cs" />
     <Compile Include="Notifications\Notification.cs" />
     <Compile Include="Notifications\NotificationAction.cs" />
@@ -141,9 +146,7 @@
       <Name>LBi.LostDoc</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Settings\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.7\tools\Microsoft.Bcl.Build.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

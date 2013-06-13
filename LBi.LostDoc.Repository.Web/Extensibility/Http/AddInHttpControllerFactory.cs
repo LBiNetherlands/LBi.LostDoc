@@ -21,7 +21,7 @@ using System.ComponentModel.Composition.ReflectionModel;
 using System.Linq;
 using System.Web.Http.Dispatcher;
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Extensibility.Http
 {
     public class AddInHttpControllerTypeResolver : DefaultHttpControllerTypeResolver
     {
@@ -36,7 +36,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
         {
             var ret = base.GetControllerTypes(assembliesResolver);
 
-            var parts = _container.Catalog.Parts.Where(
+            var parts = this._container.Catalog.Parts.Where(
                 partDef =>
                 partDef.ExportDefinitions.Any(
                     p => string.Equals(p.ContractName, ContractNames.ApiController, StringComparison.Ordinal)));

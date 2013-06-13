@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 using System.Web.Hosting;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -33,10 +34,15 @@ using LBi.LostDoc.Packaging.Composition;
 using LBi.LostDoc.Repository.Web.Areas.Administration;
 using LBi.LostDoc.Repository.Web.Composition;
 using LBi.LostDoc.Repository.Web.Configuration;
+using LBi.LostDoc.Repository.Web.Configuration.Composition;
+using LBi.LostDoc.Repository.Web.Configuration.Xaml;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Extensibility.Http;
+using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
 using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 using ContractNames = LBi.LostDoc.Extensibility.ContractNames;
+using Settings = LBi.LostDoc.Repository.Web.Configuration.Settings;
 
 namespace LBi.LostDoc.Repository.Web.Host
 {
@@ -108,6 +114,10 @@ namespace LBi.LostDoc.Repository.Web.Host
             // this might be stupid, but it fixes things for iisexpress
             Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
 
+            // set up configuration
+            string settingsPath = System.Configuration.ConfigurationManager.AppSettings["LostDoc.SettingsPath"];
+            ISettingsProvider settings = new XamlSettingsProvider(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, settingsPath));
+
             // set up add-in system
             AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed", 
                                                         AppConfig.AddInRepository, 
@@ -149,8 +159,11 @@ namespace LBi.LostDoc.Repository.Web.Host
             // this acts as a crude "remove/overwrite plugins that were in use when un/installed" hack
             addInManager.Restore();
 
+            // create setings export provider
+            SettingsExportProvider settingsExportProvider = new SettingsExportProvider(settings);
+
             // create container
-            CompositionContainer container = new CompositionContainer(catalog);
+            CompositionContainer container = new CompositionContainer(catalog, settingsExportProvider);
 
             // set up template resolver
             var lazyProviders = container.GetExports<IFileProvider>(ContractNames.TemplateProvider);
@@ -159,29 +172,38 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             // load template
             Template template = new Template(container);
-            template.Load(templateResolver, AppConfig.Template);
+            template.Load(templateResolver, settings.GetValue<string>(Settings.Template));
+
+            Func<string, string> makeAbsolute =  p => Path.Combine(HttpRuntime.AppDomainAppPath, p);
 
             // set up content manager
-            ContentManager contentManager = new ContentManager(new ContentSettings
-                                                                   {
-                                                                       ContentPath = AppConfig.ContentPath, 
-                                                                       // TODO make this configurable
-                                                                       IgnoreVersionComponent = VersionComponent.Patch, 
-                                                                       RepositoryPath = AppConfig.RepositoryPath, 
-                                                                       Template = template
-                                                                   });
+            ContentSettings contentSettings = new ContentSettings
+                                                  {
+                                                      ContentPath = makeAbsolute(settings.GetValue<string>(Settings.ContentPath)),
+                                                      IgnoreVersionComponent = settings.GetValue<VersionComponent>(Settings.IgnoreVersionComponent),
+                                                      RepositoryPath = makeAbsolute(settings.GetValue<string>(Settings.RepositoryPath)),
+                                                      Template = template
+                                                  };
+            ContentManager contentManager = new ContentManager(contentSettings);
 
             // set up notifaction system
             NotificationManager notifications = new NotificationManager();
 
             // register application services in composition container
             CompositionBatch batch = new CompositionBatch();
+            
+            //XamlSettingsProvider settingsProvider = new XamlSettingsProvider(@"c:\temp\config.xml");
+            //settingsProvider.SetValue("AStringArray", new[] {"abc", "def"});
+            //settingsProvider.SetValue("AnArray", new[] { "abc", "def" });
+            //settingsProvider.SetValue("AnInt", 123);
+            //settingsProvider.SetValue("ABool", true);
 
             this.AddExport(batch, notifications);
             this.AddExport(batch, contentManager);
             this.AddExport(batch, addInManager);
             this.AddExport(batch, traceListener);
             this.AddExport(batch, container);
+            this.AddExport(batch, settings);
 
             container.Compose(batch);
 
@@ -201,6 +223,8 @@ namespace LBi.LostDoc.Repository.Web.Host
                                                                                  container,
                                                                                  innerFactory);
             ControllerBuilder.Current.SetControllerFactory(newControllerFactory);
+
+            FilterProviders.Providers.Add(new AddInFilterProvider(container));
 
             // TODO figure out if we actually need this
             // hook in our MEF based IHttpController instead of the default one

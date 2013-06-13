@@ -16,28 +16,20 @@
 
 using System;
 using System.ComponentModel.Composition;
-using System.Web.Mvc;
+using System.Web.Http.Controllers;
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Extensibility.Http
 {
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class AdminControllerAttribute : ExportAttribute
+    public class ApiControllerAttribute : ExportAttribute
     {
-        private readonly string _name;
-
-        public AdminControllerAttribute(string name) : base(ContractNames.AdminController, typeof(IController))
+        public ApiControllerAttribute(string urlFragment)
+            : base(ContractNames.ApiController, typeof(IHttpController))
         {
-            this._name = name;
-            this.Text = name;
+            this.UrlFragment = urlFragment;
         }
 
-        public string Name { get { return this._name; } }
-
-        public string Text { get; set; }
-
-        public string Group { get; set; }
-
-        public double Order { get; set; }
+        public string UrlFragment { get; protected set; }
     }
 }

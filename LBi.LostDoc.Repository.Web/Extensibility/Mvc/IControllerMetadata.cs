@@ -14,10 +14,18 @@
  * limitations under the License. 
  */
 
-namespace LBi.LostDoc.Repository.Web.Extensibility
+namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
 {
-    public interface IApiActionMetadata : IAddInMetadata
+    // TODO is this the way to go?
+
+    public interface IControllerMetadata : IAddInMetadata
     {
-        string UrlFragment { get; }
+        string Name { get; }
+
+        string Text { get; }
+
+        string Group { get; }
+
+        double Order { get; }
     }
 }

@@ -144,11 +144,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Data\LostDoc.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>LostDoc.Settings</DependentUpon>
-    </Compile>
     <Compile Include="Areas\Administration\AdministrationAreaRegistration.cs" />
     <Compile Include="Areas\Administration\Controllers\AddInController.cs" />
     <Compile Include="Areas\Administration\Controllers\DefaultController.cs" />
@@ -321,14 +316,15 @@
     <Content Include="Areas\Administration\Views\Library\Details.cshtml" />
     <Content Include="Areas\Administration\Views\System\Index.cshtml" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.less" />
-    <Content Include="App_Data\LostDoc.Settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>LostDoc.Designer.cs</LastGenOutput>
-    </Content>
     <Content Include="Areas\Administration\Views\Shared\_ContentRepository.cshtml" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.tabs.less" />
     <Content Include="Areas\Administration\Views\Shared\_DirectoryListing.cshtml" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.library.less" />
+    <None Include="App_Data\lostdoc.config">
+      <LastGenOutput>lostdoc.Designer.cs</LastGenOutput>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\PublishProfiles\Build.pubxml" />
     <Content Include="Static\less\components.less" />
     <Content Include="Static\less\header.less" />

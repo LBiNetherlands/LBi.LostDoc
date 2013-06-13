@@ -22,6 +22,7 @@ using System.Web.Mvc;
 using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
 using LBi.LostDoc.Repository.Web.Notifications;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers

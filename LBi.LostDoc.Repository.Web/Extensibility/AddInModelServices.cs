@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.ComponentModel.Composition.ReflectionModel;
 using System.Linq;
@@ -38,6 +39,47 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
 
                 yield return new Lazy<Type, TMetadata>(() => AddInModelServices.GetPartType(partDefinition).Value, controllerMetadata);
             }
+        }
+
+        public static bool TryGetExport<TContract, TExport>(this CompositionContainer container, out TExport export)
+        {
+            return container.TryGetExport<TExport>(typeof(TContract), typeof(TExport), out export);
+        }
+
+        public static bool TryGetExport<TExport>(this CompositionContainer container, out TExport export)
+        {
+            return container.TryGetExport<TExport, TExport>(out export);
+        }
+
+        public static bool TryGetExport<TExportBase>(this CompositionContainer container, Type contracType, Type exportType, out TExportBase export)
+        {
+            var contractName = AttributedModelServices.GetContractName(contracType);
+            ImportDefinition importDefinition =
+                new ImportDefinition(ed => TypeIdentityPredicate(exportType, ed),
+                                     contractName,
+                                     ImportCardinality.ExactlyOne,
+                                     true,
+                                     false);
+
+            IEnumerable<Export> exports;
+            bool ret = container.TryGetExports(importDefinition, new AtomicComposition(), out exports);
+            if (ret)
+                export = (TExportBase)exports.First().Value;
+            else
+                export = default(TExportBase);
+
+            return ret;
+        }
+
+        public static bool TryGetExport<TExportBase>(this CompositionContainer container, Type exportType, out TExportBase export)
+        {
+            return container.TryGetExport<TExportBase>(exportType, exportType, out export);
+        }
+
+        private static bool TypeIdentityPredicate(Type explicitType, ExportDefinition ed)
+        {
+            return (string)ed.Metadata[CompositionConstants.ExportTypeIdentityMetadataName] ==
+                   AttributedModelServices.GetTypeIdentity(explicitType);
         }
 
         public static Lazy<Type> GetPartType(ComposablePartDefinition partDefinition)

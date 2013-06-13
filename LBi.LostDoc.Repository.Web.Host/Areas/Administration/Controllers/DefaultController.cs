@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
 {
