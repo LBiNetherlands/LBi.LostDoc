@@ -68,6 +68,7 @@ namespace LBi.LostDoc.Repository
 
                 string[] rawTerms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
+                BooleanQuery nameQuery = new BooleanQuery();
                 BooleanQuery titleQuery = new BooleanQuery();
                 BooleanQuery summaryQuery = new BooleanQuery();
                 BooleanQuery contentQuery = new BooleanQuery();
@@ -84,6 +85,8 @@ namespace LBi.LostDoc.Repository
                     else
                         occur = Occur.MUST;
 
+                    titleQuery.Add(new TermQuery(new Term("name", rawTerm)), occur);
+
                     titleQuery.Add(new TermQuery(new Term("title", rawTerm)), occur);
 
                     summaryQuery.Add(new TermQuery(new Term("summary", rawTerm)), occur);
@@ -96,6 +99,7 @@ namespace LBi.LostDoc.Repository
                 titleQuery.Boost = 8f;
                 contentQuery.Boost = 0.7f;
 
+                q.Add(nameQuery, Occur.SHOULD);
                 q.Add(titleQuery, Occur.SHOULD);
                 q.Add(summaryQuery, Occur.SHOULD);
                 q.Add(contentQuery, Occur.SHOULD);

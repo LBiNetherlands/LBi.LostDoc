@@ -32,6 +32,10 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="/template/apply-stylesheet">
+    <!-- remove original -->
+  </xsl:template>
+
   <xsl:template match="meta-template[@stylesheet='GlobalParameter.xslt' and position() = 1]">
     <xsl:apply-templates select="/template/apply-stylesheet" mode="inject">
       <xsl:with-param name="name" select="$name"/>

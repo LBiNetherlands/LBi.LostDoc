@@ -29,9 +29,11 @@ repository
 
 // * create site-wide admin notifications
 
+* implement SignalR for the notifications
+
 // * set up app logging
 
-* set up API-controllers through MEF/add-ins as well
+// * set up API-controllers through MEF/add-ins as well
 
 * extract ContentRepositoryController logic into LBi.LostDoc.Repository.Xxx
 

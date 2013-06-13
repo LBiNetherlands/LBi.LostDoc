@@ -1,0 +1,77 @@
+﻿@*
+ * Copyright 2013 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ *@
+
+@model LBi.LostDoc.Repository.Web.Areas.Administration.Models.LibraryModel
+
+@section ScriptIncludes {
+    <script src="~/Areas/Administration/Static/Lib/jquery.colorbox/jquery.colorbox-min.js"></script>
+    <script src="~/Areas/Administration/Static/Lib/jquery.fileTree/jqueryFileTree.js"></script>
+    <script src="~/Areas/Administration/Static/Lib/jquery.contextMenu/jquery.contextMenu.js"></script>
+    <script src="~/Areas/Administration/Static/lostdoc.admin.tabs.js"></script>
+}
+@section PageScripts {
+    <script src="~/Areas/Administration/Static/lostdoc.admin.library.js"></script>
+}
+@section CssIncludes {
+    <link rel="stylesheet" href="~/Areas/Administration/Static/Lib/jquery.colorbox/colorbox.css" />
+    <link rel="stylesheet" href="~/Areas/Administration/Static/Lib/jquery.fileTree/jqueryFileTree.css" />
+    <link rel="stylesheet" href="~/Areas/Administration/Static/Lib/jquery.contextMenu/jquery.contextMenu.css" />
+    <link rel="stylesheet/less" href="~/Areas/Administration/Static/lostdoc.admin.tabs.less" />
+    <link rel="stylesheet/less" href="~/Areas/Administration/Static/lostdoc.admin.library.less" />
+}
+
+<h1>Library</h1>
+
+<h2>Control</h2>
+Current state: @Model.SystemState
+<form action="@Url.Action("Build")" method="POST">
+    <input type="submit" value="Queue Rebuild" />
+</form>
+
+<h2>History</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var library in Model.Libraries.OrderByDescending(l => l.Created))
+        {
+            bool isCurrent = (library.Id == Model.Current);
+            string cssClass = isCurrent ? "current" : "";
+                
+            <tr class="@cssClass">
+                <td><a class="overlay" href="@Url.Action("Details", new { id = library.Id })">@library.Id</a></td>
+                <td>
+                    @library.Created
+
+                    <form action="@Url.Action("SetCurrent", new { id = library.Id })" method="POST">
+                        <input type="submit" value="Set current" @if (isCurrent)
+                                                                 {<text>disabled="disabled"</text>}/>
+                    </form>
+
+                    <form action="@Url.Action("Delete", new { id = library.Id })" method="POST">
+                        <input type="submit" value="Delete" @if (isCurrent)
+                                                            {<text>disabled="disabled"</text>}/>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

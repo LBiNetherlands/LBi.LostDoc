@@ -71,8 +71,7 @@ namespace LBi.LostDoc.Repository
                     this._contentLock.EnterReadLock();
                     if (this._currentContentRef == null)
                     {
-                        TraceSources.ContentManagerSource.TraceError("No content available");
-                        throw new InvalidOperationException("No content available.");
+                        return null;
                     }
 
                     return this._currentContentRef;
@@ -93,8 +92,7 @@ namespace LBi.LostDoc.Repository
                     this._contentLock.EnterReadLock();
                     if (this._currentContentRef == null)
                     {
-                        TraceSources.ContentManagerSource.TraceError("No content available");
-                        throw new InvalidOperationException("No content available.");
+                        return null;
                     }
 
                     return Path.Combine(this._contentPath, this._currentContentRef);

@@ -15,8 +15,11 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace LBi.LostDoc.Templating.FileProviders
 {
@@ -59,6 +62,24 @@ namespace LBi.LostDoc.Templating.FileProviders
             var ret = this._asm.GetManifestResourceStream(this.ConvertPath(path.TrimStart('/')));
             if (ret == null)
                 throw new FileNotFoundException(string.Format("Resource not found: {0} (Was: {1})", this.ConvertPath(path), path), path);
+            return ret;
+        }
+
+        public IEnumerable<string> GetDirectories(string path)
+        {
+            if (path == ".")
+                path = "";
+
+            path = this.ConvertPath(path);
+
+            if (!path.EndsWith("."))
+                path += ".";
+
+            var ret = this._asm.GetManifestResourceNames().Where(n => n.StartsWith(path))
+                          .Select(n => n.Substring(path.Length))
+                          .Select(n => n.Substring(0, n.IndexOf('.')))
+                          .Distinct(StringComparer.Ordinal);
+
             return ret;
         }
 

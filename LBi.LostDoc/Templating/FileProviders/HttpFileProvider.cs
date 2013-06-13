@@ -15,8 +15,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 
@@ -61,6 +63,11 @@ namespace LBi.LostDoc.Templating.FileProviders
                 }
                 return task.Result;
             }
+        }
+
+        public IEnumerable<string> GetDirectories(string path)
+        {
+            return Enumerable.Empty<string>();
         }
     }
 }

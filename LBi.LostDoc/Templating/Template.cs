@@ -198,14 +198,14 @@ namespace LBi.LostDoc.Templating
 
             CustomXsltContext xpathContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
 
-            xpathContext.PushVariableScope(templateData.Document.Root, parameters);
+            xpathContext.PushVariableScope(templateData.Document.Root, parameters); // 1
 
             XElement[] inputElements =
                 templateData.Document.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
 
             foreach (XElement inputElement in inputElements)
             {
-                xpathContext.PushVariableScope(inputElement, stylesheet.Variables);
+                xpathContext.PushVariableScope(inputElement, stylesheet.Variables); // 2
 
                 string saveAs = ResultToString(inputElement.XPathEvaluate(stylesheet.OutputExpression, xpathContext));
                 string version = ResultToString(inputElement.XPathEvaluate(stylesheet.VersionExpression, xpathContext));
@@ -217,7 +217,7 @@ namespace LBi.LostDoc.Templating
                 if (!EvalCondition(xpathContext, inputElement, stylesheet.ConditionExpression))
                 {
                     TraceSources.TemplateSource.TraceVerbose("{0}, {1} => Condition not met", assetId, version);
-                    xpathContext.PopVariableScope();
+                    xpathContext.PopVariableScope(); // 2
                     continue;
                 }
 
@@ -236,7 +236,7 @@ namespace LBi.LostDoc.Templating
 
                     foreach (XElement aliasInputElement in aliasInputElements)
                     {
-                        xpathContext.PushVariableScope(aliasInputElement, alias.Variables);
+                        xpathContext.PushVariableScope(aliasInputElement, alias.Variables); // 3
 
                         string aliasVersion =
                             ResultToString(aliasInputElement.XPathEvaluate(alias.VersionExpression, xpathContext));
@@ -258,7 +258,7 @@ namespace LBi.LostDoc.Templating
                                                                      assetId,
                                                                      version);
                         }
-                        xpathContext.PopVariableScope();
+                        xpathContext.PopVariableScope(); // 3
                     }
                 }
 
@@ -269,7 +269,7 @@ namespace LBi.LostDoc.Templating
 
                     foreach (XElement sectionInputElement in sectionInputElements)
                     {
-                        xpathContext.PushVariableScope(sectionInputElement, section.Variables);
+                        xpathContext.PushVariableScope(sectionInputElement, section.Variables); // 4
 
                         string sectionName =
                             ResultToString(sectionInputElement.XPathEvaluate(section.NameExpression, xpathContext));
@@ -299,11 +299,13 @@ namespace LBi.LostDoc.Templating
                                                                        sectionName);
                         }
 
-                        xpathContext.PopVariableScope();
+                        xpathContext.PopVariableScope(); // 4
                     }
                 }
 
                 var xsltParams = ResolveXsltParams(stylesheet.XsltParams, inputElement, xpathContext).ToArray();
+
+                xpathContext.PopVariableScope(); // 2
 
                 yield return new StylesheetApplication
                                  {
@@ -315,10 +317,10 @@ namespace LBi.LostDoc.Templating
                                      Transform = stylesheet.Transform,
                                      InputElement = inputElement,
                                      XsltParams = xsltParams
-                                 };
+                                 };                
             }
 
-            xpathContext.PopVariableScope();
+            xpathContext.PopVariableScope(); // 1
         }
 
         private static IEnumerable<KeyValuePair<string, object>> ResolveXsltParams(IEnumerable<XPathVariable> xsltParams,
@@ -729,7 +731,7 @@ namespace LBi.LostDoc.Templating
             // create context
             ITemplatingContext context = new TemplatingContext(this._cache,
                                                                this._container,
-                                                               null, // TODO fix this (this._basePath)
+                                                               templateData.OutputFileProvider, // TODO fix this (this._basePath)
                                                                templateData,
                                                                this._resolvers,
                                                                this._fileProvider);

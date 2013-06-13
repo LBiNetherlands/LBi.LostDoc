@@ -1,0 +1,297 @@
+﻿/*
+ * Copyright 2013 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+ body {
+	font-family: Segoe UI, Arial, Sans serif;
+	font-size: 80%
+ }
+
+ #wrapper {
+	width: 1200px; 
+	margin: 0px auto;
+ }
+
+h1, h2, h3, h4, h5, h6, h7 {
+	color: #34495E;
+	font-weight: normal;
+}
+
+h1 {
+	font-family: Segoe UI Light, Arial, Sans serif;
+	font-size: 2.5rem;
+	margin-top: .5rem;
+}
+
+table {
+	border-spacing: 0;
+
+	width: 100%;
+	border: 1px solid #BDC3C7;
+
+	thead {
+		tr {
+			background-color: #ECF0F1;
+
+			th {
+				background-color: #ededed;
+				color: #707070;
+				padding: .4rem;
+				text-align: left;
+			}
+		}
+	}
+
+	tbody {
+		tr {
+			td {
+				padding: .4rem;
+
+				form {
+						
+					float: right;
+					input[type=submit] {
+						display: inline-block;
+						float: right;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+ section[role=main] {
+	float: left;
+
+
+	width: 945px;
+}
+
+section[role=alert] {
+	position: fixed;
+	left: 0;
+	top: 0;
+	padding: 0;
+	width: 100%;
+	
+	div.handle {
+		background-color: #2980B9;
+		right: 2rem;
+		left: auto;
+		height: 48px;
+		position: fixed;
+
+		transition-property: background-color, top;
+		transition-duration: 250ms;
+		&:hover {
+			background-color: #3498db
+		}
+
+		span.icon {
+			background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAVCAYAAAC+NTVfAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAa9JREFUSEvFlc9HBGEYx+cUEdEpIiIiIqJTROwpYk+xdOoPiOi0p4iI6BoREZ0iIrpGRKeIiIiIiIgllun7eXtmzDS/sjPbfvnYndfaz7vP+zzvej2P7/uL4kP8R1qiYWonXxDj4k50M49iStRM7eRfYlP0i2PRjZyJAdEUbVM7eZALMSTWBBuqIm2BcFCcs0BMHZOTJzEj5sQrCyXyLmqCUlPyMKZOyAlNsSqGxRULHeRWjIqG4PtiMXWqPMi+4Jx23dPfcyAo8557Sompc+XkRvALlsUnCzkJKjYirlnIiqkL5eRI9IlJETu7SJ4FvcLnDlnIi6kL5cw+dwDSdcExMDbRXIpgSmjYMZF7Z5g6V/4m+LXRpjsV4byKLcH5Ru8HjooNZ06LqTPlzPm8SCvhg2BTTAOSe/E7bGZWJDqdmDpTTuNs/LxNDc23ba9ZoTqMWiKmTpXviCVBWcumLri6YzF1Qk4zTYuq/uUoO9934p4spo7Jg86mY6vMi2ACaEQXU4dyOntCdHqdFiWYADYSk9PZ/JEUXg4lwwRwBC1TO/mKyOvsKsME1E3dq3jeN2FuUxhiMWRUAAAAAElFTkSuQmCC");
+			width: 31px;
+			height: 21px;
+			display: inline-block;
+			margin-top: .8rem;
+			margin-left: .7rem;
+		}
+		span.count {
+			margin-right: .7rem;
+			font-size: 1.5rem;
+			font-family: Segoe UI Light, Arial, Sans serif;
+			color: #ffffff;
+		}
+	}
+	background-color: #2980B9;
+	// overflow: hidden;
+
+	&.hidden {
+		height: 0px;
+		div.handle {
+			top: -48px;
+		}
+	}
+
+	&.open {
+		height: auto;
+		div.handle {
+			//top: -48px;
+		}
+
+		.pusher { margin-top: 0; }
+	}
+
+	&.closed {
+		height: 0px;
+		div.handle {
+			top: 0;
+		}
+
+		ul {
+
+		}
+
+		.pusher {
+			margin-top:-100%;
+		}
+	}
+
+	.pusher { 
+		margin-top:-100%; 
+		transition:margin-top .3s ease-out; 
+	}
+
+	ul {
+
+		padding-left: 0;
+		margin: 0;
+
+		li {
+			color: #ddd;
+			padding: .3rem;
+			padding-left: .6rem;
+			list-style: none;
+			p {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+
+			a {
+				color: #fff;
+			}
+
+			&:hover {
+				background-color: #3498db;
+			}
+		}
+	}
+
+}
+
+article.package {
+	position: relative;
+	padding: 0.5rem;
+	overflow: auto;
+	background-color: #F0F0F0;
+
+	figure {
+		margin: 0;
+		float: left;
+	}
+
+	&:hover {
+	  background-color: #ECF0F1;
+	}
+
+
+	div.information {
+		width: 690px;
+		margin-left: .8rem;
+		float: left;
+
+		h3 {
+			margin-top: 0;
+			margin-bottom: 0.2rem;
+		}
+
+		details {
+			padding-bottom: 0.5rem;
+			transition-property: height;
+			transition-duration: 200ms;
+			summary {
+				&:focus {
+					outline: none;
+				}
+			}
+		}
+
+		ul.package-details {
+			position: absolute;
+			bottom: 0;
+			margin: 0;
+			margin-bottom: 0.5rem;
+			padding-left: 0px;
+			li {
+				display: inline;
+				margin-right: .5rem;
+			}
+		}
+	}
+	div.actions {
+		float: right;
+	}
+}
+
+nav {
+	header {
+		margin-top: .75rem;
+	}
+
+	> ul {
+		margin-top: 1rem !important;
+	}
+
+	margin-right: 2rem;
+	float: left;
+
+	// reset ul/li styling
+	ul, li {
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+	}
+
+	li {
+		margin-bottom: .7rem;
+
+		&.container {
+
+			li {
+				margin-top: 0.08rem;
+				margin-bottom: 0.08rem;
+
+				a.button {
+					background-color: #7F8C8D;
+
+					&:hover {
+						background-color: #95A5A6;
+					}
+				}
+			}
+		}
+
+		a.button {
+			transition-property: background-color;
+			transition-duration: 250ms;
+			
+			display: inline-block;
+			padding: 1rem;
+			width: 10rem;
+			background-color: #2980B9;
+			color: #fff;
+			text-decoration: none;
+			text-align: center;
+
+			&.active {
+				font-weight: bold;
+			}
+
+			&:hover {
+				background-color: #3498db
+			}
+		}
+	}
+}

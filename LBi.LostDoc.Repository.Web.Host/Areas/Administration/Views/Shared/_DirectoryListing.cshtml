@@ -1,0 +1,27 @@
+﻿@model LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models.DirectoryListModel
+@{
+    Layout = null;
+}
+@functions {
+    private string GetPath(DirectoryInfo root, FileSystemInfo directory)
+    {
+        return directory.FullName.Substring(root.FullName.Length).Replace("\\", "/");
+    }
+
+}
+
+<ul class="jqueryFileTree" style="display: none;">
+    @foreach (var directory in Model.Directories)
+    {
+        <li class="directory collapsed">
+            <a href="#" rel="@(GetPath(Model.Root, directory) + '/')">@directory.Name</a>
+        </li>
+    }
+    
+    @foreach (var file in Model.Files)
+    {
+        <li class="file ext_@file.Extension.TrimStart('.')">
+            <a href="#" rel="@GetPath(Model.Root, file)">@file.Name</a>
+        </li>
+    }
+</ul>

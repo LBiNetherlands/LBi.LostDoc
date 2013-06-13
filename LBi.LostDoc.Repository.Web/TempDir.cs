@@ -26,13 +26,9 @@ namespace LBi.LostDoc.Repository.Web
     {
         private readonly DirectoryInfo _dir;
 
-        public TempDir()
-            : this(System.IO.Path.Combine(AppConfig.TempPath, Guid.NewGuid().ToString()))
+        public TempDir(string basePath)
         {
-        }
-
-        public TempDir(string path)
-        {
+            string path = System.IO.Path.Combine(basePath, Guid.NewGuid().ToString());
             if (Directory.Exists(path))
                 throw new ArgumentException("Directoy already exists: " + path);
 
