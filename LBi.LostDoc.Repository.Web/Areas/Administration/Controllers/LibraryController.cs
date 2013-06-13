@@ -47,6 +47,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                                                                        .Attribute("created")
                                                                                        .Value, XmlDateTimeSerializationMode.Local)
                                                                   }).ToArray(),
+                                     //TODO: App.Instance.Content.ContentFolder will throw Exception if 'No Content available' - Add better exception handling / check
                                      Current = App.Instance.Content.ContentFolder
                                  });
         }
