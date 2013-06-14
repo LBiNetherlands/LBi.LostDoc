@@ -16,15 +16,26 @@
 
 @model LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models.IndexDocumentModel
 
+@functions {private string IsActive(string firstUri)
+    {
+        if (String.IsNullOrWhiteSpace(firstUri))
+            return "";
+        else
+            return "active";
+    }
+
+}
+
 @{
     Layout = null;
 }
 
-<a href="@Model.FirstUri">First</a>
-<a href="@Model.PreviousUri">Previous</a>
+
+<a class="@IsActive(Model.FirstUri)" href="@Model.FirstUri">First</a>
+<a class="@IsActive(Model.PreviousUri)" href="@Model.PreviousUri">Previous</a>
 <span>@((Model.Index + 1).ToString("N0")) of @Model.Count.ToString("N0")</span>
-<a href="@Model.NextUri">Next</a>
-<a href="@Model.LastUri">Last</a>
+<a class="@IsActive(Model.NextUri)" href="@Model.NextUri">Next</a>
+<a class="@IsActive(Model.LastUri)" href="@Model.LastUri">Last</a>
 <table>
     <thead>
         <tr>

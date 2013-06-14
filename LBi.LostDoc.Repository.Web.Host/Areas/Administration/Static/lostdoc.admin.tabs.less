@@ -15,33 +15,51 @@
  */
 
 div.tabs {
-	height: 100%;
-	padding: .5rem;
-	&>ul {
-		padding: 0;
-		margin-top: 0;
+    height: 100%;
+    padding: .5rem;
 
-		&>li {
-			display: inline;
-			margin-right: .5rem;
+    table {
+        tbody {
+            tr:nth-child(odd) {
+                background-color: #fff;
+            }
 
-			&.active {
-				a {
-					color: #34495E;
-				}
-			}
+            tr:nth-child(even) {
+                background-color: #eaeaea;
+            }
+        }
 
-			a {
-				color: #C4C4C4;
-				font-weight: normal;
-				font-family: Segoe UI Light, Arial, Sans serif;
-				font-size: 1.5rem;
-				text-decoration: none;
-			}
-		}
-	}
-	&>div {
-		overflow: auto;
-		height: 100%;
-	}
+        tr td {
+            word-break: break-all;
+        }
+    }
+
+    & > ul {
+        padding: 0;
+        margin-top: 0;
+
+        & > li {
+            display: inline;
+            margin-right: .5rem;
+
+            &.active {
+                a {
+                    color: #34495E;
+                }
+            }
+
+            a {
+                color: #C4C4C4;
+                font-weight: normal;
+                font-family: Segoe UI Light, Arial, Sans serif;
+                font-size: 1.5rem;
+                text-decoration: none;
+            }
+        }
+    }
+
+    & > div {
+        overflow: auto;
+        height: 100%;
+    }
 }
