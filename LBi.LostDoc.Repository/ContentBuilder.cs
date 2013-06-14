@@ -221,10 +221,10 @@ namespace LBi.LostDoc.Repository
                                                       Field.Index.NOT_ANALYZED));
                                 }
 
-                                doc.Add(new Field("name", name, Field.Store.YES, Field.Index.ANALYZED));
-                                doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED));
-                                doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED));
-                                doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED));
+                                doc.Add(new Field("name", name, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
+                                doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
+                                doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
+                                doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
                                 TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
                                 writer.AddDocument(doc);
                             }

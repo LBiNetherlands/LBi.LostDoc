@@ -15,12 +15,17 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using LBi.LostDoc.Diagnostics;
+using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Lucene.Net.Search.Highlight;
 using Lucene.Net.Store;
 
 namespace LBi.LostDoc.Repository
@@ -58,7 +63,8 @@ namespace LBi.LostDoc.Repository
             GC.SuppressFinalize(this);
         }
 
-        public SearchResultSet Search(string query, int offset = 0, int count = 20)
+
+        public SearchResultSet Search(string query, int offset = 0, int count = 20, bool includeRawData = false)
         {
             using (TraceSources.ContentSearcherSource.TraceActivity("Search [{1}-{2}]: {0}", query, offset, offset + count))
             {
@@ -66,45 +72,54 @@ namespace LBi.LostDoc.Repository
 
                 //Query q = new QueryParser(Lucene.Net.Util.Version.LUCENE_29, "body", this._analyzer).Parse(query);
 
-                string[] rawTerms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                Query luceneQuery;
 
-                BooleanQuery nameQuery = new BooleanQuery();
-                BooleanQuery titleQuery = new BooleanQuery();
-                BooleanQuery summaryQuery = new BooleanQuery();
-                BooleanQuery contentQuery = new BooleanQuery();
-
-                for (int i = 0; i < rawTerms.Length; i++)
+                if (query == "special:all")
+                    luceneQuery = new MatchAllDocsQuery();
+                else
                 {
-                    string rawTerm = rawTerms[i];
-                    Occur occur;
-                    if (rawTerms[i].StartsWith("-"))
+                    string[] rawTerms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    BooleanQuery nameQuery = new BooleanQuery();
+                    BooleanQuery titleQuery = new BooleanQuery();
+                    BooleanQuery summaryQuery = new BooleanQuery();
+                    BooleanQuery contentQuery = new BooleanQuery();
+
+                    for (int i = 0; i < rawTerms.Length; i++)
                     {
-                        rawTerm = rawTerm.Substring(1);
-                        occur = Occur.MUST_NOT;
+                        string rawTerm = rawTerms[i];
+                        Occur occur;
+                        if (rawTerms[i].StartsWith("-"))
+                        {
+                            rawTerm = rawTerm.Substring(1);
+                            occur = Occur.MUST_NOT;
+                        }
+                        else
+                            occur = Occur.MUST;
+
+                        titleQuery.Add(new TermQuery(new Term("name", rawTerm)), occur);
+
+                        titleQuery.Add(new TermQuery(new Term("title", rawTerm)), occur);
+
+                        summaryQuery.Add(new TermQuery(new Term("summary", rawTerm)), occur);
+
+                        contentQuery.Add(new TermQuery(new Term("content", rawTerm)), occur);
                     }
-                    else
-                        occur = Occur.MUST;
 
-                    titleQuery.Add(new TermQuery(new Term("name", rawTerm)), occur);
+                    BooleanQuery q = new BooleanQuery();
 
-                    titleQuery.Add(new TermQuery(new Term("title", rawTerm)), occur);
+                    titleQuery.Boost = 8f;
+                    contentQuery.Boost = 0.7f;
 
-                    summaryQuery.Add(new TermQuery(new Term("summary", rawTerm)), occur);
+                    q.Add(nameQuery, Occur.SHOULD);
+                    q.Add(titleQuery, Occur.SHOULD);
+                    q.Add(summaryQuery, Occur.SHOULD);
+                    q.Add(contentQuery, Occur.SHOULD);
 
-                    contentQuery.Add(new TermQuery(new Term("content", rawTerm)), occur);
+                    luceneQuery = q;
                 }
 
-                BooleanQuery q = new BooleanQuery();
-
-                titleQuery.Boost = 8f;
-                contentQuery.Boost = 0.7f;
-
-                q.Add(nameQuery, Occur.SHOULD);
-                q.Add(titleQuery, Occur.SHOULD);
-                q.Add(summaryQuery, Occur.SHOULD);
-                q.Add(contentQuery, Occur.SHOULD);
-
-                TopDocs docs = this._indexSearcher.Search(titleQuery, offset + count);
+                TopDocs docs = this._indexSearcher.Search(luceneQuery, offset + count);
 
                 if (docs.ScoreDocs.Length < offset)
                     throw new ArgumentOutOfRangeException("offset", "Offset is smaller than result count!");
@@ -115,20 +130,48 @@ namespace LBi.LostDoc.Repository
 
                 for (int i = 0; i < ret.Results.Length; i++)
                 {
-                    var scoreDoc = docs.ScoreDocs[offset + i];
+                    ScoreDoc scoreDoc = docs.ScoreDocs[offset + i];
 
                     Document doc = this._indexSearcher.Doc(scoreDoc.Doc);
 
                     ret.Results[i] = new SearchResult
                                          {
-                                             AssetId = AssetIdentifier.Parse(doc.GetField("aid").StringValue), 
-                                             Title = doc.GetField("title").StringValue, 
-                                             Url = new Uri(doc.GetField("uri").StringValue, UriKind.RelativeOrAbsolute), 
-                                             Blurb = doc.GetField("summary").StringValue, 
+                                             AssetId = AssetIdentifier.Parse(doc.GetField("aid").StringValue),
+                                             Title = doc.GetField("title").StringValue,
+                                             Url = new Uri(doc.GetField("uri").StringValue, UriKind.RelativeOrAbsolute),
+                                             Blurb = doc.GetField("summary").StringValue,
+                                             RawDocument = includeRawData ? GetRawData(doc, scoreDoc.Doc).ToArray(): null
                                          };
                 }
 
                 return ret;
+            }
+        }
+
+        private IEnumerable<Tuple<string, string, string[]>> GetRawData(Document doc, int docId)
+        {
+            foreach (var fieldable in doc.GetFields())
+            {
+                string name = fieldable.Name;
+                string value = fieldable.StringValue;
+                List<string> tokens = new List<string>();
+
+                try
+                {
+                    using (TokenStream tsReader = TokenSources.GetTokenStream(this._indexReader, docId, fieldable.Name))
+                    {
+                        ITermAttribute attr = tsReader.AddAttribute<ITermAttribute>();
+                        while (tsReader.IncrementToken())
+                        {
+                            tokens.Add(attr.Term);
+                        }
+                    }
+                }
+                catch (ArgumentException)
+                {
+                }
+                yield return Tuple.Create(name, value, tokens.ToArray());
+
             }
         }
 

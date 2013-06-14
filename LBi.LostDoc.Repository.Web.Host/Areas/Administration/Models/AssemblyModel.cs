@@ -14,7 +14,9 @@
  * limitations under the License. 
  */
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
+
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 {
     public class AssemblyModel
     {

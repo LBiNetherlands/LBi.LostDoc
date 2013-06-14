@@ -28,5 +28,7 @@ namespace LBi.LostDoc.Repository
         public AssetIdentifier AssetId { get; set; }
 
         public string Blurb { get; set; }
+
+        public Tuple<string, string, string[]>[] RawDocument { get; set; }
     }
 }

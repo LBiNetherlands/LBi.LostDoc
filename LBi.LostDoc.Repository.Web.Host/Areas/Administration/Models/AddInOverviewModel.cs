@@ -14,12 +14,9 @@
  * limitations under the License. 
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 {
     public class AddInOverviewModel : ModelBase
     {

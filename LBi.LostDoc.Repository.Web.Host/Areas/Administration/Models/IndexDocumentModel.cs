@@ -14,16 +14,25 @@
  * limitations under the License. 
  */
 
-using LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models;
+using System;
+using System.Collections.Generic;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 {
-    public class LibraryModel : ModelBase
+    public class IndexDocumentModel
     {
-        public string Current { get; set; }
+        public string NextUri { get; set; }
 
-        public LibraryDescriptorModel[] Libraries { get; set; }
+        public string PreviousUri { get; set; }
 
-        public State SystemState { get; set; }
+        public string FirstUri { get; set; }
+
+        public string LastUri { get; set; }
+
+        public int Count { get; set; }
+
+        public int Index { get; set; }
+
+        public Tuple<string, string, string[]>[] Fields { get; set; }
     }
 }
