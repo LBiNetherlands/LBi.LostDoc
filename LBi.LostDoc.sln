@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Packaging", "LB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Repository.Web", "LBi.LostDoc.Repository.Web\LBi.LostDoc.Repository.Web.csproj", "{CD6610BD-F313-441F-BFD6-1D003E949575}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Repository.Web.Api", "LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj", "{AC845337-41C3-47FB-855D-40749D6813CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -189,6 +191,16 @@ Global
 		{CD6610BD-F313-441F-BFD6-1D003E949575}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CD6610BD-F313-441F-BFD6-1D003E949575}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CD6610BD-F313-441F-BFD6-1D003E949575}.Release|x86.ActiveCfg = Release|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AC845337-41C3-47FB-855D-40749D6813CD}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

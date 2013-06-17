@@ -165,22 +165,11 @@
     <Compile Include="Areas\Administration\Models\SearchResultModel.cs" />
     <Compile Include="Areas\Administration\Models\SystemModel.cs" />
     <Compile Include="Areas\Administration\Models\VersionModel.cs" />
-    <Compile Include="Areas\Api\ApiAreaRegistration.cs" />
     <Compile Include="Controllers\ContentController.cs" />
-    <Compile Include="Areas\Api\Controllers\LibraryController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
-    <Compile Include="Areas\Api\Controllers\SiteController.cs" />
-    <Compile Include="Areas\Api\Models\AssemblyVersion.cs" />
-    <Compile Include="Areas\Api\Models\FileDescriptor.cs" />
-    <Compile Include="Areas\Api\Controllers\RepositoryController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Areas\Api\Models\LibraryDescriptor.cs" />
-    <Compile Include="Areas\Api\Models\LibraryModel.cs" />
-    <Compile Include="Areas\Api\Models\Result.cs" />
-    <Compile Include="Areas\Api\Models\ResultSet.cs" />
-    <Compile Include="Areas\Api\Models\SearchResult.cs" />
     <Compile Include="Models\NoContentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TraceSources.cs" />

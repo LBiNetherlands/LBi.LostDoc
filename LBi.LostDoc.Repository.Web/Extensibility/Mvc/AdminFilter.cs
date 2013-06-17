@@ -45,7 +45,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
 
             model.PageTitle = "LostDoc Administration - " + metadata.Text;
 
-            if (!string.IsNullOrWhiteSpace(active.Text))
+            if (active != null && !string.IsNullOrWhiteSpace(active.Text))
                 model.PageTitle += string.Format(" - {0}", active.Text);
         }
 

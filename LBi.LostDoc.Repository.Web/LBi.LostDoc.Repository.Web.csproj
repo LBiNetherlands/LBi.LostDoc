@@ -102,6 +102,8 @@
     <Compile Include="Configuration\Xaml\Settings.cs" />
     <Compile Include="Configuration\Xaml\XamlSettingsProvider.cs" />
     <Compile Include="DisposableExtensions.cs" />
+    <Compile Include="Extensibility\Http\AddInRouteWrapper.cs" />
+    <Compile Include="Extensibility\IHttpRouteInitializer.cs" />
     <Compile Include="Extensibility\Mvc\AddInActionInvoker.cs" />
     <Compile Include="Extensibility\Mvc\AddInControllerFactory.cs" />
     <Compile Include="Extensibility\Http\AddInHttpControllerFactory.cs" />

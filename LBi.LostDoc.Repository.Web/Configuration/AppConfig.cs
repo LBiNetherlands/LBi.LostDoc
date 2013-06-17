@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Web;
@@ -23,6 +24,7 @@ namespace LBi.LostDoc.Repository.Web.Configuration
     /// <summary>
     ///     Contains basic app settings.
     /// </summary>
+    [Obsolete("Don't use this anymore.")]
     public static class AppConfig
     {
         private static readonly string _BasePath;

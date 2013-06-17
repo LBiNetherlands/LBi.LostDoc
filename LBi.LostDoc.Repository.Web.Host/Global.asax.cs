@@ -95,10 +95,15 @@ namespace LBi.LostDoc.Repository.Web.Host
             // TODO maybe put this somewhere else (not in global.asax)
             // TODO maybe move all of this into the App class with "IAppConfig"
 
+            // set up configuration
+            string settingsPath = System.Configuration.ConfigurationManager.AppSettings["LostDoc.SettingsPath"];
+            ISettingsProvider settings = new XamlSettingsProvider(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, settingsPath));
+            Func<string, string> abs = p => Path.Combine(HttpRuntime.AppDomainAppPath, p);
+
             // initialize logger
             TraceListener traceListener =
-                new TextWriterTraceListener(Path.Combine(AppConfig.LogPath, 
-                                                         string.Format("repository_{0:yyyy'-'MM'-'dd__HHmmss}.log", 
+                new TextWriterTraceListener(Path.Combine(abs(settings.GetValue<string>(Settings.LogPath)),
+                                                         string.Format("repository_{0:yyyy'-'MM'-'dd__HHmmss}.log",
                                                                        DateTime.Now)));
 
             // TODO introduce flags/settings for controlling logging levels, but for now include everything
@@ -114,13 +119,9 @@ namespace LBi.LostDoc.Repository.Web.Host
             // this might be stupid, but it fixes things for iisexpress
             Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
 
-            // set up configuration
-            string settingsPath = System.Configuration.ConfigurationManager.AppSettings["LostDoc.SettingsPath"];
-            ISettingsProvider settings = new XamlSettingsProvider(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, settingsPath));
-
             // set up add-in system
             AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed", 
-                                                        AppConfig.AddInRepository, 
+                                                        settings.GetValue<string>(Settings.AddInRepository),
                                                         isOfficial: true);
 
             // intialize MEF
@@ -134,9 +135,9 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             // load other sources from site-settings (not config)
             AddInRepository repository = new AddInRepository(officalSource);
-            AddInManager addInManager = new AddInManager(repository, 
-                                                         AppConfig.AddInInstallPath, 
-                                                         AppConfig.AddInPackagePath);
+            AddInManager addInManager = new AddInManager(repository,
+                                                         abs(settings.GetValue<string>(Settings.AddInInstallPath)),
+                                                         abs(settings.GetValue<string>(Settings.AddInPackagePath)));
 
             // when the catalog changes, discover and route all ApiControllers
             catalog.Changed += (sender, args) => this.UpdateWebApiRegistry(args);
@@ -174,14 +175,14 @@ namespace LBi.LostDoc.Repository.Web.Host
             Template template = new Template(container);
             template.Load(templateResolver, settings.GetValue<string>(Settings.Template));
 
-            Func<string, string> makeAbsolute =  p => Path.Combine(HttpRuntime.AppDomainAppPath, p);
+            
 
             // set up content manager
             ContentSettings contentSettings = new ContentSettings
                                                   {
-                                                      ContentPath = makeAbsolute(settings.GetValue<string>(Settings.ContentPath)),
+                                                      ContentPath = abs(settings.GetValue<string>(Settings.ContentPath)),
                                                       IgnoreVersionComponent = settings.GetValue<VersionComponent>(Settings.IgnoreVersionComponent),
-                                                      RepositoryPath = makeAbsolute(settings.GetValue<string>(Settings.RepositoryPath)),
+                                                      RepositoryPath = abs(settings.GetValue<string>(Settings.RepositoryPath)),
                                                       Template = template
                                                   };
             ContentManager contentManager = new ContentManager(contentSettings);
