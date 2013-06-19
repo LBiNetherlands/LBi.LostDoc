@@ -46,6 +46,31 @@ $(function () {
                 },
                 function (file) {
                 });
+
+            var tabContainer = $('div.tabs');
+            var frame = tabContainer.find('#index-view');
+            var targetElement = tabContainer.find(frame.data('target'));
+            var url = frame.data('url');
+
+            var load = function (contentUrl) {
+                $.get(contentUrl,
+                    null,
+                    function(data, textStatus, jqXhr) {
+                        targetElement.html(data);
+                        targetElement.find(frame.data('intercept')).each(function () {
+                            var wrapper = $(this);
+                            wrapper.bind('click', function() {
+                                load(this.attr('href'));
+                                return false;
+                            }.bind(wrapper));
+                        });
+                    },
+                    'html');
+            };
+
+            load(url);
+
+
         }
     });
 

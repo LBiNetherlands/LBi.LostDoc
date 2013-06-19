@@ -31,9 +31,13 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
         public string OutputDownloadUrl { get; set; }
 
         public string LogDataUrl { get; set; }
+
         public string LogViewUrl { get; set; }
+
         public string LogDownloadUrl { get; set; }
 
         public DateTime Created { get; set; }
+
+        public string IndexUrl { get; set; }
     }
 }

@@ -156,6 +156,7 @@
     <Compile Include="Areas\Administration\Models\AddInOverviewModel.cs" />
     <Compile Include="Areas\Administration\Models\AssemblyModel.cs" />
     <Compile Include="Areas\Administration\Models\DirectoryListModel.cs" />
+    <Compile Include="Areas\Administration\Models\IndexDocumentModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryDescriptorModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryDetailsModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryModel.cs" />
@@ -325,6 +326,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Areas\Administration\Views\Library\IndexDocument.cshtml" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
     <Content Include="Static\less\components.less" />
     <Content Include="Static\less\header.less" />

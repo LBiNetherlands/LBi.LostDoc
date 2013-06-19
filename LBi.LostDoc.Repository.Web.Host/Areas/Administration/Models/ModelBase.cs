@@ -14,12 +14,10 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
 using LBi.LostDoc.Repository.Web.Notifications;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Models
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 {
     public abstract class ModelBase : IAdminModel
     {

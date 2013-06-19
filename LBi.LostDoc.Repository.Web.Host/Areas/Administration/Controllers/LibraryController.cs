@@ -50,11 +50,11 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
         public ActionResult Build()
         {
             this.Content.QueueRebuild("Requested by " + this.User.Identity.Name);
-            this.Notifications.Add(Severity.Information, 
-                                   Lifetime.Page, 
-                                   Scope.User, 
-                                   this.User, 
-                                   "Rebuilding Content", 
+            this.Notifications.Add(Severity.Information,
+                                   Lifetime.Page,
+                                   Scope.User,
+                                   this.User,
+                                   "Rebuilding Content",
                                    "A new content rebuild request has been added to the processing queue.");
 
             return this.Redirect(this.Url.Action("Index"));
@@ -64,11 +64,11 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
         {
             string contentRoot = this.Content.GetContentRoot(id);
             Directory.Delete(contentRoot, true);
-            this.Notifications.Add(Severity.Information, 
-                                   Lifetime.Page, 
-                                   Scope.User, 
-                                   this.User, 
-                                   "Library Deleted", 
+            this.Notifications.Add(Severity.Information,
+                                   Lifetime.Page,
+                                   Scope.User,
+                                   this.User,
+                                   "Library Deleted",
                                    string.Format("The library with id {0} has been deleted.", id));
 
             return this.Redirect(this.Url.Action("Index"));
@@ -88,12 +88,12 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             {
                 assemblies.Add(new AssemblyModel
                                    {
-                                       Name = group.First().PrimaryAssembly.Name, 
+                                       Name = group.First().PrimaryAssembly.Name,
                                        Versions = group.Select(ld =>
                                                                new VersionModel
                                                                    {
-                                                                       Filename = Path.GetFileName(ld.Path), 
-                                                                       Created = System.IO.File.GetCreationTime(ld.Path), 
+                                                                       Filename = Path.GetFileName(ld.Path),
+                                                                       Created = System.IO.File.GetCreationTime(ld.Path),
                                                                        Version = ld.PrimaryAssembly.AssetId.Version
                                                                    }).ToArray()
                                    });
@@ -105,16 +105,17 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                                  {
                                      Input = new ContentRepositoryModel
                                                  {
-                                                     IsReadOnly = true, 
+                                                     IsReadOnly = true,
                                                      Assemblies = assemblies.ToArray()
-                                                 }, 
-                                     OutputDataUrl = this.Url.Action("LibraryHtmlFiles", new { id }), 
-                                     OutputDownloadUrl = this.Url.Action("DownloadHtmlFile", new { id }).TrimEnd('/') + "?path=", 
-                                     OutputViewUrl = this.Url.RouteUrl("Archive", new { id, path = string.Empty }).TrimEnd('/'), 
-                                     LogDataUrl = this.Url.Action("LibraryLogFiles", new { id }), 
-                                     LogDownloadUrl = this.Url.Action("LogFile", new { id }).TrimEnd('/') + "?d=", 
-                                     LogViewUrl = this.Url.Action("LogFile", new { id, path = string.Empty }).TrimEnd('/') + "?v=", 
-                                     Created = Directory.GetCreationTime(htmlRoot)
+                                                 },
+                                     OutputDataUrl = this.Url.Action("LibraryHtmlFiles", new { id }),
+                                     OutputDownloadUrl = this.Url.Action("DownloadHtmlFile", new { id }).TrimEnd('/') + "?path=",
+                                     OutputViewUrl = this.Url.RouteUrl("Archive", new { id, path = string.Empty }).TrimEnd('/'),
+                                     LogDataUrl = this.Url.Action("LibraryLogFiles", new { id }),
+                                     LogDownloadUrl = this.Url.Action("LogFile", new { id }).TrimEnd('/') + "?d=",
+                                     LogViewUrl = this.Url.Action("LogFile", new { id, path = string.Empty }).TrimEnd('/') + "?v=",
+                                     Created = Directory.GetCreationTime(htmlRoot),
+                                     IndexUrl = this.Url.Action("IndexDocument", new{id, index = 0})
                                  });
         }
 
@@ -138,10 +139,56 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 
             return this.View(new LibraryModel
                                  {
-                                     SystemState = App.Instance.Content.CurrentState, 
-                                     Libraries = libraries.ToArray(), 
+                                     SystemState = App.Instance.Content.CurrentState,
+                                     Libraries = libraries.ToArray(),
                                      Current = App.Instance.Content.ContentFolder
                                  });
+        }
+
+        public ActionResult IndexDocument(string id, int index)
+        {
+            string contentRoot = this.Content.GetContentRoot(id);
+            string indexRoot = Path.Combine(contentRoot, "Index");
+            using (ContentSearcher searcher = new ContentSearcher(indexRoot))
+            {
+                SearchResultSet result = searcher.Search("special:all", offset: index, count: 1, includeRawData: true);
+
+                string nextUri;
+                if (index == result.HitCount - 1)
+                    nextUri = null;
+                else
+                    nextUri = Url.Action("IndexDocument", new { id, index = index + 1 });
+
+                string previousUri;
+                if (index == 0)
+                    previousUri = null;
+                else
+                    previousUri = Url.Action("IndexDocument", new { id, index = index - 1 });
+
+                string firstUri, lastUri;
+                if (result.HitCount > 0)
+                {
+                    firstUri = Url.Action("IndexDocument", new { id, index = 0 });
+                    lastUri = Url.Action("IndexDocument", new { id, index = result.HitCount - 1 });
+                }
+                else
+                {
+                    firstUri = null;
+                    lastUri = null;
+                }
+
+
+                return this.View("IndexDocument", new IndexDocumentModel
+                                                      {
+                                                          Count = result.HitCount,
+                                                          Fields = result.Results.Length > 0 ? result.Results[0].RawDocument : null,
+                                                          Index = index,
+                                                          NextUri = nextUri,
+                                                          PreviousUri = previousUri,
+                                                          FirstUri = firstUri,
+                                                          LastUri = lastUri
+                                                      });
+            }
         }
 
         public ActionResult LibraryHtmlFiles(string id, string dir)
@@ -162,12 +209,12 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
         public ActionResult SetCurrent(string id)
         {
             this.Content.SetCurrentContentFolder(id);
-            this.Notifications.Add(Severity.Information, 
-                                   Lifetime.Page, 
-                                   Scope.User, 
-                                   this.User, 
-                                   "New Library Content", 
-                                   "The library content has changed", 
+            this.Notifications.Add(Severity.Information,
+                                   Lifetime.Page,
+                                   Scope.User,
+                                   this.User,
+                                   "New Library Content",
+                                   "The library content has changed",
                                    NotificationActions.Refresh);
 
             return this.Redirect(this.Url.Action("Index"));
@@ -178,8 +225,8 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             string value = XDocument.Load(Path.Combine(d, "info.xml")).Element("content").Attribute("created").Value;
             return new LibraryDescriptorModel
                        {
-                           Id = d.Substring(root.Length), 
-                           Created = XmlConvert.ToDateTime(value, 
+                           Id = d.Substring(root.Length),
+                           Created = XmlConvert.ToDateTime(value,
                                                            XmlDateTimeSerializationMode.Local)
                        };
         }
@@ -187,17 +234,17 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
         private ActionResult DirectoryListing(string id, string folder, string path)
         {
             path = (path ?? string.Empty).TrimStart('/');
-            string contentRoot = App.Instance.Content.GetContentRoot(id);
+            string contentRoot = this.Content.GetContentRoot(id);
             string folderPath = Path.Combine(contentRoot, folder);
             string contentDir = Path.Combine(folderPath, path);
 
             DirectoryInfo di = new DirectoryInfo(contentDir);
 
-            return this.View("_DirectoryListing", 
+            return this.View("_DirectoryListing",
                              new DirectoryListModel
                                  {
-                                     Root = new DirectoryInfo(folderPath), 
-                                     Directories = di.GetDirectories(), 
+                                     Root = new DirectoryInfo(folderPath),
+                                     Directories = di.GetDirectories(),
                                      Files = di.GetFiles()
                                  });
         }
@@ -207,7 +254,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             string contentRoot = this.Content.GetContentRoot(id);
             string htmlRoot = Path.Combine(contentRoot, folder);
 
-            string realPath = Path.Combine(htmlRoot, path.TrimStart('/'));
+            string realPath = Path.GetFullPath(Path.Combine(htmlRoot, path.TrimStart('/')));
             if (realPath.StartsWith(htmlRoot))
             {
                 FilePathResult result = new FilePathResult(realPath, "text/text");
@@ -221,4 +268,6 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             throw new HttpException((int)HttpStatusCode.Forbidden, "Forbidden!");
         }
     }
+
+
 }
