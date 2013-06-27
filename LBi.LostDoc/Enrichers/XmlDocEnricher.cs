@@ -23,6 +23,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Enrichers
 {
@@ -186,29 +187,35 @@ namespace LBi.LostDoc.Enrichers
 
             if (!this._docReaders.TryGetValue(assembly, out reader))
             {
-                string path = Path.Combine(Path.GetDirectoryName(assembly.Location),
-                                           Path.GetFileNameWithoutExtension(assembly.Location) + ".xml");
+                var xmlDocName = Path.GetFileNameWithoutExtension(assembly.Location) + ".xml";
 
-                if (!File.Exists(path))
+                var searchPaths = new List<string>{Path.GetDirectoryName(assembly.Location)};
+                searchPaths.AddRange(_paths);
+
+
+                var xmlDocPath = searchPaths
+                    .Select(dirPath => Path.Combine(dirPath, xmlDocName))
+                    .FirstOrDefault(filePath => File.Exists(filePath));
+                    
+                if (!string.IsNullOrEmpty(xmlDocPath))
                 {
-                    // check alt paths
-                    foreach (string dir in this._paths)
-                    {
-                        path = Path.Combine(dir, Path.GetFileNameWithoutExtension(assembly.Location) + ".xml");
-                        if (File.Exists(path))
-                            break;
-                    }
-                }
+                    reader = new XmlDocReader();
 
-                if (File.Exists(path))
-                {
-                    this._docReaders.Add(assembly, reader = new XmlDocReader());
-
-                    using (XmlReader xreader = XmlReader.Create(path))
+                    using (XmlReader xreader = XmlReader.Create(xmlDocPath))
                         reader.Load(xreader);
                 }
-                else
-                    reader = null;
+                else 
+                {
+                    TraceSources.GeneratorSource.TraceWarning(
+                        "Failed to load XML documentation file ({0}), for {1}.  Inline comments for this assembly will not be rendered.  Ensure assembly was built with the <DocumentationFile> set in MSBuild or the 'Xml Documentation File' set in Visual Studio properties." ,
+                            xmlDocName,
+                            assembly.Location);
+
+                }
+
+                //Add reader to the cache, even if it's null (ie xmlDocName was not found) 
+                //to prevent rechecking every time
+                this._docReaders.Add(assembly, reader);
             }
 
             return reader;

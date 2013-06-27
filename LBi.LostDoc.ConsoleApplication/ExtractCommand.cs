@@ -72,106 +72,29 @@ namespace LBi.LostDoc.ConsoleApplication
 
             try
             {
-                if (this.Quiet.IsPresent)
-                {
-                    const SourceLevels quietLevel = SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical;
-                    TraceSources.GeneratorSource.Switch.Level = quietLevel;
-                }
-                else if (this.Verbose.IsPresent)
-                {
-                    const SourceLevels verboseLevel = SourceLevels.All;
-                    TraceSources.GeneratorSource.Switch.Level = verboseLevel;
-                }
-                else
-                {
-                    const SourceLevels normalLevel = SourceLevels.Information |
-                                                     SourceLevels.Warning |
-                                                     SourceLevels.Error |
-                                                     SourceLevels.Critical |
-                                                     SourceLevels.ActivityTracing;
-                    TraceSources.GeneratorSource.Switch.Level = normalLevel;
-                }
-
-                DocGenerator gen = new DocGenerator(container);
-                gen.AssetFilters.Add(new ComObjectTypeFilter());
-                gen.AssetFilters.Add(new CompilerGeneratedFilter());
-                if (!this.IncludeNonPublic.IsPresent)
-                    gen.AssetFilters.Add(new PublicTypeFilter());
-
-                gen.AssetFilters.Add(new PrivateImplementationDetailsFilter());
-                gen.AssetFilters.Add(new DynamicallyInvokableAttributeFilter());
-                gen.AssetFilters.Add(new CompilerGeneratedFilter());
-                gen.AssetFilters.Add(new LogicalMemberInfoVisibilityFilter());
-                gen.AssetFilters.Add(new SpecialNameMemberInfoFilter());
-
-                if (!string.IsNullOrWhiteSpace(this.Filter))
-                    gen.AssetFilters.Add(new AssetGlobFilter { Include = this.Filter });
-
-                XmlDocEnricher docEnricher = new XmlDocEnricher();
-                gen.Enrichers.Add(docEnricher);
-
-
-                if (!string.IsNullOrEmpty(this.NamespaceDocPath))
-                {
-                    var namespaceEnricher = new ExternalNamespaceDocEnricher();
-                    if (System.IO.Path.IsPathRooted(this.NamespaceDocPath))
-                        namespaceEnricher.Load(this.NamespaceDocPath);
-                    else if (
-                        File.Exists(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(this.Path),
-                                                           this.NamespaceDocPath)))
-                        namespaceEnricher.Load(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(this.Path),
-                                                                      this.NamespaceDocPath));
-                    else
-                        namespaceEnricher.Load(this.NamespaceDocPath);
-
-                    gen.Enrichers.Add(namespaceEnricher);
-                }
-
-
+                SetTraceLevel();
+                
                 if (!File.Exists(this.Path))
                 {
                     Console.WriteLine("File not found: '{0}'", this.Path);
                     return;
                 }
 
-                if (this.IncludeBclDocComments.IsPresent)
-                {
-                    string winPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-                    string bclDocPath = System.IO.Path.Combine(winPath, @"microsoft.net\framework\",
-                                                               string.Format("v{0}.{1}.{2}",
-                                                                             Environment.Version.Major,
-                                                                             Environment.Version.Minor,
-                                                                             Environment.Version.Build),
-                                                               @"en\");
+                this.Output = BuildOutputFilePath();
 
+                DocGenerator gen = new DocGenerator(container);
 
-                    docEnricher.AddPath(bclDocPath);
+                gen.AssetFilters.AddRange(
+                    BuildAssetFilters());
 
-                    bclDocPath = System.IO.Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-                        @"Reference Assemblies\Microsoft\Framework\.NETFramework",
-                        string.Format("v{0}.{1}",
-                                      Environment.Version.Major,
-                                      Environment.Version.Minor));
-
-                    docEnricher.AddPath(bclDocPath);
-                }
+                gen.Enrichers.AddRange(
+                    BuildEnrichers());
 
                 gen.AddAssembly(this.Path);
-
-
-                var assemblyName = AssemblyName.GetAssemblyName(this.Path);
-
+                
                 XDocument rawDoc = gen.Generate();
-                string fileName = System.IO.Path.Combine(this.Output ?? System.IO.Path.GetDirectoryName(this.Path),
-                                                         string.Format("{0}_{1}.ldoc",
-                                                                       System.IO.Path.GetFileName(this.Path),
-                                                                       assemblyName.Version));
 
-                this.Output = System.IO.Path.GetFullPath(fileName);
-
-                if (!Directory.Exists(System.IO.Path.GetDirectoryName(fileName)))
-                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fileName));
+                
                 //StringWriter output = new StringWriter();
                 //try
                 //{
@@ -189,7 +112,7 @@ namespace LBi.LostDoc.ConsoleApplication
                     
                 //}
 
-                rawDoc.Save(fileName);
+                rawDoc.Save(this.Output);
 
             }
             finally
@@ -198,6 +121,119 @@ namespace LBi.LostDoc.ConsoleApplication
             }
         }
 
+        private string BuildOutputFilePath()
+        {
+            var assemblyVersion = AssemblyName.GetAssemblyName(this.Path).Version;
+
+
+            string fileName = System.IO.Path.Combine(this.Output ?? System.IO.Path.GetDirectoryName(this.Path),
+                                                     string.Format("{0}_{1}.ldoc",
+                                                                   System.IO.Path.GetFileName(this.Path),
+                                                                   assemblyVersion));
+
+            string directoryName = System.IO.Path.GetDirectoryName(fileName);
+
+            if (!Directory.Exists(directoryName))
+                Directory.CreateDirectory(directoryName);
+
+            return System.IO.Path.GetFullPath(fileName);
+        }
+
         #endregion
+
+        private void SetTraceLevel()
+        {
+            if (this.Quiet.IsPresent)
+            {
+                const SourceLevels quietLevel = SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical;
+                TraceSources.GeneratorSource.Switch.Level = quietLevel;
+            }
+            else if (this.Verbose.IsPresent)
+            {
+                const SourceLevels verboseLevel = SourceLevels.All;
+                TraceSources.GeneratorSource.Switch.Level = verboseLevel;
+            }
+            else
+            {
+                const SourceLevels normalLevel = SourceLevels.Information |
+                                                 SourceLevels.Warning |
+                                                 SourceLevels.Error |
+                                                 SourceLevels.Critical |
+                                                 SourceLevels.ActivityTracing;
+                TraceSources.GeneratorSource.Switch.Level = normalLevel;
+            }
+        }
+
+        private IEnumerable<IAssetFilter> BuildAssetFilters()
+        {
+            //TODO: Move to Extensability container?
+            //TODO: Confirm 
+            var filters = new List<IAssetFilter>{
+                new ComObjectTypeFilter(),
+                new CompilerGeneratedFilter(),
+                new PrivateImplementationDetailsFilter(),
+                new DynamicallyInvokableAttributeFilter(),
+                new CompilerGeneratedFilter(),
+                new LogicalMemberInfoVisibilityFilter(),
+                new SpecialNameMemberInfoFilter()
+            };
+
+            if (!this.IncludeNonPublic.IsPresent)
+                filters.Add(new PublicTypeFilter());
+
+            if (!string.IsNullOrWhiteSpace(this.Filter))
+                filters.Add(new AssetGlobFilter { Include = this.Filter });
+
+            return filters;
+        }
+
+        private IEnumerable<IEnricher> BuildEnrichers()
+        {
+            var enrichers = new List<IEnricher>();
+
+            XmlDocEnricher docEnricher = new XmlDocEnricher();
+            if (this.IncludeBclDocComments.IsPresent)
+            {
+                string winPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                string bclDocPath = System.IO.Path.Combine(winPath, @"microsoft.net\framework\",
+                                                           string.Format("v{0}.{1}.{2}",
+                                                                         Environment.Version.Major,
+                                                                         Environment.Version.Minor,
+                                                                         Environment.Version.Build),
+                                                           @"en\");
+
+
+                docEnricher.AddPath(bclDocPath);
+
+                bclDocPath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                    @"Reference Assemblies\Microsoft\Framework\.NETFramework",
+                    string.Format("v{0}.{1}",
+                                  Environment.Version.Major,
+                                  Environment.Version.Minor));
+
+                docEnricher.AddPath(bclDocPath);
+            }
+
+            enrichers.Add(docEnricher);
+
+            if (!string.IsNullOrEmpty(this.NamespaceDocPath))
+            {
+                var namespaceEnricher = new ExternalNamespaceDocEnricher();
+                if (System.IO.Path.IsPathRooted(this.NamespaceDocPath))
+                    namespaceEnricher.Load(this.NamespaceDocPath);
+                else if (
+                    File.Exists(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(this.Path),
+                                                       this.NamespaceDocPath)))
+                    namespaceEnricher.Load(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(this.Path),
+                                                                  this.NamespaceDocPath));
+                else
+                    namespaceEnricher.Load(this.NamespaceDocPath);
+
+                enrichers.Add(namespaceEnricher);
+            }
+
+            return enrichers;
+        }
     }
 }
