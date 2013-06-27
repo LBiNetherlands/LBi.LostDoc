@@ -30,6 +30,10 @@
   <xsl:template match="doc:returns">
     <xsl:apply-templates select="node()" mode="doc"/>
   </xsl:template>
+	
+  <xsl:template match="doc:example">
+    <xsl:apply-templates select="node()" mode="doc"/>
+  </xsl:template>
   
   <xsl:template match="see" mode="doc">
     <a href="{ld:resolve(@cref)}">
@@ -45,7 +49,11 @@
     </em>
   </xsl:template>
 
-
+ <xsl:template match="code" mode="doc">
+    <pre>
+      <xsl:value-of select="."/>
+    </pre>
+  </xsl:template>
 
   <xsl:template name="missing">
     <span class="error">missing</span>
