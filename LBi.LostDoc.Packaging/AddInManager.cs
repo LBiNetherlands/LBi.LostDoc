@@ -27,14 +27,19 @@ namespace LBi.LostDoc.Packaging
     {
         private readonly PackageManager _packageManager;
 
-        public AddInManager(AddInRepository repository, string installDirectory, string packageDirectory)
+        public AddInManager(AddInRepository repository, string installDirectory, string packageDirectory, string tempDirectory)
         {
             this.Repository = repository;
             this.InstallDirectory = installDirectory;
             this.PackageDirectory = packageDirectory;
-
+            this.TempDirectory = tempDirectory;
+            
+            // WORKAROUND NuGet 2.5 introduced a bug whereby it fails to locate a good temp path
+            Environment.SetEnvironmentVariable("NuGetCachePath", tempDirectory);
             this._packageManager = new PackageManager(repository.NuGetRepository, packageDirectory);
         }
+
+        public string TempDirectory { get; protected set; }
 
         public event EventHandler<AddInInstalledEventArgs> Installed;
 
@@ -172,14 +177,17 @@ namespace LBi.LostDoc.Packaging
             if (!Directory.Exists(targetdir))
             {
                 Directory.CreateDirectory(targetdir);
+
                 foreach (var assemblyReference in package.NuGetPackage.AssemblyReferences)
                 {
-                    string sourcePath =
-                        Path.Combine(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage), 
-                                     assemblyReference.Path);
+                    string sourcePath = Path.Combine(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage), assemblyReference.Path);
+                    string targetPath = Path.Combine(targetdir, assemblyReference.Path);
 
-                    File.Copy(sourcePath, 
-                              Path.Combine(targetdir, assemblyReference.EffectivePath));
+                    string assemblyTargetDir = Path.GetDirectoryName(targetPath);
+                    if (!Directory.Exists(assemblyTargetDir))
+                        Directory.CreateDirectory(assemblyTargetDir);
+
+                    File.Copy(sourcePath, Path.Combine(targetdir, assemblyReference.Path));
                 }
             }
             else

@@ -33,8 +33,7 @@ namespace LBi.LostDoc.Packaging
             {
                 PackageSource packageSource = new PackageSource(source.Source, 
                                                                 source.Name, 
-                                                                isEnabled: true, 
-                                                                isOfficial: source.IsOfficial);
+                                                                isEnabled: true);
 
                 packageSources.Add(packageSource);
             }
@@ -85,8 +84,8 @@ namespace LBi.LostDoc.Packaging
 
         public AddInPackage GetUpdate(AddInPackage package, bool includePrerelease)
         {
-            var pkg =
-                this._repository.GetUpdates(new[] { package.NuGetPackage }, includePrerelease, true).FirstOrDefault();
+            var pkg = this._repository.GetUpdates(new[] { package.NuGetPackage }, includePrerelease).FirstOrDefault();
+
             if (pkg == null)
                 return null;
 

@@ -137,7 +137,8 @@ namespace LBi.LostDoc.Repository.Web.Host
             AddInRepository repository = new AddInRepository(officalSource);
             AddInManager addInManager = new AddInManager(repository,
                                                          abs(settings.GetValue<string>(Settings.AddInInstallPath)),
-                                                         abs(settings.GetValue<string>(Settings.AddInPackagePath)));
+                                                         abs(settings.GetValue<string>(Settings.AddInPackagePath)),
+                                                         abs(settings.GetValue<string>(Settings.TempPath)));
 
             // when the catalog changes, discover and route all ApiControllers
             catalog.Changed += (sender, args) => this.UpdateWebApiRegistry(args);
