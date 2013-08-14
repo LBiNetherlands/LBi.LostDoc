@@ -125,6 +125,7 @@
     <Compile Include="Templating\Transformers\ImageScaleTransform.cs" />
     <Compile Include="Templating\Transformers\ScalingMode.cs" />
     <Compile Include="Templating\UnitOfWork.cs" />
+    <Compile Include="Templating\UriExtensions.cs" />
     <Compile Include="Templating\WorkUnitResult.cs" />
     <Compile Include="Templating\XPathVariable.cs" />
     <Compile Include="Templating\XPath\XPathNavigatorIterator.cs" />

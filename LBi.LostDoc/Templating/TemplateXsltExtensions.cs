@@ -18,7 +18,6 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Text;
 using System.Xml.XPath;
 using LBi.LostDoc.Diagnostics;
 
@@ -54,7 +53,7 @@ namespace LBi.LostDoc.Templating
                 if (target != null)
                 {
                     if (!target.IsAbsoluteUri)
-                        target = this.MakeRelative(target);
+                        target = this._currentUri.GetRelativeUri(target);
 
                     return target.ToString();
                 }
@@ -62,46 +61,7 @@ namespace LBi.LostDoc.Templating
             return null;
         }
 
-        private Uri MakeRelative(Uri target)
-        {
-            string targetStr = target.ToString();
-            string[] targetFragments = targetStr.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            string currentStr = this._currentUri.ToString();
-            string[] currentFragments = currentStr.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-
-            int maxCommonFragments = Math.Min(targetFragments.Length - 1, currentFragments.Length - 1);
-
-
-            // foo/bar/baz/lur
-            // foo/bar/pul/fur
-            // 0   1   2   3
-            int j;
-            for (j = 0; j < maxCommonFragments; j++)
-            {
-                if (!StringComparer.OrdinalIgnoreCase.Equals(currentFragments[j], targetFragments[j]))
-                    break;
-            }
-
-            StringBuilder relativeUri = new StringBuilder();
-            for (int k = 0; k < maxCommonFragments - j; k++)
-                relativeUri.Append("../");
-
-            if (maxCommonFragments == 0)
-            {
-                for (int i = 0; i < currentFragments.Length - 1; i++)
-                    relativeUri.Append("../");
-            }
-
-            for (int k = j; k < targetFragments.Length; k++)
-            {
-                relativeUri.Append(targetFragments[k]);
-                if (k < targetFragments.Length - 1)
-                    relativeUri.Append('/');
-            }
-
-            target = new Uri(relativeUri.ToString(), UriKind.Relative);
-            return target;
-        }
+        
 
         #region Extension methods
         // ReSharper disable InconsistentNaming
@@ -195,7 +155,7 @@ namespace LBi.LostDoc.Templating
         public string resource(string resourceUri)
         {
             Uri targetUri = new Uri(resourceUri, UriKind.RelativeOrAbsolute);
-            return this.MakeRelative(targetUri).ToString();
+            return this._currentUri.GetRelativeUri(targetUri).ToString();
         }
         
         public XPathNodeIterator key(string keyName, object value)
