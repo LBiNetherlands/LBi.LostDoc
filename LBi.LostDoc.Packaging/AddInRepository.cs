@@ -84,7 +84,7 @@ namespace LBi.LostDoc.Packaging
 
         public AddInPackage GetUpdate(AddInPackage package, bool includePrerelease)
         {
-            var pkg = this._repository.GetUpdates(new[] { package.NuGetPackage }, includePrerelease).FirstOrDefault();
+            var pkg = this._repository.GetUpdates(new[] { package.NuGetPackage }, includePrerelease, true).FirstOrDefault();
 
             if (pkg == null)
                 return null;
