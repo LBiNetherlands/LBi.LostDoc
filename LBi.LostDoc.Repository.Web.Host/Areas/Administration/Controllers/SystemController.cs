@@ -14,7 +14,10 @@
  * limitations under the License. 
  */
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Configuration;
 using System.Linq;
 using System.Web.Mvc;
 using LBi.LostDoc.Extensibility;
@@ -24,8 +27,10 @@ using LBi.LostDoc.Repository.Web.Configuration;
 using LBi.LostDoc.Repository.Web.Configuration.Composition;
 using LBi.LostDoc.Repository.Web.Configuration.Xaml;
 using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
+using LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models;
 using LBi.LostDoc.Templating;
 using Settings = LBi.LostDoc.Repository.Web.Configuration.Settings;
+using TemplateInfo = LBi.LostDoc.Templating.TemplateInfo;
 
 namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 {
@@ -38,16 +43,45 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
         [Import]
         public ISettingsProvider SettingsProvider { get; set; }
 
-
         [AdminAction("index", IsDefault = true, Text = "Status")]
         public ActionResult Index()
         {
             TemplateResolver resolver = new TemplateResolver(this.FileProviders);
+            string currentTemplateName = this.SettingsProvider.GetValue<string>(Settings.Template);
+            TemplateInfo template;
+
+            if (!resolver.Resolve(currentTemplateName, out template))
+            {
+                template = resolver.GetTemplates().FirstOrDefault();
+                if (template == null)
+                    currentTemplateName = null;
+                else
+                    currentTemplateName = template.Name;
+            }
+
+            TemplateParameterModel[] settings;
+            if (template != null)
+                settings = Array.ConvertAll(template.Parameters, this.CreateTemplateParameterModel);
+            else
+                settings = new TemplateParameterModel[0];
+
             return this.View(new SystemModel()
                                  {
-                                     Templates = resolver.GetTemplates().ToArray(),
-                                     CurrentTemplate = this.SettingsProvider.GetValue<string>(Settings.Template)
+                                     Templates = resolver.GetTemplates().Select(ti => ti.Name).ToArray(),
+                                     CurrentTemplate = currentTemplateName,
+                                     Settings = settings
                                  });
+        }
+
+        private TemplateParameterModel CreateTemplateParameterModel(TemplateParameterInfo templateParameterInfo)
+        {
+            return new TemplateParameterModel
+                   {
+                       Name = templateParameterInfo.Name,
+                       Description = templateParameterInfo.Description,
+                       DefaultValue = templateParameterInfo.DefaultExpression,
+                       Value = this.SettingsProvider.GetValueOrDefault<string>(Settings.TemplateParameterPrefix + templateParameterInfo.Name)
+                   };
         }
 
         //[AdminAction("logs", Text = "Logs")]

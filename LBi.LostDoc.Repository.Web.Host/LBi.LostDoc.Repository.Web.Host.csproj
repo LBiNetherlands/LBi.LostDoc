@@ -169,6 +169,7 @@
     <Compile Include="Areas\Administration\Models\ContentRepositoryModel.cs" />
     <Compile Include="Areas\Administration\Models\SearchResultModel.cs" />
     <Compile Include="Areas\Administration\Models\SystemModel.cs" />
+    <Compile Include="Areas\Administration\Models\TemplateParameterModel.cs" />
     <Compile Include="Areas\Administration\Models\VersionModel.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\SearchController.cs" />

@@ -14,14 +14,19 @@
  * limitations under the License. 
  */
 
-namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
+namespace LBi.LostDoc.Templating
 {
-    public class SystemModel : ModelBase
+    public class TemplateParameterInfo
     {
-        public string[] Templates { get; set; }
+        public TemplateParameterInfo(string name, string description, string defaultExpression)
+        {
+            this.Name = name;
+            this.Description = description;
+            this.DefaultExpression = defaultExpression;
+        }
 
-        public string CurrentTemplate { get; set; }
-
-        public TemplateParameterModel[] Settings { get; set; }
+        public string Name { get; protected set; }
+        public string Description { get; protected set; }
+        public string DefaultExpression { get; protected set; }
     }
 }

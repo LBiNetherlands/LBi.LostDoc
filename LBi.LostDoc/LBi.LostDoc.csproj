@@ -120,7 +120,9 @@
     <Compile Include="Templating\StylesheetApplication.cs" />
     <Compile Include="Templating\TemplateData.cs" />
     <Compile Include="Templating\TemplateException.cs" />
+    <Compile Include="Templating\TemplateInfo.cs" />
     <Compile Include="Templating\TemplateOutput.cs" />
+    <Compile Include="Templating\TemplateParameterInfo.cs" />
     <Compile Include="Templating\TemplateResolver.cs" />
     <Compile Include="Templating\Transformers\ImageScaleTransform.cs" />
     <Compile Include="Templating\Transformers\ScalingMode.cs" />

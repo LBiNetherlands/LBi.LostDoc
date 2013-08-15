@@ -16,12 +16,11 @@
 
 namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 {
-    public class SystemModel : ModelBase
+    public class TemplateParameterModel
     {
-        public string[] Templates { get; set; }
-
-        public string CurrentTemplate { get; set; }
-
-        public TemplateParameterModel[] Settings { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string DefaultValue { get; set; }
+        public string Value { get; set; }
     }
 }

@@ -42,7 +42,7 @@ using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
-    // TODO fix error handling, a bad template.xml file will just throw random exceptions
+    // TODO fix error handling, a bad template.xml file will just throw random exceptions, xml schema validation?
     public class Template
     {
         public const string TemplateDefinitionFileName = "template.xml";
@@ -78,23 +78,25 @@ namespace LBi.LostDoc.Templating
 
         #region LoadFrom Template
 
-        public virtual void Load(TemplateResolver resolver, string name)
+        public virtual void Load(TemplateInfo templateInfo)
         {
             this._templateSourcePath = null;
+            this._fileProvider = templateInfo.Source;
+            using (Stream str = this._fileProvider.OpenFile(templateInfo.Path, FileMode.Open))
+                _templateDefinition = XDocument.Load(str, LoadOptions.SetLineInfo);
 
-            string path;
-            if (resolver.Resolve(name, out this._fileProvider, out path))
-            {
-                using (Stream str = this._fileProvider.OpenFile(path, FileMode.Open))
-                    _templateDefinition = XDocument.Load(str, LoadOptions.SetLineInfo);
+            this._basePath = Path.GetDirectoryName(templateInfo.Path);
+            this._templateResolver = templateInfo.Resolver;
+        }
 
-                this._basePath = Path.GetDirectoryName(path);
-                this._templateResolver = resolver;
-            }
+        // TODO we can eliminate the TemplaetResolver here if we only allow loading templates from a TemplateInfo
+        public virtual void Load(TemplateResolver resolver, string name)
+        {
+            TemplateInfo templateInfo;
+            if (resolver.Resolve(name, out templateInfo))
+                this.Load(templateInfo);
             else
-            {
                 throw new FileNotFoundException("Template not found, search paths: {0}", resolver.ToString());
-            }
         }
 
         protected virtual IFileProvider GetScopedFileProvider()

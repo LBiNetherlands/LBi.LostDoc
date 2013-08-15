@@ -124,18 +124,35 @@ namespace LBi.LostDoc.Repository.Web.Configuration.Xaml
                 {
                     Entry<T> unpackedEntry = entry as Entry<T>;
                     if (unpackedEntry != null)
-                    {
                         return unpackedEntry.Value;
-                    }
                     else
-                    {
                         throw new InvalidOperationException("Wrong type: " + key);
-                    }
                 }
                 else
-                {
                     throw new KeyNotFoundException(key);
+            }
+            finally
+            {
+                this._lock.ExitReadLock();
+            }
+        }
+
+        public T GetValueOrDefault<T>(string key, T defaultValue = default(T))
+        {
+            this._lock.EnterReadLock();
+            try
+            {
+                Entry entry;
+                if (this._lookup.TryGetValue(key, out entry))
+                {
+                    Entry<T> unpackedEntry = entry as Entry<T>;
+                    if (unpackedEntry != null)
+                        return unpackedEntry.Value;
+                    else
+                        throw new InvalidOperationException("Wrong type: " + key);
                 }
+                else
+                    return defaultValue;
             }
             finally
             {
