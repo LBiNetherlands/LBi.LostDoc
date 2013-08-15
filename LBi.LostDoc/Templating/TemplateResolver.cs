@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -48,7 +49,16 @@ namespace LBi.LostDoc.Templating
             }
         }
 
-        public bool Resolve(string name, out TemplateInfo templateInfo)
+        public TemplateInfo Resolve(string name)
+        {
+            TemplateInfo ret;
+            if (!this.TryResolve(name, out ret))
+                throw new Exception("Template not found: '" + name + "'");
+
+            return ret;
+        }
+
+        public bool TryResolve(string name, out TemplateInfo templateInfo)
         {
             string path = Path.Combine(name, Template.TemplateDefinitionFileName);
             IFileProvider fileProvider;

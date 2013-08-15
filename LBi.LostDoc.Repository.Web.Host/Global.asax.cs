@@ -43,6 +43,7 @@ using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 using ContractNames = LBi.LostDoc.Extensibility.ContractNames;
 using Settings = LBi.LostDoc.Repository.Web.Configuration.Settings;
+using TemplateInfo = LBi.LostDoc.Templating.TemplateInfo;
 
 namespace LBi.LostDoc.Repository.Web.Host
 {
@@ -173,10 +174,8 @@ namespace LBi.LostDoc.Repository.Web.Host
             TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
 
             // load template
-            Template template = new Template(container);
-            template.Load(templateResolver, settings.GetValue<string>(Settings.Template));
-
-            
+            TemplateInfo templateInfo = templateResolver.Resolve(settings.GetValue<string>(Settings.Template));
+            Template template = templateInfo.Load(container);           
 
             // set up content manager
             ContentSettings contentSettings = new ContentSettings

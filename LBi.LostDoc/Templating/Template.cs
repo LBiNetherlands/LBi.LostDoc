@@ -53,10 +53,9 @@ namespace LBi.LostDoc.Templating
         private readonly List<IAssetUriResolver> _resolvers;
         private string _basePath;
         private XDocument _templateDefinition;
-        private IFileProvider _fileProvider;
-        private TemplateResolver _templateResolver;
         private string _templateSourcePath;
-        
+        private TemplateInfo _templateInfo;
+
         public event EventHandler<ProgressArgs> Progress;
 
         protected virtual void OnProgress(int percent)
@@ -80,30 +79,18 @@ namespace LBi.LostDoc.Templating
 
         public virtual void Load(TemplateInfo templateInfo)
         {
+            this._templateInfo = templateInfo;
             this._templateSourcePath = null;
-            this._fileProvider = templateInfo.Source;
-            using (Stream str = this._fileProvider.OpenFile(templateInfo.Path, FileMode.Open))
+            using (Stream str = this._templateInfo.Source.OpenFile(templateInfo.Path, FileMode.Open))
                 _templateDefinition = XDocument.Load(str, LoadOptions.SetLineInfo);
 
             this._basePath = Path.GetDirectoryName(templateInfo.Path);
-            this._templateResolver = templateInfo.Resolver;
-        }
-
-        // TODO we can eliminate the TemplaetResolver here if we only allow loading templates from a TemplateInfo
-        public virtual void Load(TemplateResolver resolver, string name)
-        {
-            TemplateInfo templateInfo;
-            if (resolver.Resolve(name, out templateInfo))
-                this.Load(templateInfo);
-            else
-                throw new FileNotFoundException("Template not found, search paths: {0}", resolver.ToString());
         }
 
         protected virtual IFileProvider GetScopedFileProvider()
         {
-            return new ScopedFileProvider(this._fileProvider, this._basePath);
+            return new ScopedFileProvider(this._templateInfo.Source, this._basePath);
         }
-
 
         private IEnumerable<AliasRegistration> ParseAliasRegistration(IEnumerable<XElement> elements)
         {
@@ -357,13 +344,12 @@ namespace LBi.LostDoc.Templating
                 workingDoc = XDocument.Load(xmlReader, LoadOptions.SetLineInfo);
             
             // template inheritence
-            XAttribute templateInheritsAttr = workingDoc.Root.Attribute("inherits");
-            if (templateInheritsAttr != null)
+            //XAttribute templateInheritsAttr = workingDoc.Root.Attribute("inherits");
+            if (this._templateInfo.Inherits != null)
             {
                
                 int depth = providers.Count + 1;
-                Template inheritedTemplate = new Template(this._container);
-                inheritedTemplate.Load(this._templateResolver, templateInheritsAttr.Value);
+                Template inheritedTemplate = _templateInfo.Inherits.Load(this._container);
                 ParsedTemplate parsedTemplate = inheritedTemplate.PrepareTemplate(templateData, providers);
 
                 providers.Push(inheritedTemplate.GetScopedFileProvider());
@@ -399,9 +385,6 @@ namespace LBi.LostDoc.Templating
                                         .ToArray();
 
             customContext.PushVariableScope(workingDoc, arguments);
-
-            // we're going to need this later
-            XmlFileProviderResolver fileResolver = new XmlFileProviderResolver(providers, this._basePath);
 
             // expand any meta-template directives
             workingDoc = ApplyMetaTransforms(workingDoc, customContext, providers, tempFiles);
@@ -736,7 +719,7 @@ namespace LBi.LostDoc.Templating
                                                                templateData.OutputFileProvider, // TODO fix this (this._basePath)
                                                                templateData,
                                                                this._resolvers,
-                                                               this._fileProvider);
+                                                               this._templateInfo.Source);
 
 
             // fill indices

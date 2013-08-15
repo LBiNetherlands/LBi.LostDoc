@@ -137,9 +137,8 @@ namespace LBi.LostDoc.ConsoleApplication
                 var lazyProviders = container.GetExports<IFileProvider>(ContractNames.TemplateProvider);
                 var realProviders = lazyProviders.Select(lazy => lazy.Value);
                 TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
-
-                Template template = new Template(container);
-                template.Load(templateResolver, this.Template);
+                TemplateInfo templateInfo = templateResolver.Resolve(this.Template);
+                Template template = templateInfo.Load(container);
 
                 string outputDir = this.Output
                                    ?? (Directory.Exists(this.Path)

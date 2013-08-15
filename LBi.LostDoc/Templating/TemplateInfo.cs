@@ -27,13 +27,12 @@ namespace LBi.LostDoc.Templating
     public class TemplateInfo
     {
         // TODO we can eliminate the TemplateResolver here once we remove it as a requirement for the Template class
-        public TemplateInfo(TemplateResolver resolver, IFileProvider source, string path, string name, TemplateParameterInfo[] parameters, TemplateInfo inheritedTemplate)
+        public TemplateInfo(IFileProvider source, string path, string name, TemplateParameterInfo[] parameters, TemplateInfo inheritedTemplate)
         {
             this.Source = source;
             this.Name = name;
             this.Parameters = parameters;
             this.Path = path;
-            this.Resolver = resolver;
             this.Inherits = inheritedTemplate;
         }
 
@@ -41,7 +40,6 @@ namespace LBi.LostDoc.Templating
         public IFileProvider Source { get; protected set; }
         public string Path { get; protected set; }
         public TemplateParameterInfo[] Parameters { get; protected set; }
-        public TemplateResolver Resolver { get; protected set; }
         public TemplateInfo Inherits { get; protected set; }
 
         // TODO see if we can't get rid of this CompositionContainer
@@ -52,6 +50,7 @@ namespace LBi.LostDoc.Templating
             return ret;
         }
 
+        // TODO maybe move some of this to the TemplateResolver
         public static TemplateInfo Load(TemplateResolver resolver, IFileProvider source, string name)
         {
             string specPath = System.IO.Path.Combine(name, Template.TemplateDefinitionFileName);
@@ -70,7 +69,7 @@ namespace LBi.LostDoc.Templating
                 if (inheritsAttr != null)
                 {
                     string inheritedTemplateName = inheritsAttr.Value;
-                    if (!resolver.Resolve(inheritedTemplateName, out inheritedTemplate))
+                    if (!resolver.TryResolve(inheritedTemplateName, out inheritedTemplate))
                         throw new Exception("Failed to resolve inherted template: " + inheritedTemplateName);
 
                     // add inherited parameters
@@ -90,7 +89,7 @@ namespace LBi.LostDoc.Templating
                 }
             }
 
-            return new TemplateInfo(resolver, source, specPath, name, parameters.Values.ToArray(), inheritedTemplate);
+            return new TemplateInfo(source, specPath, name, parameters.Values.ToArray(), inheritedTemplate);
         }
 
         private static string ReadOptionalAttribute(XElement element, string attribute)

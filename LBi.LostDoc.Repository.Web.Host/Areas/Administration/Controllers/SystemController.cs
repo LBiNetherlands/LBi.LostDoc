@@ -50,7 +50,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             string currentTemplateName = this.SettingsProvider.GetValue<string>(Settings.Template);
             TemplateInfo template;
 
-            if (!resolver.Resolve(currentTemplateName, out template))
+            if (!resolver.TryResolve(currentTemplateName, out template))
             {
                 template = resolver.GetTemplates().FirstOrDefault();
                 if (template == null)
