@@ -22,6 +22,6 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 
         public string CurrentTemplate { get; set; }
 
-        public TemplateParameterModel[] Settings { get; set; }
+        public TemplateParameterModel[] TemplateParameters { get; set; }
     }
 }

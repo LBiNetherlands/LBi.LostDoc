@@ -18,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Configuration;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Web.Mvc;
 using LBi.LostDoc.Extensibility;
@@ -37,39 +39,39 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
     [AdminController("system", Group = Groups.Core, Order = 3000, Text = "System")]
     public class SystemController : Controller
     {
-        [ImportMany(ContractNames.TemplateProvider)]
-        public IFileProvider[] FileProviders { get; set; }
-
+        // TODO move to ctor with [ImportingConstructor]
         [Import]
         public ISettingsProvider SettingsProvider { get; set; }
+
+        [Import]
+        public TemplateResolver TemplateResolver { get; set; }
 
         [AdminAction("index", IsDefault = true, Text = "Status")]
         public ActionResult Index()
         {
-            TemplateResolver resolver = new TemplateResolver(this.FileProviders);
             string currentTemplateName = this.SettingsProvider.GetValue<string>(Settings.Template);
             TemplateInfo template;
 
-            if (!resolver.TryResolve(currentTemplateName, out template))
+            if (!this.TemplateResolver.TryResolve(currentTemplateName, out template))
             {
-                template = resolver.GetTemplates().FirstOrDefault();
+                template = this.TemplateResolver.GetTemplates().FirstOrDefault();
                 if (template == null)
                     currentTemplateName = null;
                 else
                     currentTemplateName = template.Name;
             }
 
-            TemplateParameterModel[] settings;
+            TemplateParameterModel[] templateParameters;
             if (template != null)
-                settings = Array.ConvertAll(template.Parameters, this.CreateTemplateParameterModel);
+                templateParameters = Array.ConvertAll(template.Parameters, this.CreateTemplateParameterModel);
             else
-                settings = new TemplateParameterModel[0];
+                templateParameters = new TemplateParameterModel[0];
 
             return this.View(new SystemModel()
                                  {
-                                     Templates = resolver.GetTemplates().Select(ti => ti.Name).ToArray(),
+                                     Templates = this.TemplateResolver.GetTemplates().Select(ti => ti.Name).ToArray(),
                                      CurrentTemplate = currentTemplateName,
-                                     Settings = settings
+                                     TemplateParameters = templateParameters
                                  });
         }
 
@@ -84,6 +86,31 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                    };
         }
 
+        public FileResult DownloadTemplate(string template)
+        {
+            TemplateInfo templateInfo = this.TemplateResolver.Resolve(template);
+
+            MemoryStream buffer = new MemoryStream();
+            using (ZipArchive archive = new ZipArchive(buffer, ZipArchiveMode.Create, true))
+            {
+                foreach (string filename in templateInfo.GetFiles())
+                {
+                    var fileEntry = archive.CreateEntry(filename, CompressionLevel.Optimal);
+                    using (var target = fileEntry.Open())
+                    using (var content = templateInfo.Source.OpenFile(filename, FileMode.Open))
+                    {
+                        content.CopyTo(target);
+                        content.Close();
+                        target.Close();
+                    }
+                }
+            }
+            buffer.Seek(0, SeekOrigin.Begin);
+            return new FileStreamResult(buffer, "application/zip")
+                       {
+                           FileDownloadName = string.Format("template_{0}.zip", template).Replace(' ', '_')
+                       };
+        }
         //[AdminAction("logs", Text = "Logs")]
         //public ActionResult Logs()
         //{

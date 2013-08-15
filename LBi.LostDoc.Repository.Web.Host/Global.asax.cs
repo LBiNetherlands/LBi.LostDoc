@@ -101,7 +101,8 @@ namespace LBi.LostDoc.Repository.Web.Host
             ISettingsProvider settings = new XamlSettingsProvider(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, settingsPath));
             Func<string, string> abs = p => Path.Combine(HttpRuntime.AppDomainAppPath, p);
 
-            // initialize logger
+            // initialize logger 
+            // TODO replace with something that writes a new log every day
             TraceListener traceListener =
                 new TextWriterTraceListener(Path.Combine(abs(settings.GetValue<string>(Settings.LogPath)),
                                                          string.Format("repository_{0:yyyy'-'MM'-'dd__HHmmss}.log",
@@ -193,18 +194,14 @@ namespace LBi.LostDoc.Repository.Web.Host
             // register application services in composition container
             CompositionBatch batch = new CompositionBatch();
             
-            //XamlSettingsProvider settingsProvider = new XamlSettingsProvider(@"c:\temp\config.xml");
-            //settingsProvider.SetValue("AStringArray", new[] {"abc", "def"});
-            //settingsProvider.SetValue("AnArray", new[] { "abc", "def" });
-            //settingsProvider.SetValue("AnInt", 123);
-            //settingsProvider.SetValue("ABool", true);
-
             this.AddExport(batch, notifications);
             this.AddExport(batch, contentManager);
             this.AddExport(batch, addInManager);
+            // TODO invert this by [Export]ing all TraceSources for automated discovery?
             this.AddExport(batch, traceListener);
             this.AddExport(batch, container);
             this.AddExport(batch, settings);
+            this.AddExport(batch, templateResolver);
 
             container.Compose(batch);
 

@@ -65,9 +65,19 @@ namespace LBi.LostDoc.Templating.FileProviders
             }
         }
 
+        public bool SupportsDiscovery
+        {
+            get { return false; }
+        }
+
         public IEnumerable<string> GetDirectories(string path)
         {
-            return Enumerable.Empty<string>();
+            throw new NotSupportedException();
+        }
+
+        public IEnumerable<string> GetFiles(string path)
+        {
+            throw new NotSupportedException();
         }
     }
 }

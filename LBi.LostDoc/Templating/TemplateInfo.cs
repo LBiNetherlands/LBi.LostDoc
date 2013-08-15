@@ -50,7 +50,27 @@ namespace LBi.LostDoc.Templating
             return ret;
         }
 
-        // TODO maybe move some of this to the TemplateResolver
+        public IEnumerable<string> GetFiles()
+        {
+            return new[] {this.Name}
+                .Concat(this.GetDirectories(this.Name))
+                .Aggregate(Enumerable.Empty<string>(),
+                           (aggregate, dir) =>
+                           aggregate.Concat(this.Source.GetFiles(dir)
+                                                .Select(file => System.IO.Path.Combine(dir, file))));
+        }
+
+        private IEnumerable<string> GetDirectories(string path)
+        {
+            IEnumerable<string> dirs = this.Source.GetDirectories(path);
+            return dirs.Aggregate(Enumerable.Empty<string>(),
+                                  (aggregate, dir) => aggregate.Concat(this.GetDirectories(System.IO.Path.Combine(path, dir))));
+        }
+
+
+
+
+        // TODO maybe move some (or all) of this to the TemplateResolver
         public static TemplateInfo Load(TemplateResolver resolver, IFileProvider source, string name)
         {
             string specPath = System.IO.Path.Combine(name, Template.TemplateDefinitionFileName);

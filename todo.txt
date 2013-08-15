@@ -41,9 +41,10 @@ repository
 
 * add settings to the repository for custom feeds, etc
 
-* add ability down view/select & download templates (as zip package from)
+// * add ability down view/select & download templates (as zip package from)
 
 * add ability to upload zip template packages?
+  could be done via a ZipFileProvider pointing to a "Templates" folder
 
 * add db/storage for local edits
 

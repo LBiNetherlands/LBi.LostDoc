@@ -49,9 +49,19 @@ namespace LBi.LostDoc.Templating.FileProviders
             return File.Open(path, mode);
         }
 
+        public bool SupportsDiscovery
+        {
+            get { return true; }
+        }
+
         public IEnumerable<string> GetDirectories(string path)
         {
             return Directory.EnumerateDirectories(path);
+        }
+
+        public IEnumerable<string> GetFiles(string path)
+        {
+            return Directory.EnumerateFiles(path);
         }
 
         #endregion

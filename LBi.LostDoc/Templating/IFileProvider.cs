@@ -23,7 +23,9 @@ namespace LBi.LostDoc.Templating
     {
         bool FileExists(string path);
         Stream OpenFile(string path, FileMode mode);
+        bool SupportsDiscovery { get; }
         IEnumerable<string> GetDirectories(string path);
+        IEnumerable<string> GetFiles(string path);
     }
 
 }

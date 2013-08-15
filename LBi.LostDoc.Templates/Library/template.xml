@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <template xmlns:var="urn:lost-doc:template.variable">
-  <!-- I can add params like this, so I can influnce templating without modifying it -->
+  <!-- parameters can be used to influence templates without having to modify them-->
   <parameter name="LogoUrl" select="'lostdoc.png'" />
 
   <!-- indexed nodes, accessible through ld:key('indexName', value) -->

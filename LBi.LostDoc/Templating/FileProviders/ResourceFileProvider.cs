@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace LBi.LostDoc.Templating.FileProviders
 {
@@ -28,7 +27,8 @@ namespace LBi.LostDoc.Templating.FileProviders
         private Assembly _asm;
         private string _ns;
 
-        public ResourceFileProvider(string ns) : this(ns, Assembly.GetCallingAssembly())
+        public ResourceFileProvider(string ns)
+            : this(ns, Assembly.GetCallingAssembly())
         {
         }
 
@@ -41,7 +41,7 @@ namespace LBi.LostDoc.Templating.FileProviders
 
             this._asm = asm;
         }
-        
+
         private string ConvertPath(string path)
         {
             return this._ns + path.Replace('\\', '.').Replace('/', '.');
@@ -65,6 +65,11 @@ namespace LBi.LostDoc.Templating.FileProviders
             return ret;
         }
 
+        public bool SupportsDiscovery
+        {
+            get { return true; }
+        }
+
         public IEnumerable<string> GetDirectories(string path)
         {
             if (path == ".")
@@ -75,12 +80,34 @@ namespace LBi.LostDoc.Templating.FileProviders
             if (!path.EndsWith("."))
                 path += ".";
 
-            var ret = this._asm.GetManifestResourceNames().Where(n => n.StartsWith(path))
+            var ret = this._asm.GetManifestResourceNames()
+                          .Where(n => n.StartsWith(path))
                           .Select(n => n.Substring(path.Length))
+                          .Where(n => n.IndexOf('.') < n.LastIndexOf('.'))
                           .Select(n => n.Substring(0, n.IndexOf('.')))
                           .Distinct(StringComparer.Ordinal);
 
             return ret;
+        }
+
+        public IEnumerable<string> GetFiles(string path)
+        {
+            if (path == ".")
+                path = "";
+
+            path = this.ConvertPath(path);
+
+            var descendants = this._asm.GetManifestResourceNames()
+                                  .Where(n => n.StartsWith(path));
+
+            foreach (var descendant in descendants)
+            {
+                string pathSuffix = descendant.Substring(path.Length);
+                int fileExtSeperator = pathSuffix.LastIndexOf('.');
+                int lastDirSeperator = pathSuffix.LastIndexOf('.', fileExtSeperator - 1);
+                if (lastDirSeperator == 0)
+                    yield return pathSuffix.Substring(1);
+            }
         }
 
         #endregion

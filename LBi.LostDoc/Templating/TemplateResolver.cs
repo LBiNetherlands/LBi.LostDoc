@@ -29,6 +29,7 @@ namespace LBi.LostDoc.Templating
         {
         }
 
+        // Todo [ImportingConstructor] ?
         public TemplateResolver(IEnumerable<IFileProvider> fileProviders)
         {
             this.Providers = fileProviders.ToArray();

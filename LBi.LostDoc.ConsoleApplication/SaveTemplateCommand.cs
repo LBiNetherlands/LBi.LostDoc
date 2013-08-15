@@ -38,6 +38,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
         public void Invoke(CompositionContainer container)
         {
+            // TODO this is really outdated and wrong
             var traceListener = new ConsolidatedConsoleTraceListener(new Dictionary<string, string>());
 
             string basePath = this.GetType().Namespace + ".Templates." + this.Template;
