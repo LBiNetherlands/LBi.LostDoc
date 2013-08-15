@@ -9,6 +9,10 @@ templates
 
 * method/types with generics need constraints in the C# syntax!
 
+* fix html/js to allow for 
+ * search (using websockets for suggestions?)
+ * adjustable column width nav/content
+
 * create service template
 
 cli
@@ -24,12 +28,16 @@ core
 * sort out messed up Lostdoc URN Namespacing
   should be: urn:schemas-lbi-nl:lostdoc:template ??
 
+* add support for intermediary xslt output/input
+  add optional "input" attribute to apply-stylesheet
+  create "apply-stylesheet" counterpart for generating intermediary files
+
 repository
 ==========
 
 // * create site-wide admin notifications
 
-* implement SignalR for the notifications
+* implement SignalR for the notifications?
 
 // * set up app logging
 
