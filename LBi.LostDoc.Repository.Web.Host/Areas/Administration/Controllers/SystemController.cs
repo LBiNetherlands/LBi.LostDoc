@@ -93,16 +93,21 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             MemoryStream buffer = new MemoryStream();
             using (ZipArchive archive = new ZipArchive(buffer, ZipArchiveMode.Create, true))
             {
-                foreach (string filename in templateInfo.GetFiles())
+                while (templateInfo != null)
                 {
-                    var fileEntry = archive.CreateEntry(filename, CompressionLevel.Optimal);
-                    using (var target = fileEntry.Open())
-                    using (var content = templateInfo.Source.OpenFile(filename, FileMode.Open))
+                    foreach (string filename in templateInfo.GetFiles())
                     {
-                        content.CopyTo(target);
-                        content.Close();
-                        target.Close();
+                        var fileEntry = archive.CreateEntry(filename, CompressionLevel.Optimal);
+                        using (var target = fileEntry.Open())
+                        using (var content = templateInfo.Source.OpenFile(filename, FileMode.Open))
+                        {
+                            content.CopyTo(target);
+                            content.Close();
+                            target.Close();
+                        }
                     }
+
+                    templateInfo = templateInfo.Inherits;
                 }
             }
             buffer.Seek(0, SeekOrigin.Begin);
