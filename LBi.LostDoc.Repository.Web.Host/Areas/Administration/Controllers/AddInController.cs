@@ -20,26 +20,36 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using LBi.LostDoc.Packaging;
-using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
-using LBi.LostDoc.Repository.Web.Extensibility;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Controllers;
 using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
 using LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Notifications;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 {
     // TODO the TEXT isn't translateable, but it's good enough for now
     [AdminController("addins", Text = "Add-ins", Group = Groups.Core, Order = 1)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class AddInController : Controller
     {
+        [ImportingConstructor]
+        public AddInController(AddInManager addIns, NotificationManager notifications)
+        {
+            this.AddIns = addIns;
+            this.Notifications = notifications;
+        }
+
+        protected NotificationManager Notifications { get; set; }
+
+        protected AddInManager AddIns { get; set; }
+
         // default action is to list all installed add-ins
         [HttpPost]
         public ActionResult Install([Bind(Prefix = "package-id")] string id, 
                                     [Bind(Prefix = "package-version")] string version)
         {
             ActionResult ret;
-            var pkg = App.Instance.AddIns.Repository.Get(id, version);
+            var pkg = this.AddIns.Repository.Get(id, version);
             if (pkg == null)
             {
                 string message = string.Format("Package (Id: '{0}', Version: '{1}') not found.", id, version);
@@ -48,13 +58,13 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                PackageResult result = App.Instance.AddIns.Install(pkg);
+                PackageResult result = this.AddIns.Install(pkg);
                 if (result == PackageResult.PendingRestart)
                 {
                     string message =
                         string.Format("Package {0} failed to install, another attempt will be made upon site restart.", 
                                       pkg.Id);
-                    App.Instance.Notifications.Add(Severity.Warning, 
+                    this.Notifications.Add(Severity.Warning, 
                                                    Lifetime.Application, 
                                                    Scope.Administration, 
                                                    "Pending restart", 
@@ -74,7 +84,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             return this.View(new AddInOverviewModel
                                  {
                                      Title = "Manage Add-ins", 
-                                     AddIns = App.Instance.AddIns
+                                     AddIns = this.AddIns
                                                  .Select(pkg =>
                                                          new AddInModel
                                                              {
@@ -90,7 +100,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult Repository()
         {
             const int COUNT = 10;
-            AddInModel[] results = App.Instance.AddIns.Repository.Search(null, true, 0, COUNT)
+            AddInModel[] results = this.AddIns.Repository.Search(null, true, 0, COUNT)
                                       .Select(pkg =>
                                               new AddInModel
                                                   {
@@ -111,7 +121,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult Search(string terms, int offset = 0)
         {
             const int COUNT = 10;
-            AddInModel[] results = App.Instance.AddIns.Repository.Search(terms, true, offset, COUNT)
+            AddInModel[] results = this.AddIns.Repository.Search(terms, true, offset, COUNT)
                                       .Select(pkg =>
                                               new AddInModel
                                                   {
@@ -133,7 +143,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                       [Bind(Prefix = "package-version")] string version)
         {
             ActionResult ret;
-            var pkg = App.Instance.AddIns.Get(id, version);
+            var pkg = this.AddIns.Get(id, version);
             if (pkg == null)
             {
                 string message = string.Format("Package (Id: '{0}', Version: '{1}') not found.", id, version);
@@ -142,13 +152,13 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                PackageResult result = App.Instance.AddIns.Uninstall(pkg);
+                PackageResult result = this.AddIns.Uninstall(pkg);
                 if (result == PackageResult.PendingRestart)
                 {
                     string message =
                         string.Format(
                             "Package {0} failed to uninstall, another attempt will be made upon site restart.", pkg.Id);
-                    App.Instance.Notifications.Add(
+                    this.Notifications.Add(
                         Severity.Warning, 
                         Lifetime.Application, 
                         Scope.Administration, 
@@ -168,7 +178,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                                    [Bind(Prefix = "package-version")] string version)
         {
             ActionResult ret;
-            var pkg = App.Instance.AddIns.Repository.Get(id, version);
+            var pkg = this.AddIns.Repository.Get(id, version);
             if (pkg == null)
             {
                 string message = string.Format("Package (Id: '{0}', Version: '{1}') not found.", id, version);
@@ -178,13 +188,13 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             else
             {
                 // TODO handle errors
-                PackageResult result = App.Instance.AddIns.Update(pkg);
+                PackageResult result = this.AddIns.Update(pkg);
                 if (result == PackageResult.PendingRestart)
                 {
                     string message =
                         string.Format("Package {0} failed to update, another attempt will be made upon site restart.", 
                                       pkg.Id);
-                    App.Instance.Notifications.Add(
+                    this.Notifications.Add(
                         Severity.Warning, 
                         Lifetime.Application, 
                         Scope.Administration, 
@@ -204,19 +214,19 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         {
             //string target = Path.Combine(AppConfig.AddInPackagePath, Path.GetFileName(package.FileName));
             //package.SaveAs(target);
-            //App.Instance.Container
+            //this.Container
             return null;
         }
 
         private bool CheckForUpdates(AddInPackage pkg)
         {
             // TODO fix prerelase hack
-            return App.Instance.AddIns.Repository.GetUpdate(pkg, true) != null;
+            return this.AddIns.Repository.GetUpdate(pkg, true) != null;
         }
 
         private bool CheckInstalled(AddInPackage pkg)
         {
-            return App.Instance.AddIns.Contains(pkg);
+            return this.AddIns.Contains(pkg);
         }
     }
 }

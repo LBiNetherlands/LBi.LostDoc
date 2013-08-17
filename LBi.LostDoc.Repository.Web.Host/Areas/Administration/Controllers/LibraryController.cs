@@ -37,12 +37,12 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
     public class LibraryController : Controller
     {
         [ImportingConstructor]
-        public LibraryController(NotificationManager notificationManager)
+        public LibraryController(ContentManager content, NotificationManager notificationManager)
         {
+            this.Content = content;
             this.Notifications = notificationManager;
         }
 
-        [Import]
         protected new ContentManager Content { get; set; }
 
         protected NotificationManager Notifications { get; set; }
@@ -76,7 +76,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 
         public ActionResult Details(string id)
         {
-            string contentRoot = App.Instance.Content.GetContentRoot(id);
+            string contentRoot = this.Content.GetContentRoot(id);
 
             var files = Directory.GetFiles(Path.Combine(contentRoot, "Source"), "*.ldoc");
             var ldocs = files.Select(f => new LostDocFileInfo(f));
@@ -139,9 +139,9 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 
             return this.View(new LibraryModel
                                  {
-                                     SystemState = App.Instance.Content.CurrentState,
+                                     SystemState = this.Content.CurrentState,
                                      Libraries = libraries.ToArray(),
-                                     Current = App.Instance.Content.ContentFolder
+                                     Current = this.Content.ContentFolder
                                  });
         }
 

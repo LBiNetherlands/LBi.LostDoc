@@ -35,15 +35,26 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ContentRepositoryController : Controller
     {
+        [ImportingConstructor]
+        public ContentRepositoryController(ContentManager content, NotificationManager notifications)
+        {
+            this.Content = content;
+            this.Notifications = notifications;
+        }
+
+        protected ContentManager Content { get; set; }
+
+        protected NotificationManager Notifications { get; set; }
+
         [HttpPost]
         public ActionResult Delete(string id)
         {
             // TODO this security check might not be good enough
-            if (Directory.GetFiles(App.Instance.Content.RepositoryPath, id, SearchOption.TopDirectoryOnly).Length > 0)
+            if (Directory.GetFiles(this.Content.RepositoryPath, id, SearchOption.TopDirectoryOnly).Length > 0)
             {
-                System.IO.File.Delete(Path.Combine(App.Instance.Content.RepositoryPath, id));
+                System.IO.File.Delete(Path.Combine(this.Content.RepositoryPath, id));
 
-                App.Instance.Notifications.Add(Severity.Information, 
+                this.Notifications.Add(Severity.Information, 
                                                Lifetime.Page, 
                                                Scope.User, 
                                                this.User, 
@@ -52,7 +63,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             }
             else
             {
-                App.Instance.Notifications.Add(Severity.Error, 
+                this.Notifications.Add(Severity.Error, 
                                                Lifetime.Page, 
                                                Scope.User, 
                                                this.User, 
@@ -67,9 +78,9 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         public ActionResult Download(string id)
         {
             // TODO this security check might not be good enough
-            if (Directory.GetFiles(App.Instance.Content.RepositoryPath, id, SearchOption.TopDirectoryOnly).Length == 1)
+            if (Directory.GetFiles(this.Content.RepositoryPath, id, SearchOption.TopDirectoryOnly).Length == 1)
             {
-                return this.File(Path.Combine(App.Instance.Content.RepositoryPath, id), "text/xml", id);
+                return this.File(Path.Combine(this.Content.RepositoryPath, id), "text/xml", id);
             }
 
             return new HttpStatusCodeResult(HttpStatusCode.NotFound, id + " not found");
@@ -78,7 +89,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         [AdminAction("index", IsDefault = true)]
         public ActionResult Index()
         {
-            var ldocFiles = Directory.GetFiles(App.Instance.Content.RepositoryPath, 
+            var ldocFiles = Directory.GetFiles(this.Content.RepositoryPath, 
                                                "*.ldoc", 
                                                SearchOption.TopDirectoryOnly);
             var ldocs = ldocFiles.Select(p => new LostDocFileInfo(p));
@@ -127,7 +138,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                 if (System.IO.File.Exists(Path.Combine(AppConfig.RepositoryPath, targetFile)))
                 {
                     string message = string.Format("Unable to add file '{0}' as it already exists.", targetFile);
-                    App.Instance.Notifications.Add(Severity.Error, 
+                    this.Notifications.Add(Severity.Error, 
                                                    Lifetime.Page, 
                                                    Scope.User, 
                                                    this.User, 
@@ -139,7 +150,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
                     System.IO.File.Move(tempLocation, Path.Combine(AppConfig.RepositoryPath, targetFile));
 
                     string message = string.Format("Successfully added file '{0}' (as '{1}') to repository.", filename, targetFile);
-                    App.Instance.Notifications.Add(
+                    this.Notifications.Add(
                         Severity.Information, 
                         Lifetime.Page, 
                         Scope.User, 
