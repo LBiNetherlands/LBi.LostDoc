@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Web;
@@ -10,10 +11,13 @@ namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
 {
     public class AdminFilter : IActionFilter
     {
-        public AdminFilter(NotificationManager notifications)
+        public AdminFilter(CompositionContainer container, NotificationManager notifications)
         {
             this.Notifications = notifications;
+            this.Container = container;
         }
+
+        protected CompositionContainer Container { get; set; }
 
         protected NotificationManager Notifications { get; set; }
 
@@ -38,7 +42,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility.Mvc
             model.Notifications = this.Notifications.Get(filterContext.HttpContext.User).ToArray();
 
 
-            var catalog = App.Instance.Container.Catalog;
+            var catalog = this.Container.Catalog;
 
             Navigation active;
             model.Navigation = BuildMenu(filterContext, catalog, out active);

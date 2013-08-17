@@ -57,7 +57,7 @@ namespace LBi.LostDoc.Repository.Web.Host
             filters.Add(new HandleErrorAttribute());
 
             // this filter injects Notifications into the IBaseModel
-            filters.Add(new AdminFilter(container.GetExportedValue<NotificationManager>()));
+            filters.Add(new AdminFilter(container, container.GetExportedValue<NotificationManager>()));
         }
 
         public static void RegisterRoutes(CompositionContainer container, RouteCollection routes)
