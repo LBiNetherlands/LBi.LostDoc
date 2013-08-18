@@ -1,5 +1,5 @@
-/*
- * Copyright 2012 LBi Netherlands B.V.
+﻿/*
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License. 
  */
 
-using System.Runtime.Serialization;
+using System.ComponentModel.Composition;
+using System.Web.Http;
 
-namespace LBi.LostDoc.Repository.Web.Api.Models
+namespace LBi.LostDoc.Repository.Web.Extensibility.Http
 {
-    [DataContract]
-    public class SearchResult
+    [InheritedExport]
+    public interface IHttpRouteInitializer
     {
-        [DataMember]
-        public int Count { get; set; }
+        void RegisterRoutes(HttpRouteCollection routes);
     }
 }

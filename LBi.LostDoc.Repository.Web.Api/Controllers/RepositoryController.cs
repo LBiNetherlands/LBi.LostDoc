@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,8 +32,17 @@ using LBi.LostDoc.Repository.Web.Security;
 namespace LBi.LostDoc.Repository.Web.Api.Controllers
 {
     [ApiKeyAuthorize]
+    [Export]
     public class RepositoryController : ApiController
     {
+        [ImportingConstructor]
+        public RepositoryController(ContentManager contentManager)
+        {
+            this.Content = contentManager;
+        }
+
+        protected ContentManager Content { get; set; }
+
         // GET /repository/
         public void Delete(string assembly, string version)
         {
@@ -53,7 +63,7 @@ namespace LBi.LostDoc.Repository.Web.Api.Controllers
 
             File.Delete(file);
 
-            App.Instance.Content.QueueRebuild(string.Format("Deleted assembly: {{A:{0}, V:{1}}}", 
+            this.Content.QueueRebuild(string.Format("Deleted assembly: {{A:{0}, V:{1}}}", 
                                                             assembly, 
                                                             realVersion.ToString()));
         }
@@ -137,7 +147,7 @@ namespace LBi.LostDoc.Repository.Web.Api.Controllers
                 builder => builder.ToString());
 
             if (ret.Count > 0)
-                App.Instance.Content.QueueRebuild("Added assemblies: " + reason);
+                this.Content.QueueRebuild("Added assemblies: " + reason);
 
             return this.Request.CreateResponse(HttpStatusCode.Accepted, ret.AsEnumerable());
         }
@@ -147,7 +157,7 @@ namespace LBi.LostDoc.Repository.Web.Api.Controllers
         [HttpGet]
         public string State()
         {
-            return App.Instance.Content.CurrentState.ToString();
+            return this.Content.CurrentState.ToString();
         }
     }
 }

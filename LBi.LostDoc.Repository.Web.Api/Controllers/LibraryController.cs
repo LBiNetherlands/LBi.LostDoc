@@ -26,6 +26,7 @@ using LBi.LostDoc.Repository.Web.Models;
 
 namespace LBi.LostDoc.Repository.Web.Api.Controllers
 {
+    [Export]
     public class LibraryController : ApiController
     {
         [ImportingConstructor]
@@ -73,7 +74,7 @@ namespace LBi.LostDoc.Repository.Web.Api.Controllers
             if (dir == null)
                 return false;
 
-            App.Instance.Content.SetCurrentContentFolder(id);
+            this.Content.SetCurrentContentFolder(id);
 
             return true;
         }

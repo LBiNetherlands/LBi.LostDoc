@@ -343,6 +343,10 @@
       <Project>{32e920e1-127c-45bd-815f-c5bf8779b621}</Project>
       <Name>LBi.LostDoc.Packaging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj">
+      <Project>{ac845337-41c3-47fb-855d-40749d6813cd}</Project>
+      <Name>LBi.LostDoc.Repository.Web.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LBi.LostDoc.Repository.Web\LBi.LostDoc.Repository.Web.csproj">
       <Project>{cd6610bd-f313-441f-bfd6-1d003e949575}</Project>
       <Name>LBi.LostDoc.Repository.Web</Name>

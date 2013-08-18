@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Routing;
+﻿using System.Web.Http;
 using LBi.LostDoc.Repository.Web.Api.Controllers;
-using LBi.LostDoc.Repository.Web.Extensibility;
-using Tavis;
+using LBi.LostDoc.Repository.Web.Extensibility.Http;
 
 namespace LBi.LostDoc.Repository.Web.Api
 {
@@ -15,9 +8,9 @@ namespace LBi.LostDoc.Repository.Web.Api
     {
         public void RegisterRoutes(HttpRouteCollection routes)
         {
-            TreeRoute treeRoute = new TreeRoute("", new TreeRoute("library").To<LibraryController>());
-
-            routes.Add("LibraryRoute", treeRoute);
+            routes.MapHttpRoute("library", "library", new {controller = "Library"});
+            routes.MapHttpRoute("site", "site", new { controller = "Site" });
+            routes.MapHttpRoute("repository", "repository", new { controller = "Repository" });
         }
     }
 }

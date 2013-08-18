@@ -15,19 +15,26 @@
  */
 
 using System;
+using System.ComponentModel.Composition;
 using System.Web.Http;
-using LBi.LostDoc.Repository.Web.Extensibility;
-using LBi.LostDoc.Repository.Web.Extensibility.Http;
 using LBi.LostDoc.Repository.Web.Security;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
+namespace LBi.LostDoc.Repository.Web.Api.Controllers
 {
-    [ApiController("site/")]
+    [Export]
     public class SiteController : ApiController
     {
+        [ImportingConstructor]
+        public SiteController(ContentManager content)
+        {
+            this.Content = content;
+        }
+
+        protected ContentManager Content { get; set; }
+
         public string Get()
         {
-            return App.Instance.Content.CurrentState.ToString();
+            return this.Content.CurrentState.ToString();
         }
 
         [ApiKeyAuthorize]
@@ -35,7 +42,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Api.Controllers
         {
             try
             {
-                App.Instance.Content.QueueRebuild(string.Empty);
+                this.Content.QueueRebuild(string.Empty);
                 return true;
             } 
             catch (Exception)

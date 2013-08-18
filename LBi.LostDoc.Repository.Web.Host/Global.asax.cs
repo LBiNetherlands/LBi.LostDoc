@@ -26,6 +26,7 @@ using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Http;
+using System.Web.Http.Routing;
 using System.Web.Mvc;
 using System.Web.Routing;
 using LBi.LostDoc.Diagnostics;
@@ -142,8 +143,15 @@ namespace LBi.LostDoc.Repository.Web.Host
                                                          abs(settings.GetValue<string>(Settings.AddInPackagePath)),
                                                          abs(settings.GetValue<string>(Settings.TempPath)));
 
+
+            // create setings export provider
+            SettingsExportProvider settingsExportProvider = new SettingsExportProvider(settings);
+
+            // create container
+            CompositionContainer container = new CompositionContainer(catalog, settingsExportProvider);
+
             // when the catalog changes, discover and route all ApiControllers
-            catalog.Changed += (sender, args) => this.UpdateWebApiRegistry(args);
+            catalog.Changed += (sender, args) => this.UpdateWebApiRegistry(container, args);
 
             //// TODO for debugging only
             //Debugger.Break();
@@ -163,11 +171,8 @@ namespace LBi.LostDoc.Repository.Web.Host
             // this acts as a crude "remove/overwrite plugins that were in use when un/installed" hack
             addInManager.Restore();
 
-            // create setings export provider
-            SettingsExportProvider settingsExportProvider = new SettingsExportProvider(settings);
 
-            // create container
-            CompositionContainer container = new CompositionContainer(catalog, settingsExportProvider);
+
 
             // set up template resolver
             var lazyProviders = container.GetExports<IFileProvider>(ContractNames.TemplateProvider);
@@ -205,10 +210,6 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             container.Compose(batch);
 
-            // TODO replace this with MEF based injection
-            // initialize app-singleton
-            App.Initialize(container, contentManager, addInManager, notifications, traceListener);
-
             // MVC init
             AreaRegistration.RegisterAllAreas();
             RegisterGlobalFilters(container, GlobalFilters.Filters);
@@ -224,10 +225,9 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             FilterProviders.Providers.Add(new AddInFilterProvider(container));
 
-            // TODO figure out if we actually need this
-            // hook in our MEF based IHttpController instead of the default one
-            //GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerTypeResolver), new AddInHttpControllerTypeResolver(App.Instance.Container));
-
+            // WebAPI init
+            GlobalConfiguration.Configuration.DependencyResolver = new MefDependencyResolver(container,
+                                                                                             GlobalConfiguration.Configuration.DependencyResolver);
         }
 
         private void AddExport<T>(CompositionBatch batch, T instance)
@@ -239,93 +239,26 @@ namespace LBi.LostDoc.Repository.Web.Host
                                        () => instance));
         }
 
-        private void UpdateWebApiRegistry(ComposablePartCatalogChangeEventArgs eventArg)
+        private void UpdateWebApiRegistry(CompositionContainer container, ComposablePartCatalogChangeEventArgs eventArg)
         {
             using (TraceSources.AddInManager.TraceActivity("Updating WebApi routes."))
             {
-                // TODO this could be cleaned up a bit
+                var httpRouteInitializers = container.GetExports<IHttpRouteInitializer, IAddInMetadata>();
 
-                foreach (var partDefinition in eventArg.RemovedDefinitions)
+                HttpRouteCollection routeCollection = GlobalConfiguration.Configuration.Routes;
+
+                routeCollection.Clear();
+
+                foreach (var routeInitializer in httpRouteInitializers)
                 {
-                    IApiControllerMetadata controllerMetadata;
-                    if (!TryGetMetadata(partDefinition, out controllerMetadata))
-                        continue;
+                    var metadata = routeInitializer.Metadata;
 
-                    Type controllerType = AddInModelServices.GetPartType(partDefinition).Value;
+                    var httpRouteInitializer = routeInitializer.Value;
 
-                    string routeName = CreateRouteName(controllerMetadata, controllerType);
-
-                    TraceSources.AddInManager.TraceInformation("Removing route: {0} (Source: {1}, Version: {2})", 
-                                                               routeName, 
-                                                               controllerMetadata.PackageId, 
-                                                               controllerMetadata.PackageVersion);
-
-                    RouteBase route = RouteTable.Routes[routeName];
-                    using (RouteTable.Routes.GetWriteLock())
-                    {
-                        RouteTable.Routes.Remove(route);
-                    }
-                }
-
-                foreach (var partDefinition in eventArg.AddedDefinitions)
-                {
-                    IApiControllerMetadata controllerMetadata;
-                    if (!TryGetMetadata(partDefinition, out controllerMetadata)) 
-                        continue;
-
-                    Type controllerType = AddInModelServices.GetPartType(partDefinition).Value;
-
-                    // Pacakge version explicitly ignored in order to remain backwards compatible
-                    string urlTemplate = string.Format("api/{0}/{1}/", 
-                                                       controllerMetadata.PackageId, 
-                                                       controllerMetadata.UrlFragment.Trim('/'));
-
-                    string routeName = CreateRouteName(controllerMetadata, controllerType);
-
-                    string controllerName = controllerType.Name.Substring(0, controllerType.Name.Length - "Controller".Length);
-
-                    TraceSources.AddInManager.TraceInformation(
-                        "Adding route: {0} (Template: '{1}', Controller: {2}, Source: {3}, Version: {4})", 
-                        routeName, 
-                        urlTemplate, 
-                        controllerName, 
-                        controllerMetadata.PackageId, 
-                        controllerMetadata.PackageVersion);
-
-                    using (RouteTable.Routes.GetWriteLock())
-                    {
-                        RouteTable.Routes.MapHttpRoute(
-                            routeName, 
-                            urlTemplate, 
-                            new
-                                {
-                                    Controller = controllerName, 
-                                });
-                    }
+                    AddInHttpRouteRewriter routeRewriter = new AddInHttpRouteRewriter(routeCollection, metadata);
+                    httpRouteInitializer.RegisterRoutes(routeRewriter);
                 }
             }
-        }
-
-        private static string CreateRouteName(IApiControllerMetadata controllerMetadata, Type controllerType)
-        {
-            return string.Format("{0}_{1}", 
-                                 controllerMetadata.PackageId, 
-                                 controllerType.FullName.Replace('.', '_'));
-        }
-
-        private static bool TryGetMetadata(ComposablePartDefinition partDefinition, out IApiControllerMetadata controllerMetadata)
-        {
-            IEnumerable<ExportDefinition> exports = partDefinition.ExportDefinitions;
-            var apiExport = exports.SingleOrDefault(export => StringComparer.Ordinal.Equals(export.ContractName,
-                                                                                            Extensibility.ContractNames.ApiController));
-            if (apiExport == null)
-            {
-                controllerMetadata = null;
-                return false;
-            }
-
-            controllerMetadata = AttributedModelServices.GetMetadataView<IApiControllerMetadata>(apiExport.Metadata);
-            return true;
         }
     }
 }
