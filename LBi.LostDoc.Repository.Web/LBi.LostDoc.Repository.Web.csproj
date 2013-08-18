@@ -91,7 +91,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App.cs" />
     <Compile Include="Composition\ControllerFactory.cs" />
     <Compile Include="Configuration\AppConfig.cs" />
     <Compile Include="Configuration\Composition\ImportSettingAttribute.cs" />
