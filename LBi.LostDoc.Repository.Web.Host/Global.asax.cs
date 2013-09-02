@@ -123,9 +123,13 @@ namespace LBi.LostDoc.Repository.Web.Host
             Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
 
             // set up add-in system
-            AddInSource officalSource = new AddInSource("Official LostDoc repository add-in feed", 
+            AddInSource officalSource = new AddInSource("Official LostDoc Add-in Repository", 
                                                         settings.GetValue<string>(Settings.AddInRepository),
                                                         isOfficial: true);
+
+            AddInSource localSource = new AddInSource("Local LostDoc Add-in Repository",
+                                                      settings.GetValue<string>(Settings.LocalRepositoryFolder),
+                                                      isOfficial: true);
 
             // intialize MEF
 
@@ -136,8 +140,7 @@ namespace LBi.LostDoc.Repository.Web.Host
             string corePackageVersion = assemblyName.Version.ToString();
             AggregateCatalog catalog = new AggregateCatalog();
 
-            // load other sources from site-settings (not config)
-            AddInRepository repository = new AddInRepository(officalSource);
+            AddInRepository repository = new AddInRepository(officalSource, localSource);
             AddInManager addInManager = new AddInManager(repository,
                                                          abs(settings.GetValue<string>(Settings.AddInInstallPath)),
                                                          abs(settings.GetValue<string>(Settings.AddInPackagePath)),

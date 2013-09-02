@@ -26,6 +26,6 @@ namespace LBi.LostDoc.Repository.Web.Configuration
         public const string AddInRepository = "LostDoc.Repository.Extensibility.Repository";
         public const string AddInPackagePath = "LostDoc.Repository.Extensibility.PackagePath";
         public const string AddInInstallPath = "LostDoc.Repository.Extensibility.InstallPath";
-
+        public static string LocalRepositoryFolder = "LostDoc.Repository.Extensibility.LocalRepositoryFolder";
     }
 }

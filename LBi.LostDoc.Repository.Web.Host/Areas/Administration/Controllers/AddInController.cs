@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Net;
@@ -96,7 +97,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                                  });
         }
 
-        [AdminAction("repository", Text = "Online")]
+        [AdminAction("repository", Text = "Repository")]
         public ActionResult Repository()
         {
             const int COUNT = 10;
@@ -110,26 +111,35 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                                                       Package = pkg
                                                   }).ToArray();
 
+            
+
             return this.View(new SearchResultModel
                                  {
-                                     Title = "Online Add-ins", 
+                                     Title = "Add-in Repository", 
+                                     AddInSources = this.AddIns.Repository.Sources.Select(s => new AddInSourceModel {Name = s.Name, Enabled = true}).ToArray(),
                                      Results = results, 
                                      NextOffset = results.Length == COUNT ? COUNT : (int?)null
                                  });
         }
 
-        public ActionResult Search(string terms, int offset = 0)
+        public ActionResult Search(int[] source, bool? includePrerelease, string terms, int offset = 0)
         {
             const int COUNT = 10;
-            AddInModel[] results = this.AddIns.Repository.Search(terms, true, offset, COUNT)
-                                      .Select(pkg =>
-                                              new AddInModel
-                                                  {
-                                                      CanInstall = !this.CheckInstalled(pkg), 
-                                                      CanUninstall = this.CheckInstalled(pkg), 
-                                                      CanUpdate = this.CheckInstalled(pkg) && this.CheckForUpdates(pkg), 
-                                                      Package = pkg
-                                                  }).ToArray();
+
+            if (source == null)
+                source = Enumerable.Range(0, this.AddIns.Repository.Sources.Length).ToArray();
+
+            AddInRepository repository = new AddInRepository(source.Select(i => this.AddIns.Repository.Sources[i]).ToArray());
+
+            AddInModel[] results = repository.Search(terms, includePrerelease.HasValue && includePrerelease.Value, offset, COUNT)
+                                             .Select(pkg =>
+                                                     new AddInModel
+                                                     {
+                                                         CanInstall = !this.CheckInstalled(pkg),
+                                                         CanUninstall = this.CheckInstalled(pkg),
+                                                         CanUpdate = this.CheckInstalled(pkg) && this.CheckForUpdates(pkg),
+                                                         Package = pkg
+                                                     }).ToArray();
 
             return this.View(new SearchResultModel
                                  {

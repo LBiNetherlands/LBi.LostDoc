@@ -160,6 +160,7 @@
     <Compile Include="Areas\Administration\Controllers\SystemController.cs" />
     <Compile Include="Areas\Administration\Models\AddInModel.cs" />
     <Compile Include="Areas\Administration\Models\AddInOverviewModel.cs" />
+    <Compile Include="Areas\Administration\Models\AddInSourceModel.cs" />
     <Compile Include="Areas\Administration\Models\AssemblyModel.cs" />
     <Compile Include="Areas\Administration\Models\DirectoryListModel.cs" />
     <Compile Include="Areas\Administration\Models\IndexDocumentModel.cs" />

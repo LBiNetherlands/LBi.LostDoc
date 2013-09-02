@@ -16,16 +16,9 @@
 
 namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 {
-    public class SearchResultModel : ModelBase
+    public class AddInSourceModel
     {
-        public AddInSourceModel[] AddInSources { get; set; }
-
-        public int? NextOffset { get; set; }
-
-        public AddInModel[] Results { get; set; }
-
-        public string Terms { get; set; }
-
-        public string Title { get; set; }
+        public string Name { get; set; }
+        public bool Enabled { get; set; }
     }
 }

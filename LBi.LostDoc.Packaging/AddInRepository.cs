@@ -24,9 +24,12 @@ namespace LBi.LostDoc.Packaging
     public class AddInRepository
     {
         private readonly IPackageRepository _repository;
+        private readonly AddInSource[] _sources;
 
         public AddInRepository(params AddInSource[] sources)
         {
+            _sources = sources;
+
             List<PackageSource> packageSources = new List<PackageSource>();
 
             foreach (AddInSource source in sources)
@@ -50,6 +53,8 @@ namespace LBi.LostDoc.Packaging
         {
             get { return this._repository; }
         }
+
+        public AddInSource[] Sources { get { return this._sources; } }
 
         public AddInPackage Get(string id, string version)
         {
