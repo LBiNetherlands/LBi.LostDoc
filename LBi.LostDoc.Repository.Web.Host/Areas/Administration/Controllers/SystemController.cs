@@ -39,12 +39,16 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
     [AdminController("system", Group = Groups.Core, Order = 3000, Text = "System")]
     public class SystemController : Controller
     {
-        // TODO move to ctor with [ImportingConstructor]
-        [Import]
-        public ISettingsProvider SettingsProvider { get; set; }
+        [ImportingConstructor]
+        public SystemController(ISettingsProvider settingsProvider, TemplateResolver templateResolver)
+        {
+            this.SettingsProvider = settingsProvider;
+            this.TemplateResolver = templateResolver;
+        }
 
-        [Import]
-        public TemplateResolver TemplateResolver { get; set; }
+        protected ISettingsProvider SettingsProvider { get; set; }
+
+        protected TemplateResolver TemplateResolver { get; set; }
 
         [AdminAction("index", IsDefault = true, Text = "Status")]
         public ActionResult Index()
@@ -77,12 +81,20 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 
         private TemplateParameterModel CreateTemplateParameterModel(TemplateParameterInfo templateParameterInfo)
         {
+            Dictionary<string, string> valueContainer = this.SettingsProvider.GetValueOrDefault<Dictionary<string, string>>(Settings.TemplateParameters);
+            if (valueContainer == null)
+                valueContainer = new Dictionary<string, string>();
+
+            string value;
+            if (!valueContainer.TryGetValue(templateParameterInfo.Name, out value))
+                value = null;
+
             return new TemplateParameterModel
                    {
                        Name = templateParameterInfo.Name,
                        Description = templateParameterInfo.Description,
                        DefaultValue = templateParameterInfo.DefaultExpression,
-                       Value = this.SettingsProvider.GetValueOrDefault<string>(Settings.TemplateParameterPrefix + templateParameterInfo.Name)
+                       Value = value
                    };
         }
 
