@@ -132,7 +132,7 @@ namespace LBi.LostDoc.Packaging
                 if (requiredPackage == null)
                 {
                     requiredPackage = this.Repository.Get(packageReference.Id, false);
-                    this._packageManager.InstallPackage(requiredPackage.NuGetPackage, true, !requiredPackage.IsReleaseVersion);
+                    this._packageManager.InstallPackage(requiredPackage.NuGetPackage, false, !requiredPackage.IsReleaseVersion);
                 }
             }
 
