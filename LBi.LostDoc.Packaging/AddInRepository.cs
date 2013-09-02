@@ -79,7 +79,8 @@ namespace LBi.LostDoc.Packaging
             else
                 packages = packages.Where(p => p.IsLatestVersion);
 
-            IPackage pkg = packages.FirstOrDefault();
+            // WORKAROUND seems to be a bug in the First() implementation in the IQueryable provider.
+            IPackage pkg = packages.AsEnumerable().FirstOrDefault();
 
             if (pkg == null)
                 return null;
