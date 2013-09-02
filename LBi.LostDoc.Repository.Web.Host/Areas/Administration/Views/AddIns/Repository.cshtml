@@ -14,6 +14,7 @@
  * limitations under the License. 
  *@
 
+@using System.Activities.Expressions
 @using LBi.LostDoc.Repository.Web.Areas.Administration.Models
 @model LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models.SearchResultModel
 
@@ -22,16 +23,27 @@
 
 <h2>Search</h2>
 <form method="GET" action="@Url.Action("Search")" data-target="#results">
-    <input type="search" name="terms"placeholder="Search repository"/>
-    <input type="submit" value="Search"/>
-    <input type="checkbox" id="cbIncludePrerelease" name="includePrerelease" value="true"/>
+    <input type="search" name="terms" placeholder="Search repository" />
+    <input type="submit" value="Search" />
+    <input type="checkbox" id="cbIncludePrerelease" name="includePrerelease" value="true" />
     <label for="cbIncludePrerelease">Include prerelease packages</label>
+    <h3>Sources</h3>
+    <ul class="sources">
+        @for (int sourceNum = 0; sourceNum < Model.AddInSources.Length; sourceNum++)
+        {
+            var addInSource = Model.AddInSources[sourceNum];
+            <li>
+                <input id="rep@(sourceNum)" type="checkbox" name="source" value="@sourceNum" @if (addInSource.Enabled) { <text>checked="checked"</text> }/>
+                <label for="rep@(sourceNum)">@addInSource.Name</label>
+            </li>
+        }
+    </ul>
 </form>
 
 <h2>Results</h2>
 <section class="package-list">
-    
-    
+
+
     @Html.Partial("Search", Model)
 
     @*    <div id="no-results" style="display: none;">

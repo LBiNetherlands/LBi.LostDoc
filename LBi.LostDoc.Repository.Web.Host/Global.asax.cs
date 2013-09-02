@@ -128,8 +128,8 @@ namespace LBi.LostDoc.Repository.Web.Host
                                                         isOfficial: true);
 
             AddInSource localSource = new AddInSource("Local LostDoc Add-in Repository",
-                                                      settings.GetValue<string>(Settings.LocalRepositoryFolder),
-                                                      isOfficial: true);
+                                                      abs(settings.GetValue<string>(Settings.LocalRepositoryFolder)),
+                                                      isOfficial: false);
 
             // intialize MEF
 
@@ -144,7 +144,8 @@ namespace LBi.LostDoc.Repository.Web.Host
             AddInManager addInManager = new AddInManager(repository,
                                                          abs(settings.GetValue<string>(Settings.AddInInstallPath)),
                                                          abs(settings.GetValue<string>(Settings.AddInPackagePath)),
-                                                         abs(settings.GetValue<string>(Settings.TempPath)));
+                                                         abs(settings.GetValue<string>(Settings.TempPath)),
+                                                         abs(settings.GetValue<string>(Settings.RequiredPackageConfigPath)));
 
 
             // create setings export provider
@@ -165,16 +166,21 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             // hook event so that installed add-ins get registered in the catalog, if composition occurs after this fires
             // or if recomposition is enabled, no restart should be requried
-            addInManager.Installed +=
-                (sender, args) => catalog.Catalogs.Add(new AddInCatalog(new DirectoryCatalog(args.InstallationPath), 
-                                                                        args.Package.Id, 
-                                                                        args.Package.Version));
+            addInManager.Installed += (sender, args) =>
+                                      {
+                                          DirectoryCatalog directoryCatalog = new DirectoryCatalog(args.InstallationPath);
+                                          catalog.Catalogs.Add(new AddInCatalog(directoryCatalog,
+                                                                                args.Package.Id,
+                                                                                args.Package.Version));
+                                      };
 
             // delete and redeploy all installed packages, this will trigger the Installed event ^
             // this acts as a crude "remove/overwrite plugins that were in use when un/installed" hack
-            addInManager.Restore();
-
-
+            if (addInManager.Restore() == PackageResult.PendingRestart)
+            {
+                // restart app domain in case this failed
+                HttpRuntime.UnloadAppDomain();
+            }
 
 
             // set up template resolver

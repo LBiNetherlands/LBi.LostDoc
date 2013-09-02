@@ -27,17 +27,20 @@ namespace LBi.LostDoc.Packaging
     {
         private readonly PackageManager _packageManager;
 
-        public AddInManager(AddInRepository repository, string installDirectory, string packageDirectory, string tempDirectory)
+        public AddInManager(AddInRepository repository, string installDirectory, string packageDirectory, string tempDirectory, string requiredPackagePath)
         {
             this.Repository = repository;
             this.InstallDirectory = installDirectory;
             this.PackageDirectory = packageDirectory;
             this.TempDirectory = tempDirectory;
-            
+            this.RequiredPackagesConfigPath = requiredPackagePath;
+
             // WORKAROUND NuGet 2.5 introduced a bug whereby it fails to locate a good temp path
             Environment.SetEnvironmentVariable("NuGetCachePath", tempDirectory);
             this._packageManager = new PackageManager(repository.NuGetRepository, packageDirectory);
         }
+
+        public string RequiredPackagesConfigPath { get; set; }
 
         public string TempDirectory { get; protected set; }
 
@@ -68,10 +71,18 @@ namespace LBi.LostDoc.Packaging
 
         public AddInPackage Get(string id, string version)
         {
-            SemanticVersion ver = SemanticVersion.Parse(version);
-            IPackage pkg =
-                this._packageManager.LocalRepository.GetPackages()
-                    .SingleOrDefault(ip => StringComparer.Ordinal.Equals(id, ip.Id) && ip.Version == ver);
+            IPackage pkg;
+            IQueryable<IPackage> installedPackages = this._packageManager.LocalRepository.GetPackages();
+
+            if (version != null)
+            {
+                SemanticVersion ver = SemanticVersion.Parse(version);
+                pkg = installedPackages.SingleOrDefault(ip => StringComparer.Ordinal.Equals(id, ip.Id) && ip.Version == ver);
+            }
+            else
+            {
+                pkg = installedPackages.SingleOrDefault(ip => StringComparer.Ordinal.Equals(id, ip.Id));
+            }
 
             if (pkg == null)
                 return null;
@@ -102,13 +113,43 @@ namespace LBi.LostDoc.Packaging
             return ret;
         }
 
-        public void Restore()
+        public PackageResult Restore()
         {
+            PackageResult ret = PackageResult.Ok;
+
             foreach (var dir in Directory.EnumerateDirectories(this.InstallDirectory))
                 Directory.Delete(dir, true);
 
+            // force install of required packages
+
+            PackageReferenceFile packageReferenceFile = new PackageReferenceFile(this.RequiredPackagesConfigPath);
+            foreach (PackageReference packageReference in packageReferenceFile.GetPackageReferences(false))
+            {
+                // TODO this should take the packageReference.Version and packageReference.VersionConstraint into consideration
+                AddInPackage requiredPackage = this.Get(packageReference.Id, null);
+
+                // not installed
+                if (requiredPackage == null)
+                {
+                    requiredPackage = this.Repository.Get(packageReference.Id, false);
+                    this._packageManager.InstallPackage(requiredPackage.NuGetPackage, true, !requiredPackage.IsReleaseVersion);
+                }
+            }
+
             foreach (AddInPackage addInPackage in this)
-                this.DeployAddIn(addInPackage);
+            {
+                if (this.DeployAddIn(addInPackage))
+                {
+                    this.OnInstalled(addInPackage, PackageResult.Ok);
+                }
+                else
+                {
+                    ret = PackageResult.PendingRestart;
+                    this.OnInstalled(addInPackage, PackageResult.PendingRestart);
+                }
+            }
+
+            return ret;
         }
 
         public PackageResult Uninstall(AddInPackage package)
@@ -144,10 +185,10 @@ namespace LBi.LostDoc.Packaging
                 var packagePath =
                     Path.GetFullPath(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage));
 
-                handler(this, 
-                        new AddInInstalledEventArgs(package, 
-                                                    result, 
-                                                    installationPath, 
+                handler(this,
+                        new AddInInstalledEventArgs(package,
+                                                    result,
+                                                    installationPath,
                                                     packagePath));
             }
         }
@@ -160,10 +201,10 @@ namespace LBi.LostDoc.Packaging
                 string packageDirectory = this._packageManager.PathResolver.GetPackageDirectory(package.NuGetPackage);
                 var installationPath = Path.GetFullPath(Path.Combine(this.InstallDirectory, packageDirectory));
 
-                handler(this, 
-                        new AddInInstalledEventArgs(package, 
-                                                    result, 
-                                                    installationPath, 
+                handler(this,
+                        new AddInInstalledEventArgs(package,
+                                                    result,
+                                                    installationPath,
                                                     null));
             }
         }
@@ -181,13 +222,9 @@ namespace LBi.LostDoc.Packaging
                 foreach (var assemblyReference in package.NuGetPackage.AssemblyReferences)
                 {
                     string sourcePath = Path.Combine(this._packageManager.PathResolver.GetInstallPath(package.NuGetPackage), assemblyReference.Path);
-                    string targetPath = Path.Combine(targetdir, assemblyReference.Path);
+                    string targetPath = Path.Combine(targetdir, Path.GetFileName(assemblyReference.Path));
 
-                    string assemblyTargetDir = Path.GetDirectoryName(targetPath);
-                    if (!Directory.Exists(assemblyTargetDir))
-                        Directory.CreateDirectory(assemblyTargetDir);
-
-                    File.Copy(sourcePath, Path.Combine(targetdir, assemblyReference.Path));
+                    File.Copy(sourcePath, targetPath);
                 }
             }
             else
