@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,21 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using LBi.Cli.Arguments;
 using LBi.LostDoc.ConsoleApplication.Extensibility;
+using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
-    [ParameterSet("Save template", Command = "Export", HelpMessage = "Saves an embedded template to disk.")]
+    [ParameterSet("Save template", Command = "Export", HelpMessage = "Saves a template to disk.")]
     public class SaveTemplateCommand : ICommand
     {
         [Parameter(HelpMessage = "Output path."), Required]
@@ -33,35 +37,41 @@ namespace LBi.LostDoc.ConsoleApplication
         [Parameter(HelpMessage = "Name of template to export."), Required]
         public string Template { get; set; }
 
+        [Parameter(HelpMessage = "Name of template to export.")]
+        [DefaultValue("$true")]
+        public bool IncludeInherited { get; set; }
+
+        [Import]
+        protected TemplateResolver TemplateResolver { get; set; }
         #region ICommand Members
 
 
         public void Invoke(CompositionContainer container)
         {
-            // TODO this is really outdated and wrong
-            var traceListener = new ConsolidatedConsoleTraceListener(new Dictionary<string, string>());
+            TemplateInfo templateInfo;
+            if (!this.TemplateResolver.TryResolve(this.Template, out templateInfo))
+                Console.WriteLine("Template not found: '{0}'.", this.Template);
 
-            string basePath = this.GetType().Namespace + ".Templates." + this.Template;
-            Assembly asm = Assembly.GetExecutingAssembly();
-            string[] names = asm.GetManifestResourceNames();
-
-            foreach (string name in names)
+            do
             {
-                if (!name.StartsWith(basePath))
-                    continue;
+                foreach (string filename in templateInfo.GetFiles())
+                {
+                    Console.WriteLine(filename);
+                    string targetPath = System.IO.Path.Combine(this.Path, filename);
+                    string targetDir = System.IO.Path.GetDirectoryName(targetPath);
+                    Directory.CreateDirectory(targetDir);
+                    using (var target = new FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None)
+                        )
+                    using (var content = templateInfo.Source.OpenFile(filename, FileMode.Open))
+                    {
+                        content.CopyTo(target);
+                        content.Close();
+                        target.Close();
+                    }
+                }
 
-
-                string outputPath =
-                    System.IO.Path.GetFullPath(
-                                               System.IO.Path.Combine(
-                                                                      this.Path, name.Substring(basePath.Length + 1)));
-                string outputDir = System.IO.Path.GetDirectoryName(outputPath);
-                if (!Directory.Exists(outputDir))
-                    Directory.CreateDirectory(outputDir);
-                using (Stream inputStream = asm.GetManifestResourceStream(name))
-                using (Stream fileStream = File.OpenWrite(outputPath))
-                    inputStream.CopyTo(fileStream);
-            }
+                templateInfo = templateInfo.Inherits;
+            } while (this.IncludeInherited && templateInfo != null);
         }
 
 
