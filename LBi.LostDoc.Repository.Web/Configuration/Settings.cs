@@ -17,7 +17,7 @@ namespace LBi.LostDoc.Repository.Web.Configuration
         // Template settings
         public const string IgnoreVersionComponent = "LostDoc.Repository.IgnoreVersionComponent";
         public const string Template = "LostDoc.Repository.Template";
-        public const string TemplateParameterPrefix = "LostDoc.Repository.Template.Settings.";
+        public const string TemplateParameters = "LostDoc.Repository.Template.Parameters";
 
         // Security
         public const string ApiKey = "LostDoc.Repository.ApiKey";
