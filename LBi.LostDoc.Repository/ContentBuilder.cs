@@ -64,7 +64,7 @@ namespace LBi.LostDoc.Repository
         public Template Template { get; set; }
 
         /// <summary>
-        /// This method will construct a three folder structure inside <paramref name="targetDirectory"/> containing: Html, Index, and Source
+        /// This method will construct a four folder structure inside <paramref name="targetDirectory"/> containing: Html, Index, Source and Logs
         /// </summary>
         /// <param name="sourceDirectory">
         /// Directory containing ldoc files
