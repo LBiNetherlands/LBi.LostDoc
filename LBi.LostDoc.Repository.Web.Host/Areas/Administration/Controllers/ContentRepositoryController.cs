@@ -21,14 +21,14 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using LBi.LostDoc.Repository.Web.Areas.Administration.Controllers;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Configuration;
-using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
 using LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Notifications;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 {
     // TODO this whole controller is BL soup, but it "works"
     [AdminController("repository", Text = "Repository", Group = Groups.Core, Order = 3000)]
@@ -89,8 +89,18 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
         [AdminAction("index", IsDefault = true)]
         public ActionResult Index()
         {
-            var ldocFiles = Directory.GetFiles(this.Content.RepositoryPath, 
-                                               "*.ldoc", 
+            string repositoryPath = this.Content.RepositoryPath;
+
+            return this.View(new ContentRepositoryModel
+                                 {
+                                     Assemblies = CreateAssemblyModels(repositoryPath).ToArray()
+                                 });
+        }
+
+        private static List<AssemblyModel> CreateAssemblyModels(string repositoryPath)
+        {
+            var ldocFiles = Directory.GetFiles(repositoryPath,
+                                               "*.ldoc",
                                                SearchOption.TopDirectoryOnly);
             var ldocs = ldocFiles.Select(p => new LostDocFileInfo(p));
             var groups = ldocs.GroupBy(ld => ld.PrimaryAssembly.AssetId);
@@ -101,21 +111,17 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration.Controllers
             {
                 assemblies.Add(new AssemblyModel
                                    {
-                                       Name = group.First().PrimaryAssembly.Name, 
-                                       Versions = group.Select(ld =>
+                                       Name = @group.First().PrimaryAssembly.Name,
+                                       Versions = @group.Select(ld =>
                                                                new VersionModel
                                                                    {
-                                                                       Filename = Path.GetFileName(ld.Path), 
-                                                                       Created = System.IO.File.GetCreationTime(ld.Path), 
+                                                                       Filename = Path.GetFileName(ld.Path),
+                                                                       Created = System.IO.File.GetCreationTime(ld.Path),
                                                                        Version = ld.PrimaryAssembly.AssetId.Version
                                                                    }).ToArray()
                                    });
             }
-
-            return this.View(new ContentRepositoryModel
-                                 {
-                                     Assemblies = assemblies.ToArray()
-                                 });
+            return assemblies;
         }
 
         [HttpPost]
