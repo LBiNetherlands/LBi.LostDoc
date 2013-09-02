@@ -555,10 +555,8 @@ namespace LBi.LostDoc.Templating
                         // create and register temp file
                         // this will override the value set in PrepareTemplate in case of template inhertence
                         // TODO this is a bit hacky, maybe add Template.Name {get;} instead of this._basePath (which could be anything)
-                        this._templateSourcePath = this.SaveTempFile(tempFiles, outputDoc,
-                                                                     this._basePath
-                                                                     + ".meta."
-                                                                     + (++metaCount).ToString(CultureInfo.InvariantCulture));
+                        string filename = this._basePath + ".meta." + (++metaCount).ToString(CultureInfo.InvariantCulture);
+                        this._templateSourcePath = this.SaveTempFile(tempFiles, outputDoc, filename);
                     }
 
 
@@ -962,7 +960,7 @@ namespace LBi.LostDoc.Templating
                     {
                         CompositionContainer paramContainer = new CompositionContainer(this._container);
 
-                        // TODO export resourceTransform.Parameters into paramContainer
+                        // TODO export resourceTransform.Parameters into paramContainer using CompositionBatch
                         ImportDefinition importDefinition =
                             new MetadataContractBasedImportDefinition(
                                 typeof(IResourceTransform),
