@@ -168,10 +168,13 @@ namespace LBi.LostDoc.Repository.Web.Host
             // or if recomposition is enabled, no restart should be requried
             addInManager.Installed += (sender, args) =>
                                       {
-                                          DirectoryCatalog directoryCatalog = new DirectoryCatalog(args.InstallationPath);
-                                          catalog.Catalogs.Add(new AddInCatalog(directoryCatalog,
-                                                                                args.Package.Id,
-                                                                                args.Package.Version));
+                                          if (args.Result == PackageResult.Ok)
+                                          {
+                                              DirectoryCatalog directoryCatalog = new DirectoryCatalog(args.InstallationPath);
+                                              catalog.Catalogs.Add(new AddInCatalog(directoryCatalog,
+                                                                                    args.Package.Id,
+                                                                                    args.Package.Version));
+                                          }
                                       };
 
             // delete and redeploy all installed packages, this will trigger the Installed event ^
