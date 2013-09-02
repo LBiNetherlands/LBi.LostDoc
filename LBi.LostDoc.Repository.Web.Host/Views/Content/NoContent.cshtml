@@ -1,0 +1,33 @@
+﻿@model LBi.LostDoc.Repository.Web.Host.Models.NoContentModel
+<!DOCTYPE html>
+<style>
+    body {
+        font-family: Segoe UI, Arial, Sans serif;
+        font-size: 80%;
+    }
+
+    h1 {
+        font-weight: normal;
+        font-family: Segoe UI Light, Arial, Sans serif;
+        font-size: 2.5rem;
+        margin-top: .5rem;
+    }
+</style>
+<html>
+<head>
+    <title>Welcome to LostDoc</title>
+</head>
+<body>
+    <h1>Welcome</h1>
+    <div>
+        @if (Model.IsBuilding)
+        {
+            <p>There's no content yet, but it is currently being generated and should be ready soon.</p>
+        }
+        else
+        {
+            <p>There's no content yet, create some using the <a href="../lostdoc">management interface</a>.</p>
+        }
+    </div>
+</body>
+</html>
