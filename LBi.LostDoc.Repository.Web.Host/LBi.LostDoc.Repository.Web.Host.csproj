@@ -382,6 +382,6 @@
   </ProjectExtensions>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.8\tools\Microsoft.Bcl.Build.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y $(SolutionDir)AddInPackages\*.nupkg $(ProjectDir)App_Data\LocalPackages\</PostBuildEvent>
+    <PostBuildEvent>copy /Y $(ProjectDir)..\AddInPackages\*.nupkg $(ProjectDir)App_Data\LocalPackages\</PostBuildEvent>
   </PropertyGroup>
 </Project>
