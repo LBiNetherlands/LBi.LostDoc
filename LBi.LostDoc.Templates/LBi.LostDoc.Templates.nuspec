@@ -13,4 +13,9 @@
         <releaseNotes>First version</releaseNotes>
         <tags>LostDocAddIn LostDocTemplatePackage</tags>
     </metadata>
+    <dependencies>
+        <group>
+            <dependency id="LBi.LostDoc.Templating.Transforms.Less" />
+        </group>
+    </dependencies>
 </package>
