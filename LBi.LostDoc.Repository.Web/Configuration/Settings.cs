@@ -8,6 +8,16 @@ namespace LBi.LostDoc.Repository.Web.Configuration
 {
     public static class Settings
     {
+        public static readonly string[] Paths = { 
+                                                    ContentPath,
+                                                    TempPath,
+                                                    LogPath,
+                                                    RepositoryPath,
+                                                    AddInPackagePath,
+                                                    AddInInstallPath,
+                                                    LocalRepositoryFolder
+                                                };
+
         // Paths
         public const string ContentPath = "LostDoc.Repository.ContentPath";
         public const string TempPath = "LostDoc.Repository.TempPath";

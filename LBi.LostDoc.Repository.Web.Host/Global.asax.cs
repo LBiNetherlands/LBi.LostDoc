@@ -102,6 +102,13 @@ namespace LBi.LostDoc.Repository.Web.Host
             ISettingsProvider settings = new XamlSettingsProvider(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, settingsPath));
             Func<string, string> abs = p => Path.Combine(HttpRuntime.AppDomainAppPath, p);
 
+            foreach (string path in Settings.Paths)
+            {
+                string absPath = abs(path);
+                if (!Directory.Exists(absPath))
+                    Directory.CreateDirectory(absPath);
+            }
+
             // initialize logger 
             // TODO replace with something that writes a new log every day
             TraceListener traceListener =
