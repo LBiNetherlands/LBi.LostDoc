@@ -102,8 +102,9 @@ namespace LBi.LostDoc.Repository.Web.Host
             ISettingsProvider settings = new XamlSettingsProvider(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, settingsPath));
             Func<string, string> abs = p => Path.Combine(HttpRuntime.AppDomainAppPath, p);
 
-            foreach (string path in Settings.Paths)
+            foreach (string key in Settings.Paths)
             {
+                string path = settings.GetValue<string>(key);
                 string absPath = abs(path);
                 if (!Directory.Exists(absPath))
                     Directory.CreateDirectory(absPath);
