@@ -1,0 +1,25 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="VerifyVersion">
+
+  <PropertyGroup>
+    <!-- use contentPath instead of iisApp, because we don't have the source (iis app) running on the build server -->
+    <DeployAsIisApp>False</DeployAsIisApp>
+    <IncludeSetACLProviderOnDestination>False</IncludeSetACLProviderOnDestination>
+  </PropertyGroup>
+
+  <!-- Target hooks-->
+  <PropertyGroup>
+    <CopyAllFilesToSingleFolderForMsdeployDependsOn>
+      $(CopyAllFilesToSingleFolderForPackageDependsOn);
+    </CopyAllFilesToSingleFolderForMsdeployDependsOn>
+
+    <AfterAddDeclareParametersItems>
+      $(AfterAddDeclareParametersItems);
+    </AfterAddDeclareParametersItems>
+  </PropertyGroup>
+
+
+  <!-- This script only targets version 11.0 since we use hooks from the Microsoft.Web.Publishing.targets -->
+  <Target Name="VerifyVersion">
+    <Error Text="The publish script only support visual studio 11.0, use the following parameter: /p:VisualStudioVersion=11.0" Condition="$(VisualStudioVersion) != '11.0'" />
+  </Target>
+</Project>
