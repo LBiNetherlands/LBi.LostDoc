@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("LBi.LostDoc.Templates")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("LostDoc Base Template Pack")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("LBi Netherlands B.V.")]
 [assembly: AssemblyProduct("LBi.LostDoc.Templates")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
