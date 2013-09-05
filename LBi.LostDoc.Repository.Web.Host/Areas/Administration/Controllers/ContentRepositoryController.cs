@@ -110,16 +110,16 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             foreach (var group in groups)
             {
                 assemblies.Add(new AssemblyModel
-                                   {
-                                       Name = @group.First().PrimaryAssembly.Name,
-                                       Versions = @group.Select(ld =>
-                                                               new VersionModel
-                                                                   {
-                                                                       Filename = Path.GetFileName(ld.Path),
-                                                                       Created = System.IO.File.GetCreationTime(ld.Path),
-                                                                       Version = ld.PrimaryAssembly.AssetId.Version
-                                                                   }).ToArray()
-                                   });
+                               {
+                                   Name = @group.First().PrimaryAssembly.Name,
+                                   Versions = @group.Select(ld =>
+                                                            new VersionModel
+                                                            {
+                                                                Filename = Path.GetFileName(ld.Path),
+                                                                Created = System.IO.File.GetCreationTime(ld.Path),
+                                                                Version = ld.PrimaryAssembly.AssetId.Version
+                                                            }).ToArray()
+                               });
             }
             return assemblies;
         }
