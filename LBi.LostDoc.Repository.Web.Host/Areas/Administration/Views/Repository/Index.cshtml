@@ -30,6 +30,6 @@
 
 <h2>Upload LostDoc file</h2>
 <form action="@Url.Action("Upload")" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" />
+    <input type="file" name="file" required="required" />
     <input type="submit" name="upload" value="Upload" />
 </form>
