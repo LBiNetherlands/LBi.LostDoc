@@ -132,6 +132,9 @@ namespace LBi.LostDoc.Packaging
                 if (requiredPackage == null)
                 {
                     requiredPackage = this.Repository.Get(packageReference.Id, false);
+                    if (requiredPackage == null)
+                        throw new Exception("Could not find required add-in package: " + packageReference.Id);
+
                     this._packageManager.InstallPackage(requiredPackage.NuGetPackage, false, !requiredPackage.IsReleaseVersion);
                 }
             }
