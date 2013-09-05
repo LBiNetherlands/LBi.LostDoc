@@ -1,49 +1,63 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="VerifyVersion">
 
   <PropertyGroup>
-    <!-- use contentPath instead of iisApp, because we don't have the source (iis app) running on the build server -->
     <DeployAsIisApp>False</DeployAsIisApp>
     <IncludeSetACLProviderOnDestination>True</IncludeSetACLProviderOnDestination>
-    <SkipApp_DataFolder>True</SkipApp_DataFolder>
-  </PropertyGroup>
 
-  <!-- Target hooks-->
-  <PropertyGroup>
+    <AfterAddContentPathToSourceManifest>
+      $(AfterAddContentPathToSourceManifest);
+      IncludeAcl;
+    </AfterAddContentPathToSourceManifest>
+
+    <CopyAllFilesToSingleFolderForPackageDependsOn>
+      IncludeCoreAddInPackages;
+      $(CopyAllFilesToSingleFolderForPackageDependsOn);
+    </CopyAllFilesToSingleFolderForPackageDependsOn>
+
     <CopyAllFilesToSingleFolderForMsdeployDependsOn>
+      IncludeCoreAddInPackages;
       $(CopyAllFilesToSingleFolderForPackageDependsOn);
     </CopyAllFilesToSingleFolderForMsdeployDependsOn>
-
-    <AfterAddDeclareParametersItems>
-      $(AfterAddDeclareParametersItems);
-    </AfterAddDeclareParametersItems>
-
-    <AfterAddIisSettingAndFileContentsToSourceManifest>
-      $(AfterAddIisSettingAndFileContentsToSourceManifest);
-    </AfterAddIisSettingAndFileContentsToSourceManifest>
   </PropertyGroup>
 
-
+ 
   <!-- This script only targets version 11.0 since we use hooks from the Microsoft.Web.Publishing.targets -->
   <Target Name="VerifyVersion">
     <Error Text="The publish script only support visual studio 11.0, use the following parameter: /p:VisualStudioVersion=11.0" Condition="$(VisualStudioVersion) != '11.0'" />
   </Target>
 
-  <Target Name="AddCustomSkipRules">
+  <Target Name="IncludeAcl">
     <ItemGroup>
-      <MsDeploySkipRules Include="SkipDeleteAppData">
-        <SkipAction>Delete</SkipAction>
-        <ObjectName>filePath</ObjectName>
-        <AbsolutePath>$(_MSDeployDirPath_FullPath)\\App_Data\\.*</AbsolutePath>
-        <XPath>
-        </XPath>
-      </MsDeploySkipRules>
-      <MsDeploySkipRules Include="SkipDeleteAppData">
-        <SkipAction>Delete</SkipAction>
-        <ObjectName>dirPath</ObjectName>
-        <AbsolutePath>$(_MSDeployDirPath_FullPath)\\App_Data\\.*</AbsolutePath>
-        <XPath>
-        </XPath>
-      </MsDeploySkipRules>
+      <MsDeploySourceManifest Include="setAcl" Condition="$(IncludeSetAclProviderOnDestination)">
+        <Path>$(_MSDeployDirPath_FullPath)</Path>
+        <setAclResourceType>Directory</setAclResourceType>
+        <AdditionalProviderSettings>setAclResourceType</AdditionalProviderSettings>
+      </MsDeploySourceManifest>
+
+      <!-- Make sure by default the anonymousAuthenticationUser have read permission to the folder so MIME type files will work -->
+      <MsDeploySourceManifest Include="setAcl" Condition="$(IncludeSetAclProviderOnDestination)">
+        <Path>$(_MSDeployDirPath_FullPath)</Path>
+        <setAclUser>anonymousAuthenticationUser</setAclUser>
+        <setAclResourceType>Directory</setAclResourceType>
+        <AdditionalProviderSettings>setAclUser;setAclResourceType</AdditionalProviderSettings>
+      </MsDeploySourceManifest>
+
+      <!-- Additionally if App_Data Need to be ReadWrite -->
+      <MsDeploySourceManifest Include="setAcl" Condition="$(IncludeSetAclProviderOnDestination) And Exists('$(_MSDeployDirPath_FullPath)\App_Data')">
+        <Path>$(_MSDeployDirPath_FullPath)\App_Data</Path>
+        <setAclAccess>Write</setAclAccess>
+        <setAclResourceType>Directory</setAclResourceType>
+        <AdditionalProviderSettings>setAclResourceType;setAclAccess</AdditionalProviderSettings>
+      </MsDeploySourceManifest>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="IncludeCoreAddInPackages">
+    <ItemGroup>
+      <_CustomFiles Include="..\AddInPackages\**\*.nupkg" />
+      <FilesForPackagingFromProject Include="%(_CustomFiles.Identity)">
+        <DestinationRelativePath>App_Data\LocalPackages\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
     </ItemGroup>
   </Target>
 
