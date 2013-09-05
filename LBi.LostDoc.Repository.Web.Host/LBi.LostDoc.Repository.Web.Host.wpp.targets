@@ -3,7 +3,8 @@
   <PropertyGroup>
     <!-- use contentPath instead of iisApp, because we don't have the source (iis app) running on the build server -->
     <DeployAsIisApp>False</DeployAsIisApp>
-    <IncludeSetACLProviderOnDestination>False</IncludeSetACLProviderOnDestination>
+    <IncludeSetACLProviderOnDestination>True</IncludeSetACLProviderOnDestination>
+    <SkipApp_DataFolder>True</SkipApp_DataFolder>
   </PropertyGroup>
 
   <!-- Target hooks-->
@@ -18,7 +19,6 @@
 
     <AfterAddIisSettingAndFileContentsToSourceManifest>
       $(AfterAddIisSettingAndFileContentsToSourceManifest);
-      AddCustomSkipRules
     </AfterAddIisSettingAndFileContentsToSourceManifest>
   </PropertyGroup>
 
