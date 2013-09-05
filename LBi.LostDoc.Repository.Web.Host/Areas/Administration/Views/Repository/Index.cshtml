@@ -33,3 +33,18 @@
     <input type="file" name="file" required="required" />
     <input type="submit" name="upload" value="Upload" />
 </form>
+
+<h2>Upload Assembly & Xml documentation file</h2>
+<form action="@Url.Action("Upload")" method="POST" enctype="multipart/form-data">
+    <h3>
+        <label for="assembly">Assembly (dll or exe)</label></h3>
+    <input type="file" name="assembly" required="required" />
+
+    <h3>
+        <label for="xmldocumentation">Xml documentation file (optional)</label></h3>
+    <input type="file" name="xmldocumentation" />
+
+    <div>
+        <input type="submit" name="upload" value="Upload" />
+    </div>
+</form>
