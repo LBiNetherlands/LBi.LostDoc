@@ -15,6 +15,11 @@
     <AfterAddDeclareParametersItems>
       $(AfterAddDeclareParametersItems);
     </AfterAddDeclareParametersItems>
+
+    <AfterAddIisSettingAndFileContentsToSourceManifest>
+      $(AfterAddIisSettingAndFileContentsToSourceManifest);
+      AddCustomSkipRules
+    </AfterAddIisSettingAndFileContentsToSourceManifest>
   </PropertyGroup>
 
 
@@ -22,4 +27,24 @@
   <Target Name="VerifyVersion">
     <Error Text="The publish script only support visual studio 11.0, use the following parameter: /p:VisualStudioVersion=11.0" Condition="$(VisualStudioVersion) != '11.0'" />
   </Target>
+
+  <Target Name="AddCustomSkipRules">
+    <ItemGroup>
+      <MsDeploySkipRules Include="SkipDeleteAppData">
+        <SkipAction>Delete</SkipAction>
+        <ObjectName>filePath</ObjectName>
+        <AbsolutePath>$(_MSDeployDirPath_FullPath)\\App_Data\\.*</AbsolutePath>
+        <XPath>
+        </XPath>
+      </MsDeploySkipRules>
+      <MsDeploySkipRules Include="SkipDeleteAppData">
+        <SkipAction>Delete</SkipAction>
+        <ObjectName>dirPath</ObjectName>
+        <AbsolutePath>$(_MSDeployDirPath_FullPath)\\App_Data\\.*</AbsolutePath>
+        <XPath>
+        </XPath>
+      </MsDeploySkipRules>
+    </ItemGroup>
+  </Target>
+
 </Project>
