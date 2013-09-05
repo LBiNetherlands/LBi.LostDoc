@@ -16,7 +16,7 @@
 
     <CopyAllFilesToSingleFolderForMsdeployDependsOn>
       IncludeCoreAddInPackages;
-      $(CopyAllFilesToSingleFolderForPackageDependsOn);
+      $(CopyAllFilesToSingleFolderForMsdeployDependsOn);
     </CopyAllFilesToSingleFolderForMsdeployDependsOn>
   </PropertyGroup>
 
