@@ -54,7 +54,7 @@
 
   <Target Name="IncludeCoreAddInPackages">
     <ItemGroup>
-      <_CustomFiles Include="..\AddInPackages\**\*.nupkg" />
+      <_CustomFiles Include="App_Data\LocalPackages\*.nupkg" />
       <FilesForPackagingFromProject Include="%(_CustomFiles.Identity)">
         <DestinationRelativePath>App_Data\LocalPackages\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
