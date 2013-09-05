@@ -22,10 +22,10 @@
 <h1>@Model.Title</h1>
 
 <h2>Search</h2>
-<form method="GET" action="@Url.Action("Search")" data-target="#results">
-    <input type="search" name="terms" placeholder="Search repository" />
+<form method="GET" action="@Url.Action("Repository")" >
+    <input type="search" name="terms" placeholder="Search repository" value="@Model.Terms" />
     <input type="submit" value="Search" />
-    <input type="checkbox" id="cbIncludePrerelease" name="includePrerelease" value="true" />
+    <input type="checkbox" id="cbIncludePrerelease" name="includePrerelease" value="true" @if(Model.IncludePrerelease) { <text>checked="checked"</text> } />
     <label for="cbIncludePrerelease">Include prerelease packages</label>
     <h3>Sources</h3>
     <ul class="sources">

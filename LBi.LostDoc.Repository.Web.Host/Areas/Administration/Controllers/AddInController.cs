@@ -98,10 +98,14 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
         }
 
         [AdminAction("repository", Text = "Repository")]
-        public ActionResult Repository()
+        public ActionResult Repository(int[] source, bool? includePrerelease, string terms = null, int offset = 0, int count = 1000)
         {
-            const int COUNT = 10;
-            AddInModel[] results = this.AddIns.Repository.Search(null, true, 0, COUNT)
+            if (source == null)
+                source = Enumerable.Range(0, this.AddIns.Repository.Sources.Length).ToArray();
+
+            AddInRepository repository = new AddInRepository(source.Select(i => this.AddIns.Repository.Sources[i]).ToArray());
+
+            AddInModel[] results = repository.Search(terms, includePrerelease.HasValue && includePrerelease.Value, offset, count)
                                       .Select(pkg =>
                                               new AddInModel
                                                   {
@@ -116,9 +120,11 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             return this.View(new SearchResultModel
                                  {
                                      Title = "Add-in Repository", 
-                                     AddInSources = this.AddIns.Repository.Sources.Select(s => new AddInSourceModel {Name = s.Name, Enabled = true}).ToArray(),
-                                     Results = results, 
-                                     NextOffset = results.Length == COUNT ? COUNT : (int?)null
+                                     AddInSources = this.AddIns.Repository.Sources.Select((s,i) => new AddInSourceModel {Name = s.Name, Enabled = source.Contains(i)}).ToArray(),
+                                     Results = results,
+                                     NextOffset = results.Length == count ? count : (int?)null,
+                                     Terms = terms,
+                                     IncludePrerelease = includePrerelease ?? false
                                  });
         }
 

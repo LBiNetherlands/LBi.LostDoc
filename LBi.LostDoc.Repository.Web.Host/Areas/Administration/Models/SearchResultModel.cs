@@ -27,5 +27,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
         public string Terms { get; set; }
 
         public string Title { get; set; }
+        
+        public bool IncludePrerelease { get; set; }
     }
 }
