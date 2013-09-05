@@ -59,6 +59,8 @@
         <DestinationRelativePath>App_Data\LocalPackages\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
     </ItemGroup>
+    <Message Importance="high" Text="MONKEY @(_CustomFiles->'%(Identity)')" />
+  
   </Target>
 
 </Project>
