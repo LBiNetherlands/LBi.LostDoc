@@ -219,15 +219,6 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             return ret;
         }
 
-        [HttpPost]
-        public ActionResult UploadPackage(HttpPostedFileBase package)
-        {
-            //string target = Path.Combine(AppConfig.AddInPackagePath, Path.GetFileName(package.FileName));
-            //package.SaveAs(target);
-            //this.Container
-            return null;
-        }
-
         private bool CheckForUpdates(AddInPackage pkg)
         {
             // TODO fix prerelase hack
