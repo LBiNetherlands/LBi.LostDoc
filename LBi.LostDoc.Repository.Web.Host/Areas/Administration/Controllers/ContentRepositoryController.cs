@@ -86,7 +86,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             return new HttpStatusCodeResult(HttpStatusCode.NotFound, id + " not found");
         }
 
-        [AdminAction("index", IsDefault = true)]
+        [AdminAction("index", Text = "Content", IsDefault = true)]
         public ActionResult Index()
         {
             string repositoryPath = this.Content.RepositoryPath;
@@ -166,6 +166,12 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
                 }
             }
 
+            return this.RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult UploadAndExtract(HttpPostedFileBase assembly, HttpPostedFileBase xmlDocumentations)
+        {
             return this.RedirectToAction("Index");
         }
     }

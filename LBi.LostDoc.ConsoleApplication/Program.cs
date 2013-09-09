@@ -27,6 +27,10 @@ namespace LBi.LostDoc.ConsoleApplication
 {
     public class Program
     {
+        public void Execute(string[] args)
+        {
+            
+        }
         /// <summary>
         /// Mains the specified args.
         /// </summary>
@@ -35,13 +39,16 @@ namespace LBi.LostDoc.ConsoleApplication
         /// </param>
         public static void Main(string[] args)
         {
+            Program self = new Program();
+            self.Execute(args);
+
             WriteSignature();
 
             using (AggregateCatalog aggregateCatalog = new AggregateCatalog())
             {
                 aggregateCatalog.Catalogs.Add(new ApplicationCatalog());
 
-                string appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string appPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
                 string pluginPath = Path.Combine(appPath, "plugins");
                 if (Directory.Exists(pluginPath))
                     aggregateCatalog.Catalogs.Add(new DirectoryCatalog(pluginPath));
@@ -63,7 +70,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
         private static void WriteSignature()
         {
-            var executingAssembly = Assembly.GetExecutingAssembly();
+            var executingAssembly = Assembly.GetEntryAssembly();
             var prodAttr = executingAssembly.GetCustomAttribute<AssemblyProductAttribute>();
             Console.WriteLine("{0} (Version: {1})", prodAttr.Product, executingAssembly.GetName().Version);
             Console.WriteLine();

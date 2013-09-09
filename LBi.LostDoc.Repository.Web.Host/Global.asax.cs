@@ -51,6 +51,7 @@ namespace LBi.LostDoc.Repository.Web.Host
 // Note: For instructions on enabling IIS6 or IIS7 classic mode, 
     // visit http://go.microsoft.com/?LinkId=9394801
 
+
     public class WebApiApplication : System.Web.HttpApplication
     {
         public static void RegisterGlobalFilters(CompositionContainer container, GlobalFilterCollection filters)
@@ -216,6 +217,9 @@ namespace LBi.LostDoc.Repository.Web.Host
             // set up notifaction system
             NotificationManager notifications = new NotificationManager();
 
+            // create job manager
+            IJobQueue jobQueue = new JobQueue();
+
             // register application services in composition container
             CompositionBatch batch = new CompositionBatch();
             
@@ -227,6 +231,7 @@ namespace LBi.LostDoc.Repository.Web.Host
             this.AddExport(batch, container);
             this.AddExport(batch, settings);
             this.AddExport(batch, templateResolver);
+            this.AddExport(batch, jobQueue);
 
             container.Compose(batch);
 

@@ -42,6 +42,7 @@
     <DesktopBuildPackageLocation>Output\LBi.LostDoc.Repository.Web.zip</DesktopBuildPackageLocation>
     <DeployIisAppPath>LBi.LostDoc.Repository.Web</DeployIisAppPath>
     <PrecompileBeforePublish>true</PrecompileBeforePublish>
+    <IncludeIisSettings>false</IncludeIisSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -166,13 +167,15 @@
     <Compile Include="Areas\Administration\Models\AssemblyModel.cs" />
     <Compile Include="Areas\Administration\Models\DirectoryListModel.cs" />
     <Compile Include="Areas\Administration\Models\IndexDocumentModel.cs" />
+    <Compile Include="Areas\Administration\Models\JobModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryDescriptorModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryDetailsModel.cs" />
     <Compile Include="Areas\Administration\Models\LibraryModel.cs" />
     <Compile Include="Areas\Administration\Models\ModelBase.cs" />
     <Compile Include="Areas\Administration\Models\ContentRepositoryModel.cs" />
     <Compile Include="Areas\Administration\Models\SearchResultModel.cs" />
-    <Compile Include="Areas\Administration\Models\SystemModel.cs" />
+    <Compile Include="Areas\Administration\Models\SystemSettingsModel.cs" />
+    <Compile Include="Areas\Administration\Models\SystemStatusModel.cs" />
     <Compile Include="Areas\Administration\Models\TemplateParameterModel.cs" />
     <Compile Include="Areas\Administration\Models\VersionModel.cs" />
     <Compile Include="Controllers\ContentController.cs" />
@@ -314,7 +317,7 @@
     <Content Include="Areas\Administration\Views\Repository\Index.cshtml" />
     <Content Include="Areas\Administration\Views\Library\Index.cshtml" />
     <Content Include="Areas\Administration\Views\Library\Details.cshtml" />
-    <Content Include="Areas\Administration\Views\System\Index.cshtml" />
+    <Content Include="Areas\Administration\Views\System\Settings.cshtml" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.less" />
     <Content Include="Areas\Administration\Views\Shared\_ContentRepository.cshtml" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.tabs.less" />
@@ -327,6 +330,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Areas\Administration\Views\Library\IndexDocument.cshtml" />
+    <Content Include="Areas\Administration\Views\System\Status.cshtml" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
     <Content Include="Static\less\components.less" />
     <Content Include="Static\less\header.less" />
@@ -363,13 +367,12 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+       Other similar extension points exist, see Microsoft.Common.targets. -->
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-  </Target> -->
+  </Target>
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
   </Target>

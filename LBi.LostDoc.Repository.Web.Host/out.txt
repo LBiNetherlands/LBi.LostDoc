@@ -1,0 +1,1183 @@
+Microsoft (R) Build Engine version 4.0.30319.17929
+[Microsoft .NET Framework, version 4.0.30319.18051]
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 5-9-2013 14:06:14.
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" on node 1 (Clean;Package target(s)).
+CoreClean:
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.Web.Host.dll.config".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.Web.Host.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.Web.Host.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Antlr3.Runtime.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Packaging.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.Web.Api.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.Web.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Microsoft.Web.Infrastructure.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Newtonsoft.Json.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Json.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Net.Http.Extensions.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Net.Http.Formatting.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Net.Http.Primitives.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Helpers.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Http.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Http.WebHost.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Mvc.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Optimization.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Razor.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.WebPages.Deployment.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.WebPages.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.WebPages.Razor.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\WebGrease.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.Contrib.Highlighter.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\NuGet.Core.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.Contrib.Memory.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Microsoft.Web.XmlTransform.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Packaging.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.Web.Api.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.Web.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Antlr3.Runtime.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Newtonsoft.Json.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Json.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Net.Http.Extensions.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Net.Http.Formatting.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Net.Http.Primitives.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Helpers.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Http.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Http.WebHost.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Mvc.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Razor.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.WebPages.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.WebPages.Deployment.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\System.Web.WebPages.Razor.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.Contrib.Highlighter.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.Contrib.Highlighter.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.Contrib.Memory.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\Lucene.Net.Contrib.Memory.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\LBi.LostDoc.Repository.Web.Host.csproj.App.config".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\LBi.LostDoc.Repository.Web.Host.csprojResolveAssemblyReference.cache".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\LBi.LostDoc.Repository.Web.Host.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\LBi.LostDoc.Repository.Web.Host.pdb".
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (1) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\LBi.LostDoc.csproj" (2) on node 1 (Clean target(s)).
+CoreClean:
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll.config".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\obj\Debug\LBi.LostDoc.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\obj\Debug\LBi.LostDoc.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\obj\Debug\LBi.LostDoc.csprojResolveAssemblyReference.cache".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\LBi.LostDoc.csproj" (Clean target(s)).
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (1) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\LBi.LostDoc.Repository.csproj" (3) on node 1 (Clean target(s)).
+CoreClean:
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\ICSharpCode.SharpZipLib.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Analyzers.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Core.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.FastVectorHighlighter.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Queries.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Regex.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.SimpleFacetedSearch.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Snowball.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.SpellChecker.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Analyzers.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Analyzers.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Core.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Core.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.FastVectorHighlighter.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.FastVectorHighlighter.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Queries.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Queries.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Regex.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Regex.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.SimpleFacetedSearch.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.SimpleFacetedSearch.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Snowball.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Snowball.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.SpellChecker.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.SpellChecker.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\obj\Debug\LBi.LostDoc.Repository.csprojResolveAssemblyReference.cache".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\obj\Debug\LBi.LostDoc.Repository.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\obj\Debug\LBi.LostDoc.Repository.pdb".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\LBi.LostDoc.Repository.csproj" (Clean target(s)).
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (1) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj" (4) on node 1 (Clean target(s)).
+CoreClean:
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\Microsoft.Web.XmlTransform.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\NuGet.Core.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\obj\Debug\LBi.LostDoc.Packaging.csprojResolveAssemblyReference.cache".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\obj\Debug\LBi.LostDoc.Packaging.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\obj\Debug\LBi.LostDoc.Packaging.pdb".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj" (Clean target(s)).
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (1) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj" (5) on node 1 (Clean target(s)).
+CoreClean:
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.Api.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.Api.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Newtonsoft.Json.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\System.Net.Http.Formatting.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\System.Web.Http.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Packaging.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.Contrib.Highlighter.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\NuGet.Core.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.Contrib.Memory.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Microsoft.Web.XmlTransform.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Newtonsoft.Json.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\System.Net.Http.Formatting.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\System.Web.Http.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Packaging.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.Contrib.Highlighter.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.Contrib.Highlighter.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.Contrib.Memory.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\Lucene.Net.Contrib.Memory.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\obj\Debug\LBi.LostDoc.Repository.Web.Api.csprojResolveAssemblyReference.cache".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\obj\Debug\LBi.LostDoc.Repository.Web.Api.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\obj\Debug\LBi.LostDoc.Repository.Web.Api.pdb".
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj" (5) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\LBi.LostDoc.Repository.Web.csproj" (6) on node 1 (Clean target(s)).
+CoreClean:
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.dll.config".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Packaging.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Microsoft.Web.Infrastructure.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Newtonsoft.Json.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Net.Http.Extensions.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Net.Http.Formatting.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Net.Http.Primitives.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.Helpers.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.Http.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.Mvc.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.Razor.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.WebPages.Deployment.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.WebPages.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.WebPages.Razor.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\NuGet.Core.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.Contrib.Highlighter.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Microsoft.Web.XmlTransform.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.Contrib.Memory.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Packaging.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Newtonsoft.Json.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Net.Http.Extensions.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Net.Http.Formatting.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Net.Http.Primitives.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.Helpers.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.Http.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.Mvc.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.Razor.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.WebPages.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.WebPages.Deployment.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\System.Web.WebPages.Razor.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.Contrib.Highlighter.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.Contrib.Highlighter.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.Contrib.Memory.pdb".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Lucene.Net.Contrib.Memory.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\obj\Debug\LBi.LostDoc.Repository.Web.csproj.App.config".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\obj\Debug\LBi.LostDoc.Repository.Web.csprojResolveAssemblyReference.cache".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\obj\Debug\LBi.LostDoc.Repository.Web.dll".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\obj\Debug\LBi.LostDoc.Repository.Web.pdb".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\LBi.LostDoc.Repository.Web.csproj" (Clean target(s)).
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj" (Clean target(s)).
+CleanWebsitesPackageCore:
+  Deleting file "Output\LBi.LostDoc.Repository.Web.zip".
+CleanWebsitesPackage:
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.SourceManifest.xml".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.deploy.cmd".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.deploy-readme.txt".
+  Deleting file "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.SetParameters.xml".
+CleanWebsitesWPPAllFilesInSingleFolder:
+  Removing directory "obj\Debug\Package\PackageTmp".
+CleanWebPublishPipelineIntermediateOutput:
+  Removing directory "obj\Debug\CSAutoParameterize".
+  Removing directory "obj\Debug\TransformWebConfig".
+  Deleting file "obj\Debug\CSAutoParameterize.parameters.xml".
+  Deleting file "obj\Debug\_WPPLastBuildInfo.txt".
+CleanAspNetCompileMergeTempDirectories:
+  Removing directory "obj\Debug\AspnetCompileMerge\Source".
+  Removing directory "obj\Debug\AspnetCompileMerge\TempBuildDir".
+ValidateGlobalPackageSetting:
+  $(PackageAsSingleFile) is True
+  $(PackageFileName) is Output\LBi.LostDoc.Repository.Web.zip. Validating...
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (1) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\LBi.LostDoc.csproj" (2:5) on node 1 (default targets).
+GenerateTargetFrameworkMonikerAttribute:
+Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+CoreCompile:
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe /noconfig /nowarn:1701,1702 /nostdlib+ /errorreport:prompt /warn:4 /define:DEBUG;TRACE /highentropyva+ /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ComponentModel.Composition.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Caching.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Serialization.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ServiceModel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" /debug+ /debug:full /filealign:512 /optimize- /out:obj\Debug\LBi.LostDoc.dll /subsystemversion:6.00 /resource:Enrichers\enrich-doc-comments.xslt,LBi.LostDoc.Enrichers.enrich-doc-comments.xslt /target:library /utf8output AssetIdentifier.cs AssetResolver.cs AssetType.cs Bundle.cs Extensibility\ContractNames.cs Composition\MetadataContractBasedImportDefinition.cs Composition\MetadataContractBuilder.cs Diagnostics\TraceActivity.cs Diagnostics\TraceExtensions.cs Diagnostics\TraceSources.cs Enrichers\AssetVersionResolver.cs Enrichers\AttributeDataEnricher.cs Enrichers\ExternalNamespaceDocEnricher.cs Enrichers\XmlDocEnricher.cs FilterContext.cs FilterState.cs Filters\CompilerGeneratedFilter.cs Filters\ComObjectTypeFilter.cs Filters\DynamicallyInvokableAttributeFilter.cs Filters\EnumMetadataFilter.cs Filters\PrivateImplementationDetailsFilter.cs IAssetResolver.cs IContextBase.cs IFilterContext.cs LostDocFileInfo.cs AssemblyInfo.cs MemberInfoFilter.cs DocGenerator.cs Filters\LogicalMemberInfoVisibilityFilter.cs Filters\PublicTypeFilter.cs IEnricher.cs IProcessingContext.cs ITypeFilter.cs Filters\SpecialNameMemberInfoFilter.cs Namespaces.cs Naming.cs ProcessingContextExtensions.cs Reflection\IAssemblyLoader.cs Reflection\ReflectionOnlyAssemblyLoader.cs "Service References\MsdnContentService\Reference.cs" Templating\AliasRegistration.cs Templating\AssetSection.cs Templating\ConstantXPathVariable.cs Templating\ExportTransformAttribute.cs Templating\ExpressionXPathVariable.cs Templating\FileProviders\DirectoryFileProvider.cs Templating\AssetResolvers\FileResolver.cs Templating\AssetResolvers\MsdnResolver.cs Templating\FileProviders\HttpFileProvider.cs Templating\IResourceTransform.cs Templating\IResourceTransformMetadata.cs Templating\ParameterExport.cs Templating\ResourceTransform.cs Templating\ScopedFileProvider.cs Templating\Index.cs Templating\ParsedTemplate.cs Templating\ProgressArgs.cs Templating\Resource.cs Templating\ResourceDeployment.cs Templating\FileProviders\ResourceFileProvider.cs Templating\SectionRegistration.cs Templating\Stylesheet.cs Templating\StylesheetApplication.cs Templating\TemplateData.cs Templating\TemplateException.cs Templating\TemplateInfo.cs Templating\TemplateOutput.cs Templating\TemplateParameterInfo.cs Templating\TemplateResolver.cs Templating\Transformers\ImageScaleTransform.cs Templating\Transformers\ScalingMode.cs Templating\UnitOfWork.cs Templating\UriExtensions.cs Templating\WorkUnitResult.cs Templating\XPathVariable.cs Templating\XPath\XPathNavigatorIterator.cs Templating\XPath\CustomXsltContext.cs Templating\IFileProvider.cs Templating\ITemplatingContext.cs Templating\Template.cs Templating\TemplateXsltExtensions.cs Templating\TemplatingContext.cs Templating\IAssetUriResolver.cs ProcessingContext.cs Templating\XPath\XPathNavigatorIndex.cs Templating\XPath\XsltContextSubstringAfterLastFunction.cs Templating\XPath\XsltContextSubstringBeforeLastFunction.cs Templating\XPath\XsltContextTernaryOperator.cs VersionComponent.cs Templating\XmlFileProviderResolver.cs Templating\XPath\XsltContextAssetIdGetter.cs Templating\XPath\XsltContextAssetVersionGetter.cs Templating\XPath\XsltContextCoalesceFunction.cs Templating\XPath\XsltContextJoinFunction.cs AssetRedirectCollection.cs XmlDocReader.cs Filters\AssetGlobFilter.cs Properties\AssemblyInfo.cs "C:\Users\patrik.husfloen\AppData\Local\Temp\1\.NETFramework,Version=v4.5.AssemblyAttributes.cs"
+_CopyAppConfigFile:
+  Copying file from "app.config" to "bin\Debug\LBi.LostDoc.dll.config".
+CopyFilesToOutputDirectory:
+  Copying file from "obj\Debug\LBi.LostDoc.dll" to "bin\Debug\LBi.LostDoc.dll".
+  LBi.LostDoc -> C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll
+  Copying file from "obj\Debug\LBi.LostDoc.pdb" to "bin\Debug\LBi.LostDoc.pdb".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\LBi.LostDoc.csproj" (default targets).
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (1) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\LBi.LostDoc.Repository.csproj" (3:4) on node 1 (default targets).
+RestorePackages:
+  "..\.nuget\NuGet.exe" install "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\packages.config" -source ""  -NonInteractive -RequireConsent -solutionDir "..\ "
+  Restoring NuGet packages...
+  To prevent NuGet from downloading packages during build, open the Visual Studio Options dialog, click on the Package Manager node and uncheck 'Allow NuGet to download missing packages'.
+  All packages listed in packages.config are already installed.
+GenerateTargetFrameworkMonikerAttribute:
+Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+CoreCompile:
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe /noconfig /nowarn:1701,1702 /nostdlib+ /errorreport:prompt /warn:4 /define:DEBUG;TRACE /highentropyva+ /reference:C:\src\lbi\LBi.LostDoc\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Analyzers.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Core.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.FastVectorHighlighter.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Highlighter.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Memory.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Queries.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Regex.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SimpleFacetedSearch.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Snowball.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SpellChecker.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ComponentModel.Composition.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Numerics.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" /debug+ /debug:full /filealign:512 /optimize- /out:obj\Debug\LBi.LostDoc.Repository.dll /subsystemversion:6.00 /resource:Templates\Repository\CreateIndex.xslt,LBi.LostDoc.Repository.Templates.Repository.CreateIndex.xslt /resource:Templates\Repository\IndexInjector.xslt,LBi.LostDoc.Repository.Templates.Repository.IndexInjector.xslt /resource:Templates\Repository\template.xml,LBi.LostDoc.Repository.Templates.Repository.template.xml /target:library /utf8output ContentBuilder.cs ContentManager.cs ContentSearcher.cs ContentSettings.cs GuidExtensions.cs Lucene\NameAnalyzer.cs Lucene\TitleAnalyzer.cs Properties\AssemblyInfo.cs SearchResult.cs SearchResultSet.cs State.cs Templates\Export.cs TraceSources.cs "C:\Users\patrik.husfloen\AppData\Local\Temp\1\.NETFramework,Version=v4.5.AssemblyAttributes.cs"
+_CopyFilesMarkedCopyLocal:
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll" to "bin\Debug\ICSharpCode.SharpZipLib.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll" to "bin\Debug\LBi.LostDoc.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Analyzers.dll" to "bin\Debug\Lucene.Net.Contrib.Analyzers.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Core.dll" to "bin\Debug\Lucene.Net.Contrib.Core.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.FastVectorHighlighter.dll" to "bin\Debug\Lucene.Net.Contrib.FastVectorHighlighter.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Highlighter.dll" to "bin\Debug\Lucene.Net.Contrib.Highlighter.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Memory.dll" to "bin\Debug\Lucene.Net.Contrib.Memory.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Queries.dll" to "bin\Debug\Lucene.Net.Contrib.Queries.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Regex.dll" to "bin\Debug\Lucene.Net.Contrib.Regex.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SimpleFacetedSearch.dll" to "bin\Debug\Lucene.Net.Contrib.SimpleFacetedSearch.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Snowball.dll" to "bin\Debug\Lucene.Net.Contrib.Snowball.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SpellChecker.dll" to "bin\Debug\Lucene.Net.Contrib.SpellChecker.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll" to "bin\Debug\Lucene.Net.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.pdb" to "bin\Debug\LBi.LostDoc.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.pdb" to "bin\Debug\Lucene.Net.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.xml" to "bin\Debug\Lucene.Net.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Analyzers.pdb" to "bin\Debug\Lucene.Net.Contrib.Analyzers.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Analyzers.xml" to "bin\Debug\Lucene.Net.Contrib.Analyzers.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Core.pdb" to "bin\Debug\Lucene.Net.Contrib.Core.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Core.xml" to "bin\Debug\Lucene.Net.Contrib.Core.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.FastVectorHighlighter.pdb" to "bin\Debug\Lucene.Net.Contrib.FastVectorHighlighter.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.FastVectorHighlighter.xml" to "bin\Debug\Lucene.Net.Contrib.FastVectorHighlighter.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Highlighter.pdb" to "bin\Debug\Lucene.Net.Contrib.Highlighter.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Highlighter.xml" to "bin\Debug\Lucene.Net.Contrib.Highlighter.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Memory.pdb" to "bin\Debug\Lucene.Net.Contrib.Memory.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Memory.xml" to "bin\Debug\Lucene.Net.Contrib.Memory.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Queries.pdb" to "bin\Debug\Lucene.Net.Contrib.Queries.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Queries.xml" to "bin\Debug\Lucene.Net.Contrib.Queries.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Regex.pdb" to "bin\Debug\Lucene.Net.Contrib.Regex.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Regex.xml" to "bin\Debug\Lucene.Net.Contrib.Regex.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SimpleFacetedSearch.pdb" to "bin\Debug\Lucene.Net.Contrib.SimpleFacetedSearch.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SimpleFacetedSearch.xml" to "bin\Debug\Lucene.Net.Contrib.SimpleFacetedSearch.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Snowball.pdb" to "bin\Debug\Lucene.Net.Contrib.Snowball.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.Snowball.xml" to "bin\Debug\Lucene.Net.Contrib.Snowball.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SpellChecker.pdb" to "bin\Debug\Lucene.Net.Contrib.SpellChecker.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Lucene.Net.Contrib.3.0.3\lib\net40\Lucene.Net.Contrib.SpellChecker.xml" to "bin\Debug\Lucene.Net.Contrib.SpellChecker.xml".
+CopyFilesToOutputDirectory:
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.dll" to "bin\Debug\LBi.LostDoc.Repository.dll".
+  LBi.LostDoc.Repository -> C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.pdb" to "bin\Debug\LBi.LostDoc.Repository.pdb".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\LBi.LostDoc.Repository.csproj" (default targets).
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (1) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj" (4:3) on node 1 (default targets).
+RestorePackages:
+  "..\.nuget\NuGet.exe" install "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\packages.config" -source ""  -NonInteractive -RequireConsent -solutionDir "..\ "
+  Restoring NuGet packages...
+  To prevent NuGet from downloading packages during build, open the Visual Studio Options dialog, click on the Package Manager node and uncheck 'Allow NuGet to download missing packages'.
+  All packages listed in packages.config are already installed.
+GenerateTargetFrameworkMonikerAttribute:
+Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+CoreCompile:
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe /noconfig /nowarn:1701,1702 /nostdlib+ /errorreport:prompt /warn:4 /define:DEBUG;TRACE /highentropyva+ /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.Web.Xdt.1.0.0\lib\net40\Microsoft.Web.XmlTransform.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\NuGet.Core.2.7.0\lib\net40-Client\NuGet.Core.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ComponentModel.Composition.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" /debug+ /debug:full /filealign:512 /optimize- /out:obj\Debug\LBi.LostDoc.Packaging.dll /subsystemversion:6.00 /target:library /utf8output AddInInstalledEventArgs.cs AddInManager.cs AddInPackage.cs AddInRepository.cs AddInSource.cs Composition\AddInCatalog.cs Composition\AddInComposablePartDefinition.cs PackageEventArgs.cs PackageResult.cs Properties\AssemblyInfo.cs "C:\Users\patrik.husfloen\AppData\Local\Temp\1\.NETFramework,Version=v4.5.AssemblyAttributes.cs"
+_CopyFilesMarkedCopyLocal:
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Web.Xdt.1.0.0\lib\net40\Microsoft.Web.XmlTransform.dll" to "bin\Debug\Microsoft.Web.XmlTransform.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\NuGet.Core.2.7.0\lib\net40-Client\NuGet.Core.dll" to "bin\Debug\NuGet.Core.dll".
+CopyFilesToOutputDirectory:
+  Copying file from "obj\Debug\LBi.LostDoc.Packaging.dll" to "bin\Debug\LBi.LostDoc.Packaging.dll".
+  LBi.LostDoc.Packaging -> C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.dll
+  Copying file from "obj\Debug\LBi.LostDoc.Packaging.pdb" to "bin\Debug\LBi.LostDoc.Packaging.pdb".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj" (default targets).
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (1) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj" (5:2) on node 1 (default targets).
+RestorePackages:
+  "..\.nuget\NuGet.exe" install "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\packages.config" -source ""  -NonInteractive -RequireConsent -solutionDir "..\ "
+  Restoring NuGet packages...
+  To prevent NuGet from downloading packages during build, open the Visual Studio Options dialog, click on the Package Manager node and uncheck 'Allow NuGet to download missing packages'.
+  All packages listed in packages.config are already installed.
+Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj" (5:2) is building "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\LBi.LostDoc.Repository.Web.csproj" (6:3) on node 1 (default targets).
+RestorePackages:
+  "..\.nuget\NuGet.exe" install "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\packages.config" -source ""  -NonInteractive -RequireConsent -solutionDir "..\ "
+  Restoring NuGet packages...
+  To prevent NuGet from downloading packages during build, open the Visual Studio Options dialog, click on the Package Manager node and uncheck 'Allow NuGet to download missing packages'.
+  All packages listed in packages.config are already installed.
+GenerateTargetFrameworkMonikerAttribute:
+Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+CoreCompile:
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe /noconfig /nowarn:1701,1702 /nostdlib+ /errorreport:prompt /warn:4 /define:DEBUG;TRACE /highentropyva+ /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ComponentModel.Composition.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Configuration.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Extensions.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Primitives.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.WebRequest.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xaml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Collections.Concurrent.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Collections.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ComponentModel.Annotations.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ComponentModel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ComponentModel.EventBasedAsync.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Diagnostics.Contracts.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Diagnostics.Debug.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Diagnostics.Tools.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Diagnostics.Tracing.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Dynamic.Runtime.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Globalization.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.IO.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Linq.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Linq.Expressions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Linq.Parallel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Linq.Queryable.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Net.NetworkInformation.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Net.Primitives.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Net.Requests.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ObjectModel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Emit.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Emit.ILGeneration.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Emit.Lightweight.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Extensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Primitives.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Resources.ResourceManager.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Extensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.InteropServices.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.InteropServices.WindowsRuntime.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Numerics.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Serialization.Json.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Serialization.Primitives.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Serialization.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Security.Principal.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.Duplex.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.Http.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.NetTcp.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.Primitives.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.Security.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Text.Encoding.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Text.Encoding.Extensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Text.RegularExpressions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Threading.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Threading.Tasks.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Threading.Tasks.Parallel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Xml.ReaderWriter.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Xml.XDocument.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Xml.XmlSerializer.dll" /debug+ /debug:full /filealign:512 /optimize- /out:obj\Debug\LBi.LostDoc.Repository.Web.dll /subsystemversion:6.00 /target:library /utf8output Composition\ControllerFactory.cs Configuration\AppConfig.cs Configuration\Composition\ImportSettingAttribute.cs Configuration\Composition\SettingsConstants.cs Configuration\ISettingsProvider.cs Configuration\Settings.cs Configuration\Composition\SettingsExportProvider.cs Configuration\Xaml\Entry.cs Configuration\Xaml\EntryCollection.cs Configuration\Xaml\Settings.cs Configuration\Xaml\XamlSettingsProvider.cs DisposableExtensions.cs Extensibility\Http\AddInHttpRoute.cs Extensibility\Http\AddInHttpRouteRewriter.cs Extensibility\Http\IHttpRouteInitializer.cs Extensibility\Http\MefDependencyResolver.cs Extensibility\Http\MefHttpControllerActivator.cs Extensibility\Mvc\IMvcRouteInitializer.cs Extensibility\Mvc\AddInActionInvoker.cs Extensibility\Mvc\AddInControllerFactory.cs Extensibility\AddInModelServices.cs Extensibility\Mvc\AdminActionAttribute.cs Extensibility\Mvc\AdminControllerAttribute.cs Extensibility\Mvc\AdminFilter.cs Extensibility\ContractNames.cs Extensibility\IAddInMetadata.cs Extensibility\Mvc\IAdminModel.cs Extensibility\Mvc\IControllerMetadata.cs Extensibility\Mvc\AddInFilterProvider.cs Extensibility\Mvc\Navigation.cs Notifications\Lifetime.cs Notifications\Notification.cs Notifications\NotificationAction.cs Notifications\NotificationManager.cs Notifications\Scope.cs Notifications\Severity.cs Properties\AssemblyInfo.cs RedirectRouteHandler.cs Security\ApiKeyAuthorizeAttribute.cs TempDir.cs TraceSources.cs "C:\Users\patrik.husfloen\AppData\Local\Temp\1\.NETFramework,Version=v4.5.AssemblyAttributes.cs"
+_CopyFilesMarkedCopyLocal:
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll" to "bin\Debug\LBi.LostDoc.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.dll" to "bin\Debug\LBi.LostDoc.Packaging.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll" to "bin\Debug\LBi.LostDoc.Repository.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll" to "bin\Debug\Microsoft.Web.Infrastructure.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll" to "bin\Debug\Newtonsoft.Json.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Extensions.dll" to "bin\Debug\System.Net.Http.Extensions.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll" to "bin\Debug\System.Net.Http.Formatting.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Primitives.dll" to "bin\Debug\System.Net.Http.Primitives.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll" to "bin\Debug\System.Web.Helpers.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll" to "bin\Debug\System.Web.Http.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll" to "bin\Debug\System.Web.Mvc.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll" to "bin\Debug\System.Web.Razor.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll" to "bin\Debug\System.Web.WebPages.Deployment.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll" to "bin\Debug\System.Web.WebPages.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll" to "bin\Debug\System.Web.WebPages.Razor.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\NuGet.Core.dll" to "bin\Debug\NuGet.Core.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.dll" to "bin\Debug\Lucene.Net.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.dll" to "bin\Debug\Lucene.Net.Contrib.Highlighter.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\Microsoft.Web.XmlTransform.dll" to "bin\Debug\Microsoft.Web.XmlTransform.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.dll" to "bin\Debug\Lucene.Net.Contrib.Memory.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.pdb" to "bin\Debug\LBi.LostDoc.Packaging.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.pdb" to "bin\Debug\LBi.LostDoc.Repository.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.pdb" to "bin\Debug\LBi.LostDoc.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.xml" to "bin\Debug\Newtonsoft.Json.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Extensions.xml" to "bin\Debug\System.Net.Http.Extensions.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.xml" to "bin\Debug\System.Net.Http.Formatting.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Primitives.xml" to "bin\Debug\System.Net.Http.Primitives.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.xml" to "bin\Debug\System.Web.Helpers.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.xml" to "bin\Debug\System.Web.Http.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.xml" to "bin\Debug\System.Web.Mvc.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.xml" to "bin\Debug\System.Web.Razor.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.xml" to "bin\Debug\System.Web.WebPages.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.xml" to "bin\Debug\System.Web.WebPages.Deployment.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.xml" to "bin\Debug\System.Web.WebPages.Razor.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.pdb" to "bin\Debug\Lucene.Net.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.xml" to "bin\Debug\Lucene.Net.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.pdb" to "bin\Debug\Lucene.Net.Contrib.Highlighter.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.xml" to "bin\Debug\Lucene.Net.Contrib.Highlighter.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.pdb" to "bin\Debug\Lucene.Net.Contrib.Memory.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.xml" to "bin\Debug\Lucene.Net.Contrib.Memory.xml".
+_CopyAppConfigFile:
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.Web.csproj.App.config" to "bin\Debug\LBi.LostDoc.Repository.Web.dll.config".
+CopyFilesToOutputDirectory:
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.Web.dll" to "bin\Debug\LBi.LostDoc.Repository.Web.dll".
+  LBi.LostDoc.Repository.Web -> C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.dll
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.Web.pdb" to "bin\Debug\LBi.LostDoc.Repository.Web.pdb".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\LBi.LostDoc.Repository.Web.csproj" (default targets).
+GenerateTargetFrameworkMonikerAttribute:
+Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+CoreCompile:
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe /noconfig /nowarn:1701,1702 /nostdlib+ /errorreport:prompt /warn:4 /define:DEBUG;TRACE /highentropyva+ /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ComponentModel.Composition.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.WebRequest.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Serialization.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" /debug+ /debug:full /filealign:512 /optimize- /out:obj\Debug\LBi.LostDoc.Repository.Web.Api.dll /subsystemversion:6.00 /target:library /utf8output AddInInitializer.cs Controllers\LibraryController.cs Controllers\RepositoryController.cs Controllers\SiteController.cs Models\AssemblyVersion.cs Models\FileDescriptor.cs Models\LibraryDescriptor.cs Models\LibraryModel.cs Models\Result.cs Models\ResultSet.cs Models\SearchResult.cs Properties\AssemblyInfo.cs "C:\Users\patrik.husfloen\AppData\Local\Temp\1\.NETFramework,Version=v4.5.AssemblyAttributes.cs"
+Controllers\LibraryController.cs(42,44): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+Controllers\LibraryController.cs(52,58): warning CS0618: 'System.Xml.XmlConvert.ToDateTime(string)' is obsolete: 'Use XmlConvert.ToDateTime() that takes in XmlDateTimeSerializationMode' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+Controllers\LibraryController.cs(60,54): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+Controllers\LibraryController.cs(72,54): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+Controllers\RepositoryController.cs(50,49): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+Controllers\RepositoryController.cs(73,45): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+Controllers\RepositoryController.cs(80,45): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+Controllers\RepositoryController.cs(89,45): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+Controllers\RepositoryController.cs(104,42): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+_CopyFilesMarkedCopyLocal:
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll" to "bin\Debug\LBi.LostDoc.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll" to "bin\Debug\LBi.LostDoc.Repository.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.dll" to "bin\Debug\LBi.LostDoc.Repository.Web.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll" to "bin\Debug\Newtonsoft.Json.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll" to "bin\Debug\System.Net.Http.Formatting.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll" to "bin\Debug\System.Web.Http.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Packaging.dll" to "bin\Debug\LBi.LostDoc.Packaging.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.dll" to "bin\Debug\Lucene.Net.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.dll" to "bin\Debug\Lucene.Net.Contrib.Highlighter.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\NuGet.Core.dll" to "bin\Debug\NuGet.Core.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.dll" to "bin\Debug\Lucene.Net.Contrib.Memory.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\Microsoft.Web.XmlTransform.dll" to "bin\Debug\Microsoft.Web.XmlTransform.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.pdb" to "bin\Debug\LBi.LostDoc.Repository.Web.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.pdb" to "bin\Debug\LBi.LostDoc.Repository.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.pdb" to "bin\Debug\LBi.LostDoc.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.xml" to "bin\Debug\Newtonsoft.Json.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.xml" to "bin\Debug\System.Net.Http.Formatting.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.xml" to "bin\Debug\System.Web.Http.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Packaging.pdb" to "bin\Debug\LBi.LostDoc.Packaging.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.pdb" to "bin\Debug\Lucene.Net.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.xml" to "bin\Debug\Lucene.Net.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.pdb" to "bin\Debug\Lucene.Net.Contrib.Highlighter.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.xml" to "bin\Debug\Lucene.Net.Contrib.Highlighter.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.pdb" to "bin\Debug\Lucene.Net.Contrib.Memory.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.xml" to "bin\Debug\Lucene.Net.Contrib.Memory.xml".
+CopyFilesToOutputDirectory:
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.Web.Api.dll" to "bin\Debug\LBi.LostDoc.Repository.Web.Api.dll".
+  LBi.LostDoc.Repository.Web.Api -> C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.Api.dll
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.Web.Api.pdb" to "bin\Debug\LBi.LostDoc.Repository.Web.Api.pdb".
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj" (default targets).
+RestorePackages:
+  "..\.nuget\NuGet.exe" install "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\packages.config" -source ""  -NonInteractive -RequireConsent -solutionDir "..\ "
+  Restoring NuGet packages...
+  To prevent NuGet from downloading packages during build, open the Visual Studio Options dialog, click on the Package Manager node and uncheck 'Allow NuGet to download missing packages'.
+  All packages listed in packages.config are already installed.
+GenerateTargetFrameworkMonikerAttribute:
+Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+CoreCompile:
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe /noconfig /nowarn:1701,1702 /nostdlib+ /errorreport:prompt /warn:4 /define:DEBUG;TRACE /highentropyva+ /reference:C:\src\lbi\LBi.LostDoc\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.Api.dll /reference:C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" /reference:C:\Windows\System32\inetsrv\Microsoft.Web.Administration.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ComponentModel.Composition.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ComponentModel.DataAnnotations.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Configuration.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.Entity.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Drawing.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.IO.Compression.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\System.Json.4.0.20126.16343\lib\net40\System.Json.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Extensions.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Primitives.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.WebRequest.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Caching.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Serialization.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.Abstractions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.ApplicationServices.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.DynamicData.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.Entity.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.Extensions.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Web.Optimization.1.1.0\lib\net40\System.Web.Optimization.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Web.Routing.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll /reference:C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" /reference:C:\src\lbi\LBi.LostDoc\packages\WebGrease.1.5.2\lib\WebGrease.dll /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Collections.Concurrent.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Collections.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ComponentModel.Annotations.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ComponentModel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ComponentModel.EventBasedAsync.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Diagnostics.Contracts.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Diagnostics.Debug.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Diagnostics.Tools.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Diagnostics.Tracing.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Dynamic.Runtime.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Globalization.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.IO.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Linq.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Linq.Expressions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Linq.Parallel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Linq.Queryable.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Net.NetworkInformation.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Net.Primitives.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Net.Requests.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ObjectModel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Emit.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Emit.ILGeneration.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Emit.Lightweight.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Extensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Reflection.Primitives.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Resources.ResourceManager.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Extensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.InteropServices.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.InteropServices.WindowsRuntime.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Numerics.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Serialization.Json.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Serialization.Primitives.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Runtime.Serialization.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Security.Principal.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.Duplex.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.Http.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.NetTcp.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.Primitives.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.ServiceModel.Security.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Text.Encoding.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Text.Encoding.Extensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Text.RegularExpressions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Threading.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Threading.Tasks.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Threading.Tasks.Parallel.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Xml.ReaderWriter.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Xml.XDocument.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\System.Xml.XmlSerializer.dll" /debug+ /debug:full /optimize- /out:obj\Debug\LBi.LostDoc.Repository.Web.Host.dll /subsystemversion:6.00 /target:library /utf8output Areas\Administration\AdministrationAreaRegistration.cs Areas\Administration\Controllers\AddInController.cs Areas\Administration\Controllers\DefaultController.cs Areas\Administration\Controllers\Groups.cs Areas\Administration\Controllers\LibraryController.cs Areas\Administration\Controllers\NotificationActions.cs Areas\Administration\Controllers\ContentRepositoryController.cs Areas\Administration\Controllers\SystemController.cs Areas\Administration\Models\AddInModel.cs Areas\Administration\Models\AddInOverviewModel.cs Areas\Administration\Models\AddInSourceModel.cs Areas\Administration\Models\AssemblyModel.cs Areas\Administration\Models\DirectoryListModel.cs Areas\Administration\Models\IndexDocumentModel.cs Areas\Administration\Models\LibraryDescriptorModel.cs Areas\Administration\Models\LibraryDetailsModel.cs Areas\Administration\Models\LibraryModel.cs Areas\Administration\Models\ModelBase.cs Areas\Administration\Models\ContentRepositoryModel.cs Areas\Administration\Models\SearchResultModel.cs Areas\Administration\Models\SystemModel.cs Areas\Administration\Models\TemplateParameterModel.cs Areas\Administration\Models\VersionModel.cs Controllers\ContentController.cs Controllers\SearchController.cs Global.asax.cs Models\NoContentModel.cs Properties\AssemblyInfo.cs Areas\Administration\Extensions.cs "C:\Users\patrik.husfloen\AppData\Local\Temp\1\.NETFramework,Version=v4.5.AssemblyAttributes.cs"
+Areas\Administration\Controllers\ContentRepositoryController.cs(45,34): warning CS0108: 'LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers.ContentRepositoryController.Content' hides inherited member 'System.Web.Mvc.Controller.Content(string)'. Use the new keyword if hiding was intended. [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj]
+Areas\Administration\Controllers\LibraryController.cs(135,44): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj]
+Areas\Administration\Controllers\ContentRepositoryController.cs(133,50): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj]
+_CopyFilesMarkedCopyLocal:
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll" to "bin\Antlr3.Runtime.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll" to "bin\LBi.LostDoc.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.dll" to "bin\LBi.LostDoc.Packaging.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll" to "bin\LBi.LostDoc.Repository.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.Api.dll" to "bin\LBi.LostDoc.Repository.Web.Api.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.dll" to "bin\LBi.LostDoc.Repository.Web.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll" to "bin\Microsoft.Web.Infrastructure.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll" to "bin\Newtonsoft.Json.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\System.Json.4.0.20126.16343\lib\net40\System.Json.dll" to "bin\System.Json.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Extensions.dll" to "bin\System.Net.Http.Extensions.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll" to "bin\System.Net.Http.Formatting.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Primitives.dll" to "bin\System.Net.Http.Primitives.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll" to "bin\System.Web.Helpers.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll" to "bin\System.Web.Http.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll" to "bin\System.Web.Http.WebHost.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll" to "bin\System.Web.Mvc.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Web.Optimization.1.1.0\lib\net40\System.Web.Optimization.dll" to "bin\System.Web.Optimization.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll" to "bin\System.Web.Razor.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll" to "bin\System.Web.WebPages.Deployment.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll" to "bin\System.Web.WebPages.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll" to "bin\System.Web.WebPages.Razor.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\WebGrease.1.5.2\lib\WebGrease.dll" to "bin\WebGrease.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.dll" to "bin\Lucene.Net.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.dll" to "bin\Lucene.Net.Contrib.Highlighter.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\NuGet.Core.dll" to "bin\NuGet.Core.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.dll" to "bin\Lucene.Net.Contrib.Memory.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\Microsoft.Web.XmlTransform.dll" to "bin\Microsoft.Web.XmlTransform.dll".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.pdb" to "bin\LBi.LostDoc.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.pdb" to "bin\LBi.LostDoc.Repository.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.pdb" to "bin\LBi.LostDoc.Packaging.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.Api.pdb" to "bin\LBi.LostDoc.Repository.Web.Api.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.pdb" to "bin\LBi.LostDoc.Repository.Web.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.pdb" to "bin\Antlr3.Runtime.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.xml" to "bin\Newtonsoft.Json.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\System.Json.4.0.20126.16343\lib\net40\System.Json.xml" to "bin\System.Json.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Extensions.xml" to "bin\System.Net.Http.Extensions.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.xml" to "bin\System.Net.Http.Formatting.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Primitives.xml" to "bin\System.Net.Http.Primitives.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.xml" to "bin\System.Web.Helpers.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.xml" to "bin\System.Web.Http.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.xml" to "bin\System.Web.Http.WebHost.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.xml" to "bin\System.Web.Mvc.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.xml" to "bin\System.Web.Razor.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.xml" to "bin\System.Web.WebPages.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.xml" to "bin\System.Web.WebPages.Deployment.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.xml" to "bin\System.Web.WebPages.Razor.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.pdb" to "bin\Lucene.Net.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.xml" to "bin\Lucene.Net.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.pdb" to "bin\Lucene.Net.Contrib.Highlighter.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.xml" to "bin\Lucene.Net.Contrib.Highlighter.xml".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.pdb" to "bin\Lucene.Net.Contrib.Memory.pdb".
+  Copying file from "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.xml" to "bin\Lucene.Net.Contrib.Memory.xml".
+_CopyAppConfigFile:
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.Web.Host.csproj.App.config" to "bin\LBi.LostDoc.Repository.Web.Host.dll.config".
+CopyFilesToOutputDirectory:
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.Web.Host.dll" to "bin\LBi.LostDoc.Repository.Web.Host.dll".
+  LBi.LostDoc.Repository.Web.Host -> C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\bin\LBi.LostDoc.Repository.Web.Host.dll
+  Copying file from "obj\Debug\LBi.LostDoc.Repository.Web.Host.pdb" to "bin\LBi.LostDoc.Repository.Web.Host.pdb".
+PostBuildEvent:
+  copy /Y C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\..\AddInPackages\*.nupkg C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\App_Data\LocalPackages\
+  C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\..\AddInPackages\LBi.LostDoc.Templates.1.0.0.0.nupkg
+  C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\..\AddInPackages\LBi.LostDoc.Templating.Transforms.Less.1.0.0.0.nupkg
+          2 file(s) copied.
+CollectFilesFromIntermediateAssembly:
+  Gather all files from Project items @(IntermediateAssembly). Adding:
+  bin\LBi.LostDoc.Repository.Web.Host.dll to bin\LBi.LostDoc.Repository.Web.Host.dll
+  bin\LBi.LostDoc.Repository.Web.Host.pdb to bin\LBi.LostDoc.Repository.Web.Host.pdb
+CollectFilesFromContent:
+  Gather all files from Project items @(Content). Adding:
+  Areas\Administration\Static\Lib\jquery.fileTree\images\application.png;Areas\Administration\Static\Lib\jquery.fileTree\images\code.png;Areas\Administration\Static\Lib\jquery.fileTree\images\css.png;Areas\Administration\Static\Lib\jquery.fileTree\images\db.png;Areas\Administration\Static\Lib\jquery.fileTree\images\directory.png;Areas\Administration\Static\Lib\jquery.fileTree\images\doc.png;Areas\Administration\Static\Lib\jquery.fileTree\images\file.png;Areas\Administration\Static\Lib\jquery.fileTree\images\film.png;Areas\Administration\Static\Lib\jquery.fileTree\images\flash.png;Areas\Administration\Static\Lib\jquery.fileTree\images\folder_open.png;Areas\Administration\Static\Lib\jquery.fileTree\images\html.png;Areas\Administration\Static\Lib\jquery.fileTree\images\java.png;Areas\Administration\Static\Lib\jquery.fileTree\images\linux.png;Areas\Administration\Static\Lib\jquery.fileTree\images\music.png;Areas\Administration\Static\Lib\jquery.fileTree\images\pdf.png;Areas\Administration\Static\Lib\jquery.fileTree\images\php.png;Areas\Administration\Static\Lib\jquery.fileTree\images\picture.png;Areas\Administration\Static\Lib\jquery.fileTree\images\ppt.png;Areas\Administration\Static\Lib\jquery.fileTree\images\psd.png;Areas\Administration\Static\Lib\jquery.fileTree\images\ruby.png;Areas\Administration\Static\Lib\jquery.fileTree\images\script.png;Areas\Administration\Static\Lib\jquery.fileTree\images\spinner.gif;Areas\Administration\Static\Lib\jquery.fileTree\images\txt.png;Areas\Administration\Static\Lib\jquery.fileTree\images\xls.png;Areas\Administration\Static\Lib\jquery.fileTree\images\zip.png;Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.css;Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.js;Areas\Administration\Static\Lib\jquery.contextMenu\images\cut.png;Areas\Administration\Static\Lib\jquery.contextMenu\images\door.png;Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_add.png;Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_copy.png;Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_delete.png;Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_edit.png;Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_paste.png;Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.css;Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.js;Areas\Administration\Static\Lib\jquery.contextMenu\jquery.ui.position.js;Areas\Administration\Static\lostdoc.admin.tabs.js;Areas\Administration\Static\Lib\jquery.colorbox\colorbox.css;Areas\Administration\Static\Lib\jquery.colorbox\images\border.png;Areas\Administration\Static\Lib\jquery.colorbox\images\controls.png;Areas\Administration\Static\Lib\jquery.colorbox\images\loading.gif;Areas\Administration\Static\Lib\jquery.colorbox\images\loading_background.png;Areas\Administration\Static\Lib\jquery.colorbox\images\overlay.png;Areas\Administration\Static\lostdoc.admin.library.js;Areas\Administration\Static\Lib\jquery.colorbox\jquery.colorbox-min.js;Areas\Administration\Static\lostdoc.notifications.js;Areas\Administration\Static\Lib\less-1.3.0.min.js;Areas\Administration\Static\lostdoc.admin.js;Global.asax;Static\css\codemirror.css;Static\css\docs.css;Static\css\simple-hint.css;Static\img\line.gif;Static\img\logo_LBi.gif;Static\img\search.png;Static\js\class\editor.js;Static\js\class\inlineEditing.js;Static\js\lib\closetag.js;Static\js\lib\codemirror.js;Static\js\lib\less-1.3.0.min.js;Static\js\lib\simple-hint.js;Static\js\lib\xml-hint.js;Static\js\lib\xml.js;Static\js\lib\zepto.data.js;Static\js\lib\zepto.js;Static\js\lostdoc.js;Web.config;Web.Debug.config;Web.Release.config;Areas\Administration\Views\_ViewStart.cshtml;packages.config;repository.config;Areas\Administration\Views\Web.config;Areas\Administration\Views\Shared\_Layout.cshtml;Areas\Administration\Views\AddIns\Installed.cshtml;Areas\Administration\Views\AddIns\_CompactView.cshtml;Areas\Administration\Views\AddIns\Repository.cshtml;Areas\Administration\Views\AddIns\Search.cshtml;Areas\Administration\Views\Repository\Index.cshtml;Areas\Administration\Views\Library\Index.cshtml;Areas\Administration\Views\Library\Details.cshtml;Areas\Administration\Views\System\Index.cshtml;Areas\Administration\Static\lostdoc.admin.less;Areas\Administration\Views\Shared\_ContentRepository.cshtml;Areas\Administration\Static\lostdoc.admin.tabs.less;Areas\Administration\Views\Shared\_DirectoryListing.cshtml;Areas\Administration\Static\lostdoc.admin.library.less;App_Data\packages.config;App_Data\lostdoc.config;Areas\Administration\Views\Library\IndexDocument.cshtml;Static\less\components.less;Static\less\header.less;Static\less\icons.less;Static\less\navigation.less;Static\less\package.less;Static\less\search.less;Static\less\structure.less;Static\less\style.less;Static\less\table.less;Static\less\tags.less;Static\less\type.less;Static\less\var.less;Views\Content\NoContent.cshtml;Views\Web.config
+CollectFilesFromIntermediateSatelliteAssembliesWithTargetPath:
+  Gather all files from Project output (IntermediateSatelliteAssembliesWithTargetPath). Adding:
+CollectFilesFromReference:
+  Gather all files from Project items @(ReferenceCopyLocalPaths,ReferenceComWrappersToCopyLocal,ResolvedIsolatedComModules,_DeploymentLooseManifestFile,NativeReferenceFile).
+CollectFilesFromAllExtraReferenceFiles:
+  Gather all files from Project items @(AllExtraReferenceFiles). Adding:
+CollectFilesFrom_binDeployableAssemblies:
+  Gather all files from Project items @(_binDeployableAssemblies). Adding:
+PipelineCollectFilesPhase:
+  Publish Pipeline Collect Files Phase
+ExcludeFilesByExtension:
+  ExcludeFilesByExtension
+ExcludeFilesByExtension:
+  ExcludeFilesByExtension
+PreTransformWebConfig:
+  Found The following for Config tranformation:
+  Web.config
+  Creating directory "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\TransformWebConfig\transformed\".
+  Creating directory "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\TransformWebConfig\transformed\Areas\Administration\Views\".
+  Creating directory "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\TransformWebConfig\transformed\Views\".
+  Copying Web.config to obj\Debug\TransformWebConfig\original\Web.config.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Web.Debug.config to obj\Debug\TransformWebConfig\assist\Web.config.
+TransformWebConfigCore:
+  Transforming Source File: C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Web.config
+    Applying Transform File: C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Web.Debug.config
+    Output File: obj\Debug\TransformWebConfig\transformed\Web.config
+  Transformation succeeded
+PostTransformWebConfig:
+  Transformed Web.config using C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Web.Debug.config into obj\Debug\TransformWebConfig\transformed\Web.config.
+PipelineTransformPhase:
+  Publish Pipeline Transform Phase
+CopyAllFilesToSingleFolderForAspNetCompileMerge:
+  Creating directory "obj\Debug\AspnetCompileMerge\Source".
+  Copying all files to temporary location below for package/publish:
+  obj\Debug\AspnetCompileMerge\Source.
+  Copying bin\LBi.LostDoc.Repository.Web.Host.dll to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Repository.Web.Host.dll.
+  Copying bin\LBi.LostDoc.Repository.Web.Host.pdb to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Repository.Web.Host.pdb.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\application.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\application.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\code.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\code.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\css.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\css.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\db.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\db.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\directory.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\directory.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\doc.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\doc.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\file.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\file.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\film.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\film.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\flash.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\flash.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\folder_open.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\folder_open.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\html.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\html.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\java.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\java.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\linux.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\linux.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\music.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\music.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\pdf.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\pdf.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\php.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\php.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\picture.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\picture.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\ppt.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\ppt.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\psd.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\psd.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\ruby.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\ruby.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\script.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\script.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\spinner.gif to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\spinner.gif.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\txt.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\txt.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\xls.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\xls.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\images\zip.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\images\zip.png.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.css to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.css.
+  Copying Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.js.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\images\cut.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\images\cut.png.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\images\door.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\images\door.png.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_add.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_add.png.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_copy.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_copy.png.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_delete.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_delete.png.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_edit.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_edit.png.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_paste.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_paste.png.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.css to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.css.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.js.
+  Copying Areas\Administration\Static\Lib\jquery.contextMenu\jquery.ui.position.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.ui.position.js.
+  Copying Areas\Administration\Static\lostdoc.admin.tabs.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\lostdoc.admin.tabs.js.
+  Copying Areas\Administration\Static\Lib\jquery.colorbox\colorbox.css to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.colorbox\colorbox.css.
+  Copying Areas\Administration\Static\Lib\jquery.colorbox\images\border.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.colorbox\images\border.png.
+  Copying Areas\Administration\Static\Lib\jquery.colorbox\images\controls.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.colorbox\images\controls.png.
+  Copying Areas\Administration\Static\Lib\jquery.colorbox\images\loading.gif to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.colorbox\images\loading.gif.
+  Copying Areas\Administration\Static\Lib\jquery.colorbox\images\loading_background.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.colorbox\images\loading_background.png.
+  Copying Areas\Administration\Static\Lib\jquery.colorbox\images\overlay.png to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.colorbox\images\overlay.png.
+  Copying Areas\Administration\Static\lostdoc.admin.library.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\lostdoc.admin.library.js.
+  Copying Areas\Administration\Static\Lib\jquery.colorbox\jquery.colorbox-min.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\jquery.colorbox\jquery.colorbox-min.js.
+  Copying Areas\Administration\Static\lostdoc.notifications.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\lostdoc.notifications.js.
+  Copying Areas\Administration\Static\Lib\less-1.3.0.min.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\Lib\less-1.3.0.min.js.
+  Copying Areas\Administration\Static\lostdoc.admin.js to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\lostdoc.admin.js.
+  Copying Global.asax to obj\Debug\AspnetCompileMerge\Source\Global.asax.
+  Copying Static\css\codemirror.css to obj\Debug\AspnetCompileMerge\Source\Static\css\codemirror.css.
+  Copying Static\css\docs.css to obj\Debug\AspnetCompileMerge\Source\Static\css\docs.css.
+  Copying Static\css\simple-hint.css to obj\Debug\AspnetCompileMerge\Source\Static\css\simple-hint.css.
+  Copying Static\img\line.gif to obj\Debug\AspnetCompileMerge\Source\Static\img\line.gif.
+  Copying Static\img\logo_LBi.gif to obj\Debug\AspnetCompileMerge\Source\Static\img\logo_LBi.gif.
+  Copying Static\img\search.png to obj\Debug\AspnetCompileMerge\Source\Static\img\search.png.
+  Copying Static\js\class\editor.js to obj\Debug\AspnetCompileMerge\Source\Static\js\class\editor.js.
+  Copying Static\js\class\inlineEditing.js to obj\Debug\AspnetCompileMerge\Source\Static\js\class\inlineEditing.js.
+  Copying Static\js\lib\closetag.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lib\closetag.js.
+  Copying Static\js\lib\codemirror.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lib\codemirror.js.
+  Copying Static\js\lib\less-1.3.0.min.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lib\less-1.3.0.min.js.
+  Copying Static\js\lib\simple-hint.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lib\simple-hint.js.
+  Copying Static\js\lib\xml-hint.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lib\xml-hint.js.
+  Copying Static\js\lib\xml.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lib\xml.js.
+  Copying Static\js\lib\zepto.data.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lib\zepto.data.js.
+  Copying Static\js\lib\zepto.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lib\zepto.js.
+  Copying Static\js\lostdoc.js to obj\Debug\AspnetCompileMerge\Source\Static\js\lostdoc.js.
+  Copying Areas\Administration\Views\_ViewStart.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\_ViewStart.cshtml.
+  Copying packages.config to obj\Debug\AspnetCompileMerge\Source\packages.config.
+  Copying repository.config to obj\Debug\AspnetCompileMerge\Source\repository.config.
+  Copying Areas\Administration\Views\Web.config to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\Web.config.
+  Copying Areas\Administration\Views\Shared\_Layout.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\Shared\_Layout.cshtml.
+  Copying Areas\Administration\Views\AddIns\Installed.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\AddIns\Installed.cshtml.
+  Copying Areas\Administration\Views\AddIns\_CompactView.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\AddIns\_CompactView.cshtml.
+  Copying Areas\Administration\Views\AddIns\Repository.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\AddIns\Repository.cshtml.
+  Copying Areas\Administration\Views\AddIns\Search.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\AddIns\Search.cshtml.
+  Copying Areas\Administration\Views\Repository\Index.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\Repository\Index.cshtml.
+  Copying Areas\Administration\Views\Library\Index.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\Library\Index.cshtml.
+  Copying Areas\Administration\Views\Library\Details.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\Library\Details.cshtml.
+  Copying Areas\Administration\Views\System\Index.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\System\Index.cshtml.
+  Copying Areas\Administration\Static\lostdoc.admin.less to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\lostdoc.admin.less.
+  Copying Areas\Administration\Views\Shared\_ContentRepository.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\Shared\_ContentRepository.cshtml.
+  Copying Areas\Administration\Static\lostdoc.admin.tabs.less to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\lostdoc.admin.tabs.less.
+  Copying Areas\Administration\Views\Shared\_DirectoryListing.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\Shared\_DirectoryListing.cshtml.
+  Copying Areas\Administration\Static\lostdoc.admin.library.less to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Static\lostdoc.admin.library.less.
+  Copying App_Data\packages.config to obj\Debug\AspnetCompileMerge\Source\App_Data\packages.config.
+  Copying App_Data\lostdoc.config to obj\Debug\AspnetCompileMerge\Source\App_Data\lostdoc.config.
+  Copying Areas\Administration\Views\Library\IndexDocument.cshtml to obj\Debug\AspnetCompileMerge\Source\Areas\Administration\Views\Library\IndexDocument.cshtml.
+  Copying Static\less\components.less to obj\Debug\AspnetCompileMerge\Source\Static\less\components.less.
+  Copying Static\less\header.less to obj\Debug\AspnetCompileMerge\Source\Static\less\header.less.
+  Copying Static\less\icons.less to obj\Debug\AspnetCompileMerge\Source\Static\less\icons.less.
+  Copying Static\less\navigation.less to obj\Debug\AspnetCompileMerge\Source\Static\less\navigation.less.
+  Copying Static\less\package.less to obj\Debug\AspnetCompileMerge\Source\Static\less\package.less.
+  Copying Static\less\search.less to obj\Debug\AspnetCompileMerge\Source\Static\less\search.less.
+  Copying Static\less\structure.less to obj\Debug\AspnetCompileMerge\Source\Static\less\structure.less.
+  Copying Static\less\style.less to obj\Debug\AspnetCompileMerge\Source\Static\less\style.less.
+  Copying Static\less\table.less to obj\Debug\AspnetCompileMerge\Source\Static\less\table.less.
+  Copying Static\less\tags.less to obj\Debug\AspnetCompileMerge\Source\Static\less\tags.less.
+  Copying Static\less\type.less to obj\Debug\AspnetCompileMerge\Source\Static\less\type.less.
+  Copying Static\less\var.less to obj\Debug\AspnetCompileMerge\Source\Static\less\var.less.
+  Copying Views\Content\NoContent.cshtml to obj\Debug\AspnetCompileMerge\Source\Views\Content\NoContent.cshtml.
+  Copying Views\Web.config to obj\Debug\AspnetCompileMerge\Source\Views\Web.config.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll to obj\Debug\AspnetCompileMerge\Source\bin\Antlr3.Runtime.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.dll to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.dll to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Packaging.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.dll to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Repository.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.Api.dll to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Repository.Web.Api.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.dll to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Repository.Web.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll to obj\Debug\AspnetCompileMerge\Source\bin\Microsoft.Web.Infrastructure.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll to obj\Debug\AspnetCompileMerge\Source\bin\Newtonsoft.Json.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\System.Json.4.0.20126.16343\lib\net40\System.Json.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Json.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Extensions.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Net.Http.Extensions.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Net.Http.Formatting.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.Net.Http.2.2.13\lib\net45\System.Net.Http.Primitives.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Net.Http.Primitives.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.Helpers.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.Http.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.Http.WebHost.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.Mvc.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Web.Optimization.1.1.0\lib\net40\System.Web.Optimization.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.Optimization.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.Razor.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.WebPages.Deployment.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.WebPages.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll to obj\Debug\AspnetCompileMerge\Source\bin\System.Web.WebPages.Razor.dll.
+  Copying C:\src\lbi\LBi.LostDoc\packages\WebGrease.1.5.2\lib\WebGrease.dll to obj\Debug\AspnetCompileMerge\Source\bin\WebGrease.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.dll to obj\Debug\AspnetCompileMerge\Source\bin\Lucene.Net.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.dll to obj\Debug\AspnetCompileMerge\Source\bin\Lucene.Net.Contrib.Highlighter.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\NuGet.Core.dll to obj\Debug\AspnetCompileMerge\Source\bin\NuGet.Core.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.dll to obj\Debug\AspnetCompileMerge\Source\bin\Lucene.Net.Contrib.Memory.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\Microsoft.Web.XmlTransform.dll to obj\Debug\AspnetCompileMerge\Source\bin\Microsoft.Web.XmlTransform.dll.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc\bin\Debug\LBi.LostDoc.pdb to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.pdb.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\LBi.LostDoc.Repository.pdb to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Repository.pdb.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Packaging\bin\Debug\LBi.LostDoc.Packaging.pdb to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Packaging.pdb.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\bin\Debug\LBi.LostDoc.Repository.Web.Api.pdb to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Repository.Web.Api.pdb.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web\bin\Debug\LBi.LostDoc.Repository.Web.pdb to obj\Debug\AspnetCompileMerge\Source\bin\LBi.LostDoc.Repository.Web.pdb.
+  Copying C:\src\lbi\LBi.LostDoc\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.pdb to obj\Debug\AspnetCompileMerge\Source\bin\Antlr3.Runtime.pdb.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.pdb to obj\Debug\AspnetCompileMerge\Source\bin\Lucene.Net.pdb.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Highlighter.pdb to obj\Debug\AspnetCompileMerge\Source\bin\Lucene.Net.Contrib.Highlighter.pdb.
+  Copying C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository\bin\Debug\Lucene.Net.Contrib.Memory.pdb to obj\Debug\AspnetCompileMerge\Source\bin\Lucene.Net.Contrib.Memory.pdb.
+  Copying obj\Debug\TransformWebConfig\transformed\Web.config to obj\Debug\AspnetCompileMerge\Source\Web.config.
+AspNetPreCompile:
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\aspnet_compiler.exe -v \ -p C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\AspnetCompileMerge\Source -c -d C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\AspnetCompileMerge\TempBuildDir 
+PipelineAspNetCompileMergePhase:
+  Publish Pipeline AspnetCompileMerge Phase
+IncludeCoreAddInPackages:
+  MONKEY App_Data\LocalPackages\LBi.LostDoc.Templates.1.0.0.0.nupkg;App_Data\LocalPackages\LBi.LostDoc.Templating.Transforms.Less.1.0.0.0.nupkg
+PreAutoParameterizationWebConfigConnectionStrings:
+  Creating directory "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\CSAutoParameterize\transformed\Areas\Administration\Views\".
+  Creating directory "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\CSAutoParameterize\transformed\Views\".
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Web.config to obj\Debug\CSAutoParameterize\original\Areas\Administration\Views\Web.config.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Views\Web.config to obj\Debug\CSAutoParameterize\original\Views\Web.config.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Web.config to obj\Debug\CSAutoParameterize\original\Web.config.
+AutoParameterizationWebConfigConnectionStringsCore:
+  Transforming Source File: C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Web.config
+    Applying Transform File: <?xml version="1.0"?>
+          <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+            <connectionStrings>
+              <add
+                connectionString="{% token='$(ReplacableToken_#(parameter)_#(tokennumber))' xpathlocator='name' parameter='$(name)-Web.config Connection String' description='$(name) Connection String used in web.config by the application to access the database.' defaultValue='$(connectionString)' tags='SqlConnectionString' %}"
+                xdt:Transform="SetTokenizedAttributes(connectionString)" xdt:SupressWarnings="True" />
+            </connectionStrings>
+          </configuration>
+    No element in the source document matches '/configuration/connectionStrings'
+    Not executing SetTokenizedAttributes (transform line 6, 15)
+    Output File: obj\Debug\CSAutoParameterize\transformed\Areas\Administration\Views\Web.config
+  Transformation succeeded
+  Transforming Source File: C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\AspnetCompileMerge\TempBuildDir\Views\Web.config
+    Applying Transform File: <?xml version="1.0"?>
+          <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+            <connectionStrings>
+              <add
+                connectionString="{% token='$(ReplacableToken_#(parameter)_#(tokennumber))' xpathlocator='name' parameter='$(name)-Web.config Connection String' description='$(name) Connection String used in web.config by the application to access the database.' defaultValue='$(connectionString)' tags='SqlConnectionString' %}"
+                xdt:Transform="SetTokenizedAttributes(connectionString)" xdt:SupressWarnings="True" />
+            </connectionStrings>
+          </configuration>
+    No element in the source document matches '/configuration/connectionStrings'
+    Not executing SetTokenizedAttributes (transform line 6, 15)
+    Output File: obj\Debug\CSAutoParameterize\transformed\Views\Web.config
+  Transformation succeeded
+  Transforming Source File: C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\AspnetCompileMerge\TempBuildDir\Web.config
+    Applying Transform File: <?xml version="1.0"?>
+          <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+            <connectionStrings>
+              <add
+                connectionString="{% token='$(ReplacableToken_#(parameter)_#(tokennumber))' xpathlocator='name' parameter='$(name)-Web.config Connection String' description='$(name) Connection String used in web.config by the application to access the database.' defaultValue='$(connectionString)' tags='SqlConnectionString' %}"
+                xdt:Transform="SetTokenizedAttributes(connectionString)" xdt:SupressWarnings="True" />
+            </connectionStrings>
+          </configuration>
+    No element in the source document matches '/configuration/connectionStrings/add'
+    Not executing SetTokenizedAttributes (transform line 6, 15)
+    Output File: obj\Debug\CSAutoParameterize\transformed\Web.config
+  Transformation succeeded
+PostAutoParameterizationWebConfigConnectionStrings:
+  Auto ConnectionString Transformed obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Web.config into obj\Debug\CSAutoParameterize\transformed\Areas\Administration\Views\Web.config.
+  Auto ConnectionString Transformed obj\Debug\AspnetCompileMerge\TempBuildDir\Views\Web.config into obj\Debug\CSAutoParameterize\transformed\Views\Web.config.
+  Auto ConnectionString Transformed obj\Debug\AspnetCompileMerge\TempBuildDir\Web.config into obj\Debug\CSAutoParameterize\transformed\Web.config.
+PipelineMsdeploySpecificTransformPhase:
+  Publish Pipeline Deploy phase Stage PipelineMsdeploySpecificTransformPhase
+CopyAllFilesToSingleFolderForMsdeploy:
+  Creating directory "obj\Debug\Package\PackageTmp".
+  Copying all files to temporary location below for package/publish:
+  obj\Debug\Package\PackageTmp.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\PrecompiledApp.config to obj\Debug\Package\PackageTmp\PrecompiledApp.config.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_global.asax.compiled to obj\Debug\Package\PackageTmp\bin\App_global.asax.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_global.asax.dll to obj\Debug\Package\PackageTmp\bin\App_global.asax.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_global.asax.pdb to obj\Debug\Package\PackageTmp\bin\App_global.asax.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_ax2u1deh.dll to obj\Debug\Package\PackageTmp\bin\App_Web_ax2u1deh.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_ax2u1deh.pdb to obj\Debug\Package\PackageTmp\bin\App_Web_ax2u1deh.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_hxbvu4ol.dll to obj\Debug\Package\PackageTmp\bin\App_Web_hxbvu4ol.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_hxbvu4ol.pdb to obj\Debug\Package\PackageTmp\bin\App_Web_hxbvu4ol.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_ibpgz12o.dll to obj\Debug\Package\PackageTmp\bin\App_Web_ibpgz12o.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_ibpgz12o.pdb to obj\Debug\Package\PackageTmp\bin\App_Web_ibpgz12o.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_jdockgsq.dll to obj\Debug\Package\PackageTmp\bin\App_Web_jdockgsq.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_jdockgsq.pdb to obj\Debug\Package\PackageTmp\bin\App_Web_jdockgsq.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_nq2nswdf.dll to obj\Debug\Package\PackageTmp\bin\App_Web_nq2nswdf.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_nq2nswdf.pdb to obj\Debug\Package\PackageTmp\bin\App_Web_nq2nswdf.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_q53emrym.dll to obj\Debug\Package\PackageTmp\bin\App_Web_q53emrym.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_q53emrym.pdb to obj\Debug\Package\PackageTmp\bin\App_Web_q53emrym.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_w5cx5jai.dll to obj\Debug\Package\PackageTmp\bin\App_Web_w5cx5jai.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\App_Web_w5cx5jai.pdb to obj\Debug\Package\PackageTmp\bin\App_Web_w5cx5jai.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\details.cshtml.52c95399.compiled to obj\Debug\Package\PackageTmp\bin\details.cshtml.52c95399.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\index.cshtml.21baf8e8.compiled to obj\Debug\Package\PackageTmp\bin\index.cshtml.21baf8e8.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\index.cshtml.52c95399.compiled to obj\Debug\Package\PackageTmp\bin\index.cshtml.52c95399.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\index.cshtml.eb799c19.compiled to obj\Debug\Package\PackageTmp\bin\index.cshtml.eb799c19.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\indexdocument.cshtml.52c95399.compiled to obj\Debug\Package\PackageTmp\bin\indexdocument.cshtml.52c95399.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\installed.cshtml.1a462008.compiled to obj\Debug\Package\PackageTmp\bin\installed.cshtml.1a462008.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\nocontent.cshtml.eba9863.compiled to obj\Debug\Package\PackageTmp\bin\nocontent.cshtml.eba9863.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\repository.cshtml.1a462008.compiled to obj\Debug\Package\PackageTmp\bin\repository.cshtml.1a462008.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\search.cshtml.1a462008.compiled to obj\Debug\Package\PackageTmp\bin\search.cshtml.1a462008.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\_compactview.cshtml.1a462008.compiled to obj\Debug\Package\PackageTmp\bin\_compactview.cshtml.1a462008.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\_contentrepository.cshtml.77b367ba.compiled to obj\Debug\Package\PackageTmp\bin\_contentrepository.cshtml.77b367ba.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\_directorylisting.cshtml.77b367ba.compiled to obj\Debug\Package\PackageTmp\bin\_directorylisting.cshtml.77b367ba.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\_layout.cshtml.77b367ba.compiled to obj\Debug\Package\PackageTmp\bin\_layout.cshtml.77b367ba.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\_viewstart.cshtml.ac9a220a.compiled to obj\Debug\Package\PackageTmp\bin\_viewstart.cshtml.ac9a220a.compiled.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Repository.Web.Host.dll to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.Host.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Repository.Web.Host.pdb to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.Host.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\application.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\application.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\code.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\code.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\css.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\css.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\db.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\db.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\directory.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\directory.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\doc.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\doc.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\file.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\file.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\film.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\film.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\flash.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\flash.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\folder_open.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\folder_open.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\html.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\html.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\java.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\java.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\linux.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\linux.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\music.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\music.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\pdf.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\pdf.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\php.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\php.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\picture.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\picture.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\ppt.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\ppt.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\psd.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\psd.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\ruby.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\ruby.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\script.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\script.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\spinner.gif to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\spinner.gif.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\txt.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\txt.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\xls.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\xls.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\images\zip.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\zip.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.css to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.css.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\images\cut.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\cut.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\images\door.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\door.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_add.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_add.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_copy.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_copy.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_delete.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_delete.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_edit.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_edit.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_paste.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_paste.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.css to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.css.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.ui.position.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.ui.position.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\lostdoc.admin.tabs.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.tabs.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.colorbox\colorbox.css to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\colorbox.css.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.colorbox\images\border.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\border.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.colorbox\images\controls.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\controls.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.colorbox\images\loading.gif to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\loading.gif.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.colorbox\images\loading_background.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\loading_background.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.colorbox\images\overlay.png to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\overlay.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\lostdoc.admin.library.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.library.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\jquery.colorbox\jquery.colorbox-min.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\jquery.colorbox-min.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\lostdoc.notifications.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.notifications.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\Lib\less-1.3.0.min.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\less-1.3.0.min.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\lostdoc.admin.js to obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\css\codemirror.css to obj\Debug\Package\PackageTmp\Static\css\codemirror.css.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\css\docs.css to obj\Debug\Package\PackageTmp\Static\css\docs.css.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\css\simple-hint.css to obj\Debug\Package\PackageTmp\Static\css\simple-hint.css.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\img\line.gif to obj\Debug\Package\PackageTmp\Static\img\line.gif.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\img\logo_LBi.gif to obj\Debug\Package\PackageTmp\Static\img\logo_LBi.gif.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\img\search.png to obj\Debug\Package\PackageTmp\Static\img\search.png.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\class\editor.js to obj\Debug\Package\PackageTmp\Static\js\class\editor.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\class\inlineEditing.js to obj\Debug\Package\PackageTmp\Static\js\class\inlineEditing.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lib\closetag.js to obj\Debug\Package\PackageTmp\Static\js\lib\closetag.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lib\codemirror.js to obj\Debug\Package\PackageTmp\Static\js\lib\codemirror.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lib\less-1.3.0.min.js to obj\Debug\Package\PackageTmp\Static\js\lib\less-1.3.0.min.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lib\simple-hint.js to obj\Debug\Package\PackageTmp\Static\js\lib\simple-hint.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lib\xml-hint.js to obj\Debug\Package\PackageTmp\Static\js\lib\xml-hint.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lib\xml.js to obj\Debug\Package\PackageTmp\Static\js\lib\xml.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lib\zepto.data.js to obj\Debug\Package\PackageTmp\Static\js\lib\zepto.data.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lib\zepto.js to obj\Debug\Package\PackageTmp\Static\js\lib\zepto.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\js\lostdoc.js to obj\Debug\Package\PackageTmp\Static\js\lostdoc.js.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\_ViewStart.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\_ViewStart.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\packages.config to obj\Debug\Package\PackageTmp\packages.config.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\repository.config to obj\Debug\Package\PackageTmp\repository.config.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Shared\_Layout.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\Shared\_Layout.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\AddIns\Installed.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns\Installed.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\AddIns\_CompactView.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns\_CompactView.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\AddIns\Repository.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns\Repository.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\AddIns\Search.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns\Search.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Repository\Index.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\Repository\Index.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Library\Index.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\Library\Index.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Library\Details.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\Library\Details.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\System\Index.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\System\Index.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\lostdoc.admin.less to obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Shared\_ContentRepository.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\Shared\_ContentRepository.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\lostdoc.admin.tabs.less to obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.tabs.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Shared\_DirectoryListing.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\Shared\_DirectoryListing.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Static\lostdoc.admin.library.less to obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.library.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\App_Data\packages.config to obj\Debug\Package\PackageTmp\App_Data\packages.config.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\App_Data\lostdoc.config to obj\Debug\Package\PackageTmp\App_Data\lostdoc.config.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Areas\Administration\Views\Library\IndexDocument.cshtml to obj\Debug\Package\PackageTmp\Areas\Administration\Views\Library\IndexDocument.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\components.less to obj\Debug\Package\PackageTmp\Static\less\components.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\header.less to obj\Debug\Package\PackageTmp\Static\less\header.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\icons.less to obj\Debug\Package\PackageTmp\Static\less\icons.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\navigation.less to obj\Debug\Package\PackageTmp\Static\less\navigation.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\package.less to obj\Debug\Package\PackageTmp\Static\less\package.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\search.less to obj\Debug\Package\PackageTmp\Static\less\search.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\structure.less to obj\Debug\Package\PackageTmp\Static\less\structure.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\style.less to obj\Debug\Package\PackageTmp\Static\less\style.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\table.less to obj\Debug\Package\PackageTmp\Static\less\table.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\tags.less to obj\Debug\Package\PackageTmp\Static\less\tags.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\type.less to obj\Debug\Package\PackageTmp\Static\less\type.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Static\less\var.less to obj\Debug\Package\PackageTmp\Static\less\var.less.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\Views\Content\NoContent.cshtml to obj\Debug\Package\PackageTmp\Views\Content\NoContent.cshtml.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Antlr3.Runtime.dll to obj\Debug\Package\PackageTmp\bin\Antlr3.Runtime.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.dll to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Packaging.dll to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Packaging.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Repository.dll to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Repository.Web.Api.dll to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.Api.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Repository.Web.dll to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Microsoft.Web.Infrastructure.dll to obj\Debug\Package\PackageTmp\bin\Microsoft.Web.Infrastructure.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Newtonsoft.Json.dll to obj\Debug\Package\PackageTmp\bin\Newtonsoft.Json.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Json.dll to obj\Debug\Package\PackageTmp\bin\System.Json.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Net.Http.Extensions.dll to obj\Debug\Package\PackageTmp\bin\System.Net.Http.Extensions.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Net.Http.Formatting.dll to obj\Debug\Package\PackageTmp\bin\System.Net.Http.Formatting.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Net.Http.Primitives.dll to obj\Debug\Package\PackageTmp\bin\System.Net.Http.Primitives.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.Helpers.dll to obj\Debug\Package\PackageTmp\bin\System.Web.Helpers.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.Http.dll to obj\Debug\Package\PackageTmp\bin\System.Web.Http.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.Http.WebHost.dll to obj\Debug\Package\PackageTmp\bin\System.Web.Http.WebHost.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.Mvc.dll to obj\Debug\Package\PackageTmp\bin\System.Web.Mvc.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.Optimization.dll to obj\Debug\Package\PackageTmp\bin\System.Web.Optimization.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.Razor.dll to obj\Debug\Package\PackageTmp\bin\System.Web.Razor.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.WebPages.Deployment.dll to obj\Debug\Package\PackageTmp\bin\System.Web.WebPages.Deployment.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.WebPages.dll to obj\Debug\Package\PackageTmp\bin\System.Web.WebPages.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\System.Web.WebPages.Razor.dll to obj\Debug\Package\PackageTmp\bin\System.Web.WebPages.Razor.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\WebGrease.dll to obj\Debug\Package\PackageTmp\bin\WebGrease.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Lucene.Net.dll to obj\Debug\Package\PackageTmp\bin\Lucene.Net.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Lucene.Net.Contrib.Highlighter.dll to obj\Debug\Package\PackageTmp\bin\Lucene.Net.Contrib.Highlighter.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\NuGet.Core.dll to obj\Debug\Package\PackageTmp\bin\NuGet.Core.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Lucene.Net.Contrib.Memory.dll to obj\Debug\Package\PackageTmp\bin\Lucene.Net.Contrib.Memory.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Microsoft.Web.XmlTransform.dll to obj\Debug\Package\PackageTmp\bin\Microsoft.Web.XmlTransform.dll.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.pdb to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Repository.pdb to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Packaging.pdb to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Packaging.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Repository.Web.Api.pdb to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.Api.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\LBi.LostDoc.Repository.Web.pdb to obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Antlr3.Runtime.pdb to obj\Debug\Package\PackageTmp\bin\Antlr3.Runtime.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Lucene.Net.pdb to obj\Debug\Package\PackageTmp\bin\Lucene.Net.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Lucene.Net.Contrib.Highlighter.pdb to obj\Debug\Package\PackageTmp\bin\Lucene.Net.Contrib.Highlighter.pdb.
+  Copying obj\Debug\AspnetCompileMerge\TempBuildDir\bin\Lucene.Net.Contrib.Memory.pdb to obj\Debug\Package\PackageTmp\bin\Lucene.Net.Contrib.Memory.pdb.
+  Copying App_Data\LocalPackages\LBi.LostDoc.Templates.1.0.0.0.nupkg to obj\Debug\Package\PackageTmp\App_Data\LocalPackages\LBi.LostDoc.Templates.1.0.0.0.nupkg.
+  Copying App_Data\LocalPackages\LBi.LostDoc.Templating.Transforms.Less.1.0.0.0.nupkg to obj\Debug\Package\PackageTmp\App_Data\LocalPackages\LBi.LostDoc.Templating.Transforms.Less.1.0.0.0.nupkg.
+  Copying obj\Debug\CSAutoParameterize\transformed\Areas\Administration\Views\Web.config to obj\Debug\Package\PackageTmp\Areas\Administration\Views\Web.config.
+  Copying obj\Debug\CSAutoParameterize\transformed\Views\Web.config to obj\Debug\Package\PackageTmp\Views\Web.config.
+  Copying obj\Debug\CSAutoParameterize\transformed\Web.config to obj\Debug\Package\PackageTmp\Web.config.
+PipelineCopyAllFilesToOneFolderForMsdeploy:
+  Publish Pipeline Deploy phase Stage PipelineCopyAllFilesToOneFolderForMsdeploy
+Package:
+  Invoking Web Deploy to generate the package with the following settings:
+  $(LocalIisVersion) is 8
+  $(DestinationIisVersion) is 8
+  $(UseIis) is False
+  $(IncludeIisSettings) is false
+  $(_DeploymentUseIis) is False
+  $(DestinationUseIis) is False
+GetMSDeployInstalledVersionPath:
+  $(_DefaultMSDeployMaxVersion) is 3
+  $(_MSDeployVersionsToTry) is 9.0
+  $(MSDeployPath) is C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\
+GenerateMsdeployManifestFiles:
+  Generate source manifest file for Web Deploy package/publish ...
+PackageUsingManifest:
+  Packaging into C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.zip.
+  Starting Web deployment task from source: manifest(C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.SourceManifest.xml) to Destination: package(C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.zip).
+  Adding sitemanifest (sitemanifest).
+  Adding ACL's for path (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp)
+  Adding ACL's for path (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp)
+  Adding ACL's for path (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\App_Data)
+  Adding virtual path (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp)
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\App_Data).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\App_Data\LocalPackages).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\App_Data\LocalPackages\LBi.LostDoc.Templates.1.0.0.0.nupkg).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\App_Data\LocalPackages\LBi.LostDoc.Templating.Transforms.Less.1.0.0.0.nupkg).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\App_Data\lostdoc.config).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\App_Data\packages.config).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\colorbox.css).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\border.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\controls.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\loading.gif).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\loading_background.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\images\overlay.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.colorbox\jquery.colorbox-min.js).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\cut.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\door.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_add.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_copy.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_delete.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_edit.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\images\page_white_paste.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.css).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.contextMenu.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.contextMenu\jquery.ui.position.js).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\application.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\code.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\css.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\db.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\directory.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\doc.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\file.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\film.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\flash.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\folder_open.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\html.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\java.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\linux.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\music.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\pdf.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\php.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\picture.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\ppt.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\psd.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\ruby.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\script.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\spinner.gif).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\txt.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\xls.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\images\zip.png).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.css).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\jquery.fileTree\jqueryFileTree.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\Lib\less-1.3.0.min.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.library.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.library.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.tabs.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.admin.tabs.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Static\lostdoc.notifications.js).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns\Installed.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns\Repository.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns\Search.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\AddIns\_CompactView.cshtml).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Library).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Library\Details.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Library\Index.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Library\IndexDocument.cshtml).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Repository).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Repository\Index.cshtml).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Shared).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Shared\_ContentRepository.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Shared\_DirectoryListing.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Shared\_Layout.cshtml).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\System).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\System\Index.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\Web.config).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Areas\Administration\Views\_ViewStart.cshtml).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Antlr3.Runtime.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Antlr3.Runtime.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_global.asax.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_global.asax.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_global.asax.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_ax2u1deh.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_ax2u1deh.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_hxbvu4ol.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_hxbvu4ol.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_ibpgz12o.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_ibpgz12o.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_jdockgsq.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_jdockgsq.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_nq2nswdf.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_nq2nswdf.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_q53emrym.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_q53emrym.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_w5cx5jai.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\App_Web_w5cx5jai.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\details.cshtml.52c95399.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\index.cshtml.21baf8e8.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\index.cshtml.52c95399.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\index.cshtml.eb799c19.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\indexdocument.cshtml.52c95399.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\installed.cshtml.1a462008.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Packaging.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Packaging.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.Api.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.Api.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.Host.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.Host.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\LBi.LostDoc.Repository.Web.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Lucene.Net.Contrib.Highlighter.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Lucene.Net.Contrib.Highlighter.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Lucene.Net.Contrib.Memory.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Lucene.Net.Contrib.Memory.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Lucene.Net.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Lucene.Net.pdb).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Microsoft.Web.Infrastructure.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Microsoft.Web.XmlTransform.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\Newtonsoft.Json.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\nocontent.cshtml.eba9863.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\NuGet.Core.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\repository.cshtml.1a462008.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\search.cshtml.1a462008.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Json.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Net.Http.Extensions.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Net.Http.Formatting.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Net.Http.Primitives.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.Helpers.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.Http.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.Http.WebHost.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.Mvc.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.Optimization.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.Razor.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.WebPages.Deployment.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.WebPages.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\System.Web.WebPages.Razor.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\WebGrease.dll).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\_compactview.cshtml.1a462008.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\_contentrepository.cshtml.77b367ba.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\_directorylisting.cshtml.77b367ba.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\_layout.cshtml.77b367ba.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\bin\_viewstart.cshtml.ac9a220a.compiled).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\packages.config).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\PrecompiledApp.config).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\repository.config).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\css).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\css\codemirror.css).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\css\docs.css).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\css\simple-hint.css).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\img).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\img\line.gif).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\img\logo_LBi.gif).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\img\search.png).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\class).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\class\editor.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\class\inlineEditing.js).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib\closetag.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib\codemirror.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib\less-1.3.0.min.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib\simple-hint.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib\xml-hint.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib\xml.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib\zepto.data.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lib\zepto.js).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\js\lostdoc.js).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\components.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\header.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\icons.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\navigation.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\package.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\search.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\structure.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\style.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\table.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\tags.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\type.less).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Static\less\var.less).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Views).
+  Adding directory (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Views\Content).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Views\Content\NoContent.cshtml).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Views\Web.config).
+  Adding file (C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\Web.config).
+  Adding declared parameter 'IIS Web Application Name'.
+  Adding declared parameter 'Add write permission to App_Data Folder'.
+  Successfully executed Web deployment task.
+  Package "LBi.LostDoc.Repository.Web.zip" is successfully created as single file at the following location:
+  file:///C:/src/lbi/LBi.LostDoc/LBi.LostDoc.Repository.Web.Host/Output
+  To get the instructions on how to deploy the web package please visit the following link:
+  http://go.microsoft.com/fwlink/?LinkId=124618
+GenerateSampleDeployScript:
+  Sample script for deploying this package is generated at the following location:
+  C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.deploy.cmd
+  For this sample script, you can change the deploy parameters by changing the following file: 
+  C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\Output\LBi.LostDoc.Repository.Web.SetParameters.xml
+Done Building Project "C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (Clean;Package target(s)).
+
+Build succeeded.
+
+"C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (Clean;Package target) (1) ->
+"C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj" (default target) (5:2) ->
+(CoreCompile target) -> 
+  Controllers\LibraryController.cs(42,44): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+  Controllers\LibraryController.cs(52,58): warning CS0618: 'System.Xml.XmlConvert.ToDateTime(string)' is obsolete: 'Use XmlConvert.ToDateTime() that takes in XmlDateTimeSerializationMode' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+  Controllers\LibraryController.cs(60,54): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+  Controllers\LibraryController.cs(72,54): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+  Controllers\RepositoryController.cs(50,49): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+  Controllers\RepositoryController.cs(73,45): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+  Controllers\RepositoryController.cs(80,45): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+  Controllers\RepositoryController.cs(89,45): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+  Controllers\RepositoryController.cs(104,42): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Api\LBi.LostDoc.Repository.Web.Api.csproj]
+
+
+"C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj" (Clean;Package target) (1) ->
+  Areas\Administration\Controllers\ContentRepositoryController.cs(45,34): warning CS0108: 'LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers.ContentRepositoryController.Content' hides inherited member 'System.Web.Mvc.Controller.Content(string)'. Use the new keyword if hiding was intended. [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj]
+  Areas\Administration\Controllers\LibraryController.cs(135,44): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj]
+  Areas\Administration\Controllers\ContentRepositoryController.cs(133,50): warning CS0618: 'LBi.LostDoc.Repository.Web.Configuration.AppConfig' is obsolete: 'Don't use this anymore.' [C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\LBi.LostDoc.Repository.Web.Host.csproj]
+
+    12 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:10.18

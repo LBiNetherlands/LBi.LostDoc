@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<sitemanifest>
+  <setAcl path="C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp" setAclResourceType="Directory" />
+  <setAcl path="C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp" setAclUser="anonymousAuthenticationUser" setAclResourceType="Directory" />
+  <setAcl path="C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp\App_Data" setAclResourceType="Directory" setAclAccess="Write" />
+  <contentPath path="C:\src\lbi\LBi.LostDoc\LBi.LostDoc.Repository.Web.Host\obj\Debug\Package\PackageTmp" />
+</sitemanifest>

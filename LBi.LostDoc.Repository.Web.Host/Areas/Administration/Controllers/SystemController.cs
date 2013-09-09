@@ -40,20 +40,34 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
     public class SystemController : Controller
     {
         [ImportingConstructor]
-        public SystemController(ISettingsProvider settingsProvider, TemplateResolver templateResolver)
+        public SystemController(ISettingsProvider settingsProvider, TemplateResolver templateResolver, IJobQueue jobQueue)
         {
             this.SettingsProvider = settingsProvider;
             this.TemplateResolver = templateResolver;
+            this.JobQueue = jobQueue;
         }
+
+        protected IJobQueue JobQueue { get; set; }
 
         protected ISettingsProvider SettingsProvider { get; set; }
 
         protected TemplateResolver TemplateResolver { get; set; }
 
-        [AdminAction("index", IsDefault = true, Text = "Status")]
-        public ActionResult Index()
+        [AdminAction("status", IsDefault = true, Text = "Status")]
+        public ActionResult Status()
         {
-            string currentTemplateName = this.SettingsProvider.GetValue<string>(Settings.Template);
+            IEnumerable<KeyValuePair<decimal, IJob>> jobs = this.JobQueue.AsEnumerable();
+
+            return this.View(new SystemStatusModel()
+            {
+                JobQueue = jobs.Select(j => new JobModel {Index = j.Key, Name = j.Value.Name, Started = j.Value.Started, Created = j.Value.Created }).ToArray()
+            });
+        }
+
+        [AdminAction("settings", IsDefault = true, Text = "Settings")]
+        public ActionResult Settings()
+        {
+            string currentTemplateName = this.SettingsProvider.GetValue<string>(Configuration.Settings.Template);
             TemplateInfo template;
 
             if (!this.TemplateResolver.TryResolve(currentTemplateName, out template))
@@ -71,7 +85,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             else
                 templateParameters = new TemplateParameterModel[0];
 
-            return this.View(new SystemModel()
+            return this.View(new SystemSettingsModel()
                                  {
                                      Templates = this.TemplateResolver.GetTemplates().Select(ti => ti.Name).ToArray(),
                                      CurrentTemplate = currentTemplateName,
@@ -81,7 +95,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
 
         private TemplateParameterModel CreateTemplateParameterModel(TemplateParameterInfo templateParameterInfo)
         {
-            Dictionary<string, string> valueContainer = this.SettingsProvider.GetValueOrDefault<Dictionary<string, string>>(Settings.TemplateParameters);
+            Dictionary<string, string> valueContainer = this.SettingsProvider.GetValueOrDefault<Dictionary<string, string>>(Configuration.Settings.TemplateParameters);
             if (valueContainer == null)
                 valueContainer = new Dictionary<string, string>();
 

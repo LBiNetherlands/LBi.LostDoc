@@ -14,14 +14,15 @@
  * limitations under the License. 
  */
 
+using System;
+
 namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Models
 {
-    public class SystemModel : ModelBase
+    public class JobModel
     {
-        public string[] Templates { get; set; }
-
-        public string CurrentTemplate { get; set; }
-
-        public TemplateParameterModel[] TemplateParameters { get; set; }
+        public decimal Index { get; set; }
+        public string Name { get; set; }
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset? Started { get; set; }
     }
 }
