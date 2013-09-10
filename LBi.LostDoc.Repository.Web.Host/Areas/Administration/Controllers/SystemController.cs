@@ -23,6 +23,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Web.Mvc;
 using LBi.LostDoc.Extensibility;
+using LBi.LostDoc.Repository.Scheduling;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Controllers;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Models;
 using LBi.LostDoc.Repository.Web.Configuration;
@@ -64,7 +65,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration.Controllers
             });
         }
 
-        [AdminAction("settings", IsDefault = true, Text = "Settings")]
+        [AdminAction("settings", Text = "Settings")]
         public ActionResult Settings()
         {
             string currentTemplateName = this.SettingsProvider.GetValue<string>(Configuration.Settings.Template);

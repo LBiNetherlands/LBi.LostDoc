@@ -32,6 +32,7 @@ using System.Web.Routing;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Packaging;
 using LBi.LostDoc.Packaging.Composition;
+using LBi.LostDoc.Repository.Scheduling;
 using LBi.LostDoc.Repository.Web.Areas.Administration;
 using LBi.LostDoc.Repository.Web.Composition;
 using LBi.LostDoc.Repository.Web.Configuration;

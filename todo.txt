@@ -22,6 +22,9 @@ cli
 core
 ====
 
+* enable working with assemblies built with different versions of the .net runtime
+  this could be difficult, not sure how that will work with Reflection, might have to switch to CCI or similar?
+
 * add StatisticsBuilder and expose it so Repository can get nice statistics
   also reduces the line count in Template.cs
 
@@ -47,13 +50,13 @@ repository
 
 * capture nuget logging and redirect to app log
 
-* add settings to the repository for custom feeds, etc
+// * add settings to the repository for custom feeds, etc
 
 // * add ability down view/select & download templates (as zip package from)
 
 * add ability to upload zip template packages?
   could be done via a ZipFileProvider pointing to a "Templates" folder
 
-* add db/storage for local edits
+* add db/storage for local edits (maybe use git for history?)
 
 * implement single-page render for local edit preview/saving

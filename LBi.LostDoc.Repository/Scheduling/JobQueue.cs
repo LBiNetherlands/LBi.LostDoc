@@ -1,4 +1,20 @@
-﻿using System;
+/*
+ * Copyright 2013 LBi Netherlands B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,48 +23,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using LBi.LostDoc.Diagnostics;
 
-namespace LBi.LostDoc.Repository
+namespace LBi.LostDoc.Repository.Scheduling
 {
-    public interface IJobQueue : IEnumerable<KeyValuePair<decimal, IJob>>
-    {
-        void Enqueue(IJob job);
-        bool Remove(decimal value);
-        bool Reorder(decimal oldValue, decimal newValue);
-    }
-
-    public interface IJob
-    {
-        string Name { get; }
-
-        DateTimeOffset Created { get; }
-
-        DateTimeOffset? Started { get; }
-
-        void Execute(CancellationToken cancellationToken);
-    }
-
-    public class Job : IJob
-    {
-        private readonly Action<CancellationToken> _action;
-
-        public Job(string name, Action<CancellationToken> action)
-        {
-            this.Name = name;
-            this._action = action;
-        }
-
-        public string Name { get; private set; }
-
-        public DateTimeOffset Created { get; private set; }
-
-        public DateTimeOffset? Started { get; private set; }
-
-        public void Execute(CancellationToken cancellationToken)
-        {
-            this._action(cancellationToken);
-        }
-    }
-
     public class JobQueue : IJobQueue
     {
         protected static TraceSource Trace = new TraceSource("LBi.LostDoc.Repository.JobQueue", SourceLevels.All);
@@ -114,7 +90,7 @@ namespace LBi.LostDoc.Repository
 
                                                   if (this._queue.Count > 0)
                                                   {
-                                                      decimal min = this._queue.Max(kvp => kvp.Key);
+                                                      decimal min = this._queue.Min(kvp => kvp.Key);
                                                       IJob nextJob = this._queue[min];
                                                       this._queue.Remove(min);
                                                       this._current = nextJob;
@@ -127,10 +103,11 @@ namespace LBi.LostDoc.Repository
                 try
                 {
                     localJob.Execute(CancellationToken.None);
+                    this.OnCompleted(localJob);
                 }
                 catch (Exception jobException)
                 {
-                    // TODO report this
+                    this.OnFaulted(localJob, jobException);
                     Trace.TraceCritical(jobException.ToString());
                 }
 
@@ -158,6 +135,30 @@ namespace LBi.LostDoc.Repository
             }
 
             return ret;
+        }
+
+        public event EventHandler<JobEventArgs> Completed;
+
+        protected virtual void OnCompleted(IJob job)
+        {
+            EventHandler<JobEventArgs> handler = this.Completed;
+            if (handler != null) handler(this, new JobEventArgs(job));
+        }
+
+        public event EventHandler<JobFaultedEventArgs> Faulted;
+
+        protected virtual void OnFaulted(IJob job, Exception exception)
+        {
+            EventHandler<JobFaultedEventArgs> handler = this.Faulted;
+            if (handler != null) handler(this, new JobFaultedEventArgs(job, exception));
+        }
+
+        public event EventHandler<JobEventArgs> Cancelled;
+
+        protected virtual void OnCancelled(IJob job)
+        {
+            EventHandler<JobEventArgs> handler = this.Cancelled;
+            if (handler != null) handler(this, new JobEventArgs(job));
         }
 
 

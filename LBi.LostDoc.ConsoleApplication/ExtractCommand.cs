@@ -172,22 +172,6 @@ namespace LBi.LostDoc.ConsoleApplication
 
                 if (!Directory.Exists(System.IO.Path.GetDirectoryName(fileName)))
                     Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fileName));
-                //StringWriter output = new StringWriter();
-                //try
-                //{
-                //    using (
-                //        XmlWriter writer = XmlWriter.Create(output,
-                //                                            new XmlWriterSettings
-                //                                                {
-                //                                                    CheckCharacters = true,
-                //                                                    Encoding = Encoding.ASCII
-                //                                                }))
-                //        rawDoc.Save(writer);
-                //}
-                //catch
-                //{
-                    
-                //}
 
                 rawDoc.Save(fileName);
 
