@@ -156,7 +156,7 @@ namespace LBi.LostDoc.Test
 
         public void SetFixture(AssemblyFixture data)
         {
-            ReflectionOnlyAssemblyLoader loader = new ReflectionOnlyAssemblyLoader(new MemoryCache("test"), new[] {Assembly.GetExecutingAssembly().Location});
+            AssemblyLoader loader = new AssemblyLoader(new MemoryCache("test"), new[] {Assembly.GetExecutingAssembly().Location});
             foreach (Assembly assembly in data)
             {
                 loader.Load(assembly.FullName);

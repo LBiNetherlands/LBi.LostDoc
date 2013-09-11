@@ -37,6 +37,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Cci.MetadataHelper">
+      <HintPath>..\3rdParty\CCI\Microsoft.Cci.MetadataHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Cci.MetadataModel">
+      <HintPath>..\3rdParty\CCI\Microsoft.Cci.MetadataModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Cci.PeReader">
+      <HintPath>..\3rdParty\CCI\Microsoft.Cci.PeReader.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -89,7 +98,7 @@
     <Compile Include="Naming.cs" />
     <Compile Include="ProcessingContextExtensions.cs" />
     <Compile Include="Reflection\IAssemblyLoader.cs" />
-    <Compile Include="Reflection\ReflectionOnlyAssemblyLoader.cs" />
+    <Compile Include="Reflection\AssemblyLoader.cs" />
     <Compile Include="Service References\MsdnContentService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

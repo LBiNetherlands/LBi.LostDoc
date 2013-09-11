@@ -106,7 +106,7 @@ namespace LBi.LostDoc
 
             XDocument ret = new XDocument();
 
-            IAssemblyLoader assemblyLoader = new ReflectionOnlyAssemblyLoader(
+            IAssemblyLoader assemblyLoader = new AssemblyLoader(
                 this._cache,
                 this._assemblyPaths.Select(Path.GetDirectoryName));
             
@@ -298,7 +298,7 @@ namespace LBi.LostDoc
                 return;
 
             IAssemblyLoader assemblyLoader =
-                new ReflectionOnlyAssemblyLoader(this._cache,
+                new AssemblyLoader(this._cache,
                                                  this._assemblyPaths.Select(Path.GetDirectoryName));
 
 

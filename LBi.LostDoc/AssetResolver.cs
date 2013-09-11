@@ -108,11 +108,8 @@ namespace LBi.LostDoc
                     object resolve = this.Resolve(assetId);
                     MemberInfo mi = (MemberInfo)resolve;
 
-                    foreach (
-                        AssetIdentifier aid in
-                            this.GetAssetHierarchy(AssetIdentifier.FromMemberInfo(mi.ReflectedType)))
+                    foreach (AssetIdentifier aid in this.GetAssetHierarchy(AssetIdentifier.FromMemberInfo(mi.ReflectedType)))
                         yield return aid;
-
 
                     break;
                 case AssetType.Assembly:
@@ -257,10 +254,10 @@ namespace LBi.LostDoc
                 allMethods.Where(
                     m =>
                     (m is ConstructorInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo) m),
+                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo)m),
                                             StringComparison.Ordinal)) ||
                     (m is MethodInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo) m), StringComparison.Ordinal)))
+                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo)m), StringComparison.Ordinal)))
                           .ToArray();
 
 

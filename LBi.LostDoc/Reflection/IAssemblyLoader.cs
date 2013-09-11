@@ -17,13 +17,14 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Cci;
 
 namespace LBi.LostDoc.Reflection
 {
-    public interface IAssemblyLoader : IDisposable, IEnumerable<Assembly>
+    public interface IAssemblyLoader : IDisposable, IEnumerable<IAssembly>
     {
-        Assembly Load(string name);
-        Assembly LoadFrom(string path);
-        IEnumerable<Assembly> GetAssemblyChain(Assembly assembly);
+        IAssembly Load(string name);
+        IAssembly LoadFrom(string path);
+        IEnumerable<IAssembly> GetAssemblyChain(IAssembly assembly);
     }
 }
