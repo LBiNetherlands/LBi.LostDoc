@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ namespace LBi.LostDoc.Reflection
         private readonly string[] _locations;
         private HashSet<Assembly> _loadedAssemblies;
 
+        // TODO why not use a Dictionary instead of a ObjectCache?
         public ReflectionOnlyAssemblyLoader(ObjectCache cache, IEnumerable<string> assemblyLocation)
         {
             this._cache = cache;
@@ -76,13 +77,24 @@ namespace LBi.LostDoc.Reflection
         public Assembly LoadFrom(string path)
         {
             Assembly assembly;
+            string fullPath = path;
             try
             {
-                assembly = Assembly.ReflectionOnlyLoadFrom(path);
+                if (!File.Exists(fullPath) && !Path.IsPathRooted(path))
+                {
+                    foreach (var basePath in this._locations)
+                    {
+                        fullPath = Path.Combine(basePath, path);
+                        if (File.Exists(fullPath))
+                            break;
+                    }
+                }
+
+                assembly = Assembly.ReflectionOnlyLoadFrom(fullPath);
             }
             catch (FileLoadException)
             {
-                var assemblyName = AssemblyName.GetAssemblyName(path);
+                var assemblyName = AssemblyName.GetAssemblyName(fullPath);
                 var fullName = assemblyName.FullName;
                 var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
                 assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
