@@ -42,6 +42,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Reflection.Context" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -54,8 +55,8 @@
     <Compile Include="AddInPackage.cs" />
     <Compile Include="AddInRepository.cs" />
     <Compile Include="AddInSource.cs" />
-    <Compile Include="Composition\AddInCatalog.cs" />
-    <Compile Include="Composition\AddInComposablePartDefinition.cs" />
+    <Compile Include="Composition\AddInConstants.cs" />
+    <Compile Include="Composition\AddInMetadataInjector.cs" />
     <Compile Include="PackageEventArgs.cs" />
     <Compile Include="PackageResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

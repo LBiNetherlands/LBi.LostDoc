@@ -26,7 +26,6 @@ using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Http;
-using System.Web.Http.Routing;
 using System.Web.Mvc;
 using System.Web.Routing;
 using LBi.LostDoc.Diagnostics;
@@ -131,7 +130,7 @@ namespace LBi.LostDoc.Repository.Web.Host
             Directory.SetCurrentDirectory(HostingEnvironment.ApplicationPhysicalPath);
 
             // set up add-in system
-            AddInSource officalSource = new AddInSource("Official LostDoc Add-in Repository", 
+            AddInSource officalSource = new AddInSource("Official LostDoc Add-in Repository",
                                                         settings.GetValue<string>(Settings.AddInRepository),
                                                         isOfficial: true);
 
@@ -170,7 +169,7 @@ namespace LBi.LostDoc.Repository.Web.Host
             //Debugger.Launch();
 
             // now register core libs
-            catalog.Catalogs.Add(new AddInCatalog(new ApplicationCatalog(), corePackageId, corePackageVersion));
+            catalog.Catalogs.Add(new ApplicationCatalog(new AddInMetadataInjector(corePackageId, corePackageVersion)));
 
             // hook event so that installed add-ins get registered in the catalog, if composition occurs after this fires
             // or if recomposition is enabled, no restart should be requried
@@ -178,10 +177,7 @@ namespace LBi.LostDoc.Repository.Web.Host
                                       {
                                           if (args.Result == PackageResult.Ok)
                                           {
-                                              DirectoryCatalog directoryCatalog = new DirectoryCatalog(args.InstallationPath);
-                                              catalog.Catalogs.Add(new AddInCatalog(directoryCatalog,
-                                                                                    args.Package.Id,
-                                                                                    args.Package.Version));
+                                              catalog.Catalogs.Add(new DirectoryCatalog(args.InstallationPath, new AddInMetadataInjector(args.Package.Id, args.Package.Version)));
                                           }
                                       };
 
