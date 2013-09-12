@@ -243,10 +243,10 @@ namespace LBi.LostDoc
                     if (distinctSet.Add(typeAsset))
                         yield return typeAsset;
 
-
-                    MemberInfo[] members =
-                        t.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
-                                     BindingFlags.NonPublic);
+                    MemberInfo[] members = t.GetMembers(BindingFlags.Instance |
+                                                        BindingFlags.Static |
+                                                        BindingFlags.Public |
+                                                        BindingFlags.NonPublic);
 
                     foreach (MemberInfo member in members)
                     {
@@ -254,7 +254,9 @@ namespace LBi.LostDoc
                         if (this.IsFiltered(filterContext, memberAsset)) 
                             continue;
 
-                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}",
+                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
+                                                                0,
+                                                                "{0}",
                                                                 memberAsset.AssetId);
                         if (distinctSet.Add(memberAsset))
                             yield return memberAsset;
@@ -522,10 +524,9 @@ namespace LBi.LostDoc
                     InterfaceMapping mapping = type.GetInterfaceMap(interfaceType);
                     if (mapping.TargetType == type)
                     {
-                        AssetIdentifier interfaceAssetId =
-                            AssetIdentifier.FromType(interfaceType.IsGenericType
-                                                         ? interfaceType.GetGenericTypeDefinition()
-                                                         : interfaceType);
+                        AssetIdentifier interfaceAssetId = AssetIdentifier.FromType(interfaceType.IsGenericType
+                                                                                        ? interfaceType.GetGenericTypeDefinition()
+                                                                                        : interfaceType);
                         if (!context.IsFiltered(interfaceAssetId))
                         {
                             var implElement = new XElement("implements");
@@ -548,8 +549,7 @@ namespace LBi.LostDoc
 
         private void GenerateTypeParamElement(IProcessingContext context, MemberInfo mInfo, Type tp)
         {
-            var tpElem = new XElement("typeparam",
-                                      new XAttribute("name", tp.Name));
+            var tpElem = new XElement("typeparam", new XAttribute("name", tp.Name));
 
             context.Element.Add(tpElem);
 
@@ -583,7 +583,6 @@ namespace LBi.LostDoc
                 case "op_AddressOf":
                 case "op_OnesComplement":
                 case "op_PointerDereference":
-
 
                 // conversion
                 case "op_Implicit":
@@ -633,7 +632,6 @@ namespace LBi.LostDoc
 
         private XElement GenerateMethodElement(IProcessingContext context, AssetIdentifier assetId)
         {
-            // Debug.Assert(context.Element.Name.LocalName != "type", "Cannot put Method into closed generic type");
             MethodBase mBase = (MethodBase)context.AssetResolver.Resolve(assetId);
 
             if (mBase is ConstructorInfo)
@@ -697,7 +695,6 @@ namespace LBi.LostDoc
             this.GenerateImplementsElement(context.Clone(ret), mInfo);
 
             this.GenerateAccessModifiers(ret, mInfo);
-
 
             if (mInfo.ContainsGenericParameters)
             {
