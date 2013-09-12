@@ -362,7 +362,7 @@ namespace LBi.LostDoc.Templating
 
                 // create and register temp file (this can be overriden later if there are meta-template directives
                 // in the template
-                this._templateSourcePath = this.SaveTempFile(tempFiles, workingDoc, "inherited." + depth);
+                this._templateSourcePath = this.SaveTempFile(tempFiles, workingDoc, "inherited." + depth + '.' + _templateInfo.Name);
             }
 
             // add our file provider to the top of the stack
@@ -617,6 +617,10 @@ namespace LBi.LostDoc.Templating
             }
             XslCompiledTransform transform;
 
+            /* TODO see if we can't defer this till after ParepareTemplate as the current situation means we
+             * load dupliacte stylesheets inherited templates, also prevents applying meta-templates to
+             * the stylesheets themselves as they are then already loaded
+             */
             Stylesheet match = stylesheets.FirstOrDefault(s => String.Equals(s.Source, src, StringComparison.Ordinal));
             if (match != null)
                 transform = match.Transform;
