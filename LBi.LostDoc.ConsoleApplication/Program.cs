@@ -15,12 +15,15 @@
  */
 
 using System;
+using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Diagnostics;
+using System.ComponentModel.Composition.Primitives;
+using System.ComponentModel.Composition.Registration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using LBi.Cli.Arguments;
+using LBi.Cli.Arguments.Binding;
 using LBi.LostDoc.ConsoleApplication.Extensibility;
 
 namespace LBi.LostDoc.ConsoleApplication
@@ -39,19 +42,45 @@ namespace LBi.LostDoc.ConsoleApplication
 
             using (AggregateCatalog aggregateCatalog = new AggregateCatalog())
             {
-                aggregateCatalog.Catalogs.Add(new ApplicationCatalog());
+                RegistrationBuilder registrationBuilder = new RegistrationBuilder();
+
+                registrationBuilder.ForTypesDerivedFrom<ICommand>()
+                                   .Export(conf => conf.AsContractName(AttributedModelServices.GetContractName(typeof(ICommand))))
+                                   .SetCreationPolicy(CreationPolicy.NonShared);
+                
+                aggregateCatalog.Catalogs.Add(new ApplicationCatalog(registrationBuilder));
 
                 string appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string pluginPath = Path.Combine(appPath, "plugins");
                 if (Directory.Exists(pluginPath))
-                    aggregateCatalog.Catalogs.Add(new DirectoryCatalog(pluginPath));
+                    aggregateCatalog.Catalogs.Add(new DirectoryCatalog(pluginPath, registrationBuilder));
 
                 using (CompositionContainer container = new CompositionContainer(aggregateCatalog))
                 {
                     ICommandProvider[] providers = container.GetExports<ICommandProvider>().Select(l => l.Value).ToArray();
-                    var commands = providers.SelectMany(p => p.GetCommands()).ToArray();
+                    Type[] commands = providers.SelectMany(p => p.GetCommands()).ToArray();
 
-                    ArgumentParser<ICommand> argumentParser = new ArgumentParser<ICommand>(commands);
+                    Func<Type, object> mefActivator =
+                        t =>
+                        {
+                            if (!typeof(ICommand).IsAssignableFrom(t))
+                                return DefaultActivator.Instance.CreateInstance(t);
+
+                            ImportDefinition importDefinition = new ImportDefinition(ed => (string)ed.Metadata[CompositionConstants.ExportTypeIdentityMetadataName] == AttributedModelServices.GetTypeIdentity(t),
+                                                                                     AttributedModelServices.GetContractName(typeof(ICommand)),
+                                                                                     ImportCardinality.ExactlyOne,
+                                                                                     false,
+                                                                                     true);
+
+                            return container.GetExports(importDefinition).First().Value;
+                        };
+
+                    ArgumentParserSettings parserSettings = new ArgumentParserSettings
+                                                            {
+                                                                TypeActivator = new DelegateActivator(mefActivator)
+                                                            };
+
+                    ArgumentParser<ICommand> argumentParser = new ArgumentParser<ICommand>(parserSettings, commands);
                     ICommand command;
                     if (argumentParser.TryParse(args, out command))
                     {
