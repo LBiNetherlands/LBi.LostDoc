@@ -31,6 +31,12 @@ namespace LBi.LostDoc.ConsoleApplication
     [ParameterSet("Save template", Command = "Export", HelpMessage = "Saves a template to disk.")]
     public class SaveTemplateCommand : ICommand
     {
+        [ImportingConstructor]
+        public SaveTemplateCommand(TemplateResolver templateResolver)
+        {
+            this.TemplateResolver = templateResolver;
+        }
+
         [Parameter(HelpMessage = "Output path."), Required]
         public string Path { get; set; }
 
@@ -41,7 +47,6 @@ namespace LBi.LostDoc.ConsoleApplication
         [DefaultValue("$true")]
         public bool IncludeInherited { get; set; }
 
-        [Import]
         protected TemplateResolver TemplateResolver { get; set; }
         #region ICommand Members
 
@@ -60,8 +65,7 @@ namespace LBi.LostDoc.ConsoleApplication
                     string targetPath = System.IO.Path.Combine(this.Path, filename);
                     string targetDir = System.IO.Path.GetDirectoryName(targetPath);
                     Directory.CreateDirectory(targetDir);
-                    using (var target = new FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None)
-                        )
+                    using (var target = new FileStream(targetPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                     using (var content = templateInfo.Source.OpenFile(filename, FileMode.Open))
                     {
                         content.CopyTo(target);

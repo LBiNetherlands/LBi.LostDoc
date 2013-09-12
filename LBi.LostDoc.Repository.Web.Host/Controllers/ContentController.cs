@@ -25,6 +25,7 @@ using LBi.LostDoc.Repository.Web.Host.Models;
 namespace LBi.LostDoc.Repository.Web.Host.Controllers
 {
     [Export]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ContentController : Controller
     {
         private ContentManager _content;

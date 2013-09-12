@@ -37,7 +37,7 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
                 var exportDefinition = partDefinition.ExportDefinitions.Single(ed => ed.ContractName == contractName);
                 TMetadata controllerMetadata = AttributedModelServices.GetMetadataView<TMetadata>(exportDefinition.Metadata);
 
-                yield return new Lazy<Type, TMetadata>(() => AddInModelServices.GetPartType(partDefinition).Value, controllerMetadata);
+                yield return new Lazy<Type, TMetadata>(() => ReflectionModelServices.GetPartType(partDefinition).Value, controllerMetadata);
             }
         }
 
@@ -80,16 +80,6 @@ namespace LBi.LostDoc.Repository.Web.Extensibility
         {
             return (string)ed.Metadata[CompositionConstants.ExportTypeIdentityMetadataName] ==
                    AttributedModelServices.GetTypeIdentity(explicitType);
-        }
-
-        public static Lazy<Type> GetPartType(ComposablePartDefinition partDefinition)
-        {
-            AddInComposablePartDefinition addinPartDef = partDefinition as AddInComposablePartDefinition;
-
-            if (addinPartDef == null)
-                throw new ArgumentException("Must be of type AddInComposablePartDefinition", "partDefinition");
-
-            return ReflectionModelServices.GetPartType(addinPartDef.Definition);
         }
     }
 }

@@ -36,9 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LBi.Cli.Arguments, Version=0.0.2.113, Culture=neutral, PublicKeyToken=a6442c589e275a88, processorArchitecture=MSIL">
+    <Reference Include="LBi.Cli.Arguments, Version=0.0.2.118, Culture=neutral, PublicKeyToken=a6442c589e275a88, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\LBi.Cli.Arguments.0.0.2.113-dev\lib\net45\LBi.Cli.Arguments.dll</HintPath>
+      <HintPath>..\packages\LBi.Cli.Arguments.0.0.2.118-dev\lib\net45\LBi.Cli.Arguments.dll</HintPath>
     </Reference>
     <Reference Include="Roslyn.Compilers">
       <HintPath>..\packages\Roslyn.Compilers.Common.1.2.20906.2\lib\net45\Roslyn.Compilers.dll</HintPath>

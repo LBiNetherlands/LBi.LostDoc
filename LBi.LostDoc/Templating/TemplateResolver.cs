@@ -16,12 +16,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace LBi.LostDoc.Templating
 {
+    [Export]
     public class TemplateResolver
     {
         public TemplateResolver(params IFileProvider[] fileProviders)
@@ -29,8 +31,8 @@ namespace LBi.LostDoc.Templating
         {
         }
 
-        // Todo [ImportingConstructor] ?
-        public TemplateResolver(IEnumerable<IFileProvider> fileProviders)
+        [ImportingConstructor]
+        public TemplateResolver([ImportMany]IEnumerable<IFileProvider> fileProviders)
         {
             this.Providers = fileProviders.ToArray();
         }
