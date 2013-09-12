@@ -47,7 +47,7 @@ using TemplateInfo = LBi.LostDoc.Templating.TemplateInfo;
 
 namespace LBi.LostDoc.Repository.Web.Host
 {
-// Note: For instructions on enabling IIS6 or IIS7 classic mode, 
+    // Note: For instructions on enabling IIS6 or IIS7 classic mode, 
     // visit http://go.microsoft.com/?LinkId=9394801
 
     public class WebApiApplication : System.Web.HttpApplication
@@ -66,27 +66,25 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             routes.MapHttpRoute("Search", "search/{id}/{searchTerms}", new { controller = "Search" });
 
-            routes.MapRoute(
-                name: "Archive", 
-                url: "archive/{id}/{*path}", 
-                defaults: new
-                              {
-                                  controller = "Content", 
-                                  id = "current", 
-                                  action = "GetContent", 
-                                  path = "Library.html"
-                              });
+            routes.MapRoute(name: "Archive",
+                            url: "archive/{id}/{*path}",
+                            defaults: new
+                                      {
+                                          controller = "Content",
+                                          id = "current",
+                                          action = "GetContent",
+                                          path = "Library.html"
+                                      });
 
-            routes.MapRoute(
-                name: "Library", 
-                url: "library/{*path}", 
-                defaults: new
-                              {
-                                  controller = "Content", 
-                                  id = "current", 
-                                  path = "Library.html", 
-                                  action = "GetContent"
-                              });
+            routes.MapRoute(name: "Library",
+                            url: "library/{*path}",
+                            defaults: new
+                                      {
+                                          controller = "Content",
+                                          id = "current",
+                                          path = "Library.html",
+                                          action = "GetContent"
+                                      });
 
             routes.Add("Redirect", new Route(string.Empty, new RedirectRouteHandler("Library")));
         }
@@ -111,10 +109,9 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             // initialize logger 
             // TODO replace with something that writes a new log every day
-            TraceListener traceListener =
-                new TextWriterTraceListener(Path.Combine(abs(settings.GetValue<string>(Settings.LogPath)),
-                                                         string.Format("repository_{0:yyyy'-'MM'-'dd__HHmmss}.log",
-                                                                       DateTime.Now)));
+            string logFilename = string.Format("repository_{0:yyyy'-'MM'-'dd__HHmmss}.log", DateTime.Now);
+            string logDir = abs(settings.GetValue<string>(Settings.LogPath));
+            TraceListener traceListener = new TextWriterTraceListener(Path.Combine(logDir, logFilename));
 
             // TODO introduce flags/settings for controlling logging levels, but for now include everything
             traceListener.Filter = new EventTypeFilter(SourceLevels.All);
@@ -162,6 +159,7 @@ namespace LBi.LostDoc.Repository.Web.Host
             CompositionContainer container = new CompositionContainer(catalog, settingsExportProvider);
 
             // when the catalog changes, discover and route all ApiControllers
+            // TODO could this be replaced with an ImportMany + recompositioning?
             catalog.Changed += (sender, args) => this.UpdateWebApiRegistry(container, args);
 
             //// TODO for debugging only
@@ -189,7 +187,6 @@ namespace LBi.LostDoc.Repository.Web.Host
                 HttpRuntime.UnloadAppDomain();
             }
 
-
             // set up template resolver
             var lazyProviders = container.GetExports<IFileProvider>(ContractNames.TemplateProvider);
             var realProviders = lazyProviders.Select(lazy => lazy.Value);
@@ -197,7 +194,7 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             // load template
             TemplateInfo templateInfo = templateResolver.Resolve(settings.GetValue<string>(Settings.Template));
-            Template template = templateInfo.Load(container);           
+            Template template = templateInfo.Load(container);
 
             // set up content manager
             ContentSettings contentSettings = new ContentSettings
@@ -214,7 +211,7 @@ namespace LBi.LostDoc.Repository.Web.Host
 
             // register application services in composition container
             CompositionBatch batch = new CompositionBatch();
-            
+
             this.AddExport(batch, notifications);
             this.AddExport(batch, contentManager);
             this.AddExport(batch, addInManager);
@@ -267,7 +264,7 @@ namespace LBi.LostDoc.Repository.Web.Host
 
                 foreach (var routeInitializer in httpRouteInitializers)
                 {
-                    var metadata = routeInitializer.Metadata;
+                    IAddInMetadata metadata = routeInitializer.Metadata;
 
                     var httpRouteInitializer = routeInitializer.Value;
 
