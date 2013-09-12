@@ -29,7 +29,7 @@ using LBi.LostDoc.Templating;
 namespace LBi.LostDoc.ConsoleApplication
 {
     [ParameterSet("Save template", Command = "Export", HelpMessage = "Saves a template to disk.")]
-    public class SaveTemplateCommand : ICommand
+    public class SaveTemplateCommand : Command
     {
         [ImportingConstructor]
         public SaveTemplateCommand(TemplateResolver templateResolver)
@@ -51,7 +51,7 @@ namespace LBi.LostDoc.ConsoleApplication
         #region ICommand Members
 
 
-        public void Invoke(CompositionContainer container)
+        public override void Invoke(CompositionContainer container)
         {
             TemplateInfo templateInfo;
             if (!this.TemplateResolver.TryResolve(this.Template, out templateInfo))

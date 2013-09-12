@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,13 @@ namespace LBi.LostDoc.Repository
         public static string ToBase36String(this Guid guid)
         {
             const string CLIST = "0123456789abcdefghijklmnopqrstuvwxyz";
-            BigInteger num = BigInteger.Abs(new BigInteger(guid.ToByteArray()));
+            byte[] buffer = guid.ToByteArray();
+            
+            // ensure it gets intepreted as a positive number by appending a zero-byte at the end
+            Array.Resize(ref buffer, buffer.Length + 1);
+            buffer[buffer.Length - 1] = 0;
+            BigInteger num = new BigInteger(buffer);
+
             string ret = string.Empty;
             while (num > 0)
             {

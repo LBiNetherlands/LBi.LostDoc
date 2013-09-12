@@ -31,14 +31,8 @@ using LBi.LostDoc.Filters;
 namespace LBi.LostDoc.ConsoleApplication
 {
     [ParameterSet("Extract", Command = "Extract", HelpMessage = "Extracts metadata from an assembly to create a ldoc file.")]
-    public class ExtractCommand : ICommand
+    public class ExtractCommand : Command
     {
-        [Parameter(HelpMessage = "Include errors and warning output only.")]
-        public LBi.Cli.Arguments.Switch Quiet { get; set; }
-
-        [Parameter(HelpMessage = "Include verbose output.")]
-        public LBi.Cli.Arguments.Switch Verbose { get; set; }
-
         [Parameter(HelpMessage = "Include non-public members.")]
         public LBi.Cli.Arguments.Switch IncludeNonPublic { get; set; }
 
@@ -61,36 +55,16 @@ namespace LBi.LostDoc.ConsoleApplication
 
         #region ICommand Members
 
-        public void Invoke(CompositionContainer container)
+        public override void Invoke(CompositionContainer container)
         {
             var traceListener = new ConsolidatedConsoleTraceListener(new Dictionary<string, string>
                                                                          {
                                                                              {"LostDoc.Core.DocGenerator", "Build"},
                                                                          });
-
-            TraceSources.GeneratorSource.Listeners.Add(traceListener);
-
             try
             {
-                if (this.Quiet.IsPresent)
-                {
-                    const SourceLevels quietLevel = SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical;
-                    TraceSources.GeneratorSource.Switch.Level = quietLevel;
-                }
-                else if (this.Verbose.IsPresent)
-                {
-                    const SourceLevels verboseLevel = SourceLevels.All;
-                    TraceSources.GeneratorSource.Switch.Level = verboseLevel;
-                }
-                else
-                {
-                    const SourceLevels normalLevel = SourceLevels.Information |
-                                                     SourceLevels.Warning |
-                                                     SourceLevels.Error |
-                                                     SourceLevels.Critical |
-                                                     SourceLevels.ActivityTracing;
-                    TraceSources.GeneratorSource.Switch.Level = normalLevel;
-                }
+                TraceSources.GeneratorSource.Listeners.Add(traceListener);
+                this.ConfigureTraceLevels(TraceSources.GeneratorSource);
 
                 DocGenerator gen = new DocGenerator(container);
                 gen.AssetFilters.Add(new ComObjectTypeFilter());

@@ -34,7 +34,7 @@ using LBi.LostDoc.Templating.FileProviders;
 namespace LBi.LostDoc.ConsoleApplication
 {
     [ParameterSet("Template", Command = "Template", HelpMessage = "Apply template to a set of ldoc files to generate output.")]
-    public class TemplateCommand : ICommand
+    public class TemplateCommand : Command
     {
         [Parameter(HelpMessage = "Include errors and warning output only.")]
         public LBi.Cli.Arguments.Switch Quiet { get; set; }
@@ -63,7 +63,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
         #region ICommand Members
 
-        public void Invoke(CompositionContainer container)
+        public override void Invoke(CompositionContainer container)
         {
             var traceListener = new ConsolidatedConsoleTraceListener(
                 new Dictionary<string, string>
@@ -81,32 +81,12 @@ namespace LBi.LostDoc.ConsoleApplication
                             "Resolve"
                         }
                     });
-
             
-            TraceSources.TemplateSource.Listeners.Add(traceListener);
-            TraceSources.AssetResolverSource.Listeners.Add(traceListener);
             try
             {
-                if (this.Quiet.IsPresent)
-                {
-                    const SourceLevels quietLevel = SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical;
-                    TraceSources.TemplateSource.Switch.Level = quietLevel;
-                    TraceSources.AssetResolverSource.Switch.Level = quietLevel;
-                    TraceSources.BundleSource.Listeners.Add(traceListener);
-                }
-                else if (this.Verbose.IsPresent)
-                {
-                    const SourceLevels verboseLevel = SourceLevels.All;
-                    TraceSources.TemplateSource.Switch.Level = verboseLevel;
-                    TraceSources.AssetResolverSource.Switch.Level = verboseLevel;
-                    TraceSources.BundleSource.Listeners.Add(traceListener);
-                }
-                else
-                {
-                    const SourceLevels normalLevel = SourceLevels.Information | SourceLevels.Warning | SourceLevels.Error | SourceLevels.ActivityTracing;
-                    TraceSources.TemplateSource.Switch.Level = normalLevel;
-                    TraceSources.AssetResolverSource.Switch.Level = normalLevel;
-                }
+                TraceSources.TemplateSource.Listeners.Add(traceListener);
+                TraceSources.AssetResolverSource.Listeners.Add(traceListener);
+                this.ConfigureTraceLevels(TraceSources.TemplateSource, TraceSources.AssetResolverSource);
 
                 LinkedList<FileInfo> includedFiles = new LinkedList<FileInfo>();
 

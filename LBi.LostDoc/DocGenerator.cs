@@ -243,10 +243,10 @@ namespace LBi.LostDoc
                     if (distinctSet.Add(typeAsset))
                         yield return typeAsset;
 
-
-                    MemberInfo[] members =
-                        t.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
-                                     BindingFlags.NonPublic);
+                    MemberInfo[] members = t.GetMembers(BindingFlags.Instance |
+                                                        BindingFlags.Static |
+                                                        BindingFlags.Public |
+                                                        BindingFlags.NonPublic);
 
                     foreach (MemberInfo member in members)
                     {
@@ -254,7 +254,9 @@ namespace LBi.LostDoc
                         if (this.IsFiltered(filterContext, memberAsset)) 
                             continue;
 
-                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}",
+                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
+                                                                0,
+                                                                "{0}",
                                                                 memberAsset.AssetId);
                         if (distinctSet.Add(memberAsset))
                             yield return memberAsset;
@@ -402,27 +404,20 @@ namespace LBi.LostDoc
         {
             Assembly asm = (Assembly)context.AssetResolver.Resolve(assetId);
 
-            var ret = new XElement("assembly",
-                                   new XAttribute("name", asm.GetName().Name),
-                                   new XAttribute("filename", asm.ManifestModule.Name),
-                                   new XAttribute("assetId", assetId),
-                                   new XAttribute("phase", context.Phase),
-                                   asm.GetReferencedAssemblies().Select(
-                                                                        an =>
-                                                                        new XElement("references",
-                                                                                     new XAttribute("assembly",
-                                                                                                    AssetIdentifier.
-                                                                                                        FromAssembly(
-                                                                                                                     Assembly
-                                                                                                                         .
-                                                                                                                         ReflectionOnlyLoad
-                                                                                                                         (an
-                                                                                                                              .
-                                                                                                                              FullName))))));
+            IEnumerable<XElement> references =
+                asm.GetReferencedAssemblies()
+                   .Select(an => new XElement("references",
+                                              new XAttribute("assembly",
+                                                             AssetIdentifier.FromAssembly(context.AssemblyLoader.Load(an.FullName)))));
 
+            XElement ret = new XElement("assembly",
+                                        new XAttribute("name", asm.GetName().Name),
+                                        new XAttribute("filename", asm.ManifestModule.Name),
+                                        new XAttribute("assetId", assetId),
+                                        new XAttribute("phase", context.Phase),
+                                        references);
 
             context.Element.Add(ret);
-
 
             foreach (IEnricher enricher in this._enrichers)
                 enricher.EnrichAssembly(context.Clone(ret), asm);
@@ -529,10 +524,9 @@ namespace LBi.LostDoc
                     InterfaceMapping mapping = type.GetInterfaceMap(interfaceType);
                     if (mapping.TargetType == type)
                     {
-                        AssetIdentifier interfaceAssetId =
-                            AssetIdentifier.FromType(interfaceType.IsGenericType
-                                                         ? interfaceType.GetGenericTypeDefinition()
-                                                         : interfaceType);
+                        AssetIdentifier interfaceAssetId = AssetIdentifier.FromType(interfaceType.IsGenericType
+                                                                                        ? interfaceType.GetGenericTypeDefinition()
+                                                                                        : interfaceType);
                         if (!context.IsFiltered(interfaceAssetId))
                         {
                             var implElement = new XElement("implements");
@@ -555,9 +549,7 @@ namespace LBi.LostDoc
 
         private void GenerateTypeParamElement(IProcessingContext context, MemberInfo mInfo, Type tp)
         {
-            // AssetIdentifier assetId = AssetIdentifier.FromType(mInfo, tp);
-            var tpElem = new XElement("typeparam",
-                                      new XAttribute("name", tp.Name));
+            var tpElem = new XElement("typeparam", new XAttribute("name", tp.Name));
 
             context.Element.Add(tpElem);
 
@@ -591,7 +583,6 @@ namespace LBi.LostDoc
                 case "op_AddressOf":
                 case "op_OnesComplement":
                 case "op_PointerDereference":
-
 
                 // conversion
                 case "op_Implicit":
@@ -641,7 +632,6 @@ namespace LBi.LostDoc
 
         private XElement GenerateMethodElement(IProcessingContext context, AssetIdentifier assetId)
         {
-            // Debug.Assert(context.Element.Name.LocalName != "type", "Cannot put Method into closed generic type");
             MethodBase mBase = (MethodBase)context.AssetResolver.Resolve(assetId);
 
             if (mBase is ConstructorInfo)
@@ -688,13 +678,13 @@ namespace LBi.LostDoc
                 if (baseMethod.ReflectedType.IsGenericType)
                 {
                     Type realTypeBase = baseMethod.ReflectedType.GetGenericTypeDefinition();
-                    MethodInfo[] allMethods =
-                        realTypeBase.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
-                                                BindingFlags.Static);
-                    baseMethod =
-                        allMethods.Single(
-                                          m =>
-                                          m.Module == baseMethod.Module && m.MetadataToken == baseMethod.MetadataToken);
+                    MethodInfo[] allMethods = realTypeBase.GetMethods(BindingFlags.Public |
+                                                                      BindingFlags.NonPublic |
+                                                                      BindingFlags.Instance |
+                                                                      BindingFlags.Static);
+
+                    baseMethod = allMethods.Single(m => m.Module == baseMethod.Module &&
+                                                        m.MetadataToken == baseMethod.MetadataToken);
                 }
 
                 declaredAs = AssetIdentifier.FromMemberInfo(baseMethod);
@@ -705,7 +695,6 @@ namespace LBi.LostDoc
             this.GenerateImplementsElement(context.Clone(ret), mInfo);
 
             this.GenerateAccessModifiers(ret, mInfo);
-
 
             if (mInfo.ContainsGenericParameters)
             {
@@ -732,7 +721,6 @@ namespace LBi.LostDoc
                 ret.Add(retElem);
             }
 
-
             return ret;
         }
 
@@ -755,9 +743,8 @@ namespace LBi.LostDoc
                     if (ifMap.TargetType != declaringType)
                         continue;
 
-                    var targetMethod =
-                        ifMap.TargetMethods.SingleOrDefault(mi => mi.MetadataToken == mInfo.MetadataToken &&
-                                                                  mi.Module == mInfo.Module);
+                    var targetMethod = ifMap.TargetMethods.SingleOrDefault(mi => mi.MetadataToken == mInfo.MetadataToken &&
+                                                                                 mi.Module == mInfo.Module);
 
                     if (targetMethod != null)
                     {
@@ -767,14 +754,15 @@ namespace LBi.LostDoc
                         if (ifMap.InterfaceMethods[mIx].DeclaringType.IsGenericType)
                         {
                             Type declType = ifMap.InterfaceMethods[mIx].DeclaringType.GetGenericTypeDefinition();
-                            MethodInfo[] allMethods =
-                                declType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
-                                                    BindingFlags.Static);
+                            MethodInfo[] allMethods = declType.GetMethods(BindingFlags.Public |
+                                                                          BindingFlags.NonPublic |
+                                                                          BindingFlags.Instance |
+                                                                          BindingFlags.Static);
 
-                            miAid =
-                                AssetIdentifier.FromMemberInfo(allMethods.Single(mi =>
-                                                                                 mi.MetadataToken == ifMap.InterfaceMethods[mIx].MetadataToken &&
-                                                                                 mi.Module == ifMap.InterfaceMethods[mIx].Module));
+                            MethodInfo memberInfo = allMethods.Single(mi =>
+                                                                      mi.MetadataToken == ifMap.InterfaceMethods[mIx].MetadataToken &&
+                                                                      mi.Module == ifMap.InterfaceMethods[mIx].Module);
+                            miAid = AssetIdentifier.FromMemberInfo(memberInfo);
                         }
                         else
                         {
@@ -880,7 +868,6 @@ namespace LBi.LostDoc
 
             ParameterInfo[] methodParams = constructorInfo.GetParameters();
             this.GenerateParameterElements(context.Clone(ret), methodParams);
-
 
             return ret;
         }
@@ -1009,7 +996,6 @@ namespace LBi.LostDoc
             const int C_INTERNAL_AND_PROTECTED = 2;
             const int C_PRIVATE = 0;
 
-
             int leastRestrictiveAccessModifier;
 
             if (setMethod != null && setMethod.IsPublic || getMethod != null && getMethod.IsPublic)
@@ -1116,8 +1102,6 @@ namespace LBi.LostDoc
             {
             }
         }
-
-
 
         ~DocGenerator()
         {
