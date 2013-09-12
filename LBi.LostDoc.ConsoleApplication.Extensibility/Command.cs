@@ -15,6 +15,7 @@
  */
 
 using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics;
 using LBi.Cli.Arguments;
 
 namespace LBi.LostDoc.ConsoleApplication.Extensibility
@@ -28,5 +29,29 @@ namespace LBi.LostDoc.ConsoleApplication.Extensibility
         public LBi.Cli.Arguments.Switch Verbose { get; set; }
 
         public abstract void Invoke(CompositionContainer container);
+
+        protected void ConfigureTraceLevels(params TraceSource[] traceSource)
+        {
+            SourceLevels currentLevel;
+            if (this.Quiet.IsPresent)
+            {
+                currentLevel = SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical;
+            }
+            else if (this.Verbose.IsPresent)
+            {
+                currentLevel = SourceLevels.All;
+            }
+            else
+            {
+                currentLevel = SourceLevels.Information |
+                               SourceLevels.Warning |
+                               SourceLevels.Error |
+                               SourceLevels.Critical |
+                               SourceLevels.ActivityTracing;
+            }
+            
+            foreach (TraceSource source in traceSource)
+                source.Switch.Level = currentLevel;
+        }
     }
 }
