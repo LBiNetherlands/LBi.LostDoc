@@ -30,6 +30,7 @@ using Lucene.Net.Store;
 
 namespace LBi.LostDoc.Repository
 {
+    // TODO this needs to be overhauled
     public class ContentSearcher : IDisposable
     {
         private readonly StandardAnalyzer _analyzer;
@@ -43,7 +44,7 @@ namespace LBi.LostDoc.Repository
             this._indexPath = indexPath;
             this._directory = FSDirectory.Open(new DirectoryInfo(indexPath));
             this._indexReader = IndexReader.Open(this._directory, readOnly: true);
-            this._analyzer = new StandardAnalyzer(global::Lucene.Net.Util.Version.LUCENE_29);
+            this._analyzer = new StandardAnalyzer(global::Lucene.Net.Util.Version.LUCENE_30);
             this._indexSearcher = new IndexSearcher(this._indexReader);
         }
 

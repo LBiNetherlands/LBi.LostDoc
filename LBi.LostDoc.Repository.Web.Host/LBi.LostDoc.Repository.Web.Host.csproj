@@ -184,6 +184,7 @@
     <Compile Include="Models\NoContentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Areas\Administration\Extensions.cs" />
+    <Compile Include="RouteConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\application.png" />
