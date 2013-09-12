@@ -19,3 +19,4 @@ _ReSharper.*
 *.Cache
 StyleCop.Cache
 packages/
+LBi.LostDoc.Repository.Web.Host/App_Data/AddIns/
