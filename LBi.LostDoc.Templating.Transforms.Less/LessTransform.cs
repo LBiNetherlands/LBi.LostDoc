@@ -27,7 +27,7 @@ namespace LBi.LostDoc.Templating.Transforms.Less
     public class LessTransform : IResourceTransform
     {
         [ImportingConstructor]
-        public LessTransform([Import(ContractNames.ResourceFileProvider, typeof(IFileProvider), RequiredCreationPolicy = CreationPolicy.Shared, Source = ImportSource.Any)]IFileProvider fileProvider)
+        public LessTransform([Import(ContractNames.ResourceFileProvider)]IFileProvider fileProvider)
         {
             this.FileProvider = fileProvider;
         }

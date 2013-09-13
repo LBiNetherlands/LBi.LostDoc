@@ -17,5 +17,7 @@
 
   <files>
     <file src="bin\$configuration$\dotless.Core.dll" target="lib\net45" />
+    <file src="bin\$configuration$\Microsoft.Practices.ServiceLocation.dll" target="lib\net45" />
+    <file src="bin\$configuration$\Pandora.dll" target="lib\net45" />
   </files>
 </package>

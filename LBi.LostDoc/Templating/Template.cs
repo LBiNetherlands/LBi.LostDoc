@@ -963,7 +963,7 @@ namespace LBi.LostDoc.Templating
 
                     foreach (var resourceTransform in resources[i].Transforms)
                     {
-                        using (CompositionContainer localContainer = new CompositionContainer(this._container))
+                        using (CompositionContainer localContainer = new CompositionContainer(this._container.Catalog))
                         {
                             string dirName = Path.GetDirectoryName(resources[i].Source);
                             CompositionBatch batch = new CompositionBatch();
@@ -980,15 +980,6 @@ namespace LBi.LostDoc.Templating
                                                        () => new ScopedFileProvider(resources[i].FileProvider, dirName)));
 
                             localContainer.Compose(batch);
-
-                            var allExports =
-                                localContainer.GetExports(new ImportDefinition(ed => true,
-                                                                               null,
-                                                                               ImportCardinality.ExactlyOne,
-                                                                               false,
-                                                                               true));
-
-                            var fp = localContainer.GetExportedValue<IFileProvider>(ContractNames.ResourceFileProvider);
 
                             // TODO export resourceTransform.Parameters into paramContainer using CompositionBatch
                             var requiredMetadata = new[]
