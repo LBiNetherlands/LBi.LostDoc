@@ -60,7 +60,7 @@
             var total = this.colLeftWidthPerc + this.colRightWidthPerc;
             //console.log("this.colLeftWidthPerc", this.colLeftWidthPerc);
             //console.log("this.colRightWidthPerc", this.colRightWidthPerc);
-            
+
 
             if (total == 100 && this.colLeftWidthPerc > 10 && this.colRightWidthPerc > 30 || init === true) {
                 this.leftColumn.css({
@@ -84,10 +84,10 @@
                     //now resize the columns
                     var colRightWidth = (this.colRightWidth - 1) + this.moved;
                     var colRightWidthPercent = this.pxToPercentage(colRightWidth);
-                    
+
                     var colLeftWidth = this.colLeftWidth - this.moved;
                     var colLeftWidthPercent = this.pxToPercentage(colLeftWidth);
-                    
+
                     //console.log("this.colLeftWidthPerc", this.colLeftWidthPerc);
                     //console.log("this.colRightWidthPerc", this.colRightWidthPerc);
 

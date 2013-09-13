@@ -23,7 +23,6 @@ namespace LBi.LostDoc.Templating
 {
     public class ResourceDeployment : UnitOfWork
     {
-        
         public ResourceDeployment(IFileProvider fileProvider, string path, string destination, IResourceTransform[] transforms)
         {
             this.FileProvider = fileProvider;

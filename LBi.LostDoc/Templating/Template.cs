@@ -300,7 +300,7 @@ namespace LBi.LostDoc.Templating
                                      Transform = stylesheet.Transform,
                                      InputElement = inputElement,
                                      XsltParams = xsltParams
-                                 };                
+                                 };
             }
 
             xpathContext.PopVariableScope(); // 1
@@ -336,12 +336,12 @@ namespace LBi.LostDoc.Templating
             // this is required to preserve the line information 
             using (var xmlReader = this._templateDefinition.CreateReader())
                 workingDoc = XDocument.Load(xmlReader, LoadOptions.SetLineInfo);
-            
+
             // template inheritence
             //XAttribute templateInheritsAttr = workingDoc.Root.Attribute("inherits");
             if (this._templateInfo.Inherits != null)
             {
-               
+
                 int depth = providers.Count + 1;
                 Template inheritedTemplate = _templateInfo.Inherits.Load(this._container);
                 ParsedTemplate parsedTemplate = inheritedTemplate.PrepareTemplate(templateData, providers);
@@ -524,14 +524,14 @@ namespace LBi.LostDoc.Templating
                         }
                     }
 
-                    
-                    
+
+
                     // this isn't very nice, but I can't figure out another way to get LineInfo included in the transformed document
                     XDocument outputDoc;
                     using (MemoryStream tempStream = new MemoryStream())
-                    using (XmlWriter outputWriter = XmlWriter.Create(tempStream, new XmlWriterSettings {Indent = true}))
+                    using (XmlWriter outputWriter = XmlWriter.Create(tempStream, new XmlWriterSettings { Indent = true }))
                     {
-                        
+
                         metaTransform.Transform(workingDoc.CreateNavigator(),
                                                 xsltArgList,
                                                 outputWriter,
