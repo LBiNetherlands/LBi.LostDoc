@@ -69,7 +69,8 @@
   </Choose>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>$(ProjectDir)..\.nuget\NuGet.exe pack $(ProjectPath) -OutputDirectory $(ProjectDir)..\AddInPackages
+    <PostBuildEvent>if not exist $(ProjectDir)..\AddInPackages mkdir $(ProjectDir)..\AddInPackages
+$(ProjectDir)..\.nuget\NuGet.exe pack $(ProjectPath) -OutputDirectory $(ProjectDir)..\AddInPackages
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
