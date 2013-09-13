@@ -152,28 +152,21 @@ namespace LBi.LostDoc.Templating
         /// <summary>
         /// The load stylesheet.
         /// </summary>
-        /// <param name="resourceProvider"></param>
+        /// <param name="fileProvider"><see cref="IFileProvider"/> used to load the stylesheet.</param>
         /// <param name="name">
         /// </param>
         /// <returns>
         /// </returns>
-        private XslCompiledTransform LoadStylesheet(Stack<IFileProvider> resourceProvider, string name)
+        private XslCompiledTransform LoadStylesheet(IFileProvider fileProvider, string name)
         {
             XslCompiledTransform ret = new XslCompiledTransform(true);
 
-            foreach (var provider in resourceProvider)
+            using (Stream str = fileProvider.OpenFile(name, FileMode.Open))
             {
-                if (provider.FileExists(name))
-                {
-                    using (Stream str = provider.OpenFile(name, FileMode.Open))
-                    {
-                        XmlReader reader = XmlReader.Create(str, new XmlReaderSettings {CloseInput = true,});
-                        XsltSettings settings = new XsltSettings(false, true);
-                        XmlResolver resolver = new XmlFileProviderResolver(resourceProvider);
-                        ret.Load(reader, settings, resolver);
-                    }
-                    break;
-                }
+                XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
+                XsltSettings settings = new XsltSettings(false, true);
+                XmlResolver resolver = new XmlFileProviderResolver(fileProvider);
+                ret.Load(reader, settings, resolver);
             }
 
             return ret;
@@ -369,6 +362,9 @@ namespace LBi.LostDoc.Templating
             // add our file provider to the top of the stack
             providers.Push(this.GetScopedFileProvider());
 
+            // create stacked provider
+            IFileProvider provider = new StackedFileProvider(providers);
+
             // start by loading any parameters as they are needed for meta-template evaluation
             CustomXsltContext customContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
 
@@ -388,7 +384,7 @@ namespace LBi.LostDoc.Templating
             customContext.PushVariableScope(workingDoc, arguments);
 
             // expand any meta-template directives
-            workingDoc = ApplyMetaTransforms(workingDoc, customContext, providers, tempFiles);
+            workingDoc = ApplyMetaTransforms(workingDoc, customContext, provider, tempFiles);
 
             // there was neither inheretance, nor any meta-template directives
             if (this._templateSourcePath == null)
@@ -409,7 +405,7 @@ namespace LBi.LostDoc.Templating
 
                 if (elem.Name.LocalName == "apply-stylesheet")
                 {
-                    stylesheets.Add(this.ParseStylesheet(providers, stylesheets, elem));
+                    stylesheets.Add(this.ParseStylesheet(provider, stylesheets, elem));
                 }
                 else if (elem.Name.LocalName == "index")
                 {
@@ -417,7 +413,7 @@ namespace LBi.LostDoc.Templating
                 }
                 else if (elem.Name.LocalName == "include-resource")
                 {
-                    resources.Add(ParseResouceDefinition(providers, elem));
+                    resources.Add(ParseResouceDefinition(provider, elem));
                 }
                 else
                 {
@@ -447,23 +443,17 @@ namespace LBi.LostDoc.Templating
             return tempFileName;
         }
 
-        private Resource ParseResouceDefinition(Stack<IFileProvider> providers, XElement elem)
+        private Resource ParseResouceDefinition(IFileProvider provider, XElement elem)
         {
             var source = this.GetAttributeValue(elem, "path");
 
             IFileProvider resourceProvider;
             Uri sourceUri;
             if (Uri.TryCreate(source, UriKind.Absolute, out sourceUri) && sourceUri.Scheme.StartsWith("http"))
-            {
                 resourceProvider = new HttpFileProvider();
-            }
             else
-            {
-                resourceProvider = providers.FirstOrDefault(p => p.FileExists(source));
-                if (resourceProvider == null)
-                    throw new FileNotFoundException("Resource not found: " + source);
-            }
-        
+                resourceProvider = provider;
+
             XAttribute outputAttr = elem.Attribute("output");
 
             string output;
@@ -493,7 +483,7 @@ namespace LBi.LostDoc.Templating
             return resource;
         }
 
-        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc, CustomXsltContext customContext, Stack<IFileProvider> providers, TempFileCollection tempFiles)
+        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc, CustomXsltContext customContext, IFileProvider provider, TempFileCollection tempFiles)
         {
             // check for meta-template directives and expand
             int metaCount = 0;
@@ -502,7 +492,7 @@ namespace LBi.LostDoc.Templating
             {
                 if (EvalCondition(customContext, metaNode, this.GetAttributeValueOrDefault(metaNode, "condition")))
                 {
-                    XslCompiledTransform metaTransform = this.LoadStylesheet(providers,
+                    XslCompiledTransform metaTransform = this.LoadStylesheet(provider,
                                                                              this.GetAttributeValue(metaNode, "stylesheet"));
 
                     XsltArgumentList xsltArgList = new XsltArgumentList();
@@ -545,7 +535,7 @@ namespace LBi.LostDoc.Templating
                         metaTransform.Transform(workingDoc.CreateNavigator(),
                                                 xsltArgList,
                                                 outputWriter,
-                                                new XmlFileProviderResolver(providers));
+                                                new XmlFileProviderResolver(provider));
 
                         outputWriter.Close();
 
@@ -600,7 +590,7 @@ namespace LBi.LostDoc.Templating
             return shouldApply;
         }
 
-        private Stylesheet ParseStylesheet(Stack<IFileProvider> providers, IEnumerable<Stylesheet> stylesheets, XElement elem)
+        private Stylesheet ParseStylesheet(IFileProvider provider, IEnumerable<Stylesheet> stylesheets, XElement elem)
         {
 
             var nameAttr = elem.Attribute("name");
@@ -626,7 +616,7 @@ namespace LBi.LostDoc.Templating
             if (match != null)
                 transform = match.Transform;
             else
-                transform = this.LoadStylesheet(providers, src);
+                transform = this.LoadStylesheet(provider, src);
 
             return new Stylesheet
                        {
