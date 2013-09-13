@@ -26,8 +26,6 @@
 
   <xsl:include href="LayoutExtensions.xslt"/>
 
-  <!--<xsl:include href="Navigation.xslt"/>-->
-
   <xsl:template match="/">
     <xsl:text disable-output-escaping="yes" xml:space="preserve">&lt;!DOCTYPE html&gt;
     </xsl:text>
@@ -37,10 +35,11 @@
         <title>
           <xsl:call-template name="title"/>
         </title>
-
+        <script src="{ld:relative('js/lib/zepto.js')}" >&#160;</script>
+        <script src="{ld:relative('js/lostdoc.js')}" >&#160;</script>
         <link rel="stylesheet" type="text/css">
           <xsl:attribute name="href">
-            <xsl:value-of select="ld:relative('style.css')"/>
+            <xsl:value-of select="ld:relative('css/style.css')"/>
           </xsl:attribute>
         </link>
         <xsl:call-template name="section-head-last"/>
@@ -49,17 +48,16 @@
         <xsl:call-template name="section-body-first"/>
         <div id="wrapper">
           <div class="main-navigation auto-height" >
-            <div class="left-col auto-height">
-              <xsl:call-template name="section-header-before"/>
-              <header>
-                <xsl:call-template name="section-header-first"/>
-                <xsl:call-template name="section-header-last"/>
-              </header>
-              <xsl:call-template name="section-header-after"/>
-              <nav>
-                <xsl:call-template name="navigation"/>
-              </nav>
-            </div>
+            <xsl:call-template name="section-header-before"/>
+            <header>
+              <xsl:call-template name="section-header-first"/>
+              <xsl:text>LostDoc</xsl:text>
+              <xsl:call-template name="section-header-last"/>
+            </header>
+            <xsl:call-template name="section-header-after"/>
+            <nav>
+              <xsl:call-template name="navigation"/>
+            </nav>
             <span class="handle"></span>
           </div>
           <!-- / Main navigation -->

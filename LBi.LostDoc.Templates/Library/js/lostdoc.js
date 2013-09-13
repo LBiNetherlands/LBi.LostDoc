@@ -91,12 +91,22 @@
                     //console.log("this.colLeftWidthPerc", this.colLeftWidthPerc);
                     //console.log("this.colRightWidthPerc", this.colRightWidthPerc);
 
-                    if (colLeftWidthPercent > 10 && colRightWidthPercent > 30) {
-                        // commit values
-                        this.colRightWidthPerc = colRightWidthPercent;
-                        this.colLeftWidthPerc = colLeftWidthPercent;
-                        this.setColumnWidth();
+                    // TODO figure out what min/max is in js
+                    if (colLeftWidthPercent < 10) {
+                        colLeftWidthPercent = 10;
+                        colRightWidthPercent = 100 - colLeftWidthPercent;
                     }
+
+                    if (colRightWidthPercent < 30) {
+                        colRightWidthPercent = 30;
+                        colLeftWidthPercent = 100 - colRightWidthPercent;
+                    }
+                    
+                    // commit values
+                    this.colRightWidthPerc = colRightWidthPercent;
+                    this.colLeftWidthPerc = colLeftWidthPercent;
+                    this.setColumnWidth();
+                    
                 }.bind(this));
             }.bind(this));
             var mouseUp = $(document).bind('mouseup', function () {

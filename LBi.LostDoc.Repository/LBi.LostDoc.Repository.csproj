@@ -106,11 +106,11 @@
     <Compile Include="SearchResultSet.cs" />
     <Compile Include="State.cs" />
     <Compile Include="Templates\Export.cs" />
-    <EmbeddedResource Include="Templates\Repository\search.js" />
     <Compile Include="TraceSources.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Templates\Repository\less\search.less" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\Repository\CreateIndex.xslt">
@@ -127,6 +127,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\Repository\LayoutExtensions.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\js\search.js" />
   </ItemGroup>
   <!--  manual edit, the build server needs to reference a dll rather than a project -->
   <Choose>

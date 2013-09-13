@@ -14,7 +14,12 @@
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
 
-  <include-resource path="search.js" output="search.js"/>
+
+  <include-resource path="less\search.less" output="css\search.css">
+    <transform name="less"/>
+  </include-resource>
+
+  <include-resource path="js\search.js" output="js\search.js"/>
   
   <!-- this stylsheet will be applied to _this_ file --><!--
   <meta-template stylesheet="IndexInjector.xslt">

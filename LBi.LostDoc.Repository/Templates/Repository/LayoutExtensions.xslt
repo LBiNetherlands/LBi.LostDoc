@@ -26,7 +26,10 @@
 
   <xsl:template name="section-head-first" />
 
-  <xsl:template name="section-head-last"/>
+  <xsl:template name="section-head-last">
+    <script defer="true" src="{ld:relative('js/search.js')}">&#160;</script>
+    <link rel="stylesheet" href="{ld:relative('css/search.css')}" type="text/css"/>
+  </xsl:template>
 
   <xsl:template name="section-body-first"/>
 
@@ -38,9 +41,9 @@
 
   <xsl:template name="section-header-after">
     <div class="search">
-      <form action="{ld:relative('search')}" method="get">
-        <input type="search" placeholder="Search" />
-        <input type="submit" value="Search" />
+      <form class="form-wrapper cf" action="{ld:relative('search')}" method="get">
+        <input type="text" placeholder="Search" required="required"/>
+        <button type="submit">Search</button>
       </form>
     </div>
     <!-- / Search -->
@@ -55,6 +58,5 @@
   <xsl:template name="section-main-after"/>
 
   <xsl:template name="section-body-last">
-    <script defer="true" src="{ld:relative('search.js')}">&#160;</script>
   </xsl:template>
 </xsl:stylesheet>
