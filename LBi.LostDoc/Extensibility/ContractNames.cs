@@ -19,5 +19,7 @@ namespace LBi.LostDoc.Extensibility
     public static class ContractNames
     {
         public const string TemplateProvider = "TemplateProvider";
+
+        public const string ResourceFileProvider = "ResourceFileProvider";
     }
 }

@@ -63,13 +63,25 @@
     <EmbeddedResource Include="Library\Type.xslt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Library\style.less" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\LBi.LostDoc\LBi.LostDoc.csproj">
       <Project>{B411734E-B768-422F-BA1C-5B9AEEF97C52}</Project>
       <Name>LBi.LostDoc</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\LayoutExtensions.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\less\colors.less" />
+    <EmbeddedResource Include="Library\less\icons.less" />
+    <EmbeddedResource Include="Library\less\layout.less" />
+    <EmbeddedResource Include="Library\less\navigation.less" />
+    <EmbeddedResource Include="Library\less\style.less" />
+    <EmbeddedResource Include="Library\less\syntax.less" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\js\lib\zepto.js" />
+    <EmbeddedResource Include="Library\js\lostdoc.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,0 +1,40 @@
+html {
+  overflow-y: scroll;
+}
+
+body {
+  background-color: @white;
+  font-size: 13px;
+  font-family: 'Segoe UI', 'Lucida Grande',Verdana,Arial,Helvetica,sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  //classes
+  &.grabbing {
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+  }
+
+  div#wrapper {
+    height: auto!important;
+    min-height: 100%;
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+  }
+
+  main {
+    background-repeat: no-repeat;
+    background-size: 6px 100%;
+    float: right;
+    //mark: will be overrided by js;
+    width: 80%;
+    // end mark
+    div.right-col {
+      border-left: 1px solid @grey_dark;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+}

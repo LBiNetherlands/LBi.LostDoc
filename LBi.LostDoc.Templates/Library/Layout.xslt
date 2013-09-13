@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012 LBi Netherlands B.V.
+  Copyright 2012-2013 LBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 
   <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
 
+  <xsl:include href="LayoutExtensions.xslt"/>
+
   <!--<xsl:include href="Navigation.xslt"/>-->
 
   <xsl:template match="/">
@@ -31,28 +33,48 @@
     </xsl:text>
     <html>
       <head>
-        <link rel="stylesheet" type="text/css">
-          <xsl:attribute name="href">
-            <xsl:value-of select="ld:resource('style.css')"/>
-          </xsl:attribute>
-        </link>
+        <xsl:call-template name="section-head-first"/>
         <title>
           <xsl:call-template name="title"/>
         </title>
+
+        <link rel="stylesheet" type="text/css">
+          <xsl:attribute name="href">
+            <xsl:value-of select="ld:relative('style.css')"/>
+          </xsl:attribute>
+        </link>
+        <xsl:call-template name="section-head-last"/>
       </head>
       <body>
+        <xsl:call-template name="section-body-first"/>
         <div id="wrapper">
-          <div id="col-left">
-            <div id="navigation">
-              <xsl:call-template name="navigation"/>
+          <div class="main-navigation auto-height" >
+            <div class="left-col auto-height">
+              <xsl:call-template name="section-header-before"/>
+              <header>
+                <xsl:call-template name="section-header-first"/>
+                <xsl:call-template name="section-header-last"/>
+              </header>
+              <xsl:call-template name="section-header-after"/>
+              <nav>
+                <xsl:call-template name="navigation"/>
+              </nav>
             </div>
+            <span class="handle"></span>
           </div>
-          <div id="col-right">
-            <div id="content">
+          <!-- / Main navigation -->
+
+          <xsl:call-template name="section-main-before"/>
+          <main class="auto-height">
+            <div class="right-col auto-height">
+              <xsl:call-template name="section-main-first"/>
               <xsl:call-template name="content"/>
+              <xsl:call-template name="section-main-last"/>
             </div>
-          </div>
+          </main>
+          <xsl:call-template name="section-main-after"/>
         </div>
+        <xsl:call-template name="section-body-last"/>
       </body>
     </html>
   </xsl:template>

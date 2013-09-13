@@ -1,0 +1,163 @@
+﻿div.main-navigation {
+  float: left;
+  position: relative;
+
+  &:after {
+    content: '';
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,@grey_dark), color-stop(100%,rgba(0,0,0,0)));
+    display: block;
+    height: 100%;
+    position: absolute;
+    right: -6px;
+    top: 0;
+    width: 6px;
+  }
+  //mark: will be overrided by js;
+  width: 20%;
+  // end mark
+  header {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+
+    .logo {
+      display: block;
+      margin: 15px;
+    }
+
+    .cf {
+      zoom: 1;
+      //pseudo elements
+      &:after {
+        clear: both;
+      }
+
+      &:before,
+      &:after {
+        content: "";
+        display: table;
+      }
+    }
+  }
+
+  div.left-col {
+    padding-left: 20px;
+  }
+
+  nav {
+    padding: 30px 0 100px 15px;
+    margin-bottom: 3px;
+    width: 100%;
+
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+
+      li {
+        margin-top: 1px;
+        overflow: hidden;
+        padding-right: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        ul {
+          margin-left: 12px;
+
+          li {
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABpJREFUKFNj2L17938GuoBRmygJZljokUIDAARxIxH6AB3sAAAAAElFTkSuQmCC) 0 1px no-repeat;
+            margin-left: -22px;
+            padding-left: 20px;
+          }
+        }
+        //classes
+        &.nav-ancestor {
+          background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABpJREFUKFNj2L17938GuoBRmygJZljokUIDAARxIxH6AB3sAAAAAElFTkSuQmCC) 0 1px no-repeat;
+          margin-left: -22px;
+          padding-left: 12px;
+        }
+
+        &.nav-root {
+          background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAIAAADZSiLoAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABhJREFUGFdjuHDhwu7du4EkA5CCAAa4GAA2yBS2mg5F0wAAAABJRU5ErkJggg==) 1px 7px no-repeat;
+          padding-left: 12px;
+          overflow: hidden;
+          margin: 0;
+          margin-left: -22px;
+        }
+      }
+
+      .nav-current > a {
+        color: @baseColor;
+        font-weight: 700;
+      }
+    }
+  }
+
+  .handle {
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0.2)), color-stop(100%,rgba(0,0,0,0)));
+    box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.5);
+    cursor: grab;
+    cursor: -webkit-grab;
+    height: 40px;
+    position: absolute;
+    right: -3px;
+    top: 40%;
+    width: 9px;
+
+    &:active {
+      cursor: grabbing;
+      cursor: -webkit-grabbing;
+    }
+  }
+}
+
+/*nav > ul {
+  margin-bottom: 3px;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+  nav ul li ul {
+    margin-left: 12px;
+  }
+
+nav li {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+  margin-top: 1px;
+}
+
+
+li.nav-root {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAIAAADZSiLoAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABhJREFUGFdjuHDhwu7du4EkA5CCAAa4GAA2yBS2mg5F0wAAAABJRU5ErkJggg==) 1px 7px no-repeat;
+  padding-left: 12px;
+  margin: 0;
+  overflow: hidden;
+}
+
+li.nav-ancestor {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAJCAYAAAD6reaeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAACFJREFUGFdjYICC3bt3/4exwTRIAIYxBFAkYKpRtNNDEABLZi/RJu+IWAAAAABJRU5ErkJggg==) 0 4px no-repeat;
+  padding-left: 12px;
+}
+
+  li.nav-ancestor ul li, nav ul li ul li {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABpJREFUKFNj2L17938GuoBRmygJZljokUIDAARxIxH6AB3sAAAAAElFTkSuQmCC) 0px 1px no-repeat;
+    padding-left: 20px;
+    margin-left: -10px;
+  }
+
+nav ul li ul li {
+  margin-left: -22px;
+}
+
+.nav-current > a {
+  color: #E66A38;
+  font-weight: bold;
+}*/

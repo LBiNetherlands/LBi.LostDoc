@@ -106,6 +106,7 @@
     <Compile Include="SearchResultSet.cs" />
     <Compile Include="State.cs" />
     <Compile Include="Templates\Export.cs" />
+    <EmbeddedResource Include="Templates\Repository\search.js" />
     <Compile Include="TraceSources.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +124,9 @@
     <EmbeddedResource Include="Templates\Repository\template.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\LayoutExtensions.xslt" />
   </ItemGroup>
   <!--  manual edit, the build server needs to reference a dll rather than a project -->
   <Choose>

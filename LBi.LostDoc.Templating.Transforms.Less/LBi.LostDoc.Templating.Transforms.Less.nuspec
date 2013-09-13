@@ -16,6 +16,6 @@
   </metadata>
 
   <files>
-    <file src="bin\$configuration$\dotless.ClientOnly.dll" target="lib\net45" />
+    <file src="bin\$configuration$\dotless.Core.dll" target="lib\net45" />
   </files>
 </package>

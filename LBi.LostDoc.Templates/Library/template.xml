@@ -9,9 +9,12 @@
   <index name="aidNoVer" match="*[@assetId]" key="get-id(@assetId)"/>
   <index name="aidInherits" match="*[@assetId and inherits/@type]" key="inherits/@type"/>
 
-  <include-resource path="style.less" output="style.css">
+  <include-resource path="less\style.less" output="css\style.css">
     <transform name="less"/>
   </include-resource>
+
+  <include-resource path="js\lostdoc.js" output="js\lostdoc.js"/>
+  <include-resource path="js\lib\zepto.js" output="js\lib\zepto.js"/>
   
   <!--<include-resource path="$LogoUrl" 
                     output="{concat('static/logo.', substring-after-last($LogoUrl, '.'))}">

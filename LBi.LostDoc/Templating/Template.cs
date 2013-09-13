@@ -36,6 +36,7 @@ using System.Xml.XPath;
 using System.Xml.Xsl;
 using LBi.LostDoc.Composition;
 using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Extensibility;
 using LBi.LostDoc.Templating.AssetResolvers;
 using LBi.LostDoc.Templating.FileProviders;
 using LBi.LostDoc.Templating.XPath;
@@ -962,22 +963,55 @@ namespace LBi.LostDoc.Templating
 
                     foreach (var resourceTransform in resources[i].Transforms)
                     {
-                        CompositionContainer paramContainer = new CompositionContainer(this._container);
+                        using (CompositionContainer localContainer = new CompositionContainer(this._container))
+                        {
+                            string dirName = Path.GetDirectoryName(resources[i].Source);
+                            CompositionBatch batch = new CompositionBatch();
+                            var exportMetadata = new Dictionary<string, object>();
 
-                        // TODO export resourceTransform.Parameters into paramContainer using CompositionBatch
-                        ImportDefinition importDefinition =
-                            new MetadataContractBasedImportDefinition(
-                                typeof(IResourceTransform),
-                                null,
-                                new[] {new Tuple<string, object, IEqualityComparer>("Name", resourceTransform.Name, StringComparer.OrdinalIgnoreCase) },
-                                ImportCardinality.ExactlyOne,
-                                false,
-                                false,
-                                CreationPolicy.NonShared);
+                            exportMetadata.Add(CompositionConstants.ExportTypeIdentityMetadataName,
+                                               AttributedModelServices.GetTypeIdentity(typeof(IFileProvider)));
 
-                        Export transformExport = paramContainer.GetExports(importDefinition).Single();
+                            exportMetadata.Add(CompositionConstants.PartCreationPolicyMetadataName,
+                                               CreationPolicy.Shared);
 
-                        transforms.Add((IResourceTransform)transformExport.Value);
+                            batch.AddExport(new Export(ContractNames.ResourceFileProvider,
+                                                       exportMetadata,
+                                                       () => new ScopedFileProvider(resources[i].FileProvider, dirName)));
+
+                            localContainer.Compose(batch);
+
+                            var allExports =
+                                localContainer.GetExports(new ImportDefinition(ed => true,
+                                                                               null,
+                                                                               ImportCardinality.ExactlyOne,
+                                                                               false,
+                                                                               true));
+
+                            var fp = localContainer.GetExportedValue<IFileProvider>(ContractNames.ResourceFileProvider);
+
+                            // TODO export resourceTransform.Parameters into paramContainer using CompositionBatch
+                            var requiredMetadata = new[]
+                                                   {
+                                                       new Tuple<string, object, IEqualityComparer>("Name",
+                                                                                                    resourceTransform.Name,
+                                                                                                    StringComparer.OrdinalIgnoreCase)
+                                                   };
+
+                            ImportDefinition importDefinition =
+                                new MetadataContractBasedImportDefinition(
+                                    typeof(IResourceTransform),
+                                    null,
+                                    requiredMetadata,
+                                    ImportCardinality.ExactlyOne,
+                                    false,
+                                    true,
+                                    CreationPolicy.NonShared);
+
+                            Export transformExport = localContainer.GetExports(importDefinition).Single();
+
+                            transforms.Add((IResourceTransform)transformExport.Value);
+                        }
                     }
 
                     yield return
