@@ -45,24 +45,23 @@
         },
 
         storeColumnWidth: function () {
-            localStorage.setItem("columnWidth", this.colLeftWidthPerc);
+            localStorage.setItem("columnWidth", JSON.stringify(this.colLeftWidthPerc));
         },
 
         openLocalStorage: function () {
-            this.colLeftWidthPerc = localStorage.getItem("columnWidth");
-            this.colRightWidthPerc = 100 - this.colLeftWidthPerc;
-            if (this.colLeftWidthPerc > 0 && this.colRightWidthPerc) {
-                this.setColumnWidth(true);
+            var rawValue = JSON.parse(localStorage.getItem("columnWidth"));
+            if (rawValue) {
+                this.colLeftWidthPerc = parseFloat();
+                console.log("load this.colLeftWidthPerc", this.colLeftWidthPerc);
+                this.colRightWidthPerc = 100 - this.colLeftWidthPerc;
+                this.setColumnWidth();
             }
         },
 
-        setColumnWidth: function (init) {
+        setColumnWidth: function () {
             var total = this.colLeftWidthPerc + this.colRightWidthPerc;
-            //console.log("this.colLeftWidthPerc", this.colLeftWidthPerc);
-            //console.log("this.colRightWidthPerc", this.colRightWidthPerc);
 
-
-            if (total == 100 && this.colLeftWidthPerc > 10 && this.colRightWidthPerc > 30 || init === true) {
+            if (total == 100) {
                 this.leftColumn.css({
                     'width': this.colLeftWidthPerc + '%'
                 });
@@ -85,8 +84,7 @@
                     var colRightWidth = (this.colRightWidth - 1) + this.moved;
                     var colRightWidthPercent = this.pxToPercentage(colRightWidth);
 
-                    var colLeftWidth = this.colLeftWidth - this.moved;
-                    var colLeftWidthPercent = this.pxToPercentage(colLeftWidth);
+                    var colLeftWidthPercent = 100 - colRightWidthPercent;
 
                     //console.log("this.colLeftWidthPerc", this.colLeftWidthPerc);
                     //console.log("this.colRightWidthPerc", this.colRightWidthPerc);
