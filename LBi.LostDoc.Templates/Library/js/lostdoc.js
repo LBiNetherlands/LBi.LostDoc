@@ -45,13 +45,14 @@
         },
 
         storeColumnWidth: function () {
-            localStorage.setItem("columnWidth", JSON.stringify(this.colLeftWidthPerc));
+            var rawValue = JSON.stringify(this.colLeftWidthPerc);
+            localStorage.setItem("columnWidth", rawValue);
         },
 
         openLocalStorage: function () {
-            var rawValue = JSON.parse(localStorage.getItem("columnWidth"));
+            var rawValue = localStorage.getItem("columnWidth");
             if (rawValue) {
-                this.colLeftWidthPerc = parseFloat();
+                this.colLeftWidthPerc = JSON.parse(rawValue);
                 console.log("load this.colLeftWidthPerc", this.colLeftWidthPerc);
                 this.colRightWidthPerc = 100 - this.colLeftWidthPerc;
                 this.setColumnWidth();
