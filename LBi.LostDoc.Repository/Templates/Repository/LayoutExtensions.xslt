@@ -43,8 +43,14 @@
     <div class="search">
       <form class="form-wrapper cf" action="{ld:relative('search')}" method="get">
         <input type="text" placeholder="Search" required="required"/>
-        <button type="submit">Search</button>
+        <button type="submit"><span/></button>
       </form>
+      <div id="search-results" class="hidden">
+        <ul>
+          <li>First</li>
+          <li>Second</li>
+        </ul>
+      </div>
     </div>
     <!-- / Search -->
   </xsl:template>
