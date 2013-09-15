@@ -29,12 +29,6 @@
             this.autoHeightElements.css({
                 'min-height': height
             });
-            //this.rightColumn.css({
-            //    'min-height': height
-            //});
-            //this.leftColumn.css({
-            //    'min-height': height
-            //});
         },
 
         pxToPercentage: function (px) {
