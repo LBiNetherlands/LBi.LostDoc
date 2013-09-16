@@ -25,8 +25,8 @@
             this._searchUri = this._form.get(0).action;
             this._input.bind('keyup', this._input_keyup.bind(this));
             this._input.bind('keydown', this._input_keydown.bind(this));
-            //this._input.bind('blur', this._input_blur.bind(this));
             $(window).bind('click', this._hideInstant.bind(this));
+            $(window).bind('keydown', this._hideFull.bind(this));
             this._form.bind('click', function (ev) { ev.stopPropagation(); });
             this._form.submit(this._performSearch.bind(this));
             console.log("_form", this._form);
@@ -94,6 +94,12 @@
 
         _hideInstant: function (e) {
             this._instantResults.addClass("hidden");
+        },
+        
+        _hideFull: function (e) {
+            if (e.keyCode == 27 && !this._fullResults.hasClass('hidden')) {
+                this._fullResults.addClass('hidden');
+            }
         },
 
         _on_keyup_timeout: function (e) {
@@ -187,7 +193,6 @@
             if (data.HitCount > 0) {
                 resultHtml += '<ul class="search-results">';
                 $.each(data.Results, function (i, item) {
-                    // find some nice js templating language here
                     resultHtml += '<li>';
                     resultHtml += '<a href="' + item.Url + '">';
                     resultHtml += '<h4>';
