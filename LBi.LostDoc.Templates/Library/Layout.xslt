@@ -35,8 +35,6 @@
         <title>
           <xsl:call-template name="title"/>
         </title>
-        <script src="{ld:relative('js/lib/zepto.js')}" >&#160;</script>
-        <script src="{ld:relative('js/lostdoc.js')}" >&#160;</script>
         <link rel="stylesheet" type="text/css">
           <xsl:attribute name="href">
             <xsl:value-of select="ld:relative('css/style.css')"/>
@@ -65,13 +63,17 @@
           <xsl:call-template name="section-main-before"/>
           <main class="auto-height">
             <div class="right-col auto-height">
-              <xsl:call-template name="section-main-first"/>
-              <xsl:call-template name="content"/>
-              <xsl:call-template name="section-main-last"/>
+              <div class="main-content">
+                <xsl:call-template name="section-main-first"/>
+                <xsl:call-template name="content"/>
+                <xsl:call-template name="section-main-last"/>
+              </div>
             </div>
           </main>
           <xsl:call-template name="section-main-after"/>
         </div>
+        <script src="{ld:relative('js/lib/zepto.js')}" >&#160;</script>
+        <script src="{ld:relative('js/lostdoc.js')}" >&#160;</script>
         <xsl:call-template name="section-body-last"/>
       </body>
     </html>

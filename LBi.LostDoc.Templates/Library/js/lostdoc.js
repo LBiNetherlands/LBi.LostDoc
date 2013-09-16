@@ -19,15 +19,35 @@
             this.leftColumn = $(this.settings['leftColumnSelector']);
             this.rightColumn = $(this.settings['rightColumnSelector']);
             this.autoHeightElements = $(this.settings['autoHeightSelector']);
-            this.setColumnHeight();
+            this.updateWindowHeight();
+            $(window).resize(this.updateWindowHeight.bind(this));
             this.openLocalStorage();
             this.initColumnResizer();
         },
 
-        setColumnHeight: function () {
-            var height = $(window).height();
+        updateWindowHeight: function () {
+            var windowHeight = $(window).height();
+
+            //var minHeight = this.autoHeightElements.reduce(function (aggregate, item, index, array) {
+            //    return Math.max(aggregate, $(item).height());
+            //}, windowHeight);
+
+            //this.autoHeightElements.css({
+            //    'min-height': minHeight
+            //});
+            
             this.autoHeightElements.css({
-                'min-height': height
+                'height': windowHeight
+            });
+
+            //this.autoHeightElements.each(function (i, item) {
+            //    $(item).find('.auto-min-height').css('min-height', windowHeight);
+            //});
+
+            var handleTop = Math.round(windowHeight * .4);
+
+            this.handle.css({
+                'top': handleTop + 'px'
             });
         },
 
@@ -69,35 +89,18 @@
         initColumnResizer: function (e) {
             var mouseDown = this.handle.bind('mousedown', function (e) {
                 $('body').addClass(this.settings['grabClass']);
-                //this.column = this.handle.offset().left;
+                
                 this.column = e.clientX;
-                this.colRightWidth = this.rightColumn.width();
+                
                 this.colLeftWidth = this.leftColumn.width();
                 var mouseMove = $(document).bind('mousemove', function (e) {
                     this.moved = this.column - e.clientX;
                     //now resize the columns
-                    var colRightWidth = (this.colRightWidth - 1) + this.moved;
-                    var colRightWidthPercent = this.pxToPercentage(colRightWidth);
-
-                    var colLeftWidthPercent = 100 - colRightWidthPercent;
-
-                    //console.log("this.colLeftWidthPerc", this.colLeftWidthPerc);
-                    //console.log("this.colRightWidthPerc", this.colRightWidthPerc);
-
-                    // TODO figure out what min/max is in js
-                    if (colLeftWidthPercent < 10) {
-                        colLeftWidthPercent = 10;
-                        colRightWidthPercent = 100 - colLeftWidthPercent;
-                    }
-
-                    if (colRightWidthPercent < 30) {
-                        colRightWidthPercent = 30;
-                        colLeftWidthPercent = 100 - colRightWidthPercent;
-                    }
+                    var newColLeftWidth = this.colLeftWidth - this.moved;
+                    var colLeftWidthPercent = this.pxToPercentage(newColLeftWidth);
+                    this.colLeftWidthPerc = Math.max(10, Math.min(70, colLeftWidthPercent));
+                    this.colRightWidthPerc = 100 - colLeftWidthPercent;
                     
-                    // commit values
-                    this.colRightWidthPerc = colRightWidthPercent;
-                    this.colLeftWidthPerc = colLeftWidthPercent;
                     this.setColumnWidth();
                     
                 }.bind(this));
