@@ -46,16 +46,18 @@
         <xsl:call-template name="section-body-first"/>
         <div id="wrapper">
           <div class="main-navigation auto-height" >
-            <xsl:call-template name="section-header-before"/>
-            <header>
-              <xsl:call-template name="section-header-first"/>
-              <xsl:text>LostDoc</xsl:text>
-              <xsl:call-template name="section-header-last"/>
-            </header>
-            <xsl:call-template name="section-header-after"/>
-            <nav>
-              <xsl:call-template name="navigation"/>
-            </nav>
+            <div class="left-col">
+              <xsl:call-template name="section-header-before"/>
+              <header>
+                <xsl:call-template name="section-header-first"/>
+                <xsl:text>LostDoc</xsl:text>
+                <xsl:call-template name="section-header-last"/>
+              </header>
+              <xsl:call-template name="section-header-after"/>
+              <nav>
+                <xsl:call-template name="navigation"/>
+              </nav>
+            </div>
             <span class="handle"></span>
           </div>
           <!-- / Main navigation -->

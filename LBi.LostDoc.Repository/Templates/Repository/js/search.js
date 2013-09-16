@@ -34,6 +34,7 @@
             console.log("_button", this._button);
             console.log("_instantResults", this._instantResults);
             console.log("_searchUri", this._searchUri);
+            this._instantSelected = -1;
         },
 
         _input_keyup: function (e) {
@@ -71,7 +72,7 @@
                 }
             } else if (e.keyCode == 13) { // enter
                 if (this._instantSelected == -1) {
-
+                    this._performSearch();
                 } else {
                     this._instantResults.find('li.selected a').each(function (i, item) {
                         window.location.href = $(item).attr('href');
