@@ -665,6 +665,8 @@ namespace LBi.LostDoc.Templating
         {
             Stopwatch timer = Stopwatch.StartNew();
 
+            this._fileResolver.Clear();
+
             ParsedTemplate tmpl = this.PrepareTemplate(templateData);
 
             // collect all work that has to be done
@@ -969,9 +971,10 @@ namespace LBi.LostDoc.Templating
                                                        exportMetadata,
                                                        () => new ScopedFileProvider(resources[i].FileProvider, dirName)));
 
+                            // TODO export resourceTransform.Parameters into localContainer using CompositionBatch
+
                             localContainer.Compose(batch);
 
-                            // TODO export resourceTransform.Parameters into paramContainer using CompositionBatch
                             var requiredMetadata = new[]
                                                    {
                                                        new Tuple<string, object, IEqualityComparer>("Name",

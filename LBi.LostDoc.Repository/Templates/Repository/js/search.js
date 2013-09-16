@@ -29,7 +29,6 @@
         },
 
         _input_keyUp: function (e) {
-            alert('woo: ' + this._searchUri);
             console.log("this", this);
             // set some timeout
             this._keyup_timeout = setTimeout('lostDoc.search._on_keyup_timeout', this.settings.keyupTimeout);
