@@ -90,14 +90,14 @@
                     }
                     this._oldClientX = e.clientX;
 
-                    this._colLeftWidth = this._leftColumn.width();
+                    this._leftColtWidth = this._leftColumn.width();
                     
                     var mouseMove = $(document).bind('mousemove', function (e) {
                         var offset = this._oldClientX - e.clientX;
                         
                         // TODO move constants into settings
-                        this._leftColWidthPercent = Math.max(10, Math.min(70, this._pxToPercentage(this._colLeftWidth - offset)));
-                        console.log(offset);
+                        this._leftColWidthPercent = Math.max(10, Math.min(70, this._pxToPercentage(this._leftColtWidth - offset)));
+                        // console.log(offset, this._leftColWidthPercent);
                         this._update();
                     }.bind(this));
                 }.bind(this));
@@ -136,12 +136,10 @@
             },
 
             _update: function () {
-                this._leftColumn.css({
-                    'width': this.colLeftWidthPercent + '%'
-                });
-                this._rightColumn.css({
-                    'width': 100 - this.colLeftWidthPercent + '%'
-                });
+                //console.log('update: ', this);
+                //console.log('update: ', this._leftColWidthPercent + '%');
+                this._leftColumn.css('width', this._leftColWidthPercent + '%');
+                this._rightColumn.css('width', (100 - this._leftColWidthPercent) + '%');
             },
             
             onResized: function(leftColWidthPercent) {
