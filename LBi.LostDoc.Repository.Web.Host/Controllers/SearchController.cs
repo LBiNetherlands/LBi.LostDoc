@@ -21,6 +21,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Web.Http;
+using LBi.LostDoc.Repository.Web.Api.Models;
 using LBi.LostDoc.Repository.Web.Configuration;
 using LBi.LostDoc.Repository.Web.Models;
 
@@ -64,6 +65,8 @@ namespace LBi.LostDoc.Repository.Web.Host.Controllers
 
                 return new ResultSet
                            {
+                               Query = searchTerms,
+                               Offset = offset,
                                HitCount = res.HitCount,
                                Results = res.Results.Select(r => new Result
                                                                      {

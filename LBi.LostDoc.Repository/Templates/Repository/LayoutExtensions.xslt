@@ -58,7 +58,9 @@
 
   <xsl:template name="section-main-before"/>
 
-  <xsl:template name="section-main-first"/>
+  <xsl:template name="section-main-first">
+    <xsl:attribute name="data-bind">css: { hidden: resultSet() }</xsl:attribute>
+  </xsl:template>
 
   <xsl:template name="section-main-last">
     <!--<div id="full-results" class="hidden">
@@ -66,9 +68,31 @@
     </div>-->
   </xsl:template>
 
-  <xsl:template name="section-main-after"/>
+  <xsl:template name="section-main-after">
+    <div id="full-results" data-bind="css: {{ hidden: !resultSet() }}, with: resultSet">
+      
+      <h1>
+        Results for '<span class="query" data-bind="text: query">&#160;</span>'
+      </h1>
+      <div class="loader" data-bind="visible: loading">Loading...</div>
+      <div class="no-results" data-bind="css: {{ hidden: !noResults() }}">
+        No results found.
+      </div>
+      <ul class="search-results" data-bind="foreach: results, css: {{ hidden: !hasResults() }}">
+        <li>
+          <a data-bind="attr: {{ href: url, title: title }}">
+            <h4 data-bind="text: title">&#160;</h4>
+          </a>
+          <p data-bind="text: blurb">&#160;</p>
+        </li>
+      </ul>
+      <button data-bind="click: fetchNext, css: {{ hidden: !hasMore() }}">Load more results</button>
+      <!--<pre data-bind="text: ko.toJSON($data, null, 2)">x</pre>-->
+    </div>
+  </xsl:template>
 
   <xsl:template name="section-body-last">
+    <script src="{ld:relative('js/lib/knockout.js')}">&#160;</script>
     <script src="{ld:relative('js/search.js')}">&#160;</script>
   </xsl:template>
 </xsl:stylesheet>

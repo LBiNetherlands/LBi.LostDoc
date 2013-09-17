@@ -131,6 +131,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\Repository\js\search.js" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\js\lib\knockout.js" />
+  </ItemGroup>
   <!--  manual edit, the build server needs to reference a dll rather than a project -->
   <Choose>
     <When Condition=" '$(AlternateReferenceLocation)' != '' ">

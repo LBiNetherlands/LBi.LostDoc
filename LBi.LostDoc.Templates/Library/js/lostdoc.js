@@ -114,10 +114,14 @@
             },
             
             _resize: function(ev) {
-                var leftColWidth = this._container.width() * this._leftColWidthPercent;
-                this._leftColWidthPercent = this._pxToPercentage(leftColWidth);
-                this._update();
-                
+                var leftColWidth = this._container.width() * (this._leftColWidthPercent / 100);
+                var newLeftColWidthPercent = this._pxToPercentage(leftColWidth);
+
+                if (newLeftColWidthPercent != this._leftColWidthPercent) {
+                    this._leftColWidthPercent = newLeftColWidthPercent;
+                    this._update();
+                }
+
                 var windowHeight = $(window).height();
 
                 var handleTop = Math.round(windowHeight * .4);

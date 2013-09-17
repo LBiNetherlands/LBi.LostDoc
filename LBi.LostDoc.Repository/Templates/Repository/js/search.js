@@ -12,7 +12,12 @@
             'instantResults': 'div#instant-results',
             'keyupTimeout': 1000,
             'instantResultCount': 5,
-            'fullResults': 'div.main-content',
+            'content': 'main',
+
+            'fullResults': 'div#full-results',
+            'fullResultsList': '.search-results',
+            'fullResultsNone': '.no-results',
+            'fullResultsMore': 'button',
             'fullResultCount': 20
         },
 
@@ -22,19 +27,23 @@
             this._button = $(this.settings.button);
             this._instantResults = $(this.settings.instantResults);
             this._fullResults = $(this.settings.fullResults);
+            this._fullResultsList = this._fullResults.find(this.settings.fullResultsList);
+            this._fullResultsNone = this._fullResults.find(this.settings.fullResultsNone);
+            this._fullResultsMore = this._fullResults.find(this.settings.fullResultsMore);
+            this._content = $(this.settings.content);
             this._searchUri = this._form.get(0).action;
+
             this._input.bind('keyup', this._input_keyup.bind(this));
             this._input.bind('keydown', this._input_keydown.bind(this));
             $(window).bind('click', this._hideInstant.bind(this));
             $(window).bind('keydown', this._hideFull.bind(this));
             this._form.bind('click', function (ev) { ev.stopPropagation(); });
             this._form.submit(this._performSearch.bind(this));
-            console.log("_form", this._form);
-            console.log("_input", this._input);
-            console.log("_button", this._button);
-            console.log("_instantResults", this._instantResults);
-            console.log("_searchUri", this._searchUri);
             this._instantSelected = -1;
+
+            this._fullResultsMore.bind('click', this._performSearch.bind(this));
+
+            ko.applyBindings(this.viewModel);
         },
 
         _input_keyup: function (e) {
@@ -95,10 +104,12 @@
         _hideInstant: function (e) {
             this._instantResults.addClass("hidden");
         },
-        
+
         _hideFull: function (e) {
             if (e.keyCode == 27 && !this._fullResults.hasClass('hidden')) {
                 this._fullResults.addClass('hidden');
+                this._content.removeClass("hidden");
+                this._fullResultsQuery = null;
             }
         },
 
@@ -113,17 +124,13 @@
                 //data: { name: 'Zepto.js' },
                 // type of data we are expecting in return:
                 dataType: 'json',
-                timeout: 300,
+                timeout: 5000,
                 //context: $('body'),
                 success: this._renderInstantResults.bind(this),
                 error: function (xhr, type) {
                     alert('Ajax error!');
                 }
             });
-
-            //alert('timeout!');
-            // check for input box data
-            // do search, call _renderInstantResult on successful callback
         },
 
         _performSearch: function (e) {
@@ -135,20 +142,23 @@
             this._instantResults.addClass("hidden");
 
             var terms = this._input.val();
-            $.ajax({
-                type: 'GET',
-                url: this._searchUri + '/' + terms + '?count=' + this.settings.fullResultCount,
-                // data to be added to query string:
-                //data: { name: 'Zepto.js' },
-                // type of data we are expecting in return:
-                dataType: 'json',
-                timeout: 300,
-                //context: $('body'),
-                success: this._renderFullResults.bind(this),
-                error: function (xhr, type) {
-                    alert('Ajax error!');
-                }
-            });
+
+            this.viewModel.resultSet(new this._resultSet(this._searchUri, terms));
+
+            //$.ajax({
+            //    type: 'GET',
+            //    url: this._searchUri + '/' + terms + '?count=' + this.settings.fullResultCount + offset,
+            //    // data to be added to query string:
+            //    //data: { name: 'Zepto.js' },
+            //    // type of data we are expecting in return:
+            //    dataType: 'json',
+            //    timeout: 5000,
+            //    //context: $('body'),
+            //    success: this._renderFullResults.bind(this),
+            //    error: function (xhr, type) {
+            //        console.error('Ajax error!', xhr, type);
+            //    }
+            //});
             return false;
         },
 
@@ -188,29 +198,107 @@
         },
 
         _renderFullResults: function (data) {
-            var resultHtml = '';
-            resultHtml = '<h1>Results</h1>';
-            if (data.HitCount > 0) {
-                resultHtml += '<ul class="search-results">';
-                $.each(data.Results, function (i, item) {
-                    resultHtml += '<li>';
-                    resultHtml += '<a href="' + item.Url + '">';
-                    resultHtml += '<h4>';
-                    resultHtml += item.Title;
-                    resultHtml += '</h4>';
-                    resultHtml += '</a>';
-                    resultHtml += '<p>';
-                    resultHtml += item.Blurb;
-                    resultHtml += '</p>';
-                    resultHtml += '</li>';
-                });
-                resultHtml += '</ul>';
+            //var resultHtml = '';
+            //if (data.HitCount > 0) {
+            //    $.each(data.Results, function (i, item) {
+            //        resultHtml += '<li>';
+            //        resultHtml += '<a href="' + item.Url + '">';
+            //        resultHtml += '<h4>';
+            //        resultHtml += item.Title;
+            //        resultHtml += '</h4>';
+            //        resultHtml += '</a>';
+            //        resultHtml += '<p>';
+            //        resultHtml += item.Blurb;
+            //        resultHtml += '</p>';
+            //        resultHtml += '</li>';
+            //    });
 
-                this._fullResults.html(resultHtml);
-            } else {
-                this._fullResults.html("<h1>no results</h1>");
-            }
-            this._fullResults.removeClass("hidden");
+            //    if (data.HitCount > this._fullResultsList.find('li').length) {
+            //        this._fullResultsMore.removeClass('hidden');
+            //    } else {
+            //        this._fullResultsMore.addClass('hidden');
+            //    }
+
+            //    this._fullResultsList.removeClass('hidden');
+            //    this._fullResultsNone.addClass('hidden');
+            //} else {
+            //    this._fullResultsList.addClass('hidden');
+            //    this._fullResultsNone.removeClass('hidden');
+            //}
+            //if (this._fullResultsQuery) {
+            //    this._fullResultsList.append(resultHtml);
+            //} else {
+            //    this._fullResultsList.html(resultHtml);
+            //}
+            //this._content.addClass("hidden");
+            //this._fullResults.removeClass("hidden");
+            console.log("this", this);
+
+        },
+
+        viewModel: {
+            resultSet: ko.observable(),
+        },
+
+        _resultSet: function (searchUri, query) {
+            
+            this._searchUri = searchUri;
+            this.query = query;
+            this.hitCount = ko.observable();
+            this.results = ko.observableArray([]);
+
+            var self = this;
+ 
+            this.loading = ko.computed(function () {
+                return self.hitCount() == null;
+            }, this);
+
+            this.hasMore = ko.computed(function() {
+                return self.hitCount() > self.results().length;
+            }, this);
+            
+            this.noResults = ko.computed(function () {
+                return self.hitCount() === 0;
+            }, this);
+            
+            this.hasResults = ko.computed(function () {
+                return self.hitCount() > 0;
+            }, this);
+            
+
+            this._bindResults = function (data) {
+                this.hitCount(data.HitCount);
+                var results = data.Results.map(function(value, index, array) {
+                    return {
+                        title: value.Title,
+                        blurb: value.Blurb,
+                        url: value.Url,
+                    };
+                }, this);
+                this.results(this.results().concat(results));
+            };
+
+            this.fetchNext = function () {
+
+                // perform ajax request
+                $.ajax({
+                    type: 'GET',
+                    url: this._searchUri + '/' + this.query + '?count=20' + '&offset=' + this.results().length,
+                    // data to be added to query string:
+                    //data: { name: 'Zepto.js' },
+                    // type of data we are expecting in return:
+                    dataType: 'json',
+                    timeout: 5000,
+                    //context: $('body'),
+                    success: this._bindResults.bind(this),
+                    error: function (xhr, type) {
+                        console.error('Ajax error!', xhr, type);
+                    }
+                });
+            };
+
+            // initial load
+            this.fetchNext();
         }
     };//end window
     $(function () {
