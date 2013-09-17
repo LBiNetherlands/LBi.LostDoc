@@ -64,9 +64,9 @@ namespace LBi.LostDoc.Repository.Web.Host
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapHttpRoute("SearchCurrent", "library/search/{searchTerms}", new { controller = "Search", id = "current" });
+            routes.MapHttpRoute("SearchCurrent", "library/search", new { controller = "Search", id = "current" });
 
-            routes.MapHttpRoute("SearchArchive", "archive/{id}/search/{searchTerms}", new { controller = "Search" });
+            routes.MapHttpRoute("SearchArchive", "archive/{id}/search", new { controller = "Search" });
 
             routes.MapRoute(name: RouteConstants.ArchiveRouteName,
                             url: "archive/{id}/{*path}",

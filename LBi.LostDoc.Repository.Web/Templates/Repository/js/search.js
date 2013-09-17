@@ -10,7 +10,7 @@
             'input': 'div.search form input',
 
             'keyupTimeout': 1000,
-            
+
             'instantResultCount': 5,
             'fullResultCount': 20
         },
@@ -24,7 +24,7 @@
             this._input.bind('keyup', this._input_keyup.bind(this));
             this._input.bind('keydown', this._input_keydown.bind(this));
             $(window).bind('click', this._hideInstant.bind(this));
-            $(window).bind('keydown', this._hideFull.bind(this));
+            $(window).bind('keydown', this._window_keydown.bind(this));
             this._form.bind('click', function (ev) { ev.stopPropagation(); });
             this._form.submit(this._performSearch.bind(this));
 
@@ -55,6 +55,7 @@
                     } else {
                         this.viewModel.instant(null);
                     }
+                    return false;
                 } else if (e.keyCode == 38) { // up
                     this.viewModel.instant().selectPrev();
                 } else if (e.keyCode == 40) { // down
@@ -75,11 +76,12 @@
             this.viewModel.instant(null);
         },
 
-        _hideFull: function (e) {
+        _window_keydown: function (e) {
             if (e.keyCode == 27 && !this.viewModel.instant()) {
                 this.viewModel.resultSet(null);
-            } else if (e.keyCode == 191) {
-                this._input.setFocus();
+            } else if (e.keyCode == 191 && e.target != this._input.get(0)) {
+                this._input.focus();
+                return false;
             }
         },
 
@@ -87,8 +89,10 @@
             console.log("_on_keyup_timeout", this);
             this._keyup_timeout = null;
             var terms = this._input.val();
-
-            this.viewModel.instant(new this._resultSet(this._searchUri, terms, this.settings.instantResultCount));
+            if ($.trim(terms) == '')
+                this.viewModel.instant(null);
+            else
+                this.viewModel.instant(new this._resultSet(this._searchUri, terms, this.settings.instantResultCount));
         },
 
         _performSearch: function (e) {
@@ -142,9 +146,7 @@
                 this.selected(this.results()[this._selected]);
             };
 
-            this.loading = ko.computed(function () {
-                return this.hitCount() == null;
-            }, this);
+            this.loading = ko.observable(true);
 
             this.hasMore = ko.computed(function () {
                 return this.hitCount() > this.results().length;
@@ -169,14 +171,14 @@
                     };
                 }, this);
                 this.results(this.results().concat(results));
+                this.loading(false);
             };
 
             this.fetchNext = function () {
-
                 // perform ajax request
                 $.ajax({
                     type: 'GET',
-                    url: this._searchUri + '/' + this.query + '?count=' + this._pageSize + '&offset=' + this.results().length,
+                    url: this._searchUri + '?q=' + encodeURIComponent(this.query) + '&c=' + this._pageSize + '&o=' + this.results().length,
                     // data to be added to query string:
                     //data: { name: 'Zepto.js' },
                     // type of data we are expecting in return:
@@ -186,7 +188,8 @@
                     success: this._bindResults.bind(this),
                     error: function (xhr, type) {
                         console.error('Ajax error!', xhr, type);
-                    }
+                        this.loading(false);
+                    }.bind(this)
                 });
             };
 

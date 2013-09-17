@@ -74,11 +74,9 @@
 
   <xsl:template name="section-main-after">
     <div id="full-results" data-bind="css: {{ hidden: !resultSet() }}, with: resultSet">
-
       <h1>
         Results for '<span class="query" data-bind="text: query">&#160;</span>'
       </h1>
-      <div class="loader" data-bind="visible: loading">Loading...</div>
       <div class="no-results" data-bind="css: {{ hidden: !noResults() }}">
         No results found.
       </div>
@@ -91,6 +89,7 @@
         </li>
       </ul>
       <button data-bind="click: fetchNext, css: {{ hidden: !hasMore() }}">Load more results</button>
+      <div class="loader" data-bind="visible: loading">Loading...</div>
       <!--<pre data-bind="text: ko.toJSON($data, null, 2)">x</pre>-->
     </div>
   </xsl:template>

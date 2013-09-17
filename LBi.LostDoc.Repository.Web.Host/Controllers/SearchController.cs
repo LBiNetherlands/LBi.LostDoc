@@ -21,6 +21,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Web.Http;
+using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Api.Models;
 using LBi.LostDoc.Repository.Web.Configuration;
 using LBi.LostDoc.Repository.Web.Models;
@@ -45,7 +46,10 @@ namespace LBi.LostDoc.Repository.Web.Host.Controllers
             this._content = contentManager;
         }
 
-        public ResultSet Get(string id, string searchTerms, int offset = 0, int count = 200)
+        public ResultSet Get(string id,
+                             [FromUri(Name = "q")]string searchTerms,
+                             [FromUri(Name = "o")]int offset = 0,
+                             [FromUri(Name = "c")]int count = 200)
         {
             ContentSearcher search = null;
             Func<Uri, Uri> createUri;
