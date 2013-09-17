@@ -46,10 +46,14 @@
           <span/>
         </button>
       </form>
-      <div id="instant-results" class="hidden">
-        <ul>
-          <li>First</li>
-          <li>Second</li>
+      <div id="instant-results" data-bind="css: {{ hidden: !instant() }}, with: instant">
+        <ul data-bind="foreach: results, css: {{ hidden: !hasResults() }}">
+          <li data-bind="css: {{selected: $parent.selected() == $data }}">
+            <a data-bind="attr: {{ href: url, title: title }}">
+              <h4 data-bind="text: title">&#160;</h4>
+              <p data-bind="text: blurb">&#160;</p>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -70,7 +74,7 @@
 
   <xsl:template name="section-main-after">
     <div id="full-results" data-bind="css: {{ hidden: !resultSet() }}, with: resultSet">
-      
+
       <h1>
         Results for '<span class="query" data-bind="text: query">&#160;</span>'
       </h1>
