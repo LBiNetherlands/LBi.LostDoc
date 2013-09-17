@@ -78,6 +78,8 @@
         _hideFull: function (e) {
             if (e.keyCode == 27 && !this.viewModel.instant()) {
                 this.viewModel.resultSet(null);
+            } else if (e.keyCode == 191) {
+                this._input.setFocus();
             }
         },
 
