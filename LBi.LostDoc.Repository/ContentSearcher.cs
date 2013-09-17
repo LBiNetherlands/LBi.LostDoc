@@ -71,8 +71,6 @@ namespace LBi.LostDoc.Repository
             {
                 SearchResultSet ret = new SearchResultSet();
 
-                //Query q = new QueryParser(Lucene.Net.Util.Version.LUCENE_29, "body", this._analyzer).Parse(query);
-
                 Query luceneQuery;
 
                 if (query == "special:all")
@@ -81,6 +79,7 @@ namespace LBi.LostDoc.Repository
                 {
                     string[] rawTerms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
+                    // TODO figure out how to build a decent query
                     BooleanQuery nameQuery = new BooleanQuery();
                     BooleanQuery titleQuery = new BooleanQuery();
                     BooleanQuery summaryQuery = new BooleanQuery();
@@ -96,9 +95,9 @@ namespace LBi.LostDoc.Repository
                             occur = Occur.MUST_NOT;
                         }
                         else
-                            occur = Occur.MUST;
+                            occur = Occur.SHOULD;
 
-                        titleQuery.Add(new TermQuery(new Term("name", rawTerm)), occur);
+                        nameQuery.Add(new TermQuery(new Term("name", rawTerm)), occur);
 
                         titleQuery.Add(new TermQuery(new Term("title", rawTerm)), occur);
 

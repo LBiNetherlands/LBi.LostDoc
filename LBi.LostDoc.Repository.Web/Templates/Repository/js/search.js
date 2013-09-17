@@ -9,7 +9,7 @@
             'form': 'div.search form',
             'input': 'div.search form input',
 
-            'keyupTimeout': 1000,
+            'keyupTimeout': 250,
 
             'instantResultCount': 5,
             'fullResultCount': 20
