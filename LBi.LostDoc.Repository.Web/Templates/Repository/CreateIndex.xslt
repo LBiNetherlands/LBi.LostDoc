@@ -70,7 +70,32 @@
         </xsl:choose>
       </type>
 
+      <path>
+        <xsl:apply-templates select="." mode="path"/>
+      </path>
+
     </document>
+  </xsl:template>
+
+  <xsl:template match="*[@assetId]" mode="path">
+    <xsl:apply-templates select="parent::*" mode="path" />
+    <fragment assetId ="{@assetId}" />
+  </xsl:template>
+
+  <xsl:template match="namespace[@assetId]" mode="path">
+    <xsl:choose>
+      <xsl:when test="contains(@name, '.')">
+        <xsl:apply-templates select="parent::assembly/namespace[@name = ld:substringBeforeLast(current()/@name, '.')]" mode="path"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="parent::assembly" mode="path"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <fragment assetId ="{@assetId}" />
+  </xsl:template>
+
+  <xsl:template match="assembly[@assetId]" mode="path">
+    <fragment assetId ="{@assetId}" />
   </xsl:template>
 </xsl:stylesheet>
 

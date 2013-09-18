@@ -39,5 +39,8 @@ namespace LBi.LostDoc.Repository.Web.Api.Models
 
         [DataMember]
         public string[] Flags { get; set; }
+
+        [DataMember]
+        public string Name { get; set; }
     }
 }

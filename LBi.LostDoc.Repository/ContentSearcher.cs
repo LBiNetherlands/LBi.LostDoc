@@ -103,6 +103,7 @@ namespace LBi.LostDoc.Repository
                     else
                     {
                         BooleanQuery termQuery = new BooleanQuery();
+                        termQuery.Add(new TermQuery(new Term("camelCase", term)) { Boost = 6f }, Occur.SHOULD);
                         termQuery.Add(new TermQuery(new Term("name", term)) { Boost = 5f }, Occur.SHOULD);
                         termQuery.Add(new TermQuery(new Term("title", term)) { Boost = 4f }, Occur.SHOULD);
                         termQuery.Add(new TermQuery(new Term("summary", term)), Occur.SHOULD);
@@ -129,6 +130,7 @@ namespace LBi.LostDoc.Repository
                     ret.Results[i] = new SearchResult
                                          {
                                              AssetId = AssetIdentifier.Parse(doc.GetField("aid").StringValue),
+                                             Name = doc.GetField("name").StringValue,
                                              Title = doc.GetField("title").StringValue,
                                              Url = new Uri(doc.GetField("uri").StringValue, UriKind.RelativeOrAbsolute),
                                              Blurb = doc.GetField("summary").StringValue,

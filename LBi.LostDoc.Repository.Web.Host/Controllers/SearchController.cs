@@ -76,6 +76,7 @@ namespace LBi.LostDoc.Repository.Web.Host.Controllers
                                                                      {
                                                                          AssetId = r.AssetId.ToString(),
                                                                          Title = r.Title,
+                                                                         Name = r.Name,
                                                                          Url = createUri(r.Url),
                                                                          Blurb = r.Blurb,
                                                                          Type = r.Type,

@@ -20,6 +20,8 @@ namespace LBi.LostDoc.Repository
 {
     public class SearchResult
     {
+        public string Name { get; set; }
+
         public string Title { get; set; }
 
         public Uri Url { get; set; }

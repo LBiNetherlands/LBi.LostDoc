@@ -17,27 +17,33 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Lucene.Net.Analysis;
 
 namespace LBi.LostDoc.Repository.Lucene
 {
-    public class NameAnalyzer : Analyzer
+    public class CamelCaseAnalyzer : Analyzer
     {
         public override TokenStream TokenStream(string fieldName, TextReader reader)
         {
             string str = reader.ReadToEnd();
 
-            if (str.IndexOf('(') > 0)
-                str = str.Substring(0, str.IndexOf('('));
-
-            if (str.IndexOf('<') > 0)
-                str = str.Substring(0, str.IndexOf('<'));
-
             string[] parts = str.Split('.');
 
             StringBuilder tokenString = new StringBuilder();
             for (int i = 0; i < parts.Length; i++)
+            {
+                if (parts[i].IndexOf('(') > 0)
+                    parts[i] = parts[i].Substring(0, parts[i].IndexOf('('));
+
+                if (parts[i].IndexOf('<') > 0)
+                    parts[i] = parts[i].Substring(0, parts[i].IndexOf('<'));
+
+                parts[i] = new string(parts[i].Where(c => char.IsUpper(c) || char.IsNumber(c)).ToArray());
+            }
+
+            tokenString.AppendLine(parts[parts.Length - 1]);
+
+            for (int i = parts.Length - 2; i >= 0; i--)
             {
                 tokenString.AppendLine(string.Join(".", parts, i, parts.Length - i));
             }
