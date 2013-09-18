@@ -16,9 +16,8 @@
 
 using System;
 using System.Runtime.Serialization;
-using LBi.LostDoc;
 
-namespace LBi.LostDoc.Repository.Web.Models
+namespace LBi.LostDoc.Repository.Web.Api.Models
 {
     [DataContract]
     public class Result
@@ -34,5 +33,11 @@ namespace LBi.LostDoc.Repository.Web.Models
         
         [DataMember]
         public string Blurb { get; set; }
+
+        [DataMember]
+        public string Type { get; set; }
+
+        [DataMember]
+        public string[] Flags { get; set; }
     }
 }

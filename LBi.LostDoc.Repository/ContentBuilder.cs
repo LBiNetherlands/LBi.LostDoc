@@ -196,6 +196,14 @@ namespace LBi.LostDoc.Repository
                                 string title = docElement.Element("title").Value.Trim();
                                 string summary = docElement.Element("summary").Value.Trim();
                                 string text = docElement.Element("text").Value.Trim();
+                                string type = docElement.Element("type").Value.Trim();
+
+                                var typeFlags = docElement.Element("type")
+                                                          .Attributes()
+                                                          .Where(a =>
+                                                                 a.Name.LocalName.StartsWith("is") &&
+                                                                 XmlConvert.ToBoolean(a.Value))
+                                                          .Select(a => a.Name.LocalName);
 
                                 StylesheetApplication ssApplication;
 
@@ -210,6 +218,14 @@ namespace LBi.LostDoc.Repository
                                                   Field.Store.YES,
                                                   Field.Index.NO));
                                 doc.Add(new Field("aid", ssApplication.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
+                                doc.Add(new Field("type", type, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
+                                foreach (string typeFlag in typeFlags)
+                                {
+                                    doc.Add(new Field("typeFlag", typeFlag, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                                }
+
                                 foreach (AssetIdentifier aid in ssApplication.Aliases)
                                     doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
 

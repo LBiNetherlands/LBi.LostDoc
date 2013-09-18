@@ -43,6 +43,7 @@ using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
+    // TODO consider moving parsing code into a TemplateParser class
     // TODO fix error handling, a bad template.xml file will just throw random exceptions, xml schema validation?
     public class Template
     {

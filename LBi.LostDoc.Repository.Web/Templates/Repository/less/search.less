@@ -89,6 +89,8 @@
   #instant-results {
     overflow: hidden;
 
+    box-shadow:0px 2px 2px @grey_dark;
+
     &.hidden {
       height: 0;
     }
@@ -124,6 +126,10 @@
 
         &.selected {
           background-color: #fff;
+
+          h4 {
+            color: @baseColor;
+          }
         }
 
         h4 {

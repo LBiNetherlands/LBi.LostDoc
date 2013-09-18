@@ -168,6 +168,8 @@
                         title: value.Title,
                         blurb: value.Blurb,
                         url: value.Url,
+                        type: value.Type,
+                        flags: value.Flags
                     };
                 }, this);
                 this.results(this.results().concat(results));

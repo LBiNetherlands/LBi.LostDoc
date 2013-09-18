@@ -57,6 +57,19 @@
 
         <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
       </text>
+
+      <type>
+        <xsl:copy-of select="@isInternal | @isPrivate | @isProtected | @isSealed | @isStatic | @isPublic | @isProtectedAndInternal | @isProtectedOrInternal"/>
+        <xsl:choose>
+          <xsl:when test="self::method and attribute and ld:asset(attribute/@type) = 'T:System.Runtime.CompilerServices.ExtensionAttribute'">
+            <xsl:text>extension-method</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="name()"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </type>
+
     </document>
   </xsl:template>
 </xsl:stylesheet>

@@ -71,55 +71,47 @@ namespace LBi.LostDoc.Repository
             {
                 SearchResultSet ret = new SearchResultSet();
 
-                Query luceneQuery;
 
-                if (query == "special:all")
-                    luceneQuery = new MatchAllDocsQuery();
-                else
+                string[] rawTerms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                BooleanQuery termQueries = new BooleanQuery();
+
+                // TODO figure out how to build a decent query
+
+                for (int i = 0; i < rawTerms.Length; i++)
                 {
-                    string[] rawTerms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    string term = rawTerms[i];
 
-                    // TODO figure out how to build a decent query
-                    BooleanQuery nameQuery = new BooleanQuery();
-                    BooleanQuery titleQuery = new BooleanQuery();
-                    BooleanQuery summaryQuery = new BooleanQuery();
-                    BooleanQuery contentQuery = new BooleanQuery();
-
-                    for (int i = 0; i < rawTerms.Length; i++)
+                    Occur occur;
+                    if (rawTerms[i].StartsWith("-"))
                     {
-                        string rawTerm = rawTerms[i];
-                        Occur occur;
-                        if (rawTerms[i].StartsWith("-"))
-                        {
-                            rawTerm = rawTerm.Substring(1);
-                            occur = Occur.MUST_NOT;
-                        }
-                        else
-                            occur = Occur.SHOULD;
-
-                        nameQuery.Add(new TermQuery(new Term("name", rawTerm)), occur);
-
-                        titleQuery.Add(new TermQuery(new Term("title", rawTerm)), occur);
-
-                        summaryQuery.Add(new TermQuery(new Term("summary", rawTerm)), occur);
-
-                        contentQuery.Add(new TermQuery(new Term("content", rawTerm)), occur);
+                        term = term.Substring(1);
+                        occur = Occur.MUST_NOT;
                     }
+                    else
+                        occur = Occur.MUST;
 
-                    BooleanQuery q = new BooleanQuery();
-
-                    titleQuery.Boost = 8f;
-                    contentQuery.Boost = 0.7f;
-
-                    q.Add(nameQuery, Occur.SHOULD);
-                    q.Add(titleQuery, Occur.SHOULD);
-                    q.Add(summaryQuery, Occur.SHOULD);
-                    q.Add(contentQuery, Occur.SHOULD);
-
-                    luceneQuery = q;
+                    if (term.StartsWith("type:", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        term = term.Substring("type:".Length);
+                        termQueries.Add(new TermQuery(new Term("type", term)), occur);
+                    }
+                    else if (StringComparer.InvariantCultureIgnoreCase.Equals(term, "special:all"))
+                    {
+                        termQueries.Add(new MatchAllDocsQuery(), occur);
+                    }
+                    else
+                    {
+                        BooleanQuery termQuery = new BooleanQuery();
+                        termQuery.Add(new TermQuery(new Term("name", term)) { Boost = 5f }, Occur.SHOULD);
+                        termQuery.Add(new TermQuery(new Term("title", term)) { Boost = 4f }, Occur.SHOULD);
+                        termQuery.Add(new TermQuery(new Term("summary", term)), Occur.SHOULD);
+                        termQuery.Add(new TermQuery(new Term("content", term)) { Boost = 0.5f }, Occur.SHOULD);
+                        termQueries.Add(termQuery, occur);
+                    }
                 }
 
-                TopDocs docs = this._indexSearcher.Search(luceneQuery, offset + count);
+                TopDocs docs = this._indexSearcher.Search(termQueries, offset + count);
 
                 if (docs.ScoreDocs.Length < offset)
                     throw new ArgumentOutOfRangeException("offset", "Offset is smaller than result count!");
@@ -140,7 +132,9 @@ namespace LBi.LostDoc.Repository
                                              Title = doc.GetField("title").StringValue,
                                              Url = new Uri(doc.GetField("uri").StringValue, UriKind.RelativeOrAbsolute),
                                              Blurb = doc.GetField("summary").StringValue,
-                                             RawDocument = includeRawData ? GetRawData(doc, scoreDoc.Doc).ToArray(): null
+                                             RawDocument = includeRawData ? GetRawData(doc, scoreDoc.Doc).ToArray() : null,
+                                             Type = doc.GetField("type").StringValue,
+                                             Flags = doc.GetFields("typeFlag").Select(f => f.StringValue).ToArray()
                                          };
                 }
 

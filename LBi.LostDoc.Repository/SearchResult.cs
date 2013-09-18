@@ -15,7 +15,6 @@
  */
 
 using System;
-using LBi.LostDoc;
 
 namespace LBi.LostDoc.Repository
 {
@@ -29,6 +28,10 @@ namespace LBi.LostDoc.Repository
 
         public string Blurb { get; set; }
 
+        public string Type { get; set; }
+
         public Tuple<string, string, string[]>[] RawDocument { get; set; }
+
+        public string[] Flags { get; set; }
     }
 }
