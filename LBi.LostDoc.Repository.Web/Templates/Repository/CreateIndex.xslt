@@ -60,21 +60,53 @@
 
       <type>
         <xsl:copy-of select="@isInternal | @isPrivate | @isProtected | @isSealed | @isStatic | @isPublic | @isProtectedAndInternal | @isProtectedOrInternal"/>
-        <xsl:choose>
-          <xsl:when test="self::method and attribute and ld:asset(attribute/@type) = 'T:System.Runtime.CompilerServices.ExtensionAttribute'">
-            <xsl:text>extension-method</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="name()"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:apply-templates select="." mode="type" />
       </type>
 
       <path>
-        <xsl:apply-templates select="." mode="path"/>
+        <xsl:variable name="path">
+          <xsl:apply-templates select="." mode="path"/>
+        </xsl:variable>
+
+        <xsl:apply-templates select="msxsl:node-set($path)" mode="enrich-path"/>
       </path>
 
     </document>
+  </xsl:template>
+
+  <xsl:template match="fragment[@assetId]" mode="enrich-path">
+    <xsl:copy>
+      <xsl:copy-of select="@assetId"/>
+      <xsl:attribute name="name">
+        <xsl:apply-templates select="ld:key('aid', @assetId)" mode="shortName"/>
+      </xsl:attribute>
+      <xsl:attribute name="url">
+        <xsl:choose>
+          <xsl:when test="ld:key('aid', @assetId)/@declaredAs">
+            <xsl:value-of select="ld:resolve(ld:key('aid', @assetId)/@declaredAs)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="ld:resolve(@assetId)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="type">
+        <xsl:apply-templates select="ld:key('aid', @assetId)" mode="type"/>
+      </xsl:attribute>
+      <xsl:attribute name="blurb">
+        <xsl:variable name="resultSet">
+          <xsl:choose>
+            <xsl:when test="ld:key('aid', @assetId)/@declaredAs">
+              <xsl:apply-templates select="ld:key('aid', ld:key('aid', @assetId)/@declaredAs)/doc:summary" mode="doc"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="ld:key('aid', @assetId)/doc:summary" mode="doc"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="msxsl:node-set($resultSet)//text()"/>
+      </xsl:attribute>
+    </xsl:copy>
   </xsl:template>
 
   <xsl:template match="*[@assetId]" mode="path">
@@ -96,6 +128,17 @@
 
   <xsl:template match="assembly[@assetId]" mode="path">
     <fragment assetId ="{@assetId}" />
+  </xsl:template>
+
+  <xsl:template match="*[@assetId]" mode="type">
+    <xsl:choose>
+      <xsl:when test="self::method and attribute and ld:asset(attribute/@type) = 'T:System.Runtime.CompilerServices.ExtensionAttribute'">
+        <xsl:text>extension-method</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="name()"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>
 

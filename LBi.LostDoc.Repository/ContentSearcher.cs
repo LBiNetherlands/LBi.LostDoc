@@ -27,6 +27,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Search.Highlight;
 using Lucene.Net.Store;
+using Newtonsoft.Json.Linq;
 
 namespace LBi.LostDoc.Repository
 {
@@ -71,8 +72,7 @@ namespace LBi.LostDoc.Repository
             {
                 SearchResultSet ret = new SearchResultSet();
 
-
-                string[] rawTerms = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] rawTerms = query.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                 BooleanQuery termQueries = new BooleanQuery();
 
@@ -103,8 +103,8 @@ namespace LBi.LostDoc.Repository
                     else
                     {
                         BooleanQuery termQuery = new BooleanQuery();
-                        termQuery.Add(new TermQuery(new Term("camelCase", term)) { Boost = 6f }, Occur.SHOULD);
-                        termQuery.Add(new TermQuery(new Term("name", term)) { Boost = 5f }, Occur.SHOULD);
+                        termQuery.Add(new PrefixQuery(new Term("camelCase", term)) { Boost = 6f }, Occur.SHOULD);
+                        termQuery.Add(new PrefixQuery(new Term("name", term)) { Boost = 5f }, Occur.SHOULD);
                         termQuery.Add(new TermQuery(new Term("title", term)) { Boost = 4f }, Occur.SHOULD);
                         termQuery.Add(new TermQuery(new Term("summary", term)), Occur.SHOULD);
                         termQuery.Add(new TermQuery(new Term("content", term)) { Boost = 0.5f }, Occur.SHOULD);
@@ -127,6 +127,18 @@ namespace LBi.LostDoc.Repository
 
                     Document doc = this._indexSearcher.Doc(scoreDoc.Doc);
 
+                    var jsonPath = doc.GetField("path").StringValue;
+                    var jsonArray = JArray.Parse(jsonPath);
+                    var fragments = jsonArray.Cast<JObject>()
+                                             .Select(f => new PathFragment
+                                                          {
+                                                              AssetId = AssetIdentifier.Parse(f["assetId"].Value<string>()),
+                                                              Name = f["name"].Value<string>(),
+                                                              Url = new Uri(f["url"].Value<string>(), UriKind.RelativeOrAbsolute),
+                                                              Blurb = f["blurb"].Value<string>(),
+                                                              Type = f["type"].Value<string>(),
+                                                          }).ToArray();
+
                     ret.Results[i] = new SearchResult
                                          {
                                              AssetId = AssetIdentifier.Parse(doc.GetField("aid").StringValue),
@@ -134,9 +146,10 @@ namespace LBi.LostDoc.Repository
                                              Title = doc.GetField("title").StringValue,
                                              Url = new Uri(doc.GetField("uri").StringValue, UriKind.RelativeOrAbsolute),
                                              Blurb = doc.GetField("summary").StringValue,
-                                             RawDocument = includeRawData ? GetRawData(doc, scoreDoc.Doc).ToArray() : null,
+                                             RawDocument = includeRawData ? this.GetRawData(doc, scoreDoc.Doc).ToArray() : null,
                                              Type = doc.GetField("type").StringValue,
-                                             Flags = doc.GetFields("typeFlag").Select(f => f.StringValue).ToArray()
+                                             Flags = doc.GetFields("typeFlag").Select(f => f.StringValue).ToArray(),
+                                             Path = fragments
                                          };
                 }
 

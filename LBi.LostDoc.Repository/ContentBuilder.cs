@@ -30,6 +30,7 @@ using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
+using Newtonsoft.Json;
 using Directory = System.IO.Directory;
 
 namespace LBi.LostDoc.Repository
@@ -206,6 +207,8 @@ namespace LBi.LostDoc.Repository
                                                                  XmlConvert.ToBoolean(a.Value))
                                                           .Select(a => a.Name.LocalName);
 
+                                var path = docElement.Element("path").Elements("fragment");
+
                                 StylesheetApplication ssApplication;
 
                                 // TODO we blindly generate index data for everything with an assetId which means that sometiems we get misses here
@@ -243,6 +246,34 @@ namespace LBi.LostDoc.Repository
                                 doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
                                 doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
                                 doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
+
+                                using (StringWriter stringWriter = new StringWriter())
+                                {
+                                    JsonWriter jsonWriter = new JsonTextWriter(stringWriter);
+                                    jsonWriter.WriteStartArray();
+                                    foreach (var element in path)
+                                    {
+                                        jsonWriter.WriteStartObject();
+                                        jsonWriter.WritePropertyName("assetId");
+                                        jsonWriter.WriteValue(element.Attribute("assetId").Value);
+                                        jsonWriter.WritePropertyName("name");
+                                        jsonWriter.WriteValue(element.Attribute("name").Value);
+                                        jsonWriter.WritePropertyName("url");
+                                        jsonWriter.WriteValue(element.Attribute("url").Value);
+                                        jsonWriter.WritePropertyName("blurb");
+                                        jsonWriter.WriteValue(element.Attribute("blurb").Value);
+                                        jsonWriter.WritePropertyName("type");
+                                        jsonWriter.WriteValue(element.Attribute("type").Value);
+                                        jsonWriter.WriteEndObject();
+                                    }
+                                    jsonWriter.WriteEndArray();
+                                    doc.Add(new Field("path",
+                                                      stringWriter.ToString(),
+                                                      Field.Store.YES,
+                                                      Field.Index.NO,
+                                                      Field.TermVector.NO));
+                                }
+
                                 TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
                                 writer.AddDocument(doc);
                             }

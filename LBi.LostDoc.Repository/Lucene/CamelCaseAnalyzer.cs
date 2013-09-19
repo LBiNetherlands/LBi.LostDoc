@@ -48,7 +48,7 @@ namespace LBi.LostDoc.Repository.Lucene
                 tokenString.AppendLine(string.Join(".", parts, i, parts.Length - i));
             }
 
-            return new WhitespaceTokenizer(new StringReader(tokenString.ToString()));
+            return new WhitespaceTokenizer(new StringReader(tokenString.ToString().ToLowerInvariant()));
         }
     }
 }

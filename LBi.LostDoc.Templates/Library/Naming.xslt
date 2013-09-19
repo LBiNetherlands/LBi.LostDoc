@@ -327,25 +327,6 @@
     <xsl:value-of select="@name"/>
   </xsl:template>
 
-  <!-- this is only for closed generic types-->
-  <!--
-  <xsl:template match="type" mode="displayText">
-    -->
-  <!--<xsl:text>T-</xsl:text>-->
-  <!--
-    <xsl:choose>
-      <xsl:when test="typearg">
-        <xsl:value-of select="substring-before(@name, '`')"/>
-        <xsl:text>&lt;</xsl:text>
-        <xsl:apply-templates select="typearg" mode="displayText"/>
-        <xsl:text>&gt;</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="@name"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>-->
-
   <xsl:template match="typearg" mode="displayText">
     <!--<xsl:apply-templates select="//*[@assetId = current()/@type]" mode="displayText"/>-->
     <xsl:apply-templates select="ld:key('aid', current()/@type)" mode="displayText"/>
@@ -358,6 +339,183 @@
     <xsl:value-of select="@name"/>
   </xsl:template>
 
+
+  <!-- SHORT NAMES -->
+
+  <xsl:template match="class" mode="shortName">
+    <xsl:value-of select="@name"/>
+  </xsl:template>
+
+  <xsl:template match="@*" mode="shortName">
+    <xsl:choose>
+      <xsl:when test="name() = 'param'">
+        <xsl:value-of select="."/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="parent::*/with">
+            <xsl:value-of select="substring-before(ld:key('aid', current())/@name, '`')"/>
+            <xsl:text>&lt;</xsl:text>
+            <xsl:apply-templates select="parent::*/with" mode="shortName"/>
+            <xsl:text>&gt;</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="ld:key('aid', current())" mode="shortName"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="with" mode="shortName">
+    <xsl:if test="position() > 1">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="@type | @param" mode="shortName"/>
+  </xsl:template>
+
+  <xsl:template match="constructor" mode="shortName">
+    <xsl:choose>
+      <xsl:when test="../typeparam">
+        <xsl:value-of select="substring-before(../@name, '`')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="../@name"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test="param">
+      <xsl:text>(</xsl:text>
+      <xsl:apply-templates select="param" mode="shortName"/>
+      <xsl:text>)</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="assembly" mode="shortName">
+    <xsl:value-of select="@name"/>
+  </xsl:template>
+
+  <xsl:template match="namespace" mode="shortName">
+    <xsl:choose>
+      <xsl:when test="contains(@name, '.')">
+        <xsl:value-of select="ld:substringAfterLast(@name, '.')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@name"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- operators -->
+  <xsl:template match="operator[@name = 'op_Implicit' or @name = 'op_Explicit']" mode="shortName">
+    <xsl:value-of select="substring-after(@name, 'op_')"/>
+    <xsl:text> Conversion </xsl:text>
+    <xsl:choose>
+      <xsl:when test="param/@type = parent::*/@assetId">
+        <xsl:text> to </xsl:text>
+        <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/returns/@type]" mode="shortName" />-->
+        <xsl:apply-templates select="ld:key('aid', current()/returns/@type)" mode="shortName" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text> from </xsl:text>
+        <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/param/@type]" mode="shortName" />-->
+        <xsl:apply-templates select="ld:key('aid', current()/param/@type)" mode="shortName" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="operator" mode="shortName">
+    <xsl:value-of select="substring-after(@name, 'op_')"/>
+  </xsl:template>
+
+  <xsl:template match="method" mode="shortName">
+    <xsl:choose>
+      <xsl:when test="typeparam">
+        <xsl:value-of select="@name"/>
+        <xsl:text>&lt;</xsl:text>
+        <xsl:apply-templates select="typeparam" mode="shortName"/>
+        <xsl:text>&gt;</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@name"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test="param">
+      <xsl:text>(</xsl:text>
+      <xsl:apply-templates select="param" mode="shortName"/>
+      <xsl:text>)</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="property[@declaredAs]" mode="shortName" priority="50">
+    <!--<xsl:apply-templates select="//*[@assetId = current()/@declaredAs]" mode="shortName"/>-->
+    <xsl:apply-templates select="ld:key('aid', current()/@declaredAs)" mode="shortName"/>
+  </xsl:template>
+
+  <xsl:template match="property" mode="shortName">
+    <xsl:value-of select="@name"/>
+    <xsl:if test="param">
+      <xsl:text>[</xsl:text>
+      <xsl:apply-templates select="param" mode="shortName"/>
+      <xsl:text>]</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="field" mode="shortName">
+    <xsl:value-of select="@name"/>
+  </xsl:template>
+
+  <xsl:template match="param" mode="shortName">
+    <xsl:if test="position() > 1">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="@type | @param | arrayOf" mode="shortName"/>
+  </xsl:template>
+
+  <xsl:template match="arrayOf" mode="shortName">
+    <xsl:apply-templates select="@type | @param  | arrayOf" mode="shortName"/>
+    <xsl:text>[</xsl:text>
+    <xsl:call-template name="arrayRank">
+      <xsl:with-param name="rank" select="@rank" />
+    </xsl:call-template>
+    <xsl:text>]</xsl:text>
+  </xsl:template>
+
+  <!-- this is only for open generic types-->
+  <xsl:template match="typeparam" mode="shortName">
+    <xsl:value-of select="@name"/>
+  </xsl:template>
+
+  <xsl:template match="class | interface | struct" mode="shortName">
+    <xsl:choose>
+      <xsl:when test="typeparam">
+        <xsl:value-of select="substring-before(@name, '`')"/>
+        <xsl:text>&lt;</xsl:text>
+        <xsl:apply-templates select="typeparam" mode="shortName"/>
+        <xsl:text>&gt;</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@name"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="enum" mode="shortName">
+    <xsl:if test="not(@assetId)">
+      <xsl:message terminate="yes">No asset id found on enum!</xsl:message>
+    </xsl:if>
+    <xsl:value-of select="@name"/>
+  </xsl:template>
+
+  <xsl:template match="typearg" mode="shortName">
+    <xsl:apply-templates select="ld:key('aid', current()/@type)" mode="shortName"/>
+  </xsl:template>
+
+  <xsl:template match="typeparam" mode="shortName">
+    <xsl:if test="position() &gt; 1">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+    <xsl:value-of select="@name"/>
+  </xsl:template>
 
 
 </xsl:stylesheet>

@@ -80,7 +80,8 @@ namespace LBi.LostDoc.Repository.Web.Host.Controllers
                                                                          Url = createUri(r.Url),
                                                                          Blurb = r.Blurb,
                                                                          Type = r.Type,
-                                                                         Flags = r.Flags
+                                                                         Flags = r.Flags,
+                                                                         Path = r.Path.Select(pf => new ResultPath { Name = pf.Name, AssetId = pf.AssetId, Url = createUri(pf.Url), Blurb = pf.Blurb, Type = pf.Type}).ToArray()
                                                                      }).ToArray()
                            };
             }

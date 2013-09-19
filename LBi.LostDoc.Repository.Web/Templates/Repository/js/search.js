@@ -169,7 +169,15 @@
                         blurb: value.Blurb,
                         url: value.Url,
                         type: value.Type,
-                        flags: value.Flags
+                        flags: value.Flags,
+                        path: value.Path.map(function (fragment) {
+                            return {
+                                name: fragment.Name,
+                                url: fragment.Url,
+                                blurb: $.trim(fragment.Blurb),
+                                type: 'fragment-' + fragment.Type
+                            };
+                        })
                     };
                 }, this);
                 this.results(this.results().concat(results));

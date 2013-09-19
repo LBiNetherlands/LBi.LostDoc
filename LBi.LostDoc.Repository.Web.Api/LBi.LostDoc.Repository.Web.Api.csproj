@@ -65,6 +65,7 @@
     <Compile Include="Models\LibraryDescriptor.cs" />
     <Compile Include="Models\LibraryModel.cs" />
     <Compile Include="Models\Result.cs" />
+    <Compile Include="Models\ResultPath.cs" />
     <Compile Include="Models\ResultSet.cs" />
     <Compile Include="Models\SearchResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

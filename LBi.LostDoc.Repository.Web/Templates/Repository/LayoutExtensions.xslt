@@ -86,6 +86,10 @@
             <h4 data-bind="text: title">&#160;</h4>
           </a>
           <p data-bind="text: blurb">&#160;</p>
+          <div class="path" data-bind="foreach: path">
+            <span data-bind="if: $index() &gt; 0">»</span>
+            <a class="fragment" data-bind="text: name, attr: {{ href: url, title: blurb ? blurb : name }}, css: type">&#160;</a>
+          </div>
         </li>
       </ul>
       <button data-bind="click: fetchNext, css: {{ hidden: !hasMore() }}">Load more results</button>

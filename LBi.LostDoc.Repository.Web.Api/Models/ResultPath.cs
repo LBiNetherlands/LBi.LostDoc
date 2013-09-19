@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 LBi Netherlands B.V.
+ * Copyright 2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,26 @@
  */
 
 using System;
+using System.Runtime.Serialization;
 
-namespace LBi.LostDoc.Repository
+namespace LBi.LostDoc.Repository.Web.Api.Models
 {
-    public class SearchResult
+    [DataContract]
+    public class ResultPath
     {
+        [DataMember]
         public string Name { get; set; }
+        
+        [DataMember]
+        public string AssetId { get; set; }
 
-        public string Title { get; set; }
-
+        [DataMember]
         public Uri Url { get; set; }
 
-        public AssetIdentifier AssetId { get; set; }
-
+        [DataMember]
         public string Blurb { get; set; }
 
+        [DataMember]
         public string Type { get; set; }
-
-        public Tuple<string, string, string[]>[] RawDocument { get; set; }
-
-        public string[] Flags { get; set; }
-
-        public PathFragment[] Path { get; set; }
     }
 }
