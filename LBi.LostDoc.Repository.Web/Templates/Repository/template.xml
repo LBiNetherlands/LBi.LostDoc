@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<template xmlns:var="urn:lost-doc:template.variable"
+          inherits="Library">
+
+  <apply-stylesheet name="Index"
+                  stylesheet="CreateIndex.xslt"
+                  select="/bundle"
+                  assetId="'IX:*'"
+                  version="'0.0.0.0'"
+                  output="'index.xml'">
+    <with-param name="assetId" select="@assetId" />
+  </apply-stylesheet>
+
+  <include-resource path="less\search.less" output="css\search.css">
+    <transform name="less"/>
+  </include-resource>
+
+  <include-resource path="js\search.js" output="js\search.js"/>
+
+  <include-resource path="js\lib\knockout.js" output="js\lib\knockout.js"/>
+  
+  <!-- this stylsheet will be applied to _this_ file --><!--
+  <meta-template stylesheet="IndexInjector.xslt">
+    <with-param name="targets" select="'Type.xslt,Member.xslt'"/>
+  </meta-template>-->  
+</template>

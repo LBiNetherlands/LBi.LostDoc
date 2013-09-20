@@ -184,6 +184,7 @@
     <Compile Include="Models\NoContentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Areas\Administration\Extensions.cs" />
+    <Compile Include="RouteConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Administration\Static\Lib\jquery.fileTree\images\application.png" />
@@ -236,23 +237,6 @@
     <Content Include="Areas\Administration\Static\Lib\less-1.3.0.min.js" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.js" />
     <Content Include="Global.asax" />
-    <Content Include="Static\css\codemirror.css" />
-    <Content Include="Static\css\docs.css" />
-    <Content Include="Static\css\simple-hint.css" />
-    <Content Include="Static\img\line.gif" />
-    <Content Include="Static\img\logo_LBi.gif" />
-    <Content Include="Static\img\search.png" />
-    <Content Include="Static\js\class\editor.js" />
-    <Content Include="Static\js\class\inlineEditing.js" />
-    <Content Include="Static\js\lib\closetag.js" />
-    <Content Include="Static\js\lib\codemirror.js" />
-    <Content Include="Static\js\lib\less-1.3.0.min.js" />
-    <Content Include="Static\js\lib\simple-hint.js" />
-    <Content Include="Static\js\lib\xml-hint.js" />
-    <Content Include="Static\js\lib\xml.js" />
-    <Content Include="Static\js\lib\zepto.data.js" />
-    <Content Include="Static\js\lib\zepto.js" />
-    <Content Include="Static\js\lostdoc.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -272,7 +256,7 @@
     <Folder Include="App_Data\Packages\" />
     <Folder Include="App_Data\Repository\temp\" />
     <Folder Include="Images\" />
-    <Folder Include="Security\" />
+    <Folder Include="Static\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -329,18 +313,6 @@
     </Content>
     <Content Include="Areas\Administration\Views\Library\IndexDocument.cshtml" />
     <None Include="Properties\PublishProfiles\Build.pubxml" />
-    <Content Include="Static\less\components.less" />
-    <Content Include="Static\less\header.less" />
-    <Content Include="Static\less\icons.less" />
-    <Content Include="Static\less\navigation.less" />
-    <Content Include="Static\less\package.less" />
-    <Content Include="Static\less\search.less" />
-    <Content Include="Static\less\structure.less" />
-    <Content Include="Static\less\style.less" />
-    <Content Include="Static\less\table.less" />
-    <Content Include="Static\less\tags.less" />
-    <Content Include="Static\less\type.less" />
-    <Content Include="Static\less\var.less" />
     <Content Include="Views\Content\NoContent.cshtml" />
     <Content Include="Views\Web.config" />
   </ItemGroup>
@@ -384,7 +356,15 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y $(ProjectDir)..\AddInPackages\*.nupkg $(ProjectDir)App_Data\LocalPackages\</PostBuildEvent>
+    <PostBuildEvent>echo removing LocalPackages folder
+if exist $(ProjectDir)App_Data\LocalPackages rmdir /Q /S $(ProjectDir)App_Data\LocalPackages
+echo creating LocalPackages folder
+mkdir $(ProjectDir)App_Data\LocalPackages
+echo copying AddinPackages to LocalPackages
+copy /Y $(ProjectDir)..\AddInPackages\*.nupkg $(ProjectDir)App_Data\LocalPackages\
+echo removing Packages folder
+if exist $(ProjectDir)App_Data\Packages rmdir /Q /S $(ProjectDir)App_Data\Packages
+</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets')" />
@@ -392,4 +372,8 @@
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
     <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>

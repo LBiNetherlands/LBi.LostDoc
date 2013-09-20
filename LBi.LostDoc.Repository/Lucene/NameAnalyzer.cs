@@ -14,9 +14,14 @@
  * limitations under the License. 
  */
 
+using System;
+using System.Data.Odbc;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using LBi.LostDoc.Templating;
 using Lucene.Net.Analysis;
 
 namespace LBi.LostDoc.Repository.Lucene
@@ -39,17 +44,29 @@ namespace LBi.LostDoc.Repository.Lucene
             for (int i = 0; i < parts.Length; i++)
             {
                 tokenString.AppendLine(string.Join(".", parts, i, parts.Length - i));
-                parts[i] = new string(parts[i].Where(char.IsUpper).ToArray());
             }
 
-            tokenString.AppendLine(parts[parts.Length - 1]);
-
-            for (int i = parts.Length - 2; i >= 0; i--)
+            if (parts.Length > 0)
             {
-                tokenString.AppendLine(string.Join(".", parts, i, parts.Length - i));
-            }
+                var lastPart = parts[parts.Length - 1];
+                int[] indices = lastPart.Select((c, i) => new { c, i }).Where(t => char.IsUpper(t.c)).Select(t => t.i).ToArray();
 
-            return new WhitespaceTokenizer(new StringReader(tokenString.ToString()));
+                int lastIndex = 0;
+                foreach (var index in indices)
+                {
+                    var subPart = lastPart.Substring(lastIndex, index - lastIndex);
+                    if (!string.IsNullOrWhiteSpace(subPart))
+                        tokenString.AppendLine(subPart);
+
+                    lastIndex = index;
+                }
+                if (lastIndex > 0 && lastIndex < lastPart.Length)
+                    tokenString.AppendLine(lastPart.Substring(lastIndex));
+
+            }
+                
+
+            return new WhitespaceTokenizer(new StringReader(tokenString.ToString().ToLowerInvariant()));
         }
     }
 }

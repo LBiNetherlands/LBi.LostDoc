@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012 LBi Netherlands B.V.
+  Copyright 2012-2013 LBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,35 +24,60 @@
 
   <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
 
-  <!--<xsl:include href="Navigation.xslt"/>-->
+  <xsl:include href="LayoutExtensions.xslt"/>
 
   <xsl:template match="/">
     <xsl:text disable-output-escaping="yes" xml:space="preserve">&lt;!DOCTYPE html&gt;
     </xsl:text>
     <html>
       <head>
-        <link rel="stylesheet" type="text/css">
-          <xsl:attribute name="href">
-            <xsl:value-of select="ld:resource('style.css')"/>
-          </xsl:attribute>
-        </link>
+        <xsl:call-template name="section-head-first"/>
         <title>
           <xsl:call-template name="title"/>
         </title>
+        <link rel="stylesheet" type="text/css">
+          <xsl:attribute name="href">
+            <xsl:value-of select="ld:relative('css/style.css')"/>
+          </xsl:attribute>
+        </link>
+        <xsl:call-template name="section-head-last"/>
       </head>
       <body>
+        <xsl:call-template name="section-body-first"/>
         <div id="wrapper">
-          <div id="col-left">
-            <div id="navigation">
-              <xsl:call-template name="navigation"/>
+          <div class="left-col-outer auto-height" >
+            <div class="left-col-inner auto-height">
+              <xsl:call-template name="section-header-before"/>
+              <header>
+                <xsl:call-template name="section-header-first"/>
+                <xsl:text>LostDoc</xsl:text>
+                <xsl:call-template name="section-header-last"/>
+              </header>
+              <xsl:call-template name="section-header-after"/>
+              <nav>
+                <xsl:call-template name="navigation"/>
+              </nav>
+            </div>
+            <span class="handle"></span>
+          </div>
+          <!-- / Main navigation -->
+
+          <div class="right-col-outer auto-height">
+            <div class="right-col-inner auto-height">
+              <xsl:call-template name="section-main-before"/>
+              <main class="main-content">
+                <xsl:call-template name="section-main-first"/>
+                <xsl:call-template name="content"/>
+                <xsl:call-template name="section-main-last"/>
+              </main>
+              <xsl:call-template name="section-main-after"/>
             </div>
           </div>
-          <div id="col-right">
-            <div id="content">
-              <xsl:call-template name="content"/>
-            </div>
-          </div>
+
         </div>
+        <script src="{ld:relative('js/lib/zepto.js')}" >&#160;</script>
+        <script src="{ld:relative('js/lostdoc.js')}" >&#160;</script>
+        <xsl:call-template name="section-body-last"/>
       </body>
     </html>
   </xsl:template>

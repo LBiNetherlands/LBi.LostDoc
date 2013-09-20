@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
+using Newtonsoft.Json;
 using Directory = System.IO.Directory;
 
 namespace LBi.LostDoc.Repository
@@ -125,11 +126,10 @@ namespace LBi.LostDoc.Repository
                                        {
                                            AssetRedirects = assetRedirects,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
-                                           OutputFileProvider =
-                                               new ScopedFileProvider(new DirectoryFileProvider(), htmlDir.FullName),
+                                           OutputFileProvider = new ScopedFileProvider(new DirectoryFileProvider(), htmlDir.FullName),
 
                                            //TargetDirectory = htmlDir.FullName,
-                                           Arguments = new Dictionary<string, object> { { "SearchUri", "/search/" } },
+                                           Arguments = new Dictionary<string, object> { },
                                            KeepTemporaryFiles = true,
                                            TemporaryFilesPath = Path.Combine(logDir.FullName, "temp")
                                        };
@@ -164,11 +164,13 @@ namespace LBi.LostDoc.Repository
 
                     Analyzer titleAnalyzer = new TitleAnalyzer();
                     Analyzer nameAnalyzer = new NameAnalyzer();
+                    Analyzer camelCaseAnalyzer = new CamelCaseAnalyzer();
                     IDictionary<string, Analyzer> fieldAnalyzers = new Dictionary<string, Analyzer>
-                                                                       {
-                                                                           { "title", titleAnalyzer },
-                                                                           {"name", nameAnalyzer }
-                                                                       };
+                                                                   {
+                                                                       { "title", titleAnalyzer },
+                                                                       { "name", nameAnalyzer },
+                                                                       { "camelCase", camelCaseAnalyzer }
+                                                                   };
 
                     PerFieldAnalyzerWrapper analyzerWrapper = new PerFieldAnalyzerWrapper(analyzer, fieldAnalyzers);
 
@@ -196,6 +198,16 @@ namespace LBi.LostDoc.Repository
                                 string title = docElement.Element("title").Value.Trim();
                                 string summary = docElement.Element("summary").Value.Trim();
                                 string text = docElement.Element("text").Value.Trim();
+                                string type = docElement.Element("type").Value.Trim();
+
+                                var typeFlags = docElement.Element("type")
+                                                          .Attributes()
+                                                          .Where(a =>
+                                                                 a.Name.LocalName.StartsWith("is") &&
+                                                                 XmlConvert.ToBoolean(a.Value))
+                                                          .Select(a => a.Name.LocalName);
+
+                                var path = docElement.Element("path").Elements("fragment");
 
                                 StylesheetApplication ssApplication;
 
@@ -203,13 +215,21 @@ namespace LBi.LostDoc.Repository
                                 if (!saDict.TryGetValue(AssetIdentifier.Parse(assetId), out ssApplication))
                                     continue;
 
-                                var doc = new Document();
-
+                                Document doc = new Document();
+                                
                                 doc.Add(new Field("uri",
                                                   new Uri(ssApplication.SaveAs, UriKind.Relative).ToString(),
                                                   Field.Store.YES,
                                                   Field.Index.NO));
                                 doc.Add(new Field("aid", ssApplication.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
+                                doc.Add(new Field("type", type, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
+                                foreach (string typeFlag in typeFlags)
+                                {
+                                    doc.Add(new Field("typeFlag", typeFlag, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                                }
+
                                 foreach (AssetIdentifier aid in ssApplication.Aliases)
                                     doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
 
@@ -222,9 +242,38 @@ namespace LBi.LostDoc.Repository
                                 }
 
                                 doc.Add(new Field("name", name, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
+                                doc.Add(new Field("camelCase", name, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
                                 doc.Add(new Field("title", title, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
                                 doc.Add(new Field("summary", summary, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
                                 doc.Add(new Field("content", text, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS));
+
+                                using (StringWriter stringWriter = new StringWriter())
+                                {
+                                    JsonWriter jsonWriter = new JsonTextWriter(stringWriter);
+                                    jsonWriter.WriteStartArray();
+                                    foreach (var element in path)
+                                    {
+                                        jsonWriter.WriteStartObject();
+                                        jsonWriter.WritePropertyName("assetId");
+                                        jsonWriter.WriteValue(element.Attribute("assetId").Value);
+                                        jsonWriter.WritePropertyName("name");
+                                        jsonWriter.WriteValue(element.Attribute("name").Value);
+                                        jsonWriter.WritePropertyName("url");
+                                        jsonWriter.WriteValue(element.Attribute("url").Value);
+                                        jsonWriter.WritePropertyName("blurb");
+                                        jsonWriter.WriteValue(element.Attribute("blurb").Value);
+                                        jsonWriter.WritePropertyName("type");
+                                        jsonWriter.WriteValue(element.Attribute("type").Value);
+                                        jsonWriter.WriteEndObject();
+                                    }
+                                    jsonWriter.WriteEndArray();
+                                    doc.Add(new Field("path",
+                                                      stringWriter.ToString(),
+                                                      Field.Store.YES,
+                                                      Field.Index.NO,
+                                                      Field.TermVector.NO));
+                                }
+
                                 TraceSources.ContentBuilderSource.TraceVerbose("Indexing document: {0}", doc.ToString());
                                 writer.AddDocument(doc);
                             }

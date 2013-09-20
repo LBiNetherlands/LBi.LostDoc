@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ namespace LBi.LostDoc.Templating.AssetResolvers
 {
     public class FileResolver : IAssetUriResolver, IEnumerable<KeyValuePair<AssetIdentifier, Uri>>, IEqualityComparer<Uri>
     {
-        private Dictionary<string, Dictionary<Version, Uri>> _lookupCache;
-
-        private HashSet<Uri> _seenUris;
-        private StringComparer _comparer;
+        private readonly Dictionary<string, Dictionary<Version, Uri>> _lookupCache;
+        private readonly HashSet<Uri> _seenUris;
+        private readonly StringComparer _comparer;
 
         public FileResolver()
             : this(false)
@@ -93,11 +92,13 @@ namespace LBi.LostDoc.Templating.AssetResolvers
 
         public IEnumerator<KeyValuePair<AssetIdentifier, Uri>> GetEnumerator()
         {
-            return (this._lookupCache.SelectMany(kvp => kvp.Value,
-                                                 (kvp, innerKvp) =>
-                                                 new KeyValuePair<AssetIdentifier, Uri>(
-                                                     new AssetIdentifier(kvp.Key, innerKvp.Key),
-                                                     innerKvp.Value))).GetEnumerator();
+            var enumerable = (this._lookupCache.SelectMany(kvp => kvp.Value,
+                                                           (kvp, innerKvp) =>
+                                                           new KeyValuePair<AssetIdentifier, Uri>(
+                                                               new AssetIdentifier(kvp.Key, innerKvp.Key),
+                                                               innerKvp.Value)));
+
+            return enumerable.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -113,6 +114,12 @@ namespace LBi.LostDoc.Templating.AssetResolvers
         int IEqualityComparer<Uri>.GetHashCode(Uri obj)
         {
             return this._comparer.GetHashCode(obj.ToString());
+        }
+
+        public void Clear()
+        {
+            this._lookupCache.Clear();
+            this._seenUris.Clear();
         }
     }
 }

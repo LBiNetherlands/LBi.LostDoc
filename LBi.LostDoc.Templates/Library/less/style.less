@@ -1,0 +1,174 @@
+﻿@import "colors.less";
+@import "layout.less";
+@import "navigation.less";
+@import "syntax.less";
+@import "icons.less";
+
+h1 {
+  font-size: 3em;
+  font-family: 'Segoe UI Light', 'Segoe UI', 'Lucida Grande',Verdana,Arial,Helvetica,sans-serif;
+  color: #707070;
+  font-weight: normal;
+  margin: 0;
+  padding-top: 15px;
+  padding-bottom: 10px;
+}
+
+h2, h3, h4, h5 {
+  margin-bottom: 7px;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  font-size: 13px;
+  font-family: 'Segoe UI', 'Lucida Grande',Verdana,Arial,Helvetica,sans-serif;
+}
+
+a {
+  color: #1364C4;
+  text-decoration: none;
+}
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  a:visited {
+    color: #960BB4;
+  }
+
+span.error {
+  color: red;
+}
+
+
+
+
+
+div.version {
+  font-size: 1.25em;
+  margin-bottom: 20px;
+}
+
+  div.version > span {
+    font-weight: bold;
+  }
+
+div.version-selector {
+  position: relative;
+  display: inline;
+}
+
+  div.version-selector:hover ul {
+    display: block;
+  }
+
+  div.version-selector ul {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #fff;
+    border: 1px solid gray;
+    padding: 10px;
+    list-style: none;
+    min-width: 100px;
+  }
+
+    div.version-selector ul li {
+      padding-left: 0;
+    }
+
+      div.version-selector ul li:hover {
+        background-color: #efefef;
+      }
+
+      div.version-selector ul li a {
+        display: block;
+      }
+
+
+
+/* content */
+
+
+table th {
+  background-color: #E5E5E5;
+  padding-right: 4px;
+  padding-left: 4px;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  text-align: left;
+  height: 21px;
+  font-family: 'Segoe UI',Verdana,Arial;
+  font-size: 1.077em;
+  color: black;
+  font-style: normal;
+  font-weight: normal;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #BBB;
+}
+
+table td {
+  background-color: white;
+  line-height: 140%;
+  padding-right: 4px;
+  padding-left: 4px;
+  padding-bottom: 9px;
+  margin: 1px;
+  padding-top: 9px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #BBB;
+}
+
+table {
+  width: 100%;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #BBB;
+  border-collapse: collapse;
+}
+
+ul.type-hierarchy, ul.type-hierarchy ul {
+  list-style: none;
+  padding-left: 10px;
+}
+
+ul.type-hierarchy {
+  padding-left: 0;
+  margin-top: 0;
+}
+
+  ul.type-hierarchy li span.current {
+    font-weight: bold;
+  }
+
+
+a[href^="http://"] {
+  padding-right: 13px;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAV0lEQVR4Xq2QwQ2AAAwC3cmd2Kk7sRP64CEJ9qOX8OPatMc/QKppnEPhTmJh23CLiwAqIw21CybKQ28qQi37WGFYBJcwfJQpP8LlEHKyZMF0IdmF13zlAjZ/6H4wb+mUAAAAAElFTkSuQmCC) center right no-repeat;
+}
+
+dl.parameters dt {
+  font-style: italic;
+}
+
+/*** THIS IS FOR NAMESPAC AND ASSEMBLY SPEC ***/
+
+dl.origin {
+}
+
+  dl.origin dt {
+    float: left;
+    clear: left;
+    margin-right: .5em;
+    font-weight: bold;
+  }
+
+  dl.origin dd {
+    margin-left: 0;
+  }
+

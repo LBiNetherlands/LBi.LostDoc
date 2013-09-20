@@ -152,9 +152,9 @@ namespace LBi.LostDoc.Templating
             return ai.AssetId;
         }
 
-        public string resource(string resourceUri)
+        public string relative(string uri)
         {
-            Uri targetUri = new Uri(resourceUri, UriKind.RelativeOrAbsolute);
+            Uri targetUri = new Uri(uri, UriKind.RelativeOrAbsolute);
             return this._currentUri.GetRelativeUri(targetUri).ToString();
         }
         

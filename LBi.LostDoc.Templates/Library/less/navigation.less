@@ -1,0 +1,83 @@
+﻿
+//mark: will be overrided by js;
+
+// end mark
+header {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+
+    .logo {
+        display: block;
+        margin: 15px;
+    }
+
+    .cf {
+        zoom: 1;
+        //pseudo elements
+        &:after {
+            clear: both;
+        }
+
+        &:before,
+        &:after {
+            content: "";
+            display: table;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+nav {
+    padding: 15px 0 100px 30px;
+    margin-bottom: 3px;
+
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            margin-top: 1px;
+            overflow: hidden;
+            padding-right: 10px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            ul {
+                margin-left: 12px;
+
+                li {
+                    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABpJREFUKFNj2L17938GuoBRmygJZljokUIDAARxIxH6AB3sAAAAAElFTkSuQmCC) 0 1px no-repeat;
+                    margin-left: -22px;
+                    padding-left: 20px;
+                }
+            }
+            //classes
+            &.nav-ancestor {
+                background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABpJREFUKFNj2L17938GuoBRmygJZljokUIDAARxIxH6AB3sAAAAAElFTkSuQmCC) 0 1px no-repeat;
+                margin-left: -22px;
+                padding-left: 12px;
+            }
+
+            &.nav-root {
+                background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAIAAADZSiLoAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABhJREFUGFdjuHDhwu7du4EkA5CCAAa4GAA2yBS2mg5F0wAAAABJRU5ErkJggg==) 1px 7px no-repeat;
+                padding-left: 12px;
+                overflow: hidden;
+                margin: 0;
+                margin-left: -22px;
+            }
+        }
+
+        .nav-current > a {
+            color: @baseColor;
+            font-weight: 700;
+        }
+    }
+}

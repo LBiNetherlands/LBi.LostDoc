@@ -125,6 +125,7 @@
     <Compile Include="Templating\ResourceDeployment.cs" />
     <Compile Include="Templating\FileProviders\ResourceFileProvider.cs" />
     <Compile Include="Templating\SectionRegistration.cs" />
+    <Compile Include="Templating\StackedFileProvider.cs" />
     <Compile Include="Templating\Stylesheet.cs" />
     <Compile Include="Templating\StylesheetApplication.cs" />
     <Compile Include="Templating\TemplateData.cs" />

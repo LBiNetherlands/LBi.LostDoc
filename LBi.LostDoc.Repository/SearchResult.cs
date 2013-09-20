@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  */
 
 using System;
-using LBi.LostDoc;
 
 namespace LBi.LostDoc.Repository
 {
     public class SearchResult
     {
+        public string Name { get; set; }
+
         public string Title { get; set; }
 
         public Uri Url { get; set; }
@@ -29,6 +30,12 @@ namespace LBi.LostDoc.Repository
 
         public string Blurb { get; set; }
 
+        public string Type { get; set; }
+
         public Tuple<string, string, string[]>[] RawDocument { get; set; }
+
+        public string[] Flags { get; set; }
+
+        public PathFragment[] Path { get; set; }
     }
 }

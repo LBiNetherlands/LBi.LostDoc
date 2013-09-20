@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,23 @@
  */
 
 using System.Runtime.Serialization;
+using LBi.LostDoc.Repository.Web.Models;
 
-namespace LBi.LostDoc.Repository.Web.Models
+namespace LBi.LostDoc.Repository.Web.Api.Models
 {
     [DataContract]
     public class ResultSet
     {
-        [DataMember]
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Offset { get; set; }
+
+        [DataMember(Order = 3)]
         public int HitCount { get; set; }
-        
-        [DataMember]
+
+        [DataMember(Order = 4)]
         public Result[] Results { get; set; }
     }
 }

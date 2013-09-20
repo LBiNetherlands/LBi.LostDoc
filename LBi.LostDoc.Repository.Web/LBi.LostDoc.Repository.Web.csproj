@@ -133,10 +133,12 @@
     <Compile Include="RedirectRouteHandler.cs" />
     <Compile Include="Security\ApiKeyAuthorizeAttribute.cs" />
     <Compile Include="TempDir.cs" />
+    <Compile Include="Templates\Export.cs" />
     <Compile Include="TraceSources.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Templates\Repository\less\search.less" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj">
@@ -152,7 +154,30 @@
       <Name>LBi.LostDoc</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\CreateIndex.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\IndexInjector.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\js\lib\knockout.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\js\search.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\LayoutExtensions.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Repository\template.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets')" />
