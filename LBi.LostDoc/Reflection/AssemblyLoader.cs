@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Runtime.Caching;
 using LBi.LostDoc.Diagnostics;
 using Microsoft.Cci;
+using AssemblyName = System.Reflection.AssemblyName;
 
 namespace LBi.LostDoc.Reflection
 {
@@ -70,37 +71,23 @@ namespace LBi.LostDoc.Reflection
 
         public IAssembly LoadFrom(string path)
         {
-            IAssembly assembly;
-            using (var host = new PeReader.DefaultHost())
-            {
-                try
-                {
-                    assembly = host.Lo
-                }
-                catch (FileLoadException)
-                {
-                    var assemblyName = AssemblyName.GetAssemblyName(path);
-                    var fullName = assemblyName.FullName;
-                    var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-                    assembly =
-                        loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
-                }
-
-                this.RegisterAssembly(assembly);
-            }
+            AssemblyName assemblyName = System.Reflection.AssemblyName.GetAssemblyName(path);
+            AssemblyIdentity identity = UnitHelper.GetAssemblyIdentity(assemblyName, this._host);
+            IAssembly assembly = this._host.LoadAssembly(identity);
+            this.RegisterAssembly(assembly);
             return assembly;
         }
 
         public IEnumerable<IAssembly> GetAssemblyChain(IAssembly assembly)
         {
-
-            var obj = this._cache.Get(assembly.);
+            string fullName = assembly.AssemblyIdentity.ToString();
+            var obj = this._cache.Get(fullName);
 
             if (obj != null)
             {
                 TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheHit,
                                                          "Getting assembly chain for assembly {0} from cache.",
-                                                         assembly.FullName);
+                                                         fullName);
                 return (IAssembly[])obj;
             }
             Stopwatch timer = Stopwatch.StartNew();
@@ -109,22 +96,22 @@ namespace LBi.LostDoc.Reflection
 
             TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheMiss,
                                          "No assembly chain cached for assembly {0}.",
-                                         assembly.FullName);
+                                         fullName);
 
-            foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
+            foreach (IAssemblyReference assemblyRef in assembly.AssemblyReferences)
             {
-                Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
+                IAssembly refAsm = this.LoadAssemblyInternal(assemblyRef.AssemblyIdentity.ToString(),
                                                             Path.GetDirectoryName(assembly.Location));
 
-                TraceSources.AssemblyLoader.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
+                TraceSources.AssemblyLoader.TraceVerbose("Loading referenced assembly: {0}", refAsm.AssemblyIdentity.ToString());
 
                 Debug.Assert(refAsm != null);
 
                 ret.Add(refAsm);
             }
 
-            if (!this._cache.Add(assembly.FullName, ret.ToArray(), ObjectCache.InfiniteAbsoluteExpiration))
-                TraceSources.AssemblyLoader.TraceVerbose("Failed to add assembly chain to cache for assembly: {0}", assembly.FullName);
+            if (!this._cache.Add(fullName, ret.ToArray(), ObjectCache.InfiniteAbsoluteExpiration))
+                TraceSources.AssemblyLoader.TraceVerbose("Failed to add assembly chain to cache for assembly: {0}", fullName);
 
             TraceSources.AssemblyLoader.TraceData(TraceEventType.Verbose,
                                                   TraceEvents.CachePenalty,
@@ -133,17 +120,17 @@ namespace LBi.LostDoc.Reflection
             return ret;
         }
 
-        private Assembly LoadAssemblyInternal(string fullName, params string[] probePaths)
+        private IAssembly LoadAssemblyInternal(string fullName, params string[] probePaths)
         {
-            Assembly[] assemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
+            AssemblyIdentity assemblyIdentity = UnitHelper.GetAssemblyIdentity(new AssemblyName(fullName), this._host);
+            IAssembly ret = _host.FindAssembly(assemblyIdentity);
 
-            Assembly ret = assemblies.FirstOrDefault(a => a.FullName == fullName);
-
+            _host.
             if (ret == null)
             {
                 try
                 {
-                    ret = Assembly.ReflectionOnlyLoad(fullName);
+                    ret = _host.LoadAssembly(assemblyIdentity);
                 }
                 catch (FileNotFoundException)
                 {
@@ -159,7 +146,7 @@ namespace LBi.LostDoc.Reflection
                         {
                             if (AssemblyName.GetAssemblyName(fileName).FullName == fullName)
                             {
-                                ret = Assembly.ReflectionOnlyLoadFrom(fileName);
+                                ret = _host.LoadAssembly(new AssemblyIdentity(assemblyIdentity, fileName));
                                 break;
                             }
                         }
@@ -175,42 +162,24 @@ namespace LBi.LostDoc.Reflection
             return ret;
         }
 
-        private Assembly OnFailedAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            var asm = this.LoadAssemblyInternal(args.Name, Path.GetDirectoryName(args.RequestingAssembly.Location));
-
-            var obj = this._cache.Get(args.RequestingAssembly.FullName);
-            if (asm != null && obj != null)
-            {
-                Assembly[] assemblies = (Assembly[])obj;
-                if (Array.IndexOf(assemblies, asm) < 0)
-                {
-                    Array.Resize(ref assemblies, assemblies.Length + 1);
-                    assemblies[assemblies.Length - 1] = asm;
-                    this._cache.Add(args.RequestingAssembly.FullName, assemblies, ObjectCache.InfiniteAbsoluteExpiration);
-                }
-            }
-            return asm;
-        }
 
         public void Dispose()
         {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.OnFailedAssemblyResolve;
         }
 
-        public IEnumerator<Assembly> GetEnumerator()
+        public IEnumerator<IAssembly> GetEnumerator()
         {
-            var clone = new HashSet<Assembly>(this._loadedAssemblies);
-            var seen = new HashSet<Assembly>();
+            var clone = new HashSet<IAssembly>(this._loadedAssemblies);
+            var seen = new HashSet<IAssembly>();
             do
             {
-                foreach (Assembly assembly in clone)
+                foreach (IAssembly assembly in clone)
                 {
                     yield return assembly;
                 }
 
                 seen.UnionWith(clone);
-                clone = new HashSet<Assembly>(this._loadedAssemblies);
+                clone = new HashSet<IAssembly>(this._loadedAssemblies);
                 clone.ExceptWith(seen);
 
             } while (clone.Count > 0);
@@ -221,201 +190,4 @@ namespace LBi.LostDoc.Reflection
             return this.GetEnumerator();
         }
     }
-    //public class ReflectionOnlyAssemblyLoader : IAssemblyLoader
-    //{
-    //    private readonly ObjectCache _cache;
-    //    private readonly string[] _locations;
-    //    private HashSet<Assembly> _loadedAssemblies;
-
-    //    public ReflectionOnlyAssemblyLoader(ObjectCache cache, IEnumerable<string> assemblyLocation)
-    //    {
-    //        this._cache = cache;
-    //        this._locations = assemblyLocation.ToArray();
-    //        this._loadedAssemblies = new HashSet<Assembly>();
-    //        AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += this.OnFailedAssemblyResolve;
-    //    }
-
-    //    public Assembly Load(string name)
-    //    {
-    //        Assembly assembly;
-    //        try
-    //        {
-    //            assembly = Assembly.ReflectionOnlyLoad(name);
-    //        }
-    //        catch (FileLoadException)
-    //        {
-    //            var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-    //            assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, name));
-    //        }
-
-    //        this.RegisterAssembly(assembly);
-
-    //        return assembly;
-    //    }
-
-    //    private void RegisterAssembly(Assembly assembly, bool direct = true)
-    //    {
-    //        if (assembly != null && this._loadedAssemblies.Add(assembly))
-    //        {
-    //            TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheHit,
-    //                                     "Loading assembly {0}.",
-    //                                     assembly.FullName);
-
-    //            if (direct)
-    //            {
-    //                this.GetAssemblyChain(assembly);
-    //            }
-    //        } 
-    //    }
-
-    //    public Assembly LoadFrom(string path)
-    //    {
-    //        Assembly assembly;
-    //        try
-    //        {
-    //            assembly = Assembly.ReflectionOnlyLoadFrom(path);
-    //        }
-    //        catch (FileLoadException)
-    //        {
-    //            var assemblyName = AssemblyName.GetAssemblyName(path);
-    //            var fullName = assemblyName.FullName;
-    //            var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-    //            assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, fullName));
-    //        }
-
-    //        this.RegisterAssembly(assembly);
-
-    //        return assembly;
-    //    }
-
-    //    public IEnumerable<Assembly> GetAssemblyChain(Assembly assembly)
-    //    {
-
-    //        var obj = this._cache.Get(assembly.FullName);
-
-    //        if (obj != null)
-    //        {
-    //            TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheHit,
-    //                                                     "Getting assembly chain for assembly {0} from cache.",
-    //                                                     assembly.FullName);
-    //            return (Assembly[])obj;
-    //        }
-    //        Stopwatch timer = Stopwatch.StartNew();
-
-    //        List<Assembly> ret = new List<Assembly> {assembly};
-
-    //        TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheMiss,
-    //                                     "No assembly chain cached for assembly {0}.",
-    //                                     assembly.FullName);
-
-    //        foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
-    //        {
-    //            Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
-    //                                                        Path.GetDirectoryName(assembly.Location));
-
-    //            TraceSources.AssemblyLoader.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
-
-    //            Debug.Assert(refAsm != null);
-
-    //            ret.Add(refAsm);
-    //        }
-
-    //        if (!this._cache.Add(assembly.FullName, ret.ToArray(), ObjectCache.InfiniteAbsoluteExpiration))
-    //            TraceSources.AssemblyLoader.TraceVerbose("Failed to add assembly chain to cache for assembly: {0}", assembly.FullName);
-
-    //        TraceSources.AssemblyLoader.TraceData(TraceEventType.Verbose,
-    //                                              TraceEvents.CachePenalty,
-    //                                              (ulong)((timer.ElapsedTicks / (double)Stopwatch.Frequency) * 1000000));
-
-    //        return ret;
-    //    }
-
-    //    private Assembly LoadAssemblyInternal(string fullName, params string[] probePaths)
-    //    {
-    //        Assembly[] assemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-
-    //        Assembly ret = assemblies.FirstOrDefault(a => a.FullName == fullName);
-
-    //        if (ret == null)
-    //        {
-    //            try
-    //            {
-    //                ret = Assembly.ReflectionOnlyLoad(fullName);
-    //            }
-    //            catch (FileNotFoundException)
-    //            {
-    //                foreach (string asmPath in probePaths)
-    //                {
-    //                    IEnumerable<string> allFiles;
-    //                    allFiles = Directory.EnumerateFiles(asmPath, "*.dll");
-    //                    allFiles = allFiles.Concat(Directory.EnumerateFiles(asmPath, "*.exe"));
-    //                    allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.dll"))); 
-    //                    allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.exe")));
-
-    //                    foreach (string fileName in allFiles)
-    //                    {
-    //                        if (AssemblyName.GetAssemblyName(fileName).FullName == fullName)
-    //                        {
-    //                            ret = Assembly.ReflectionOnlyLoadFrom(fileName);
-    //                            break;
-    //                        }
-    //                    }
-
-    //                    if (ret != null)
-    //                        break;
-    //                }
-    //            }
-    //        }
-
-    //        this.RegisterAssembly(ret, direct: false);
-
-    //        return ret;
-    //    }
-
-    //    private Assembly OnFailedAssemblyResolve(object sender, ResolveEventArgs args)
-    //    {
-    //        var asm = this.LoadAssemblyInternal(args.Name, Path.GetDirectoryName(args.RequestingAssembly.Location));
-
-    //        var obj = this._cache.Get(args.RequestingAssembly.FullName);
-    //        if (asm != null && obj != null)
-    //        {
-    //            Assembly[] assemblies = (Assembly[]) obj;
-    //            if (Array.IndexOf(assemblies, asm) < 0)
-    //            {
-    //                Array.Resize(ref assemblies, assemblies.Length + 1);
-    //                assemblies[assemblies.Length - 1] = asm;
-    //                this._cache.Add(args.RequestingAssembly.FullName, assemblies, ObjectCache.InfiniteAbsoluteExpiration);
-    //            }
-    //        }
-    //        return asm;
-    //    }
-
-    //    public void Dispose()
-    //    {
-    //        AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.OnFailedAssemblyResolve;
-    //    }
-
-    //    public IEnumerator<Assembly> GetEnumerator()
-    //    {
-    //        var clone = new HashSet<Assembly>(this._loadedAssemblies);
-    //        var seen = new HashSet<Assembly>();
-    //        do
-    //        {
-    //            foreach (Assembly assembly in clone)
-    //            {
-    //                yield return assembly;
-    //            }
-
-    //            seen.UnionWith(clone);
-    //            clone = new HashSet<Assembly>(this._loadedAssemblies);
-    //            clone.ExceptWith(seen);
-
-    //        } while (clone.Count > 0);
-    //    }
-
-    //    IEnumerator IEnumerable.GetEnumerator()
-    //    {
-    //        return this.GetEnumerator();
-    //    }
-    //}
 }

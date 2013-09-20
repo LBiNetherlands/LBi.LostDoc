@@ -22,6 +22,8 @@ using System.Linq;
 using System.Reflection;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Reflection;
+using Microsoft.Cci;
+using AssemblyName = System.Reflection.AssemblyName;
 
 namespace LBi.LostDoc
 {
@@ -51,7 +53,7 @@ namespace LBi.LostDoc
         {
             object ret;
             if (!this._cache.TryGetValue(assetIdentifier, out ret))
-                this._cache.Add(assetIdentifier, ret = this.ResolveInternal(assetIdentifier, (Assembly)this.ResolveInternal(hintAssembly)));
+                this._cache.Add(assetIdentifier, ret = this.ResolveInternal(assetIdentifier, (IAssembly)this.ResolveInternal(hintAssembly)));
 
             return ret;
         }
@@ -67,13 +69,12 @@ namespace LBi.LostDoc
             {
                 case AssetType.Namespace:
                     string ns = (string)this.Resolve(assetId);
-                    Assembly[] matchingAssemblies =
-                        this._assemblyLoader.Where(a => a.GetName().Version == assetId.Version)
-                            .Where(a => a.GetTypes().Any(
+                    IAssembly[] matchingAssemblies =
+                        this._assemblyLoader.Where(a => a.Version == assetId.Version)
+                            .Where(a => a.GetAllTypes().OfType<INamespaceTypeDefinition>().Any(
                                 t1 =>
-                                t1.Namespace != null &&
-                                (StringComparer.Ordinal.Equals(t1.Namespace, ns) ||
-                                t1.Namespace.StartsWith(ns + ".", StringComparison.Ordinal))))
+                                StringComparer.Ordinal.Equals(t1.ContainingNamespace.Name.Value, ns) ||
+                                t1.ContainingNamespace.Name.Value.StartsWith(ns + ".", StringComparison.Ordinal)))
                             .ToArray();
 
                     if (matchingAssemblies.Length == 0)
@@ -84,7 +85,7 @@ namespace LBi.LostDoc
                         TraceSources.AssetResolverSource.TraceWarning(
                             "Namespace {0} found in more than one assembly: {1}",
                             ns,
-                            string.Join(", ", matchingAssemblies.Select(a => a.GetName().Name)));
+                            string.Join(", ", matchingAssemblies.Select(a => a.AssemblyIdentity.Name.Value)));
                     }
                     yield return AssetIdentifier.FromAssembly(matchingAssemblies[0]);
                     break;
@@ -119,14 +120,14 @@ namespace LBi.LostDoc
             }
         }
 
-        public IEnumerable<Assembly> Context
+        public IEnumerable<IAssembly> Context
         {
             get { return this._assemblyLoader; }
         }
 
         #endregion
 
-        private object ResolveInternal(AssetIdentifier assetIdentifier, Assembly hintAssembly = null)
+        private object ResolveInternal(AssetIdentifier assetIdentifier, IAssembly hintAssembly = null)
         {
             switch (assetIdentifier.Type)
             {
@@ -219,17 +220,16 @@ namespace LBi.LostDoc
             return allEvents.Single(e => Naming.GetAssetId(e).Equals(assetIdentifier.AssetId));
         }
 
-        private object ResolveAssembly(AssetIdentifier assetId, Assembly hintAssembly)
+        private object ResolveAssembly(AssetIdentifier assetId, IAssembly hintAssembly)
         {
-            IEnumerable<Assembly> referencedAssemblies =
-                this._assemblyLoader.SelectMany(
-                                            a =>
-                                            a.GetReferencedAssemblies().Select(
-                                                                               n =>
-                                                                               Assembly.ReflectionOnlyLoad(n.FullName)));
 
-            IEnumerable<Assembly> assemblies = this._assemblyLoader.Concat(referencedAssemblies);
-            foreach (Assembly assembly in assemblies)
+            IEnumerable<IAssembly> assemblies = Enumerable.Empty<IAssembly>();
+            if (hintAssembly != null)
+                assemblies = this._assemblyLoader.GetAssemblyChain(hintAssembly);
+
+            assemblies = assemblies.Concat(this._assemblyLoader.SelectMany(this._assemblyLoader.GetAssemblyChain));
+
+            foreach (IAssembly assembly in assemblies)
             {
                 if (AssetIdentifier.FromAssembly(assembly).Equals(assetId))
                     return assembly;
@@ -296,26 +296,28 @@ namespace LBi.LostDoc
             return properties[0];
         }
 
-        private bool TryGetType(string typeName, Assembly hintAssembly, out Type type)
+        private bool TryGetType(string typeName, IAssembly hintAssembly, out ITypeDefinition type)
         {
-            List<Type> allMatches = new List<Type>();
+            List<ITypeDefinition> allMatches = new List<ITypeDefinition>();
 
             if (hintAssembly != null)
             {
-                type = hintAssembly.GetType(typeName, false, false);
+                type = hintAssembly.GetAllTypes().SingleOrDefault(td => StringComparer.Ordinal.Equals(td.Name.Value, typeName));
                 if (type != null)
                     return true;
             }
 
             foreach (var assembly in this._assemblyLoader)
             {
-                var tmp = assembly.GetType(typeName, false, false);
+                var tmp = assembly.GetAllTypes().SingleOrDefault(td => StringComparer.Ordinal.Equals(td.Name.Value, typeName));
+                INamespaceTypeDefinition nstd;
                 if (tmp != null)
                     allMatches.Add(tmp);
             }
 
             if (allMatches.Count > 1)
             {
+                // TODO figure out how to get IAssembly from ITypeDefinition 
                 TraceSources.AssetResolverSource.TraceWarning("More than one type ({0}) found: {1}",
                                                               typeName,
                                                               string.Join(", ",
@@ -336,7 +338,7 @@ namespace LBi.LostDoc
             return string.Equals(n1.FullName, n2.FullName, StringComparison.Ordinal);
         }
 
-        private object ResolveType(AssetIdentifier assetId, Assembly hintAssembly)
+        private object ResolveType(AssetIdentifier assetId, IAssembly hintAssembly)
         {
             string typeName = assetId.AssetId.Substring(assetId.TypeMarker.Length + 1);
             int startIndex = 0;
@@ -344,7 +346,7 @@ namespace LBi.LostDoc
         }
 
 
-        protected internal Type GetDeclaringType(string typeName, ref int startIndex, Assembly hintAssembly)
+        protected internal Type GetDeclaringType(string typeName, ref int startIndex, IAssembly hintAssembly)
         {
             Type ret = null;
 

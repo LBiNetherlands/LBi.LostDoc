@@ -16,12 +16,13 @@
 
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Cci;
 
 namespace LBi.LostDoc
 {
     public interface IAssetResolver
     {
-        IEnumerable<Assembly> Context { get; }
+        IEnumerable<IAssembly> Context { get; }
         object Resolve(AssetIdentifier assetId);
         object Resolve(AssetIdentifier assetId, AssetIdentifier assemblyHint);
         IEnumerable<AssetIdentifier> GetAssetHierarchy(AssetIdentifier assetId);

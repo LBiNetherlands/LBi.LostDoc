@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using Microsoft.Cci;
 
 namespace LBi.LostDoc
 {
@@ -341,9 +342,9 @@ namespace LBi.LostDoc
                                        version);
         }
 
-        public static AssetIdentifier FromAssembly(Assembly asm)
+        public static AssetIdentifier FromAssembly(IAssembly asm)
         {
-            return new AssetIdentifier("A:" + asm.GetName().Name, asm.GetName().Version);
+            return new AssetIdentifier("A:" + asm.Name, asm.Version);
         }
 
         public static AssetIdentifier FromType(Type type)
