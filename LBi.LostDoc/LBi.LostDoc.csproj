@@ -37,6 +37,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Cci.MetadataModel">
+      <HintPath>..\3rdParty\CCI\Microsoft.Cci.MetadataModel.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -55,6 +58,7 @@
     <Compile Include="AssetResolver.cs" />
     <Compile Include="AssetType.cs" />
     <Compile Include="Bundle.cs" />
+    <Compile Include="Cci\CciDocGenerator.cs" />
     <Compile Include="Extensibility\ContractNames.cs" />
     <Compile Include="Composition\MetadataContractBasedImportDefinition.cs" />
     <Compile Include="Composition\MetadataContractBuilder.cs" />
@@ -72,8 +76,10 @@
     <Compile Include="Filters\DynamicallyInvokableAttributeFilter.cs" />
     <Compile Include="Filters\EnumMetadataFilter.cs" />
     <Compile Include="Filters\PrivateImplementationDetailsFilter.cs" />
+    <Compile Include="IAssetEnricher.cs" />
     <Compile Include="IAssetResolver.cs" />
     <Compile Include="IContextBase.cs" />
+    <Compile Include="IDocGenerator.cs" />
     <Compile Include="IFilterContext.cs" />
     <Compile Include="LostDocFileInfo.cs" />
     <Compile Include="AssemblyInfo.cs" />

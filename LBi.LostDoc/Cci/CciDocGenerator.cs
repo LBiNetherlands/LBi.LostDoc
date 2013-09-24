@@ -1,20 +1,4 @@
-﻿/*
- * Copyright 2012 LBi Netherlands B.V.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. 
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
@@ -22,31 +6,31 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Caching;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using LBi.LostDoc.Diagnostics;
-using LBi.LostDoc.Enrichers;
 using LBi.LostDoc.Filters;
-using LBi.LostDoc.Reflection;
+using Microsoft.Cci;
 
-namespace LBi.LostDoc
+namespace LBi.LostDoc.Cci
 {
-    public class DocGenerator : IDocGenerator
+    public class CciDocGenerator : IDocGenerator
     {
         private readonly List<string> _assemblyPaths;
         private readonly List<IEnricher> _enrichers;
         private readonly List<IAssetFilter> _filters;
         private readonly ObjectCache _cache;
         private readonly CompositionContainer _container;
-        private Assembly[] _assemblies;
+        private IAssembly[] _assemblies;
 
         public DocGenerator(CompositionContainer container)
         {
             this._assemblyPaths = new List<string>();
             this._filters = new List<IAssetFilter>();
             this._enrichers = new List<IEnricher>();
-            this.Enrichers.Add(new AttributeDataEnricher());
+            //this.Enrichers.Add(new AttributeDataEnricher());
             this.AssetFilters.Add(new EnumMetadataFilter());
             this._cache = new MemoryCache("DocGeneratorCache");
             this._container = container;
@@ -57,10 +41,10 @@ namespace LBi.LostDoc
             get { return this._filters; }
         }
 
-        public List<IEnricher> Enrichers
-        {
-            get { return this._enrichers; }
-        }
+        //public List<IEnricher> Enrichers
+        //{
+        //    get { return this._enrichers; }
+        //}
 
         #region IDisposable Members
 
@@ -82,17 +66,17 @@ namespace LBi.LostDoc
 
         public XDocument Generate()
         {
-            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Enrichers:");
+            //TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Enrichers:");
 
-            for (int i = 0; i < this.Enrichers.Count; i++)
-            {
-                IEnricher enricher = this.Enrichers[i];
-                TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
-                                                        0,
-                                                        "[{0}] {1}",
-                                                        i,
-                                                        enricher.GetType().FullName);
-            }
+            //for (int i = 0; i < this.Enrichers.Count; i++)
+            //{
+            //    IEnricher enricher = this.Enrichers[i];
+            //    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
+            //                                            0,
+            //                                            "[{0}] {1}",
+            //                                            i,
+            //                                            enricher.GetType().FullName);
+            //}
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Filter:");
             for (int i = 0; i < this.AssetFilters.Count; i++)
@@ -109,7 +93,7 @@ namespace LBi.LostDoc
             IAssemblyLoader assemblyLoader = new ReflectionOnlyAssemblyLoader(
                 this._cache,
                 this._assemblyPaths.Select(Path.GetDirectoryName));
-            
+
             this._assemblies = this._assemblyPaths.Select(assemblyLoader.LoadFrom).ToArray();
 
             XNamespace defaultNs = string.Empty;
@@ -158,12 +142,12 @@ namespace LBi.LostDoc
 
                         phaseAssetCount++;
 
-                        if (((Stopwatch.GetTimestamp() - lastProgressOutput)/(double) Stopwatch.Frequency) > 5.0)
+                        if (((Stopwatch.GetTimestamp() - lastProgressOutput) / (double)Stopwatch.Frequency) > 5.0)
                         {
                             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0,
                                                                     "Phase {0} progress {1:P1} ({2:N0}/{3:N0})",
                                                                     phase,
-                                                                    phaseAssetCount/(double) assets.Count,
+                                                                    phaseAssetCount / (double)assets.Count,
                                                                     phaseAssetCount,
                                                                     assets.Count);
 
@@ -205,21 +189,21 @@ namespace LBi.LostDoc
 
 
         private IEnumerable<AssetIdentifier> DiscoverAssets(IAssetResolver assetResolver,
-                                                            IEnumerable<Assembly> assemblies)
+                                                            IEnumerable<IAssembly> assemblies)
         {
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
             HashSet<AssetIdentifier> distinctSet = new HashSet<AssetIdentifier>();
             IFilterContext filterContext = new FilterContext(this._cache, this._container, assetResolver, FilterState.Discovery);
 
             // find and filter all types from all assemblies 
-            foreach (Assembly asm in assemblies)
+            foreach (IAssembly asm in assemblies)
             {
-                foreach (Type t in asm.GetTypes())
+                foreach (INamedTypeDefinition t in asm.GetAllTypes())
                 {
                     // check if type survives filtering
                     AssetIdentifier typeAsset = AssetIdentifier.FromMemberInfo(t);
 
-                    if (this.IsFiltered(filterContext, typeAsset)) 
+                    if (this.IsFiltered(filterContext, typeAsset))
                         continue;
 
                     /* type was not filtered */
@@ -251,7 +235,7 @@ namespace LBi.LostDoc
                     foreach (MemberInfo member in members)
                     {
                         AssetIdentifier memberAsset = AssetIdentifier.FromMemberInfo(member);
-                        if (this.IsFiltered(filterContext, memberAsset)) 
+                        if (this.IsFiltered(filterContext, memberAsset))
                             continue;
 
                         TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
@@ -1103,7 +1087,7 @@ namespace LBi.LostDoc
             }
         }
 
-        ~DocGenerator()
+        ~CciDocGenerator()
         {
             this.Dispose(false);
         }
