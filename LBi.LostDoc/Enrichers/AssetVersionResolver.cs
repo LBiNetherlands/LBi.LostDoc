@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,17 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Cci;
+using AssemblyName = System.Reflection.AssemblyName;
 
 namespace LBi.LostDoc.Enrichers
 {
     internal class AssetVersionResolver
     {
         private readonly IProcessingContext _context;
-        private readonly Assembly _hintAssembly;
+        private readonly IAssembly _hintAssembly;
 
-        public AssetVersionResolver(IProcessingContext context, Assembly hintAssembly)
+        public AssetVersionResolver(IProcessingContext context, IAssembly hintAssembly)
         {
             this._context = context;
             this._hintAssembly = hintAssembly;

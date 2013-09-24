@@ -95,8 +95,8 @@
     <Compile Include="ITypeFilter.cs" />
     <Compile Include="Filters\SpecialNameMemberInfoFilter.cs" />
     <Compile Include="Namespaces.cs" />
-    <Compile Include="Naming.cs" />
     <Compile Include="ProcessingContextExtensions.cs" />
+    <Compile Include="Reflection\CciHelper.cs" />
     <Compile Include="Reflection\IAssemblyLoader.cs" />
     <Compile Include="Reflection\AssemblyLoader.cs" />
     <Compile Include="Service References\MsdnContentService\Reference.cs">

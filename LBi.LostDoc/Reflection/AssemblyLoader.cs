@@ -125,7 +125,6 @@ namespace LBi.LostDoc.Reflection
             AssemblyIdentity assemblyIdentity = UnitHelper.GetAssemblyIdentity(new AssemblyName(fullName), this._host);
             IAssembly ret = _host.FindAssembly(assemblyIdentity);
 
-            _host.
             if (ret == null)
             {
                 try

@@ -1,41 +1,26 @@
-﻿/*
- * Copyright 2012 LBi Netherlands B.V.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. 
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Microsoft.Cci;
 
-namespace LBi.LostDoc
+namespace LBi.Cci
 {
-    public class Naming
+    public static class Naming
     {
         public static string GetAssetId(string namespaceName)
         {
             return string.Format("N:{0}", namespaceName);
         }
 
-        private static string GetTypeName(Type type)
+        private static string GetTypeFullName(Type type)
         {
             if (type.IsNested)
             {
                 return string.Format("{0}.{1}",
-                                     GetTypeName(type.DeclaringType),
+                                     GetTypeFullName(type.DeclaringType),
                                      type.Name);
             }
 
@@ -45,42 +30,93 @@ namespace LBi.LostDoc
             return type.FullName;
         }
 
+        private static string GetTypeFullName(ITypeDefinition type)
+        {
+            Contract.Assert(!(type is Dummy));
+
+            INestedTypeDefinition nestedType = type as INestedTypeDefinition;
+            if (nestedType != null)
+            {
+                return string.Format("{0}.{1}",
+                                     GetTypeFullName(nestedType.ContainingTypeDefinition),
+                                     nestedType.Name);
+            }
+
+            INamespaceTypeDefinition namespaceTypeDef = type as INamespaceTypeDefinition;
+            if (namespaceTypeDef != null)
+            {
+                return string.Format("{0}.{1}",
+                                     GetNamespaceName(namespaceTypeDef.ContainingNamespace),
+                                     namespaceTypeDef.Name.Value);
+            }
+
+            throw new InvalidOperationException("Unknowng ITypeDefinition: " + type.GetType().FullName);
+        }
+
+        private static string GetTypeName(INestedTypeDefinition type)
+        {
+            var ret = TypeHelper.GetTypeName(type, NameFormattingOptions.None);
+            return ret;
+            //if (type.MangleName)
+            //    return type.MangledName;
+
+            //return type.Name;
+        }
+
+        private static string GetNamespaceName(INamespaceDefinition namespaceDefinition)
+        {
+            INamespaceMember nestedNamespace = namespaceDefinition as INamespaceMember;
+
+            if (nestedNamespace != null)
+            {
+                if (nestedNamespace.ContainingNamespace is IRootUnitNamespace)
+                    return namespaceDefinition.Name.Value;
+
+                return string.Format("{0}.{1}",
+                                     GetNamespaceName(nestedNamespace.ContainingNamespace),
+                                     namespaceDefinition.Name.Value);
+            }
+
+            return namespaceDefinition.Name.Value;
+        }
 
         public static string GetAssetId(Type type)
         {
-            if (type.IsGenericParameter) // TODO add extra guard here
-                throw new InvalidOperationException("Type is generic parameter.");
+            return string.Format("T:{0}", GetTypeFullName(type));
+        }
 
-            return string.Format("T:{0}", GetTypeName(type));
+        public static string GetAssetId(ITypeDefinition type)
+        {
+            return string.Format("T:{0}", GetTypeFullName(type));
         }
 
         public static string GetAssetId(PropertyInfo propertyInfo)
         {
             ParameterInfo[] p = propertyInfo.GetIndexParameters();
             if (p.Length == 0)
-                return string.Format("P:{0}.{1}", GetTypeName(propertyInfo.ReflectedType), propertyInfo.Name);
+                return string.Format("P:{0}.{1}", GetTypeFullName(propertyInfo.ReflectedType), propertyInfo.Name);
 
             return string.Format("P:{0}.{1}{2}",
-                                 GetTypeName(propertyInfo.ReflectedType),
+                                 GetTypeFullName(propertyInfo.ReflectedType),
                                  propertyInfo.Name,
                                  CreateParameterSignature(propertyInfo, p.Select(pr => pr.ParameterType).ToArray()));
         }
 
         public static string GetAssetId(FieldInfo fieldInfo)
         {
-            return string.Format("F:{0}.{1}", GetTypeName(fieldInfo.ReflectedType), fieldInfo.Name);
+            return string.Format("F:{0}.{1}", GetTypeFullName(fieldInfo.ReflectedType), fieldInfo.Name);
         }
 
         public static string GetAssetId(MethodInfo mInfo)
         {
-            string ret = string.Format("M:{0}.{1}", GetTypeName(mInfo.ReflectedType), GetMethodName(mInfo));
+            string ret = string.Format("M:{0}.{1}", GetTypeFullName(mInfo.ReflectedType), GetMethodName(mInfo));
             return ret;
         }
 
         public static string GetAssetId(ConstructorInfo mInfo)
         {
             return string.Format("M:{0}.{1}{2}",
-                                 GetTypeName(mInfo.DeclaringType),
+                                 GetTypeFullName(mInfo.DeclaringType),
                                  GetExplicitName(mInfo.Name),
                                  CreateParameterSignature(mInfo,
                                                           mInfo.GetParameters().Select(p => p.ParameterType).ToArray()));
@@ -234,8 +270,7 @@ namespace LBi.LostDoc
                     (declMethodBase.Name == "op_Implicit" ||
                      declMethodBase.Name == "op_Explicit"))
                 {
-                    ret.Append("~").Append(CreateParameterSignature(
-                                                                    null /* HACK: pass null to prevent stack overflow on infinite recursion */,
+                    ret.Append("~").Append(CreateParameterSignature(null /* HACK: pass null to prevent stack overflow on infinite recursion */,
                                                                     new[] { declMethodBase.ReturnType },
                                                                     wrap: false /* don't wrap return var in parens */));
                 }
@@ -246,7 +281,7 @@ namespace LBi.LostDoc
 
         public static string GetAssetId(EventInfo eventInfo)
         {
-            return string.Format("E:{0}.{1}", GetTypeName(eventInfo.ReflectedType), eventInfo.Name);
+            return string.Format("E:{0}.{1}", GetTypeFullName(eventInfo.ReflectedType), eventInfo.Name);
         }
     }
 }

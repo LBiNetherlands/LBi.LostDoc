@@ -91,10 +91,11 @@ namespace LBi.LostDoc
                     break;
                 case AssetType.Type:
 
-                    Type t = (Type)this.Resolve(assetId);
-                    while (t.IsNested)
+                    ITypeDefinition t = (ITypeDefinition)this.Resolve(assetId);
+                    while (t is INestedTypeDefinition)
                     {
-                        t = t.DeclaringType;
+                        INestedTypeDefinition nestedTypeDef = (INestedTypeDefinition)t;
+                        t = nestedTypeDef.ContainingTypeDefinition;
                         yield return AssetIdentifier.FromMemberInfo(t);
                     }
 
@@ -310,7 +311,6 @@ namespace LBi.LostDoc
             foreach (var assembly in this._assemblyLoader)
             {
                 var tmp = assembly.GetAllTypes().SingleOrDefault(td => StringComparer.Ordinal.Equals(td.Name.Value, typeName));
-                INamespaceTypeDefinition nstd;
                 if (tmp != null)
                     allMatches.Add(tmp);
             }
@@ -321,7 +321,7 @@ namespace LBi.LostDoc
                 TraceSources.AssetResolverSource.TraceWarning("More than one type ({0}) found: {1}",
                                                               typeName,
                                                               string.Join(", ",
-                                                                          allMatches.Select(t => t.Assembly.GetName().Name)));
+                                                                          allMatches.Select(t => t.GetAssembly().GetFullName())));
             }
 
             if (allMatches.Count > 0)
