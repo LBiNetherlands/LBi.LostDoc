@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Xml;
 
 namespace Company.Project.Library
@@ -42,6 +43,7 @@ namespace Company.Project.Library
         /// <summary>
         ///   Initializes a new instance of the <see cref="RegularClass" /> class.
         /// </summary>
+        [ACustom(42, 5, ArrayProp = new object[] { typeof(RegularClass), 5, new object[] { typeof(string[]), "test", "test2", BindingFlags.CreateInstance | BindingFlags.Static | BindingFlags.Public } })]
         public RegularClass()
         {
         }
@@ -68,7 +70,7 @@ namespace Company.Project.Library
         /// <param name="readOnlyInt">
         /// The read only (optional) int. 
         /// </param>
-        [ACustom(42, 5, ArrayProp = new object[] {typeof(RegularClass), 5, "test"})]
+        [ACustom(42, 5, ArrayProp = new object[] { typeof(RegularClass), 5, "test" })]
         public RegularClass(string aString, int? readOnlyInt)
         {
         }
@@ -101,8 +103,8 @@ namespace Company.Project.Library
         /// <summary>
         /// A Virtual FOo Method
         /// </summary>
-        [ACustom(ArrayProp = new object[] {typeof(List<>), typeof(List<string>)})]
-        [ACustom(ArrayProp = new object[] {typeof(RegularClass), 5, "test"})]
+        [ACustom(ArrayProp = new object[] { typeof(List<>), typeof(List<string>) })]
+        [ACustom(ArrayProp = new object[] { typeof(RegularClass), 5, "test", "with\0null", "with\r\nnewline" })]
         public virtual void Foo()
         {
         }
@@ -285,7 +287,7 @@ namespace Company.Project.Library
         /// <param name="ptr">the IntPtr param</param>
         public void WithIntPtr(IntPtr ptr)
         {
-            
+
         }
 
 

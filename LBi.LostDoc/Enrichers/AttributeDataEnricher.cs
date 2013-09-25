@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,20 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace LBi.LostDoc.Enrichers
 {
     public class AttributeDataEnricher : IEnricher
     {
+        protected static readonly Regex InvalidCharacters = new Regex("[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-u10FFFF]",
+                                                                      RegexOptions.Compiled);
+
         #region IEnricher Members
 
         public void EnrichType(IProcessingContext context, Type type)
@@ -64,8 +69,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichReturnValue(IProcessingContext context, MethodInfo methodInfo)
         {
-            GenerateAttributeElements(context,
-                                      CustomAttributeData.GetCustomAttributes(methodInfo.ReturnParameter));
+            GenerateAttributeElements(context, CustomAttributeData.GetCustomAttributes(methodInfo.ReturnParameter));
         }
 
         public void EnrichParameter(IProcessingContext context, ParameterInfo item)
@@ -90,16 +94,12 @@ namespace LBi.LostDoc.Enrichers
 
         #endregion
 
-        // TODO fix this, and the accompanying XSLT template, the construction of attribute 
-        // arguments isn't very consitent 
-        private static void GenerateAttributeElements(IProcessingContext context,
-                                                      IEnumerable<CustomAttributeData> attrData)
+        protected virtual void GenerateAttributeElements(IProcessingContext context, IEnumerable<CustomAttributeData> attrData)
         {
             foreach (CustomAttributeData custAttr in attrData)
             {
-                AssetIdentifier typeAssetId =
-                    AssetIdentifier.FromMemberInfo(custAttr.Constructor.ReflectedType
-                                                   ?? custAttr.Constructor.DeclaringType);
+                AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(custAttr.Constructor.ReflectedType
+                                                                             ?? custAttr.Constructor.DeclaringType);
 
                 if (context.IsFiltered(typeAssetId))
                     continue;
@@ -107,34 +107,16 @@ namespace LBi.LostDoc.Enrichers
                 context.AddReference(AssetIdentifier.FromMemberInfo(custAttr.Constructor));
 
                 var attrElem = new XElement("attribute",
-                                            new XAttribute("type",
-                                                           typeAssetId),
-                                            new XAttribute("constructor",
-                                                           AssetIdentifier.FromMemberInfo(custAttr.Constructor)));
+                                            new XAttribute("type", typeAssetId),
+                                            new XAttribute("constructor", AssetIdentifier.FromMemberInfo(custAttr.Constructor)));
 
                 foreach (CustomAttributeTypedArgument cta in custAttr.ConstructorArguments)
                 {
-                    if (cta.Value is ReadOnlyCollection<CustomAttributeTypedArgument>)
-                    {
-                        AssetIdentifier elementAssetId =
-                            AssetIdentifier.FromMemberInfo(cta.ArgumentType.GetElementType());
-                        context.AddReference(elementAssetId);
-                        attrElem.Add(new XElement("argument",
-                                                  new XElement("array",
-                                                               new XAttribute("type", elementAssetId),
-                                                               ((IEnumerable<CustomAttributeTypedArgument>)cta.Value).
-                                                                   Select(
-                                                                          ata =>
-                                                                          new XElement("element",
-                                                                                       GenerateAttributeArgument(
-                                                                                                                 context,
-                                                                                                                 ata))))));
-                    }
-                    else
-                    {
-                        attrElem.Add(new XElement("argument",
-                                                  GenerateAttributeArgument(context, cta)));
-                    }
+                    XElement argElem = new XElement("argument");
+
+                    this.GenerateValueLiteral(context.Clone(argElem), cta);
+
+                    attrElem.Add(argElem);
                 }
 
                 foreach (CustomAttributeNamedArgument cta in custAttr.NamedArguments)
@@ -142,82 +124,85 @@ namespace LBi.LostDoc.Enrichers
                     AssetIdentifier namedMember = AssetIdentifier.FromMemberInfo(cta.MemberInfo);
                     context.AddReference(namedMember);
 
-                    if (cta.TypedValue.Value is ReadOnlyCollection<CustomAttributeTypedArgument>)
-                    {
-                        context.AddReference(namedMember);
-                        AssetIdentifier elementAssetId =
-                            AssetIdentifier.FromMemberInfo(cta.TypedValue.ArgumentType.GetElementType());
-                        context.AddReference(elementAssetId);
-                        attrElem.Add(new XElement("argument",
-                                                  new XAttribute("member", namedMember),
-                                                  new XElement("array",
-                                                               new XAttribute("type", elementAssetId),
-                                                               ((IEnumerable<CustomAttributeTypedArgument>)
-                                                                cta.TypedValue.Value).Select(
-                                                                                             ata =>
-                                                                                             new XElement("element",
-                                                                                                          GenerateAttributeArgument(context, ata))))));
-                    }
-                    else
-                    {
-                        attrElem.Add(new XElement("argument",
-                                                  new XAttribute("member", namedMember),
-                                                  GenerateAttributeArgument(context, cta.TypedValue)));
-                    }
+                    XElement argElem = new XElement("argument",
+                                                    new XAttribute("member", namedMember));
+
+                    this.GenerateValueLiteral(context.Clone(argElem), cta.TypedValue);
+
+                    attrElem.Add(argElem);
                 }
 
 
                 context.Element.Add(attrElem);
             }
-
-            //using (var ms = new MemoryStream())
-            //    context.Element.Save(ms);
         }
 
-        private static IEnumerable<XObject> GenerateAttributeArgument(IProcessingContext context,
-                                                                      CustomAttributeTypedArgument cata)
+        protected virtual void GenerateValueLiteral(IProcessingContext context, CustomAttributeTypedArgument cta)
         {
-            // TODO this needs to be cleaned up, and fixed
-            context.AddReference(AssetIdentifier.FromMemberInfo(cata.ArgumentType));
-            yield return new XAttribute("type", AssetIdentifier.FromMemberInfo(cata.ArgumentType));
-
-            if (cata.ArgumentType.IsEnum)
+            var arrayValues = cta.Value as IEnumerable<CustomAttributeTypedArgument>;
+            if (arrayValues != null)
             {
-                if (
-                    cata.ArgumentType.GetCustomAttributesData().Any(
-                                                                    ca =>
-                                                                    ca.Constructor.DeclaringType ==
-                                                                    typeof(FlagsAttribute)))
-                {
-                    string flags = Enum.ToObject(cata.ArgumentType, cata.Value).ToString();
-                    string[] parts = flags.Split(',');
+                Debug.Assert(cta.ArgumentType.IsArray);
+                this.GenerateArrayLiteral(context, cta.ArgumentType.GetElementType(), arrayValues);
+            }
+            else if (cta.ArgumentType == typeof(Type))
+            {
+                XElement typeElement = new XElement("typeRef");
+                DocGenerator.GenerateTypeRef(context.Clone(typeElement), (Type)cta.Value);
+                context.Element.Add(typeElement);
+            }
+            else
+            {
+                XElement constElement = new XElement("constant",
+                                                     new XAttribute("type", AssetIdentifier.FromType(cta.ArgumentType)));
 
-                    yield return
-                        new XElement("literal",
-                                     new XAttribute("value", cata.Value),
-                                     Array.ConvertAll(parts,
-                                                      s => new XElement("flag", new XAttribute("value", s.Trim()))));
+                if (cta.ArgumentType == typeof(string) && this.ContainsInvalidXmlCharacters((string)cta.Value))
+                {
+                    string rawValue = (string)cta.Value;
+                    var matches = InvalidCharacters.Matches(rawValue);
+                    int startPos = 0;
+                    foreach (Match match in matches)
+                    {
+                        int invalidPos = match.Groups[0].Index;
+                        Debug.Assert(match.Groups[0].Length == 1);
+
+                        if (startPos < invalidPos)
+                            constElement.Add(rawValue.Substring(startPos, invalidPos - startPos));
+
+                        constElement.Add(new XElement("char", new XAttribute("value", (short)match.Groups[0].Value[0])));
+
+                        startPos = invalidPos + match.Groups[0].Length;
+                    }
+
+                    // add trailing bit
+                    constElement.Add(rawValue.Substring(startPos));
                 }
                 else
                 {
-                    string value = Enum.GetName(cata.ArgumentType, cata.Value);
-                    if (value != null)
-                        yield return new XElement("literal", new XAttribute("value", value));
-
-                    yield return new XElement("literal", new XAttribute("value", cata.Value));
+                    constElement.Add(new XAttribute("value", cta.Value));
                 }
-            }
-            else if (cata.ArgumentType == typeof(Type))
-            {
-                XElement tmp = new XElement("tmp");
-                DocGenerator.GenerateTypeRef(context.Clone(tmp), (Type)cata.Value, "value");
-                yield return tmp.Attribute("value");
-                foreach (XElement xElement in tmp.Elements())
-                    yield return xElement;
 
+                context.Element.Add(constElement);
             }
-            else // TODO fix how this encodes unprintable characters 
-                yield return new XAttribute("value", cata.Value.ToString().Replace("\0", "\\0"));
+        }
+
+        protected virtual bool ContainsInvalidXmlCharacters(string value)
+        {
+            return InvalidCharacters.IsMatch(value);
+        }
+
+        protected virtual void GenerateArrayLiteral(IProcessingContext context, Type elementType, IEnumerable<CustomAttributeTypedArgument> arrayValues)
+        {
+            XElement arrayElement = new XElement("arrayOf",
+                                                 new XAttribute("type", AssetIdentifier.FromType(elementType)),
+                                                 new XAttribute("rank", 1)); // attributes only suport one-dimensional arrays
+
+            foreach (CustomAttributeTypedArgument cta in arrayValues)
+            {
+                this.GenerateValueLiteral(context.Clone(arrayElement), cta);
+            }
+
+            context.Element.Add(arrayElement);
         }
     }
 }
