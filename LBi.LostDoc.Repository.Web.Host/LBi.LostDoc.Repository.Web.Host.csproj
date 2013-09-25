@@ -251,9 +251,7 @@
   <ItemGroup>
     <Folder Include="App_Data\AddIns\" />
     <Folder Include="App_Data\Content\" />
-    <Folder Include="App_Data\LocalPackages\" />
     <Folder Include="App_Data\Logs\" />
-    <Folder Include="App_Data\Packages\" />
     <Folder Include="App_Data\Repository\temp\" />
     <Folder Include="Images\" />
     <Folder Include="Static\" />
@@ -356,14 +354,14 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>echo removing LocalPackages folder
-if exist $(ProjectDir)App_Data\LocalPackages rmdir /Q /S $(ProjectDir)App_Data\LocalPackages
-echo creating LocalPackages folder
-mkdir $(ProjectDir)App_Data\LocalPackages
-echo copying AddinPackages to LocalPackages
-copy /Y $(ProjectDir)..\AddInPackages\*.nupkg $(ProjectDir)App_Data\LocalPackages\
-echo removing Packages folder
-if exist $(ProjectDir)App_Data\Packages rmdir /Q /S $(ProjectDir)App_Data\Packages
+    <PostBuildEvent>echo removing AddIns\Repository folder
+if exist $(ProjectDir)App_Data\AddIns\Repository rmdir /Q /S $(ProjectDir)App_Data\AddIns\Repository
+echo creating AddIns\Repository folder
+mkdir $(ProjectDir)App_Data\AddIns\Repository
+echo copying AddinPackages to AddIns\Repository
+copy /Y $(ProjectDir)..\AddInPackages\*.nupkg $(ProjectDir)App_Data\AddIns\Repository\
+echo removing AddIns\Packages folder
+if exist $(ProjectDir)App_Data\AddIns\Packages rmdir /Q /S $(ProjectDir)App_Data\AddIns\Packages
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
