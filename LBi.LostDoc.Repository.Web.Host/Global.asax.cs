@@ -158,7 +158,7 @@ namespace LBi.LostDoc.Repository.Web.Host
             SettingsExportProvider settingsExportProvider = new SettingsExportProvider(settings);
 
             // create container
-            CompositionContainer container = new CompositionContainer(catalog, settingsExportProvider);
+            CompositionContainer container = new CompositionContainer(catalog, true, settingsExportProvider);
 
             // when the catalog changes, discover and route all ApiControllers
             // TODO could this be replaced with an ImportMany + recompositioning?
