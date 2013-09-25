@@ -17,7 +17,7 @@
 using System.Web.Mvc;
 using LBi.LostDoc.Repository.Web.Areas.Administration.Controllers;
 
-namespace LBi.LostDoc.Repository.Web.Areas.Administration
+namespace LBi.LostDoc.Repository.Web.Host.Areas.Administration
 {
     public class AdministrationAreaRegistration : AreaRegistration
     {
@@ -37,7 +37,7 @@ namespace LBi.LostDoc.Repository.Web.Areas.Administration
                 new { action = "Index", id = UrlParameter.Optional });
 
             var asmName = typeof (DefaultController).Assembly.GetName();
-            context.MapRoute("AdministrationDefault",
+            context.MapRoute(RouteConstants.AdministrationRouteName,
                              "lostdoc",
                              new
                                  {

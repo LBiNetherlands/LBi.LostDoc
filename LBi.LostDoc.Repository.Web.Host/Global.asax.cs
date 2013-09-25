@@ -39,6 +39,7 @@ using LBi.LostDoc.Repository.Web.Configuration.Xaml;
 using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Extensibility.Http;
 using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
+using LBi.LostDoc.Repository.Web.Host.Areas.Administration;
 using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 using ContractNames = LBi.LostDoc.Extensibility.ContractNames;

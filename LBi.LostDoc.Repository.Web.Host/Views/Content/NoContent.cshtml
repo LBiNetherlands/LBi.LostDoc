@@ -1,4 +1,5 @@
-﻿@model LBi.LostDoc.Repository.Web.Host.Models.NoContentModel
+﻿@using LBi.LostDoc.Repository.Web.Host
+@model LBi.LostDoc.Repository.Web.Host.Models.NoContentModel
 <!DOCTYPE html>
 <style>
     body {
@@ -26,7 +27,7 @@
         }
         else
         {
-            <p>There's no content yet, create some using the <a href="../lostdoc">management interface</a>.</p>
+            <p>There's no content yet, create some using the <a href="@Url.RouteUrl(RouteConstants.AdministrationRouteName)">management interface</a>.</p>
         }
     </div>
 </body>
