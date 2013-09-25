@@ -148,6 +148,8 @@ namespace LBi.LostDoc.Templating
 
         public string asset(string aid)
         {
+            if (string.IsNullOrWhiteSpace(aid))
+                throw new ArgumentException("Asset id cannot be empty.");
             AssetIdentifier ai = this.Parse(aid);
             return ai.AssetId;
         }
