@@ -125,17 +125,7 @@ namespace LBi.LostDoc.Reflection
                                          "No assembly chain cached for assembly {0}.",
                                          assembly.FullName);
 
-            foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
-            {
-                Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
-                                                            Path.GetDirectoryName(assembly.Location));
-
-                TraceSources.AssemblyLoader.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
-
-                Debug.Assert(refAsm != null);
-
-                ret.Add(refAsm);
-            }
+            this.GetAssemblyChain(assembly, ret);
 
             if (!this._cache.Add(assembly.FullName, ret.ToArray(), ObjectCache.InfiniteAbsoluteExpiration))
                 TraceSources.AssemblyLoader.TraceVerbose("Failed to add assembly chain to cache for assembly: {0}", assembly.FullName);
@@ -145,6 +135,25 @@ namespace LBi.LostDoc.Reflection
                                                   (ulong)((timer.ElapsedTicks / (double)Stopwatch.Frequency) * 1000000));
 
             return ret;
+        }
+
+        private void GetAssemblyChain(Assembly assembly, List<Assembly> ret)
+        {
+            foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
+            {
+                Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
+                                                            Path.GetDirectoryName(assembly.Location));
+
+                TraceSources.AssemblyLoader.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
+
+                Debug.Assert(refAsm != null);
+
+                if (!ret.Contains(refAsm))
+                {
+                    ret.Add(refAsm);
+                    GetAssemblyChain(refAsm, ret);
+                }
+            }
         }
 
         private Assembly LoadAssemblyInternal(string fullName, params string[] probePaths)
