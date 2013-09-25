@@ -268,9 +268,67 @@
         <xsl:apply-templates select="implements" mode="syntax-cs-naming"/>
       </xsl:if>
     </span>
+
+    <xsl:apply-templates select="typeparam" mode="syntax-cs-generic-constraints"/>
+  </xsl:template>
+  
+  <!-- generic type parameter constraints -->
+
+  <xsl:template match="typeparam" mode="syntax-cs-generic-constraints">
+    <xsl:variable name="constraints">
+      <xsl:apply-templates select="constraint[not(@type) or ld:asset(@type) != 'T:System.ValueType']|@isValueType|@isReferenceType|@hasDefaultConstructor[not(../@isValueType)]" mode="syntax-cs-generic-constraint-spec"/>
+    </xsl:variable>
+    <xsl:if test="$constraints">
+      <span class="line">
+        <span class="keyword">
+          <xsl:text>where </xsl:text>
+        </span>
+        <xsl:value-of select="@name"/>
+        <xsl:text> : </xsl:text>
+        <xsl:value-of select="$constraints"/>
+      </span>
+    </xsl:if>
   </xsl:template>
 
+  <xsl:template match="@isValueType" mode="syntax-cs-generic-constraint-spec">
+    <xsl:if test="position() > 1">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+    
+    <span class="keyword">
+      <xsl:text>struct</xsl:text>
+    </span>
+  </xsl:template>
 
+  <xsl:template match="@isReferenceType" mode="syntax-cs-generic-constraint-spec">
+    <xsl:if test="position() > 1">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+    
+    <span class="keyword">
+      <xsl:text>class</xsl:text>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="@hasDefaultConstructor" mode="syntax-cs-generic-constraint-spec">
+    <xsl:if test="position() > 1">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+    
+    <span class="keyword">
+      <xsl:text>new()</xsl:text>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="constraint" mode="syntax-cs-generic-constraint-spec">
+    <xsl:if test="position() > 1">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+
+    <xsl:apply-templates select="@type | @param | arrayOf" mode="syntax-cs-naming"/>
+  </xsl:template>
+
+  <!-- //generic type parameter constraints -->
 
   <xsl:template match="implements" mode="syntax-cs-naming">
     <xsl:if test="position() > 1">
@@ -318,7 +376,7 @@
         </xsl:when>
         <xsl:when test="@isSealed = 'true'">
           <xsl:text>sealed </xsl:text>
-        </xsl:when>        
+        </xsl:when>
         <xsl:when test="@isStatic = 'true'">
           <xsl:text>static </xsl:text>
         </xsl:when>
@@ -515,22 +573,16 @@
       <xsl:text>(</xsl:text>
       <xsl:if test="not(param)">
         <xsl:text>)</xsl:text>
-        <xsl:if test="typeparam/constraint">
-          <xsl:text> where : </xsl:text>
-          <xsl:apply-templates select="typeparam/constraint" mode="syntax-cs"/>
-        </xsl:if>
       </xsl:if>
     </span>
     <xsl:if test="param">
       <xsl:apply-templates select="param" mode="syntax-cs-naming"/>
       <span class="line">
         <xsl:text>)</xsl:text>
-        <xsl:if test="typeparam/constraint">
-          <xsl:text> where : </xsl:text>
-          <xsl:apply-templates select="typeparam/constraint" mode="syntax-cs"/>
-        </xsl:if>
       </span>
     </xsl:if>
+
+    <xsl:apply-templates select="typeparam" mode="syntax-cs-generic-constraints"/>
   </xsl:template>
 
 
