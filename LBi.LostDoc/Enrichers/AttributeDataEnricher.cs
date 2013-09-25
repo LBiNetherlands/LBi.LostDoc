@@ -153,8 +153,9 @@ namespace LBi.LostDoc.Enrichers
             }
             else
             {
-                XElement constElement = new XElement("constant",
-                                                     new XAttribute("type", AssetIdentifier.FromType(cta.ArgumentType)));
+                XElement constElement = new XElement("constant");
+
+                DocGenerator.GenerateTypeRef(context.Clone(constElement), cta.ArgumentType);
 
                 if (cta.ArgumentType == typeof(string) && InvalidCharacters.IsMatch((string)cta.Value))
                 {
@@ -189,12 +190,15 @@ namespace LBi.LostDoc.Enrichers
         protected virtual void GenerateArrayLiteral(IProcessingContext context, Type elementType, IEnumerable<CustomAttributeTypedArgument> arrayValues)
         {
             XElement arrayElement = new XElement("arrayOf",
-                                                 new XAttribute("type", AssetIdentifier.FromType(elementType)),
                                                  new XAttribute("rank", 1)); // attributes only suport one-dimensional arrays
+
+            DocGenerator.GenerateTypeRef(context.Clone(arrayElement), elementType);
 
             foreach (CustomAttributeTypedArgument cta in arrayValues)
             {
-                this.GenerateValueLiteral(context.Clone(arrayElement), cta);
+                XElement elementElement = new XElement("element");
+                this.GenerateValueLiteral(context.Clone(elementElement), cta);
+                arrayElement.Add(elementElement);
             }
 
             context.Element.Add(arrayElement);

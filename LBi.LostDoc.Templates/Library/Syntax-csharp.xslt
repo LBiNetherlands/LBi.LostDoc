@@ -271,7 +271,7 @@
 
     <xsl:apply-templates select="typeparam" mode="syntax-cs-generic-constraints"/>
   </xsl:template>
-  
+
   <!-- generic type parameter constraints -->
 
   <xsl:template match="typeparam" mode="syntax-cs-generic-constraints">
@@ -294,7 +294,7 @@
     <xsl:if test="position() > 1">
       <xsl:text>, </xsl:text>
     </xsl:if>
-    
+
     <span class="keyword">
       <xsl:text>struct</xsl:text>
     </span>
@@ -304,7 +304,7 @@
     <xsl:if test="position() > 1">
       <xsl:text>, </xsl:text>
     </xsl:if>
-    
+
     <span class="keyword">
       <xsl:text>class</xsl:text>
     </span>
@@ -314,7 +314,7 @@
     <xsl:if test="position() > 1">
       <xsl:text>, </xsl:text>
     </xsl:if>
-    
+
     <span class="keyword">
       <xsl:text>new()</xsl:text>
     </span>
@@ -703,6 +703,7 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- attribute support -->
 
   <xsl:template match="attribute" mode="syntax-cs">
     <!-- skip certain attributes -->
@@ -724,7 +725,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="*" mode="syntax-cs-literal">
+  <xsl:template match="argument" mode="syntax-cs-literal">
     <xsl:if test="position() > 1">
       <xsl:text>, </xsl:text>
     </xsl:if>
@@ -733,13 +734,16 @@
       <xsl:apply-templates select="ld:key('aid', current()/@member)" mode="syntax-cs-naming"/>
       <xsl:text> = </xsl:text>
     </xsl:if>
-    <xsl:choose>
+    <xsl:apply-templates select="*" mode="syntax-cs-literal"/>
+    <!--<xsl:choose>
       <xsl:when test="array">
         <span class="keyword">
           <xsl:text>new </xsl:text>
         </span>
         <xsl:apply-templates select="array/@type" mode="syntax-cs-naming"/>
-        <!--<xsl:value-of select="/bundle/assembly/namespace//*[@assetId = current()/array/@type]/@name"/>-->
+        -->
+    <!--<xsl:value-of select="/bundle/assembly/namespace//*[@assetId = current()/array/@type]/@name"/>-->
+    <!--
         <xsl:text>[] {</xsl:text>
         <xsl:apply-templates select="array/element" mode="syntax-cs-literal"/>
         <xsl:text>}</xsl:text>
@@ -782,9 +786,153 @@
       <xsl:otherwise>
         <xsl:value-of select="@value"/>
       </xsl:otherwise>
-    </xsl:choose>
+    </xsl:choose>-->
 
   </xsl:template>
+
+
+
+  <!-- literal strings -->
+
+  <xsl:template match="constant[ld:asset(@type) = 'T:System.String' and @value]" mode="syntax-cs-literal">
+    <xsl:text>"</xsl:text>
+    <xsl:value-of select="@value"/>
+    <xsl:text>"</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="constant[ld:asset(@type) = 'T:System.String']" mode="syntax-cs-literal">
+    <xsl:text>"</xsl:text>
+    <xsl:apply-templates select="*|text()" mode ="syntax-cs-literal-string"/>
+    <xsl:text>"</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="char[@value = '0']" mode="syntax-cs-literal-string">
+    <xsl:text>\0</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="char" mode="syntax-cs-literal-string">
+    <xsl:text>\u</xsl:text>
+    <xsl:variable name="hex">
+      <xsl:call-template name="convert-decimal-to-hex">
+        <xsl:with-param name="num" select="@value"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="substring(concat('0000', @value), string-length($hex) + 1)"/>
+  </xsl:template>
+
+  <!-- TODO figure out how to deal with tab, newlines, and other entities -->
+  <xsl:template match="text()" mode="syntax-cs-literal-string">
+    <xsl:value-of select="."/>
+  </xsl:template>
+
+  <xsl:template name="convert-decimal-to-hex">
+    <xsl:param name="num" />
+    <xsl:if test="$num > 0">
+      <xsl:call-template name="convert-decimal-to-hex">
+        <xsl:with-param name="num" select="floor($num div 16)" />
+      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="$num mod 16 &lt; 10">
+          <xsl:value-of select="$num mod 16" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$num mod 16 = 10">A</xsl:when>
+            <xsl:when test="$num mod 16 = 11">B</xsl:when>
+            <xsl:when test="$num mod 16 = 12">C</xsl:when>
+            <xsl:when test="$num mod 16 = 13">D</xsl:when>
+            <xsl:when test="$num mod 16 = 14">E</xsl:when>
+            <xsl:when test="$num mod 16 = 15">F</xsl:when>
+            <xsl:otherwise>A</xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- //literal strings -->
+
+  <!-- literal boolean -->
+
+  <xsl:template match="constant[ld:asset(@type) = 'T:System.Boolean' and @value]" mode="syntax-cs-literal">
+    <span class="keyword">
+      <xsl:text>true</xsl:text>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="constant[ld:asset(@type) = 'T:System.Boolean']" mode="syntax-cs-literal">
+    <span class="keyword">
+      <xsl:text>false</xsl:text>
+    </span>
+  </xsl:template>
+
+  <!-- //literal boolean -->
+
+  <!-- literal char -->
+  
+  <!-- TODO this isn't really good enough for null chars etc-->
+  <xsl:template match="constant[ld:asset(@type) = 'T:System.Char']" mode="syntax-cs-literal">
+    <xsl:text>'</xsl:text>
+    <xsl:value-of select="@value"/>
+    <xsl:text>'</xsl:text>
+  </xsl:template>
+  
+  <!-- //literal char-->
+
+
+  <!-- literal decimal -->
+  
+  <xsl:template match="constant[ld:asset(@type) = 'T:System.Decimal']" mode="syntax-cs-literal">
+    <xsl:value-of select="@value"/>
+    <xsl:text>m</xsl:text>
+  </xsl:template>
+  
+  <!-- //literal decimal-->
+
+  <!-- literal numbers -->
+
+  <!-- TODO expand this for byte,sbyte,short,ushort,int,uint,long,ulong-->
+  <xsl:template match="constant" mode="syntax-cs-literal">
+    <xsl:value-of select="@value"/>
+  </xsl:template>
+
+  <!-- //literal numbers-->
+  
+  <!-- literal type -->
+  
+  <xsl:template match="typeRef" mode="syntax-cs-literal">
+    <span class="keyword">
+      <xsl:text>typeof</xsl:text>
+    </span>
+    <xsl:text>(</xsl:text>
+    <xsl:apply-templates select="@type | arrayOf" mode="syntax-cs-naming"/>
+    <xsl:text>)</xsl:text>
+  </xsl:template>
+  
+  <!-- //literal type-->
+
+  <!-- literal type -->
+
+  <xsl:template match="arrayOf" mode="syntax-cs-literal">
+    <span class="keyword">
+      <xsl:text>new</xsl:text>
+    </span>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="@type | arrayOf" mode="syntax-cs-naming"/>
+    <xsl:text>[] { </xsl:text>
+    <xsl:apply-templates select="element" mode="syntax-cs-literal"/>
+    <xsl:text> }</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="element" mode="syntax-cs-literal">
+    <xsl:if test="position() &gt; 1">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="*" mode="syntax-cs-literal"/>
+  </xsl:template>
+
+  <!-- //literal type-->
+
 
   <xsl:template match="flag" mode="syntax-cs-literal">
     <xsl:if test="position() > 1">
