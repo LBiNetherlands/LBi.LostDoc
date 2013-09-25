@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -92,7 +93,7 @@ namespace LBi.LostDoc.Test
         [Fact]
         public void NestedClosedGenericType()
         {
-            string aid = Naming.GetAssetId(typeof(GenericClass<string>.NestedGeneric<int>));
+            string aid = Naming.GetAssetId(typeof(GenericClass<string>.NestedGeneric<Uri>));
             Assert.Equal("T:Company.Project.Library.GenericClass`1.NestedGeneric`1", aid);
         }
 
@@ -102,11 +103,11 @@ namespace LBi.LostDoc.Test
         {
             string aid =
                 Naming.GetAssetId(
-                                  typeof(GenericClass<string>.NestedGeneric<int>).GetMethods().First(
+                                  typeof(GenericClass<string>.NestedGeneric<Uri>).GetMethods().First(
                                                                                                      m =>
                                                                                                      m.Name.StartsWith
                                                                                                          ("ConsumeP")));
-            Assert.Equal("M:Company.Project.Library.GenericClass`1.NestedGeneric`1.ConsumeP(System.Int32)", aid);
+            Assert.Equal("M:Company.Project.Library.GenericClass`1.NestedGeneric`1.ConsumeP(System.Uri)", aid);
         }
 
 

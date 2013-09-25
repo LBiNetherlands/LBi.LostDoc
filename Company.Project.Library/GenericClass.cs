@@ -111,7 +111,7 @@ namespace Company.Project.Library
         /// <typeparam name="M">The generic</typeparam>
         /// <param name="n">The param</param>
         /// <returns></returns>
-        public Boolean TryRefMethodGeneric<M>(ref NestedGeneric<M> n) { return false; }
+        public Boolean TryRefMethodGeneric<M>(ref NestedGeneric<M> n) where M: Uri { return false; }
 
 
 
@@ -142,7 +142,7 @@ namespace Company.Project.Library
 
         #region Nested type: NestedGeneric
 
-        public class NestedGeneric<P>
+        public class NestedGeneric<P> where P: Uri
         {
             public void ConsumeP(P input)
             {
