@@ -156,7 +156,7 @@ namespace LBi.LostDoc.Enrichers
                 XElement constElement = new XElement("constant",
                                                      new XAttribute("type", AssetIdentifier.FromType(cta.ArgumentType)));
 
-                if (cta.ArgumentType == typeof(string) && this.ContainsInvalidXmlCharacters((string)cta.Value))
+                if (cta.ArgumentType == typeof(string) && InvalidCharacters.IsMatch((string)cta.Value))
                 {
                     string rawValue = (string)cta.Value;
                     var matches = InvalidCharacters.Matches(rawValue);
@@ -184,11 +184,6 @@ namespace LBi.LostDoc.Enrichers
 
                 context.Element.Add(constElement);
             }
-        }
-
-        protected virtual bool ContainsInvalidXmlCharacters(string value)
-        {
-            return InvalidCharacters.IsMatch(value);
         }
 
         protected virtual void GenerateArrayLiteral(IProcessingContext context, Type elementType, IEnumerable<CustomAttributeTypedArgument> arrayValues)
