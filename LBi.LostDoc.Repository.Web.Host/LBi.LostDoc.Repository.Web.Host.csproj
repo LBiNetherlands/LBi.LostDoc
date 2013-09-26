@@ -315,6 +315,11 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LBi.LostDoc.AddIns\LBi.LostDoc.AddIns.csproj">
+      <Project>{86f2b577-7ad3-4f25-99d2-ed63b3e56a74}</Project>
+      <Name>LBi.LostDoc.AddIns</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj">
       <Project>{32e920e1-127c-45bd-815f-c5bf8779b621}</Project>
       <Name>LBi.LostDoc.Packaging</Name>
