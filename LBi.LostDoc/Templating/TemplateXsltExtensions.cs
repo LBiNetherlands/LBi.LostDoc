@@ -201,6 +201,11 @@ namespace LBi.LostDoc.Templating
             return ret;
         }
 
+        public string replace(string str, string target, string replacement)
+        {
+            return str.Replace(target, replacement);
+        }
+
         // ReSharper restore InconsistentNaming
         #endregion
     }

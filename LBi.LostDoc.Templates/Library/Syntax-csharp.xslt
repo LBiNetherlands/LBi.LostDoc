@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012 LBi Netherlands B.V.
+  Copyright 2012-2013 LBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -197,7 +197,7 @@
         </xsl:when>
         <xsl:when test="ld:asset(@underlyingType) = 'T:System.Byte'">
           <span class="keyword">
-            <xsl:text>bbyte</xsl:text>
+            <xsl:text>byte</xsl:text>
           </span>
         </xsl:when>
         <xsl:when test="ld:asset(@underlyingType) = 'T:System.UInt16'">
@@ -735,59 +735,6 @@
       <xsl:text> = </xsl:text>
     </xsl:if>
     <xsl:apply-templates select="*" mode="syntax-cs-literal"/>
-    <!--<xsl:choose>
-      <xsl:when test="array">
-        <span class="keyword">
-          <xsl:text>new </xsl:text>
-        </span>
-        <xsl:apply-templates select="array/@type" mode="syntax-cs-naming"/>
-        -->
-    <!--<xsl:value-of select="/bundle/assembly/namespace//*[@assetId = current()/array/@type]/@name"/>-->
-    <!--
-        <xsl:text>[] {</xsl:text>
-        <xsl:apply-templates select="array/element" mode="syntax-cs-literal"/>
-        <xsl:text>}</xsl:text>
-      </xsl:when>
-      <xsl:when test="enum/flag">
-        <xsl:apply-templates select="enum/flag" mode="syntax-cs-literal"/>
-      </xsl:when>
-      <xsl:when test="ld:asset(@type) = 'T:System.Type'">
-        <span class="keyword">
-          <xsl:text>typeof</xsl:text>
-        </span>
-        <xsl:text>(</xsl:text>
-        <xsl:apply-templates select="@value" mode="syntax-cs-naming"/>
-        <xsl:text>)</xsl:text>
-      </xsl:when>
-      <xsl:when test="ld:asset(@type) = 'T:System.String'">
-        <xsl:text>"</xsl:text>
-        <xsl:value-of select="@value"/>
-        <xsl:text>"</xsl:text>
-      </xsl:when>
-      <xsl:when test="ld:asset(@type) = 'T:System.Char'">
-        <xsl:text>'</xsl:text>
-        <xsl:value-of select="@value"/>
-        <xsl:text>'</xsl:text>
-      </xsl:when>
-      <xsl:when test="ld:asset(@type) = 'T:System.Decimal'">
-        <xsl:value-of select="@value"/>
-        <xsl:text>m</xsl:text>
-      </xsl:when>
-      <xsl:when test="ld:asset(@type) = 'T:System.Boolean' and @value = 'True'">
-        <span class="keyword">
-          <xsl:text>true</xsl:text>
-        </span>
-      </xsl:when>
-      <xsl:when test="ld:asset(@type) = 'T:System.Boolean' and @value = 'False'">
-        <span class="keyword">
-          <xsl:text>false</xsl:text>
-        </span>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="@value"/>
-      </xsl:otherwise>
-    </xsl:choose>-->
-
   </xsl:template>
 
 
@@ -796,13 +743,13 @@
 
   <xsl:template match="constant[ld:asset(@type) = 'T:System.String' and @value]" mode="syntax-cs-literal">
     <xsl:text>"</xsl:text>
-    <xsl:value-of select="@value"/>
+    <xsl:value-of select="ld:replace(ld:replace(ld:replace(@value, '&#x9;', '\t'), '&#xA;', '\n'), '&#xD;', '\r')"/>
     <xsl:text>"</xsl:text>
   </xsl:template>
 
-  <xsl:template match="constant[ld:asset(@type) = 'T:System.String']" mode="syntax-cs-literal">
+  <xsl:template match="constant[ld:asset(@type) = 'T:System.String' and not(@value)]" mode="syntax-cs-literal">
     <xsl:text>"</xsl:text>
-    <xsl:apply-templates select="*|text()" mode ="syntax-cs-literal-string"/>
+    <xsl:apply-templates select="*|text()" mode="syntax-cs-literal-string"/>
     <xsl:text>"</xsl:text>
   </xsl:template>
 
@@ -822,7 +769,7 @@
 
   <!-- TODO figure out how to deal with tab, newlines, and other entities -->
   <xsl:template match="text()" mode="syntax-cs-literal-string">
-    <xsl:value-of select="."/>
+    <xsl:value-of select="ld:replace(ld:replace(ld:replace(., '&#x9;', '\t'), '&#xA;', '\n'), '&#xD;', '\r')"/>
   </xsl:template>
 
   <xsl:template name="convert-decimal-to-hex">
@@ -934,12 +881,12 @@
   <!-- //literal type-->
 
 
-  <xsl:template match="flag" mode="syntax-cs-literal">
+  <!--<xsl:template match="flag" mode="syntax-cs-literal">
     <xsl:if test="position() > 1">
       <xsl:text> | </xsl:text>
     </xsl:if>
     <xsl:value-of select="ld:key('aid', current()/ancestor::argument/@type)/@name"/>
     <xsl:text>.</xsl:text>
     <xsl:value-of select="@value"/>
-  </xsl:template>
+  </xsl:template>-->
 </xsl:stylesheet>
