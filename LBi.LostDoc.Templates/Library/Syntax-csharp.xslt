@@ -779,19 +779,14 @@
         <xsl:with-param name="num" select="floor($num div 16)" />
       </xsl:call-template>
       <xsl:choose>
-        <xsl:when test="$num mod 16 &lt; 10">
-          <xsl:value-of select="$num mod 16" />
-        </xsl:when>
+        <xsl:when test="$num mod 16 = 10">A</xsl:when>
+        <xsl:when test="$num mod 16 = 11">B</xsl:when>
+        <xsl:when test="$num mod 16 = 12">C</xsl:when>
+        <xsl:when test="$num mod 16 = 13">D</xsl:when>
+        <xsl:when test="$num mod 16 = 14">E</xsl:when>
+        <xsl:when test="$num mod 16 = 15">F</xsl:when>
         <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="$num mod 16 = 10">A</xsl:when>
-            <xsl:when test="$num mod 16 = 11">B</xsl:when>
-            <xsl:when test="$num mod 16 = 12">C</xsl:when>
-            <xsl:when test="$num mod 16 = 13">D</xsl:when>
-            <xsl:when test="$num mod 16 = 14">E</xsl:when>
-            <xsl:when test="$num mod 16 = 15">F</xsl:when>
-            <xsl:otherwise>A</xsl:otherwise>
-          </xsl:choose>
+          <xsl:value-of select="$num mod 16" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
