@@ -218,7 +218,9 @@
       </xsl:when>
       <xsl:when test="@type">
         <a href="{ld:resolve(@type)}">
-          <xsl:apply-templates select="@type" mode="displayText"/>
+          <xsl:apply-templates select="@type" mode="displayText">
+            <xsl:with-param name="attributes" select="attribute" />
+          </xsl:apply-templates>
         </a>
       </xsl:when>
       <xsl:when test="arrayOf">

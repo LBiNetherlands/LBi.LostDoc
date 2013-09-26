@@ -76,6 +76,22 @@ namespace Company.Project.Library
         }
 
         /// <summary>
+        /// Dynamic everywhere!
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public dynamic WithDynamic(dynamic x)
+        {
+            return x;
+        }
+
+        /// <summary>
+        ///  Gets or sets the dynamic property.
+        /// </summary>
+        public dynamic DynamicProperty { get; set; }
+       
+
+        /// <summary>
         ///   Gets or sets the string property.
         /// </summary>
         /// <returns>The string</returns>

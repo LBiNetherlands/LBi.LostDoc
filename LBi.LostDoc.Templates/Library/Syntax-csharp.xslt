@@ -33,10 +33,17 @@
 
   <xsl:template match="class | interface | struct" mode="syntax-cs-naming">
     <xsl:param name="typeargs" select="false()"/>
+    <xsl:param name="attributes" select="false()"/>
+
     <xsl:if test="position() > 1">
       <xsl:text>, </xsl:text>
     </xsl:if>
     <xsl:choose>
+      <xsl:when test="ld:asset(@assetId) = 'T:System.Object' and $attributes and $attributes[ld:asset(@type) = 'T:System.Runtime.CompilerServices.DynamicAttribute']">
+        <span class="keyword">
+          <xsl:text>dynamic</xsl:text>
+        </span>
+      </xsl:when>
       <xsl:when test="ld:asset(@assetId) = 'T:System.Object'">
         <span class="keyword">
           <xsl:text>object</xsl:text>
@@ -126,6 +133,7 @@
   </xsl:template>
 
   <xsl:template match="@*" mode="syntax-cs-naming">
+    <xsl:param name="attributes" select="false()"/>
     <xsl:choose>
       <xsl:when test="name() = 'param'">
         <xsl:value-of select="."/>
@@ -139,8 +147,9 @@
             <xsl:text>&gt;</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <!--<xsl:apply-templates select="//*[@assetId = current()]" mode="syntax-cs-naming"/>-->
-            <xsl:apply-templates select="ld:key('aid', current())" mode="syntax-cs-naming"/>
+            <xsl:apply-templates select="ld:key('aid', current())" mode="syntax-cs-naming">
+              <xsl:with-param name="attributes" select="$attributes" />
+            </xsl:apply-templates>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
@@ -400,8 +409,15 @@
       <xsl:apply-templates select="attribute" mode="syntax-cs"/>
     </xsl:if>
     <span class="line">
+      <xsl:apply-templates select="returns/attribute" mode="syntax-cs">
+        <xsl:with-param name="prefix" select="'return'"/>
+      </xsl:apply-templates>
+
       <xsl:apply-templates select="." mode="syntax-cs-access"/>
-      <xsl:apply-templates select="returns/@type | returns/@param | returns/arrayOf" mode="syntax-cs-naming"/>
+
+      <xsl:apply-templates select="returns/@type | returns/@param | returns/arrayOf" mode="syntax-cs-naming">
+        <xsl:with-param name="attributes" select="returns/attribute"/>
+      </xsl:apply-templates>
 
       <xsl:choose>
         <xsl:when test="@name = 'op_Implicit'">
@@ -553,11 +569,16 @@
     <xsl:if test="attribute">
       <xsl:apply-templates select="attribute" mode="syntax-cs"/>
     </xsl:if>
+    <xsl:apply-templates select="returns/attribute" mode="syntax-cs">
+      <xsl:with-param name="prefix" select="'return'"/>
+    </xsl:apply-templates>
     <span class="line">
       <xsl:apply-templates select="." mode="syntax-cs-access"/>
       <xsl:choose>
         <xsl:when test="returns">
-          <xsl:apply-templates select="returns/@type | returns/@param" mode="syntax-cs-naming"/>
+          <xsl:apply-templates select="returns/@type | returns/@param" mode="syntax-cs-naming">
+            <xsl:with-param name="attributes" select="returns/attribute"/>
+          </xsl:apply-templates>
         </xsl:when>
         <xsl:otherwise>
           <span class="keyword">void</span>
@@ -614,7 +635,9 @@
     </xsl:if>
     <span class="line">
       <xsl:apply-templates select="." mode="syntax-cs-access"/>
-      <xsl:apply-templates select="@type | @param" mode="syntax-cs-naming"/>
+      <xsl:apply-templates select="@type | @param" mode="syntax-cs-naming">
+        <xsl:with-param name="attributes" select="attribute" />
+      </xsl:apply-templates>
       <xsl:text> </xsl:text>
       <xsl:choose>
         <xsl:when test="../attribute[ld:asset(@type) = 'T:System.Reflection.DefaultMemberAttribute']/argument/@value = @name">
@@ -663,7 +686,7 @@
   <xsl:template match="param" mode="syntax-cs-naming">
     <span class="line indent">
       <xsl:if test="attribute">
-        <xsl:apply-templates select="attribute"/>
+        <xsl:apply-templates select="attribute" mode="syntax-cs"/>
       </xsl:if>
       <xsl:if test="@isOut">
         <span class="keyword">out </span>
@@ -674,7 +697,9 @@
       <xsl:if test="position() = 1 and parent::method/attribute and ld:asset(parent::method/attribute/@type) = 'T:System.Runtime.CompilerServices.ExtensionAttribute'">
         <span class="keyword">this </span>
       </xsl:if>
-      <xsl:apply-templates select="@type | @param | arrayOf" mode="syntax-cs-naming"/>
+      <xsl:apply-templates select="@type | @param | arrayOf" mode="syntax-cs-naming">
+        <xsl:with-param name="attributes" select="attribute" />
+      </xsl:apply-templates>
       <xsl:text> </xsl:text>
       <xsl:value-of select="@name"/>
       <xsl:if test="position() != last()">
@@ -706,22 +731,33 @@
   <!-- attribute support -->
 
   <xsl:template match="attribute" mode="syntax-cs">
-    <!-- skip certain attributes -->
-    <xsl:if test="ld:asset(@type) != 'T:System.Reflection.DefaultMemberAttribute' and ld:asset(@type) != 'T:System.Runtime.CompilerServices.ExtensionAttribute'">
-      <span class="line">
-        <xsl:text>[</xsl:text>
-        <xsl:variable name="name" select="/bundle/assembly/namespace//class[constructor/@assetId = current()/@constructor]/@name"/>
-        <xsl:value-of select="ld:substringBeforeLast($name, 'Attribute')"/>
-        <xsl:if test="not(contains($name, 'Attribute'))">
-          <xsl:value-of select="$name"/>
-        </xsl:if>
-        <xsl:if test="argument">
-          <xsl:text>(</xsl:text>
-          <xsl:apply-templates select="argument" mode="syntax-cs-literal"/>
-          <xsl:text>)</xsl:text>
-        </xsl:if>
-        <xsl:text>]</xsl:text>
-      </span>
+    <xsl:param name="prefix" select="''"/>
+    
+    <!-- skip the DynamicAttribute -->
+    <xsl:if test="ld:asset(@type) != 'T:System.Runtime.CompilerServices.DynamicAttribute'">  
+      <!-- skip certain attributes -->
+      <xsl:if test="ld:asset(@type) != 'T:System.Reflection.DefaultMemberAttribute' and ld:asset(@type) != 'T:System.Runtime.CompilerServices.ExtensionAttribute'">
+        <span class="line">
+          <xsl:text>[</xsl:text>
+          <xsl:if test="$prefix">
+            <span class="keyword">
+              <xsl:value-of select="$prefix"/>
+            </span>
+            <xsl:text>: </xsl:text>
+          </xsl:if>
+          <xsl:variable name="name" select="/bundle/assembly/namespace//class[constructor/@assetId = current()/@constructor]/@name"/>
+          <xsl:value-of select="ld:substringBeforeLast($name, 'Attribute')"/>
+          <xsl:if test="not(contains($name, 'Attribute'))">
+            <xsl:value-of select="$name"/>
+          </xsl:if>
+          <xsl:if test="argument">
+            <xsl:text>(</xsl:text>
+            <xsl:apply-templates select="argument" mode="syntax-cs-literal"/>
+            <xsl:text>)</xsl:text>
+          </xsl:if>
+          <xsl:text>]</xsl:text>
+        </span>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
@@ -811,24 +847,24 @@
   <!-- //literal boolean -->
 
   <!-- literal char -->
-  
+
   <!-- TODO this isn't really good enough for null chars etc-->
   <xsl:template match="constant[ld:asset(@type) = 'T:System.Char']" mode="syntax-cs-literal">
     <xsl:text>'</xsl:text>
     <xsl:value-of select="@value"/>
     <xsl:text>'</xsl:text>
   </xsl:template>
-  
+
   <!-- //literal char-->
 
 
   <!-- literal decimal -->
-  
+
   <xsl:template match="constant[ld:asset(@type) = 'T:System.Decimal']" mode="syntax-cs-literal">
     <xsl:value-of select="@value"/>
     <xsl:text>m</xsl:text>
   </xsl:template>
-  
+
   <!-- //literal decimal-->
 
   <!-- literal numbers -->
@@ -839,9 +875,9 @@
   </xsl:template>
 
   <!-- //literal numbers-->
-  
+
   <!-- literal type -->
-  
+
   <xsl:template match="typeRef" mode="syntax-cs-literal">
     <span class="keyword">
       <xsl:text>typeof</xsl:text>
@@ -850,7 +886,7 @@
     <xsl:apply-templates select="@type | arrayOf" mode="syntax-cs-naming"/>
     <xsl:text>)</xsl:text>
   </xsl:template>
-  
+
   <!-- //literal type-->
 
   <!-- literal type -->
