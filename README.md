@@ -27,7 +27,7 @@ lostdoc.exe Template -Path .\tmp -Template Library -Verbose -Force -Output .\out
 
 Known issues
 ------------
-There is currently no support for async/await and dynamic.
+There is currently no support for async/await an co/contravariance in the XSLTs.
 See todo.txt for more details and information.
 
 Contribute
