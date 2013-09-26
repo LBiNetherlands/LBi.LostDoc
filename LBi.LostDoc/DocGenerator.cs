@@ -367,8 +367,10 @@ namespace LBi.LostDoc
 
         public static void GenerateTypeRef(IProcessingContext context, Type pType, string attrName = null)
         {
+            // TODO rethink how we generate the typerefs, probably ensure we always output a root element rather than just the attribute for param/type
             if (pType.IsArray)
             {
+                // TODO arrayOf is the only capitalized element
                 var arrayElem = new XElement("arrayOf", new XAttribute("rank", pType.GetArrayRank()));
                 context.Element.Add(arrayElem);
                 GenerateTypeRef(context.Clone(arrayElem), pType.GetElementType());
