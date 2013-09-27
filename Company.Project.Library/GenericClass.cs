@@ -97,6 +97,26 @@ namespace Company.Project.Library
         }
 
         /// <summary>
+        /// Doc comment for ConsumesArrayOfTypeParam
+        /// </summary>
+        /// <param name="arr1">p1</param>
+        /// <param name="arr2">p2</param>
+        /// <typeparam name="Q"></typeparam>
+        public void ConsumesArrayOfTypeParam<Q>(T[] arr1, Q[] arr2)
+        {
+        }
+
+        /// <summary>
+        /// Doc comment for ConsumesArrayOfTypeParam with rank 2 and 3
+        /// </summary>
+        /// <param name="arr1">p1</param>
+        /// <param name="arr2">p2</param>
+        /// <typeparam name="Q"></typeparam>
+        public void ConsumesArraysOfTypeParamWithRankGreatherThan1<Q>(T[,] arr1, Q[,,] arr2)
+        {
+        }
+
+        /// <summary>
         /// Method with ref parameter.
         /// </summary>
         /// <param name="str"></param>

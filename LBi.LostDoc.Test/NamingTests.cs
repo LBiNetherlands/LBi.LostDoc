@@ -50,6 +50,20 @@ namespace LBi.LostDoc.Test
         }
 
 
+        [Fact]
+        public void GenericMethodOnGenericClass_WithGenericArrayParameters()
+        {
+            Assert.Equal("M:Company.Project.Library.GenericClass`1.ConsumesArrayOfTypeParam``1(`0[],``0[])",
+                         Naming.GetAssetId(typeof(GenericClass<>).GetMethod("ConsumesArrayOfTypeParam")));
+        }
+
+        [Fact]
+        public void GenericMethodOnGenericClass_WithGenericArrayParametersWithRankGreaterThanOne()
+        {
+            Assert.Equal("M:Company.Project.Library.GenericClass`1.ConsumesArraysOfTypeParamWithRankGreatherThan1``1(`0[0:,0:],``0[0:,0:,0:])",
+                         Naming.GetAssetId(typeof(GenericClass<>).GetMethod("ConsumesArraysOfTypeParamWithRankGreatherThan1")));
+        }
+
         [Fact(Skip = "Generic params no longer supported in Naming")]
         public void OverriddenGenericMethod__WithGenericParameter()
         {

@@ -138,7 +138,7 @@ namespace LBi.LostDoc
         {
             StringBuilder ret = new StringBuilder();
 
-            if (!type.IsGenericParameter)
+            if (!type.IsGenericParameter && (!type.IsArray || !type.GetElementType().IsGenericParameter))
             {
                 if (type.IsNested)
                 {
@@ -160,16 +160,34 @@ namespace LBi.LostDoc
                 else
                     ret.Append(type.Name);
             }
-            else if (type.IsGenericParameter)
+            else if (type.IsGenericParameter || type.IsArray && type.GetElementType().IsGenericParameter)
             {
+                Type realType = type.IsArray ? type.GetElementType() : type;
                 int ix = -1;
-                if (type.DeclaringMethod != null)
-                    ix = Array.IndexOf(type.DeclaringMethod.GetGenericArguments(), type);
+                if (realType.DeclaringMethod != null)
+                    ix = Array.IndexOf(realType.DeclaringMethod.GetGenericArguments(), realType);
 
                 if (ix >= 0)
                     ret.Append("``").Append(ix);
                 else
-                    ret.Append('`').Append(Array.IndexOf(type.DeclaringType.GetGenericArguments(), type));
+                    ret.Append('`').Append(Array.IndexOf(realType.DeclaringType.GetGenericArguments(), realType));
+
+                if (type.IsArray)
+                {
+                    ret.Append('[');
+                    if (type.GetArrayRank() > 1)
+                    {
+                        for (int rank = 1; rank <= type.GetArrayRank(); rank++)
+                        {
+                            if (rank > 1)
+                                ret.Append(',');
+
+                            // TODO figure out if we can actually get a lower bound and size for the array
+                            ret.Append("0:");
+                        }
+                    }
+                    ret.Append(']');
+                }
             }
             else
                 ret.Append(type.Name);
