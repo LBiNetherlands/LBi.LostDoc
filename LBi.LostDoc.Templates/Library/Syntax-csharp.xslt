@@ -284,9 +284,8 @@
   <!-- generic type parameter constraints -->
 
   <xsl:template match="typeparam" mode="syntax-cs-generic-constraints">
-    <xsl:variable name="constraints">
-      <xsl:apply-templates select="constraint[not(@type) or ld:asset(@type) != 'T:System.ValueType']|@isValueType|@isReferenceType|@hasDefaultConstructor[not(../@isValueType)]" mode="syntax-cs-generic-constraint-spec"/>
-    </xsl:variable>
+    <xsl:variable name="constraints" select="constraint[not(@type) or ld:asset(@type) != 'T:System.ValueType']|@isValueType|@isReferenceType|@hasDefaultConstructor[not(../@isValueType)]" />
+    
     <xsl:if test="$constraints">
       <span class="line">
         <span class="keyword">
@@ -294,7 +293,7 @@
         </span>
         <xsl:value-of select="@name"/>
         <xsl:text> : </xsl:text>
-        <xsl:value-of select="$constraints"/>
+        <xsl:apply-templates select="$constraints" mode="syntax-cs-generic-constraint-spec"/>
       </span>
     </xsl:if>
   </xsl:template>
