@@ -40,7 +40,12 @@ namespace LBi.LostDoc
             }
 
             if (type.IsGenericType)
-                return string.Format("{0}.{1}", type.Namespace, type.Name);
+            {
+                if (type.Namespace != null)
+                    return string.Format("{0}.{1}", type.Namespace, type.Name);
+                
+                return type.Name;
+            }
 
             return type.FullName;
         }
