@@ -24,6 +24,8 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc hrc ld">
 
+  <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
+
   <xsl:param name="assetId"/>
 
   <xsl:include href="Layout.xslt"/>

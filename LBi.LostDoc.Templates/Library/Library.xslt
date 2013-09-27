@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012 LBi Netherlands B.V.
+  Copyright 2012-2013 LBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
                 xmlns:hrc="urn:lostdoc-core:inheritance-hierarchy"
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc hrc ld">
+
+  <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
 
   <xsl:include href="Layout.xslt"/>
   <xsl:include href="Naming.xslt"/>

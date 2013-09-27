@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using System.Xml.Xsl;
 using LBi.LostDoc.Diagnostics;
 
@@ -61,12 +61,7 @@ namespace LBi.LostDoc.Templating
                 argList.AddExtensionObject(Namespaces.TemplateExtensions, new TemplateXsltExtensions(context, newUri));
 
                 using (Stream stream = context.TemplateData.OutputFileProvider.OpenFile(this.SaveAs, mode))
-                using (XmlWriter xmlWriter = XmlWriter.Create(stream,
-                                                              new XmlWriterSettings
-                                                              {
-                                                                  CloseOutput = true,
-                                                                  Indent = true
-                                                              }))
+                using (TextWriter writer = new StreamWriter(stream, Encoding.UTF8))
                 {
                     if (exists)
                     {
@@ -85,12 +80,13 @@ namespace LBi.LostDoc.Templating
                     long tickStart = localTimer.ElapsedTicks;
                     this.Transform.Transform(context.Document,
                                              argList,
-                                             xmlWriter);
+                                             writer);
                     TraceSources.TemplateSource.TraceVerbose("Transform applied in: {0:N0} ms",
                                                              ((localTimer.ElapsedTicks - tickStart)/
                                                               (double) Stopwatch.Frequency)*1000);
 
-                    xmlWriter.Close();
+                    writer.Close();
+                    stream.Close();
                 }
             }
             else
