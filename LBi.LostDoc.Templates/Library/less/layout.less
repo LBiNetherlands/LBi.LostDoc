@@ -1,79 +1,103 @@
 html {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 body {
-    background-color: @white;
-    font-size: 13px;
-    font-family: 'Segoe UI', 'Lucida Grande',Verdana,Arial,Helvetica,sans-serif;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    //classes
-    &.resizing {
-        user-select: none;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
+  background-color: @white;
+  font-size: 13px;
+  font-family: 'Segoe UI', 'Lucida Grande',Verdana,Arial,Helvetica,sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  //classes
+  &.resizing {
+    user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    cursor: ew-resize;
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+
+    a:hover {
+      cursor: ew-resize;
+      cursor: grabbing;
+      cursor: -webkit-grabbing;
+    }
+  }
+
+  div#wrapper {
+    height: auto!important;
+    min-height: 100%;
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+  }
+
+  .left-col-outer {
+    float: left;
+    position: relative;
+
+    &:after {
+      content: '';
+      background: -moz-linear-gradient(left, @grey_dark 0%, rgba(0,0,0,0) 100%);
+      background: -webkit-gradient(linear, left top, right top, color-stop(0%,@grey_dark), color-stop(100%,rgba(0,0,0,0)));
+      background: -webkit-linear-gradient(left, @grey_dark 0%,rgba(0,0,0,0) 100%);
+      background: -o-linear-gradient(left, @grey_dark 0%,rgba(0,0,0,0) 100%);
+      background: -ms-linear-gradient(left, @grey_dark 0%,rgba(0,0,0,0) 100%);
+      background: linear-gradient(to right, @grey_dark 0%,rgba(0,0,0,0) 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#33000000', endColorstr='#00000000',GradientType=1 );
+      display: block;
+      height: 100%;
+      position: absolute;
+      right: -6px;
+      top: 0;
+      width: 6px;
     }
 
-    div#wrapper {
-        height: auto!important;
-        min-height: 100%;
-        margin: 0 auto;
-        width: 100%;
-        position: relative;
+    width: 20%;
+  }
+
+  .right-col-outer {
+    position: relative;
+    background-repeat: no-repeat;
+    background-size: 6px 100%;
+    float: right;
+    //mark: will be overrided by js;
+    width: 80%;
+    // end mark
+    .right-col-inner {
+      border-left: 1px solid @grey_dark;
+      padding-left: 20px;
+      padding-right: 20px;
+      overflow-y: scroll;
     }
+  }
 
-    .left-col-outer {
-        float: left;
-        position: relative;
+  .handle {
+    background: -moz-linear-gradient(left, @grey_dark 0%, rgba(0,0,0,0) 100%);
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,@grey_dark), color-stop(100%,rgba(0,0,0,0)));
+    background: -webkit-linear-gradient(left, @grey_dark 0%,rgba(0,0,0,0) 100%);
+    background: -o-linear-gradient(left, @grey_dark 0%,rgba(0,0,0,0) 100%);
+    background: -ms-linear-gradient(left, @grey_dark 0%,rgba(0,0,0,0) 100%);
+    background: linear-gradient(to right, @grey_dark 0%,rgba(0,0,0,0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#33000000', endColorstr='#00000000',GradientType=1 );
+    box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.5);
+    cursor: ew-resize;
+    cursor: grab;
+    cursor: -webkit-grab;
+    height: 40px;
+    position: absolute;
+    right: -3px;
+    top: 40%;
+    width: 9px;
+    z-index: 10000;
 
-        &:after {
-            content: '';
-            background: -webkit-gradient(linear, left top, right top, color-stop(0%,@grey_dark), color-stop(100%,rgba(0,0,0,0)));
-            display: block;
-            height: 100%;
-            position: absolute;
-            right: -6px;
-            top: 0;
-            width: 6px;
-        }
-
-        width: 20%;
+    &:active {
+      cursor: ew-resize;
+      cursor: grabbing;
+      cursor: -webkit-grabbing;
     }
-
-    .right-col-outer {
-        position: relative;
-        background-repeat: no-repeat;
-        background-size: 6px 100%;
-        float: right;
-        //mark: will be overrided by js;
-        width: 80%;
-        // end mark
-        .right-col-inner {
-            border-left: 1px solid @grey_dark;
-            padding-left: 20px;
-            padding-right: 20px;
-            overflow-y: scroll;
-        }
-    }
-
-    .handle {
-        background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0.2)), color-stop(100%,rgba(0,0,0,0)));
-        box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.5);
-        -webkit-box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.5);
-        cursor: grab;
-        cursor: -webkit-grab;
-        height: 40px;
-        position: absolute;
-        right: -3px;
-        top: 40%;
-        width: 9px;
-        z-index: 10000;
-
-        &:active {
-            cursor: grabbing;
-            cursor: -webkit-grabbing;
-        }
-    }
+  }
 }
