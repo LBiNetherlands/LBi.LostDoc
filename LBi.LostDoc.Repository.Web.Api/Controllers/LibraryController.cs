@@ -27,6 +27,7 @@ using LBi.LostDoc.Repository.Web.Models;
 namespace LBi.LostDoc.Repository.Web.Api.Controllers
 {
     [Export]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LibraryController : ApiController
     {
         [ImportingConstructor]
