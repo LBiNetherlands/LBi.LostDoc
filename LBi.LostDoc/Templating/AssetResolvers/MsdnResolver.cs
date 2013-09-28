@@ -57,7 +57,8 @@ namespace LBi.LostDoc.Templating.AssetResolvers
             }
 
             // filter out non-MS namespaces
-            string name = assetId.Substring(2);
+
+            string name = assetId.Substring(assetId.IndexOf(':') + 1);
             if (!name.StartsWith("System", StringComparison.OrdinalIgnoreCase) &&
                 !name.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase) &&
                 !name.StartsWith("Accessibility", StringComparison.OrdinalIgnoreCase))
