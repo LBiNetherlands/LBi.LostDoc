@@ -36,12 +36,6 @@ namespace LBi.LostDoc.ConsoleApplication
     [ParameterSet("Template", Command = "Template", HelpMessage = "Apply template to a set of ldoc files to generate output.")]
     public class TemplateCommand : Command
     {
-        [Parameter(HelpMessage = "Include errors and warning output only.")]
-        public LBi.Cli.Arguments.Switch Quiet { get; set; }
-
-        [Parameter(HelpMessage = "Include verbose output.")]
-        public LBi.Cli.Arguments.Switch Verbose { get; set; }
-
         [Parameter(HelpMessage = "Overwrites existing files.")]
         public LBi.Cli.Arguments.Switch Force { get; set; }
 
