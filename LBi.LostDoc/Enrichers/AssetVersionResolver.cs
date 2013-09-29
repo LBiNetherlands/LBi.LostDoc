@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,34 +81,23 @@ namespace LBi.LostDoc.Enrichers
 
         private Version GetNamespaceVersion(Assembly assembly, string ns)
         {
-            // FIX this could throw a TypeLoadException
-            var types = assembly.GetTypes();
-            Version version = null;
-            for (int typeNum = 0; typeNum < types.Length; typeNum++)
+            foreach (Assembly asm in this._context.AssemblyLoader.GetAssemblyChain(assembly))
             {
-                if (ns.Equals(types[typeNum].Namespace) ||
-                    (types[typeNum].Namespace != null &&
-                     types[typeNum].Namespace.StartsWith(ns) &&
-                     types[typeNum].Namespace[ns.Length] == '.'))
+                var types = asm.GetTypes();
+
+                for (int typeNum = 0; typeNum < types.Length; typeNum++)
                 {
-                    version = this._hintAssembly.GetName().Version;
-                    break;
+                    if (ns.Equals(types[typeNum].Namespace) ||
+                        (types[typeNum].Namespace != null &&
+                         types[typeNum].Namespace.StartsWith(ns) &&
+                         types[typeNum].Namespace[ns.Length] == '.'))
+                    {
+                        return assembly.GetName().Version;
+                    }
                 }
             }
 
-            if (version == null)
-            {
-                AssemblyName[] referencedAssemblies = this._hintAssembly.GetReferencedAssemblies();
-
-                for (int refNum = 0; refNum < referencedAssemblies.Length; refNum++)
-                {
-                    Assembly asm = this._context.AssetResolver.Context.Single(a => a.GetName().FullName.Equals(referencedAssemblies[refNum].FullName, StringComparison.Ordinal));
-                    version = this.GetNamespaceVersion(asm, ns);
-                    if (version != null)
-                        break;
-                }
-            }
-            return version;
+            throw new Exception("Could not find namespace '" + ns + "' in any loaded assembly");
         }
     }
 }
