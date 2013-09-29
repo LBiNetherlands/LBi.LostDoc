@@ -8,7 +8,7 @@
 $choices = @(
     (New-Object -TypeName PSObject @{
                                         C = "Extract other"; 
-                                        A = @("Extract -IncludeBclDocComments -Path ..\..\..\LBi.LostDoc.Repository.Web.Host\bin\System.Web.Mvc.dll -Output .\tmp\")
+                                        A = @((Get-ChildItem -Path ..\..\..\LBi.LostDoc.Repository.Web.Host\bin\System.Web.*.dll).FullName | %{ "Extract -IncludeBclDocComments -Path {0} -Output .\tmp\" -f $_ })
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Extract Company.Project.Library"; 
