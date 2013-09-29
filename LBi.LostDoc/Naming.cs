@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ namespace LBi.LostDoc
             {
                 if (type.Namespace != null)
                     return string.Format("{0}.{1}", type.Namespace, type.Name);
-                
+
                 return type.Name;
             }
 
@@ -138,9 +138,40 @@ namespace LBi.LostDoc
         {
             StringBuilder ret = new StringBuilder();
 
-            if (!type.IsGenericParameter && (!type.IsArray || !type.GetElementType().IsGenericParameter))
+            if (type.IsArray)
             {
-                if (type.IsNested)
+                Type elementType = type.GetElementType();
+
+                ret.Append(CreateParameterTypeSignature(declaringMember, elementType));
+
+                ret.Append('[');
+                if (type.GetArrayRank() > 1)
+                {
+                    for (int rank = 1; rank <= type.GetArrayRank(); rank++)
+                    {
+                        if (rank > 1)
+                            ret.Append(',');
+
+                        // TODO figure out if we can actually get a lower bound and size for the array
+                        ret.Append("0:");
+                    }
+                }
+                ret.Append(']');
+            }
+            else
+            {
+                if (type.IsGenericParameter)
+                {
+                    int ix = -1;
+                    if (type.DeclaringMethod != null)
+                        ix = Array.IndexOf(type.DeclaringMethod.GetGenericArguments(), type);
+
+                    if (ix >= 0)
+                        ret.Append("``").Append(ix);
+                    else
+                        ret.Append('`').Append(Array.IndexOf(type.DeclaringType.GetGenericArguments(), type));
+                }
+                else if (type.IsNested)
                 {
                     ret.Append(CreateParameterTypeSignature(declaringMember, type.DeclaringType))
                        .Append('.');
@@ -150,75 +181,42 @@ namespace LBi.LostDoc
                     ret.Append(type.Namespace)
                        .Append('.');
                 }
-            }
 
-            if (type.IsGenericType)
-            {
-                int pos = type.Name.LastIndexOf('`');
-                if (pos >= 0)
-                    ret.Append(type.Name.Substring(0, pos));
-                else
+                if (type.IsGenericType)
+                {
+                    int pos = type.Name.LastIndexOf('`');
+                    if (pos >= 0)
+                        ret.Append(type.Name.Substring(0, pos));
+                    else
+                        ret.Append(type.Name);
+
+                    Type[] genArgs = type.GetGenericArguments();
+
+                    if (type.IsNested)
+                    {
+                        HashSet<Type> genericArguments = new HashSet<Type>(genArgs);
+
+                        Type declaringType = type.DeclaringType;
+
+                        while (declaringType != null)
+                        {
+                            if (declaringType.IsGenericType)
+                            {
+                                foreach (var genArg in declaringType.GetGenericArguments())
+                                    genericArguments.Remove(genArg);
+                            }
+
+                            declaringType = declaringType.DeclaringType;
+                        }
+
+                        genArgs = genericArguments.ToArray();
+                    }
+                    ret.Append('{')
+                       .Append(CreateParameterSignature(declaringMember, genArgs, wrap: false))
+                       .Append('}');
+                }
+                else if (!type.IsGenericParameter)
                     ret.Append(type.Name);
-            }
-            else if (type.IsGenericParameter || type.IsArray && type.GetElementType().IsGenericParameter)
-            {
-                Type realType = type.IsArray ? type.GetElementType() : type;
-                int ix = -1;
-                if (realType.DeclaringMethod != null)
-                    ix = Array.IndexOf(realType.DeclaringMethod.GetGenericArguments(), realType);
-
-                if (ix >= 0)
-                    ret.Append("``").Append(ix);
-                else
-                    ret.Append('`').Append(Array.IndexOf(realType.DeclaringType.GetGenericArguments(), realType));
-
-                if (type.IsArray)
-                {
-                    ret.Append('[');
-                    if (type.GetArrayRank() > 1)
-                    {
-                        for (int rank = 1; rank <= type.GetArrayRank(); rank++)
-                        {
-                            if (rank > 1)
-                                ret.Append(',');
-
-                            // TODO figure out if we can actually get a lower bound and size for the array
-                            ret.Append("0:");
-                        }
-                    }
-                    ret.Append(']');
-                }
-            }
-            else
-                ret.Append(type.Name);
-
-
-            if (type.IsGenericType)
-            {
-                Type[] genArgs = type.GetGenericArguments();
-
-                if (type.IsNested)
-                {
-                    HashSet<Type> genericArguments = new HashSet<Type>(genArgs);
-
-                    Type declaringType = type.DeclaringType;
-
-                    while (declaringType != null)
-                    {
-                        if (declaringType.IsGenericType)
-                        {
-                            foreach (var genArg in declaringType.GetGenericArguments())
-                                genericArguments.Remove(genArg);
-                        }
-
-                        declaringType = declaringType.DeclaringType;
-                    }
-
-                    genArgs = genericArguments.ToArray();
-                }
-                ret.Append('{')
-                   .Append(CreateParameterSignature(declaringMember, genArgs, wrap: false))
-                   .Append('}');
             }
 
             return ret.ToString();
