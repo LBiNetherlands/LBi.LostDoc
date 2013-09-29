@@ -107,6 +107,8 @@ namespace LBi.LostDoc
 
         #endregion
 
+
+        // TODO this could probably be drastically simplified as we no longer care about the the component parts of an AssetIdentifier
         public static AssetIdentifier Parse(string assetId)
         {
             int startIndex = 0;
@@ -187,6 +189,11 @@ namespace LBi.LostDoc
                     endOfAsset = startIndex;
                     ParseSimple(assetId, ref endOfAsset);
                     startIndex = endOfAsset;
+                }
+
+                while (startIndex < assetId.Length && assetId[startIndex] == '[')
+                {
+                    startIndex = assetId.IndexOf(']', startIndex) + 1;
                 }
             }
 
