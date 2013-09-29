@@ -204,7 +204,7 @@ namespace LBi.LostDoc
                     type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
                                    BindingFlags.Instance);
 
-                return allFields.Single(f => Naming.GetAssetId(f).Equals(assetIdentifier.AssetId));
+                return allFields.SingleOrDefault(f => Naming.GetAssetId(f).Equals(assetIdentifier.AssetId));
             }
         }
 
