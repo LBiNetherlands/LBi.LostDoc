@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
 using LBi.LostDoc.MsdnContentService;
 
 namespace LBi.LostDoc.Templating.AssetResolvers
@@ -26,10 +25,10 @@ namespace LBi.LostDoc.Templating.AssetResolvers
     {
         private const string UrlFormat = "http://msdn2.microsoft.com/{0}/library/{1}";
 
-        private readonly ConcurrentDictionary<string, string> _cachedMsdnUrls = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<string, Uri> _cachedMsdnUrls = new ConcurrentDictionary<string, Uri>();
         private string _locale = "en-us";
-        private BasicHttpBinding _msdnBinding;
-        private EndpointAddress _msdnEndpoint;
+        private readonly BasicHttpBinding _msdnBinding;
+        private readonly EndpointAddress _msdnEndpoint;
 
         public MsdnResolver()
         {
@@ -47,14 +46,9 @@ namespace LBi.LostDoc.Templating.AssetResolvers
 
         public Uri ResolveAssetId(string assetId, Version version)
         {
-            string ret;
+            Uri ret;
             if (this._cachedMsdnUrls.TryGetValue(assetId, out ret))
-            {
-                if (ret != null)
-                    return new Uri(string.Format(UrlFormat, this._locale, ret));
-
-                return null;
-            }
+                return ret;
 
             // filter out non-MS namespaces
 
@@ -70,37 +64,54 @@ namespace LBi.LostDoc.Templating.AssetResolvers
             msdnRequest.contentIdentifier = "AssetId:" + assetId;
             msdnRequest.locale = this._locale;
 
-            string endpoint = null;
-
-            ContentServicePortTypeClient client = new ContentServicePortTypeClient(_msdnBinding, _msdnEndpoint);
-            try
+            int retries = 3;
+            do
             {
-                getContentResponse msdnResponse = client.GetContent(new appId {value = "LostDoc"}, msdnRequest);
-                endpoint = msdnResponse.contentId;
-            }
-            catch (FaultException<mtpsFaultDetailType>)
-            {
-            }
-            finally
-            {
+                ContentServicePortTypeClient client = new ContentServicePortTypeClient(_msdnBinding, _msdnEndpoint);
                 try
                 {
-                    client.Close();
+                    getContentResponse msdnResponse = client.GetContent(new appId { value = "LostDoc" }, msdnRequest);
+                    if (msdnResponse.contentId != null)
+                        ret = new Uri(string.Format(UrlFormat, this._locale, msdnResponse.contentId));
+
+                    break;
                 }
-                catch
+                catch (TimeoutException)
                 {
-                    client.Abort();
+                    // retry
                 }
-                
-                ((IDisposable)client).Dispose();
-            }
+                catch (FaultException<mtpsFaultDetailType> fe)
+                {
+                    // this is a fallback because MSDN doesn't have links for enumeration fields
+                    // so we assume that any unresolved field will be represented on it's parent type page
+                    if (assetId.StartsWith("F:"))
+                    {
+                        // TODO add logging for this
+                        string parentEnum = "T:" + assetId.Substring("F:".Length);
+                        parentEnum = parentEnum.Substring(0, parentEnum.LastIndexOf('.'));
+                        ret = this.ResolveAssetId(parentEnum, version);
+                    }
 
-            this._cachedMsdnUrls.TryAdd(assetId, endpoint);
+                    break;
+                }
+                finally
+                {
+                    try
+                    {
+                        client.Close();
+                    }
+                    catch
+                    {
+                        client.Abort();
+                    }
 
-            if (string.IsNullOrEmpty(endpoint))
-                return null;
-            
-            return new Uri(string.Format(UrlFormat, this._locale, endpoint));
+                    ((IDisposable)client).Dispose();
+                }
+            } while (--retries > 0);
+
+            this._cachedMsdnUrls.TryAdd(assetId, ret);
+
+            return ret;
         }
 
         #endregion
