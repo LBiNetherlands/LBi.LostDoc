@@ -517,7 +517,7 @@ namespace LBi.LostDoc
                 {
                     Type[] inheritedTypeParams = type.DeclaringType.GetGenericArguments();
 
-                    Debug.Assert(typeParams.Length > inheritedTypeParams.Length);
+                    Debug.Assert(typeParams.Length >= inheritedTypeParams.Length);
 
                     for (int paramPos = 0; paramPos < inheritedTypeParams.Length; paramPos++)
                     {
