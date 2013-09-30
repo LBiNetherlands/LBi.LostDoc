@@ -139,6 +139,7 @@ namespace LBi.LostDoc.Enrichers
 
         protected virtual void GenerateValueLiteral(IProcessingContext context, CustomAttributeTypedArgument cta)
         {
+            // TODO guard against cta.Value == null
             var arrayValues = cta.Value as IEnumerable<CustomAttributeTypedArgument>;
             if (arrayValues != null)
             {

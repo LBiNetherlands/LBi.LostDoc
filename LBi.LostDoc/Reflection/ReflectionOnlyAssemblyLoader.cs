@@ -43,6 +43,7 @@ namespace LBi.LostDoc.Reflection
 
         public Assembly Load(string name)
         {
+            // TODO rewrite this to call LoadAssemblyInternal
             Assembly assembly;
             try
             {
@@ -195,7 +196,58 @@ namespace LBi.LostDoc.Reflection
                     {
                         string newFullName = AppDomain.CurrentDomain.ApplyPolicy(fullName);
                         if (newFullName != fullName)
-                            return this.LoadAssemblyInternal(newFullName, probePaths);
+                            ret = this.LoadAssemblyInternal(newFullName, probePaths);
+
+                        // bypass RegisterAssembly so we don't call it twice
+                        if (ret != null)
+                            return ret;
+
+                        // TODO this is a little hacky, figure out how to pass in explicit assembly redirects
+                        // TODO make this optional, last-ditch attempt?
+                        // this doesn't check the GAC
+                        // this will just pick the first matching assembly which might not alwasy be the right one
+                        AssemblyName name = new AssemblyName(fullName);
+                        foreach (string asmPath in probePaths)
+                        {
+                            IEnumerable<string> allFiles;
+                            allFiles = Directory.EnumerateFiles(asmPath, "*.dll");
+                            allFiles = allFiles.Concat(Directory.EnumerateFiles(asmPath, "*.exe"));
+                            allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.dll")));
+                            allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.exe")));
+
+                            foreach (string fileName in allFiles)
+                            {
+                                AssemblyName otherName = AssemblyName.GetAssemblyName(fileName);
+                                if (otherName.Name == name.Name)
+                                {
+                                    var thisPubKey = name.GetPublicKeyToken();
+                                    if (thisPubKey != null)
+                                    {
+                                        var otherPubKey = otherName.GetPublicKeyToken();
+                                        if (otherPubKey != null)
+                                        {
+                                            if (thisPubKey.Length != otherPubKey.Length)
+                                                continue;
+
+                                            int i;
+                                            for (i = 0; i < thisPubKey.Length; i++)
+                                            {
+                                                if (thisPubKey[i] != otherPubKey[i])
+                                                    break;
+                                            }
+                                            if (i < thisPubKey.Length)
+                                                continue;
+                                        } 
+                                    
+                                    }
+                                    ret = Assembly.ReflectionOnlyLoadFrom(fileName);
+                                    break;
+                                }
+                            }
+
+                            if (ret != null)
+                                break;
+                        }
                     }
                 }
             }
