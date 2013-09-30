@@ -81,8 +81,10 @@ namespace LBi.LostDoc.Enrichers
             if (ret != null)
                 this._context.AddReference(ret);
             else
+            {
+                // TODO log warning/error failed to resolve asset
                 ret = aid;
-
+            }
             return ret.ToString();
         }
 
