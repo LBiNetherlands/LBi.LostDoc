@@ -248,6 +248,9 @@ namespace LBi.LostDoc
             int startIndex = 0;
             Type type = this.GetDeclaringType(asset, ref startIndex, hintAssembly);
 
+            if (type == null)
+                return null;
+
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
             var allMethods =
                 type.GetMethods(bindingFlags)
@@ -257,10 +260,10 @@ namespace LBi.LostDoc
                 allMethods.Where(
                     m =>
                     (m is ConstructorInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo) m),
+                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo)m),
                                             StringComparison.Ordinal)) ||
                     (m is MethodInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo) m), StringComparison.Ordinal)))
+                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo)m), StringComparison.Ordinal)))
                           .ToArray();
 
 
@@ -268,10 +271,13 @@ namespace LBi.LostDoc
             if (methods.Length == 2 && methods[1].DeclaringType == type)
                 return methods[1];
 
-            Debug.Assert(methods.Length == 1 || methods.Length == 2,
-                         string.Format("Found {0} methods, expected 1 or 2.", methods.Length));
+            Debug.Assert(methods.Length <= 2,
+                         string.Format("Found {0} methods, expected 0, 1 or 2.", methods.Length));
 
-            return methods[0];
+            if (methods.Length > 0)
+                return methods[0];
+
+            return null;
         }
 
         private PropertyInfo ResolveProperty(AssetIdentifier assetId, Assembly hintAssembly)
@@ -280,6 +286,9 @@ namespace LBi.LostDoc
 
             int startIndex = 0;
             Type type = this.GetDeclaringType(asset, ref startIndex, hintAssembly);
+            
+            if (type == null)
+                return null;
 
             PropertyInfo[] allProps =
                 type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
