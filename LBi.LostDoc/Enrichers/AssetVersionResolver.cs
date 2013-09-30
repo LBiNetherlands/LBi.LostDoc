@@ -35,14 +35,16 @@ namespace LBi.LostDoc.Enrichers
         {
             AssetIdentifier aid = AssetIdentifier.Parse(assetId);
             AssetIdentifier hintAsmAid = null;
-            
+            AssetIdentifier ret = null;
+
             if (this._hintAssembly != null)
                 hintAsmAid = AssetIdentifier.FromAssembly(this._hintAssembly);
 
             if (aid.Type == AssetType.Assembly)
             {
                 Assembly asm = (Assembly)this._context.AssetResolver.Resolve(aid, hintAsmAid);
-                aid = AssetIdentifier.FromAssembly(asm);
+                if (asm != null)
+                    ret = AssetIdentifier.FromAssembly(asm);
             }
             else if (aid.Type == AssetType.Namespace)
             {
@@ -50,33 +52,38 @@ namespace LBi.LostDoc.Enrichers
 
                 var version = this.GetNamespaceVersion(this._hintAssembly, ns);
 
-                if (version == null)
-                    throw new Exception("Version not found for asset: " + assetId);
-
-                aid = AssetIdentifier.FromNamespace(ns, version);
+                if (version != null)
+                    ret = AssetIdentifier.FromNamespace(ns, version);
             }
             else
             {
                 object obj = this._context.AssetResolver.Resolve(aid, hintAsmAid);
-                if (aid.Type == AssetType.Unknown)
+
+                if (obj != null)
                 {
-                    MethodInfo[] arr = obj as MethodInfo[];
-                    if (arr != null)
+                    if (aid.Type == AssetType.Unknown)
                     {
-                        // TODO this isn't very nice but it should do the trick for now
-                        var dummyAid = AssetIdentifier.FromMemberInfo(arr[0]);
-                        aid = new AssetIdentifier(aid.AssetId, dummyAid.Version);
+                        MethodInfo[] arr = obj as MethodInfo[];
+                        if (arr != null)
+                        {
+                            // TODO this isn't very nice but it should do the trick for now
+                            var dummyAid = AssetIdentifier.FromMemberInfo(arr[0]);
+                            ret = new AssetIdentifier(aid.AssetId, dummyAid.Version);
+                        }
+                        else
+                            throw new NotSupportedException("Unknow AssetIdentifier marker: " + aid.TypeMarker);
                     }
                     else
-                        throw new NotSupportedException("Unknow AssetIdentifier marker: " + aid.TypeMarker);
+                        ret = AssetIdentifier.FromMemberInfo((MemberInfo)obj);
                 }
-                else
-                    aid = AssetIdentifier.FromMemberInfo((MemberInfo)obj);
             }
 
-            this._context.AddReference(aid);
+            if (ret != null)
+                this._context.AddReference(ret);
+            else
+                ret = aid;
 
-            return aid.ToString();
+            return ret.ToString();
         }
 
         private Version GetNamespaceVersion(Assembly assembly, string ns)
