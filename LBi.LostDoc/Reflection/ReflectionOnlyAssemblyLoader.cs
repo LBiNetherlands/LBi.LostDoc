@@ -190,6 +190,13 @@ namespace LBi.LostDoc.Reflection
                         if (ret != null)
                             break;
                     }
+
+                    if (ret == null)
+                    {
+                        string newFullName = AppDomain.CurrentDomain.ApplyPolicy(fullName);
+                        if (newFullName != fullName)
+                            return this.LoadAssemblyInternal(newFullName, probePaths);
+                    }
                 }
             }
 
