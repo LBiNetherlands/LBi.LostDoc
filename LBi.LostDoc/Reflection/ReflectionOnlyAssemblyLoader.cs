@@ -208,34 +208,35 @@ namespace LBi.LostDoc.Reflection
                             foreach (string fileName in allFiles)
                             {
                                 AssemblyName otherName = AssemblyName.GetAssemblyName(fileName);
-                                if (otherName.Name == name.Name)
+
+                                if (otherName.Name != name.Name) 
+                                    continue;
+
+                                // only load it if the version is the same or higher
+                                if (otherName.Version < name.Version)
+                                    continue;
+
+                                var thisPubKey = name.GetPublicKeyToken();
+                                if (thisPubKey != null)
                                 {
-                                    // only load it if the version is the same or higher
-                                    if (otherName.Version < name.Version)
-                                        continue;
-
-                                    var thisPubKey = name.GetPublicKeyToken();
-                                    if (thisPubKey != null)
+                                    var otherPubKey = otherName.GetPublicKeyToken();
+                                    if (otherPubKey != null)
                                     {
-                                        var otherPubKey = otherName.GetPublicKeyToken();
-                                        if (otherPubKey != null)
-                                        {
-                                            if (thisPubKey.Length != otherPubKey.Length)
-                                                continue;
+                                        if (thisPubKey.Length != otherPubKey.Length)
+                                            continue;
 
-                                            int i;
-                                            for (i = 0; i < thisPubKey.Length; i++)
-                                            {
-                                                if (thisPubKey[i] != otherPubKey[i])
-                                                    break;
-                                            }
-                                            if (i < thisPubKey.Length)
-                                                continue;
+                                        int i;
+                                        for (i = 0; i < thisPubKey.Length; i++)
+                                        {
+                                            if (thisPubKey[i] != otherPubKey[i])
+                                                break;
                                         }
+                                        if (i < thisPubKey.Length)
+                                            continue;
                                     }
-                                    ret = Assembly.ReflectionOnlyLoadFrom(fileName);
-                                    break;
                                 }
+                                ret = Assembly.ReflectionOnlyLoadFrom(fileName);
+                                break;
                             }
 
                             if (ret != null)
