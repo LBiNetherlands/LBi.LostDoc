@@ -26,8 +26,10 @@ using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Reflection
 {
+    // TODO the behavior of this class is no longer obvious, needs to be cleaned up
     public class ReflectionOnlyAssemblyLoader : IAssemblyLoader
     {
+        // TODO get rich of this Cache and just use a dictionary?
         private readonly ObjectCache _cache;
         private readonly string[] _locations;
         private HashSet<Assembly> _loadedAssemblies;
@@ -43,21 +45,7 @@ namespace LBi.LostDoc.Reflection
 
         public Assembly Load(string name)
         {
-            // TODO rewrite this to call LoadAssemblyInternal
-            Assembly assembly;
-            try
-            {
-                assembly = Assembly.ReflectionOnlyLoad(name);
-            }
-            catch (FileLoadException)
-            {
-                var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-                assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, name));
-            }
-
-            this.RegisterAssembly(assembly);
-            
-            return assembly;
+            return this.LoadAssemblyInternal(name, true, this._locations);
         }
 
         private void RegisterAssembly(Assembly assembly, bool direct = true)
@@ -65,14 +53,14 @@ namespace LBi.LostDoc.Reflection
             if (assembly != null && this._loadedAssemblies.Add(assembly))
             {
                 TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheHit,
-                                         "Loading assembly {0}.",
-                                         assembly.FullName);
+                                                         "Loading assembly {0}.",
+                                                         assembly.FullName);
 
                 if (direct)
                 {
                     this.GetAssemblyChain(assembly);
                 }
-            } 
+            }
         }
 
         public Assembly LoadFrom(string path)
@@ -120,11 +108,11 @@ namespace LBi.LostDoc.Reflection
             }
             Stopwatch timer = Stopwatch.StartNew();
 
-            List<Assembly> ret = new List<Assembly> {assembly};
+            List<Assembly> ret = new List<Assembly> { assembly };
 
             TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheMiss,
-                                         "No assembly chain cached for assembly {0}.",
-                                         assembly.FullName);
+                                                     "No assembly chain cached for assembly {0}.",
+                                                     assembly.FullName);
 
             this.GetAssemblyChain(assembly, ret);
 
@@ -143,6 +131,7 @@ namespace LBi.LostDoc.Reflection
             foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
             {
                 Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
+                                                            false,
                                                             Path.GetDirectoryName(assembly.Location));
 
                 TraceSources.AssemblyLoader.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
@@ -157,7 +146,7 @@ namespace LBi.LostDoc.Reflection
             }
         }
 
-        private Assembly LoadAssemblyInternal(string fullName, params string[] probePaths)
+        private Assembly LoadAssemblyInternal(string fullName, bool direct, params string[] probePaths)
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
 
@@ -176,7 +165,7 @@ namespace LBi.LostDoc.Reflection
                         IEnumerable<string> allFiles;
                         allFiles = Directory.EnumerateFiles(asmPath, "*.dll");
                         allFiles = allFiles.Concat(Directory.EnumerateFiles(asmPath, "*.exe"));
-                        allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.dll"))); 
+                        allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.dll")));
                         allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.exe")));
 
                         foreach (string fileName in allFiles)
@@ -194,9 +183,10 @@ namespace LBi.LostDoc.Reflection
 
                     if (ret == null)
                     {
+                        // TODO maybe we should apply the policy first
                         string newFullName = AppDomain.CurrentDomain.ApplyPolicy(fullName);
                         if (newFullName != fullName)
-                            ret = this.LoadAssemblyInternal(newFullName, probePaths);
+                            ret = this.LoadAssemblyInternal(newFullName, direct, probePaths);
 
                         // bypass RegisterAssembly so we don't call it twice
                         if (ret != null)
@@ -220,6 +210,10 @@ namespace LBi.LostDoc.Reflection
                                 AssemblyName otherName = AssemblyName.GetAssemblyName(fileName);
                                 if (otherName.Name == name.Name)
                                 {
+                                    // only load it if the version is the same or higher
+                                    if (otherName.Version < name.Version)
+                                        continue;
+
                                     var thisPubKey = name.GetPublicKeyToken();
                                     if (thisPubKey != null)
                                     {
@@ -237,8 +231,7 @@ namespace LBi.LostDoc.Reflection
                                             }
                                             if (i < thisPubKey.Length)
                                                 continue;
-                                        } 
-                                    
+                                        }
                                     }
                                     ret = Assembly.ReflectionOnlyLoadFrom(fileName);
                                     break;
@@ -248,23 +241,26 @@ namespace LBi.LostDoc.Reflection
                             if (ret != null)
                                 break;
                         }
+
+                        if (ret != null)
+                            TraceSources.AssemblyLoader.TraceWarning("Redirecting assembly '{0}' to version: {1}", fullName, ret.GetName().Version);
                     }
                 }
             }
 
-            this.RegisterAssembly(ret, direct: false);
+            this.RegisterAssembly(ret, direct: direct);
 
             return ret;
         }
 
         private Assembly OnFailedAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            var asm = this.LoadAssemblyInternal(args.Name, Path.GetDirectoryName(args.RequestingAssembly.Location));
-            
+            var asm = this.LoadAssemblyInternal(args.Name, false, Path.GetDirectoryName(args.RequestingAssembly.Location));
+
             var obj = this._cache.Get(args.RequestingAssembly.FullName);
             if (asm != null && obj != null)
             {
-                Assembly[] assemblies = (Assembly[]) obj;
+                Assembly[] assemblies = (Assembly[])obj;
                 if (Array.IndexOf(assemblies, asm) < 0)
                 {
                     Array.Resize(ref assemblies, assemblies.Length + 1);
@@ -294,7 +290,7 @@ namespace LBi.LostDoc.Reflection
                 seen.UnionWith(clone);
                 clone = new HashSet<Assembly>(this._loadedAssemblies);
                 clone.ExceptWith(seen);
-                
+
             } while (clone.Count > 0);
         }
 
