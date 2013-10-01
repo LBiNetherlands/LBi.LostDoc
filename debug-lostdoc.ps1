@@ -7,8 +7,12 @@
 [bool]$script:verbose = $false;
 $choices = @(
     (New-Object -TypeName PSObject @{
-                                        C = "Extract other"; 
+                                        C = "Extract System.Web.*.dll from Web.Host bin folder"; 
                                         A = @((Get-ChildItem -Path ..\..\..\LBi.LostDoc.Repository.Web.Host\bin\System.Web.*.dll).FullName | %{ "Extract -IncludeBclDocComments -Path {0} -Output .\tmp\" -f $_ })
+                                    }),
+    (New-Object -TypeName PSObject @{
+                                        C = "Extract *.dll from Web.Host bin folder"; 
+                                        A = @((Get-ChildItem -Path ..\..\..\LBi.LostDoc.Repository.Web.Host\bin\*.dll).FullName | %{ "Extract -IncludeBclDocComments -Path {0} -Output .\tmp\" -f $_ })
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Extract Company.Project.Library"; 
