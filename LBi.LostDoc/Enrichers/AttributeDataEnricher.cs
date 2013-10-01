@@ -22,7 +22,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace LBi.LostDoc.Enrichers
 {
@@ -139,7 +141,6 @@ namespace LBi.LostDoc.Enrichers
 
         protected virtual void GenerateValueLiteral(IProcessingContext context, CustomAttributeTypedArgument cta)
         {
-            // TODO guard against cta.Value == null
             var arrayValues = cta.Value as IEnumerable<CustomAttributeTypedArgument>;
             if (arrayValues != null)
             {
@@ -149,7 +150,10 @@ namespace LBi.LostDoc.Enrichers
             else if (cta.ArgumentType == typeof(Type))
             {
                 XElement typeElement = new XElement("typeRef");
-                DocGenerator.GenerateTypeRef(context.Clone(typeElement), (Type)cta.Value);
+                if (cta.Value == null)
+                    this.GenerateNullLiteral(context.Clone(typeElement));
+                else
+                    DocGenerator.GenerateTypeRef(context.Clone(typeElement), (Type)cta.Value);
                 context.Element.Add(typeElement);
             }
             else
@@ -158,7 +162,9 @@ namespace LBi.LostDoc.Enrichers
 
                 DocGenerator.GenerateTypeRef(context.Clone(constElement), cta.ArgumentType);
 
-                if (cta.ArgumentType == typeof(string) && InvalidCharacters.IsMatch((string)cta.Value))
+                if (cta.Value == null)
+                    this.GenerateNullLiteral(context.Clone(constElement));
+                else if (cta.ArgumentType == typeof(string) && InvalidCharacters.IsMatch((string)cta.Value))
                 {
                     string rawValue = (string)cta.Value;
                     var matches = InvalidCharacters.Matches(rawValue);
@@ -186,6 +192,11 @@ namespace LBi.LostDoc.Enrichers
 
                 context.Element.Add(constElement);
             }
+        }
+
+        private void GenerateNullLiteral(IProcessingContext context)
+        {
+            context.Element.Add(new XAttribute(XName.Get("nil", "xsi"), XmlConvert.ToString(true)));
         }
 
         protected virtual void GenerateArrayLiteral(IProcessingContext context, Type elementType, IEnumerable<CustomAttributeTypedArgument> arrayValues)
