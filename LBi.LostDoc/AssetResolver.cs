@@ -200,11 +200,14 @@ namespace LBi.LostDoc
             }
             else
             {
-                FieldInfo[] allFields =
-                    type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
-                                   BindingFlags.Instance);
+                FieldInfo[] allFields = type.GetFields(BindingFlags.Public |
+                                                       BindingFlags.NonPublic |
+                                                       BindingFlags.Static |
+                                                       BindingFlags.Instance);
 
-                return allFields.SingleOrDefault(f => Naming.GetAssetId(f).Equals(assetIdentifier.AssetId));
+                FieldInfo[] matchingFields = allFields.Where(f => Naming.GetAssetId(f).Equals(assetIdentifier.AssetId)).ToArray();
+
+                return this.GetVisible(type, matchingFields);
             }
         }
 
@@ -252,21 +255,20 @@ namespace LBi.LostDoc
                 return null;
 
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
-            var allMethods =
-                type.GetMethods(bindingFlags)
-                    .Concat<MethodBase>(type.GetConstructors(bindingFlags));
 
-            MethodBase[] methods =
-                allMethods.Where(
-                    m =>
-                    (m is ConstructorInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo)m),
-                                            StringComparison.Ordinal)) ||
-                    (m is MethodInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo)m), StringComparison.Ordinal)))
-                          .ToArray();
+            IEnumerable<MemberInfo> allMethods =type.GetMethods(bindingFlags);
+            allMethods = allMethods.Concat(type.GetConstructors(bindingFlags));
+
+            MemberInfo[] methods = allMethods.Where(m => (m is ConstructorInfo && assetId.AssetId == Naming.GetAssetId((ConstructorInfo)m)) ||
+                                                         (m is MethodInfo && assetId.AssetId == Naming.GetAssetId((MethodInfo)m)))
+                                             .ToArray();
 
 
+            return this.GetVisible(type, methods);
+        }
+
+        private T GetVisible<T>(Type type, T[] methods) where T : MemberInfo 
+        {
             // if there is a "new" method on the type we'll find both it and the method it hides.
             if (methods.Length == 2 && methods[1].DeclaringType == type)
                 return methods[1];
@@ -290,22 +292,15 @@ namespace LBi.LostDoc
             if (type == null)
                 return null;
 
-            PropertyInfo[] allProps =
-                type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
-                                   BindingFlags.Instance);
-            PropertyInfo[] properties =
-                allProps
-                    .Where(p => assetId.AssetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal))
-                    .ToArray();
+            PropertyInfo[] allProps = type.GetProperties(BindingFlags.Public |
+                                                         BindingFlags.NonPublic |
+                                                         BindingFlags.Static |
+                                                         BindingFlags.Instance);
 
-            // if there is a "new" property on the type we'll find both it and the property it hides.
-            if (properties.Length == 2 && properties[1].DeclaringType == type)
-                return properties[1];
+            PropertyInfo[] properties = allProps.Where(p => assetId.AssetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal))
+                                                .ToArray();
 
-            Debug.Assert(properties.Length == 1 || properties.Length == 2,
-                         string.Format("Found {0} properties, expected 1 or 2.", properties.Length));
-
-            return properties[0];
+            return this.GetVisible(type, properties);
         }
 
         private bool TryGetType(string typeName, Assembly hintAssembly, out Type type)
