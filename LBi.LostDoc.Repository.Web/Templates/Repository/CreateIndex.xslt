@@ -78,7 +78,7 @@
     <xsl:copy>
       <xsl:copy-of select="@assetId"/>
       <xsl:attribute name="name">
-        <xsl:apply-templates select="ld:key('aid', @assetId)" mode="shortName"/>
+        <xsl:apply-templates select="ld:key('aid', @assetId)[1]" mode="shortName"/>
       </xsl:attribute>
       <xsl:attribute name="url">
         <xsl:choose>

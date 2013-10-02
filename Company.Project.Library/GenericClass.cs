@@ -97,6 +97,36 @@ namespace Company.Project.Library
         }
 
         /// <summary>
+        /// Doc comment for ConsumesArrayOfTypeParam
+        /// </summary>
+        /// <param name="arr1">p1</param>
+        /// <param name="arr2">p2</param>
+        /// <typeparam name="Q"></typeparam>
+        public void ConsumesArrayOfTypeParam<Q>(T[] arr1, Q[] arr2)
+        {
+        }
+
+        /// <summary>
+        /// Doc comment for ConsumesArrayOfTypeParam2
+        /// </summary>
+        /// <param name="arr1">p1</param>
+        /// <param name="arr2">p2</param>
+        /// <typeparam name="Q"></typeparam>
+        public void ConsumesArrayOfTypeParam2<Q>(T[][,][,,] arr1, Q[][,][,,] arr2)
+        {
+        }
+
+        /// <summary>
+        /// Doc comment for ConsumesArrayOfTypeParam with rank 2 and 3
+        /// </summary>
+        /// <param name="arr1">p1</param>
+        /// <param name="arr2">p2</param>
+        /// <typeparam name="Q"></typeparam>
+        public void ConsumesArraysOfTypeParamWithRankGreatherThan1<Q>(T[,] arr1, Q[,,] arr2)
+        {
+        }
+
+        /// <summary>
         /// Method with ref parameter.
         /// </summary>
         /// <param name="str"></param>
@@ -111,7 +141,7 @@ namespace Company.Project.Library
         /// <typeparam name="M">The generic</typeparam>
         /// <param name="n">The param</param>
         /// <returns></returns>
-        public Boolean TryRefMethodGeneric<M>(ref NestedGeneric<M> n) { return false; }
+        public Boolean TryRefMethodGeneric<M>(ref NestedGeneric<M> n) where M: Uri { return false; }
 
 
 
@@ -142,7 +172,7 @@ namespace Company.Project.Library
 
         #region Nested type: NestedGeneric
 
-        public class NestedGeneric<P>
+        public class NestedGeneric<P> where P: Uri
         {
             public void ConsumeP(P input)
             {

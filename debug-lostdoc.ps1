@@ -1,14 +1,16 @@
 ﻿param($ldPath = $(throw "ldpath required"));
 
-[System.AppDomainSetup]$setup = New-Object -TypeName System.AppDomainSetup -Property @{ApplicationBase = [System.IO.Path]::GetDirectoryName($ldPath)}
-[System.AppDomain]$app = [System.AppDomain]::CreateDomain("lostdoc", [System.AppDomain]::CurrentDomain.Evidence, $setup)
-#$app.Load("LBi.LostDoc.ConsoleApplication"); 
-#[void][System.Reflection.Assembly]::LoadFrom($ldPath);
-[bool]$script:verbose = $false;
+
+
+[string]$script:verbose = "";
 $choices = @(
     (New-Object -TypeName PSObject @{
-                                        C = "Extract other"; 
-                                        A = @("Extract -IncludeBclDocComments -Path C:\temp\testdlls\Aquabrowser.Core100.dll -Filter `"Aqua*`" -Output .\tmp\")
+                                        C = "Extract System.Web.*.dll from Web.Host bin folder"; 
+                                        A = @((Get-ChildItem -Path ..\..\..\LBi.LostDoc.Repository.Web.Host\bin\System.Web.*.dll).FullName | %{ "Extract -IncludeBclDocComments -Path {0} -Output .\tmp\" -f $_ })
+                                    }),
+    (New-Object -TypeName PSObject @{
+                                        C = "Extract *.dll from Web.Host bin folder"; 
+                                        A = @((Get-ChildItem -Path ..\..\..\LBi.LostDoc.Repository.Web.Host\bin\*.dll).FullName | %{ "Extract -IncludeBclDocComments -Path {0} -Output .\tmp\" -f $_ })
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Extract Company.Project.Library"; 
@@ -63,10 +65,16 @@ $choices = @(
                                         }
                                     }), 
     (New-Object -TypeName PSObject @{
-                                        C = "Toggle verbose"; 
+                                        C = "Toggle verobisty"; 
                                         A ={
-                                            $script:verbose = -not $script:verbose; 
-                                            Write-Host "Verbose: $verbose"
+                                            if ($script:verbose -eq "") {
+                                                $script:verbose = "-Verbose";
+                                            } elseif ($script:verbose -eq "-Verbose") {
+                                                $script:verbose = "-Quiet";
+                                            } else {
+                                                $script:verbose = "";
+                                            }
+                                            Write-Host "Flag: $verbose"
                                         }
                                     }),
     (New-Object -TypeName PSObject @{
@@ -97,11 +105,14 @@ while ($true) {
             if ($arg -is [ScriptBlock]) {
                 & $arg;
             } else {
-                "Launching with arguments: " + $arg;
-                if ($script:verbose) {
-                    $arg += ' -Verbose';
+                [System.AppDomainSetup]$setup = New-Object -TypeName System.AppDomainSetup -Property @{ApplicationBase = [System.IO.Path]::GetDirectoryName($ldPath)}
+                [System.AppDomain]$app = [System.AppDomain]::CreateDomain("lostdoc", [System.AppDomain]::CurrentDomain.Evidence, $setup)
+                if ($script:verbose -ne "") {
+                    $arg += ' ' + $script:verbose;
                 }
+                "Launching with arguments: " + $arg;
                 $app.ExecuteAssembly($ldPath, $arg)
+                [System.AppDomain]::Unload($app);
             }
         }
     }

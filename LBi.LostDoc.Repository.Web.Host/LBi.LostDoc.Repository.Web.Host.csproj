@@ -251,9 +251,7 @@
   <ItemGroup>
     <Folder Include="App_Data\AddIns\" />
     <Folder Include="App_Data\Content\" />
-    <Folder Include="App_Data\LocalPackages\" />
     <Folder Include="App_Data\Logs\" />
-    <Folder Include="App_Data\Packages\" />
     <Folder Include="App_Data\Repository\temp\" />
     <Folder Include="Images\" />
     <Folder Include="Static\" />
@@ -317,6 +315,11 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LBi.LostDoc.AddIns\LBi.LostDoc.AddIns.csproj">
+      <Project>{86f2b577-7ad3-4f25-99d2-ed63b3e56a74}</Project>
+      <Name>LBi.LostDoc.AddIns</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\LBi.LostDoc.Packaging\LBi.LostDoc.Packaging.csproj">
       <Project>{32e920e1-127c-45bd-815f-c5bf8779b621}</Project>
       <Name>LBi.LostDoc.Packaging</Name>
@@ -356,14 +359,14 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>echo removing LocalPackages folder
-if exist $(ProjectDir)App_Data\LocalPackages rmdir /Q /S $(ProjectDir)App_Data\LocalPackages
-echo creating LocalPackages folder
-mkdir $(ProjectDir)App_Data\LocalPackages
-echo copying AddinPackages to LocalPackages
-copy /Y $(ProjectDir)..\AddInPackages\*.nupkg $(ProjectDir)App_Data\LocalPackages\
-echo removing Packages folder
-if exist $(ProjectDir)App_Data\Packages rmdir /Q /S $(ProjectDir)App_Data\Packages
+    <PostBuildEvent>echo removing AddIns\Repository folder
+if exist $(ProjectDir)App_Data\AddIns\Repository rmdir /Q /S $(ProjectDir)App_Data\AddIns\Repository
+echo creating AddIns\Repository folder
+mkdir $(ProjectDir)App_Data\AddIns\Repository
+echo copying AddinPackages to AddIns\Repository
+copy /Y $(ProjectDir)..\AddInPackages\*.nupkg $(ProjectDir)App_Data\AddIns\Repository\
+echo removing AddIns\Packages folder
+if exist $(ProjectDir)App_Data\AddIns\Packages rmdir /Q /S $(ProjectDir)App_Data\AddIns\Packages
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

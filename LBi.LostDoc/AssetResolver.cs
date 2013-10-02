@@ -135,12 +135,9 @@ namespace LBi.LostDoc
             {
                 case AssetType.Unknown:
                     if (StringComparer.Ordinal.Equals("Overload", assetIdentifier.TypeMarker))
-                    {
                         return this.ResolveOverloads(assetIdentifier, hintAssembly);
-                    }
-                    throw new ArgumentException(string.Format("Type '{0}' not supported.", assetIdentifier.TypeMarker),
-                                                "assetIdentifier");
-
+                    TraceSources.AssetResolverSource.TraceWarning("Type '{0}' not supported.", assetIdentifier.TypeMarker);
+                    return null;
                 case AssetType.Namespace:
                     return assetIdentifier.AssetId.Substring(assetIdentifier.TypeMarker.Length + 1);
                 case AssetType.Type:
@@ -200,11 +197,14 @@ namespace LBi.LostDoc
             }
             else
             {
-                FieldInfo[] allFields =
-                    type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
-                                   BindingFlags.Instance);
+                FieldInfo[] allFields = type.GetFields(BindingFlags.Public |
+                                                       BindingFlags.NonPublic |
+                                                       BindingFlags.Static |
+                                                       BindingFlags.Instance);
 
-                return allFields.Single(f => Naming.GetAssetId(f).Equals(assetIdentifier.AssetId));
+                FieldInfo[] matchingFields = allFields.Where(f => Naming.GetAssetId(f).Equals(assetIdentifier.AssetId)).ToArray();
+
+                return this.GetVisible(type, matchingFields);
             }
         }
 
@@ -248,30 +248,35 @@ namespace LBi.LostDoc
             int startIndex = 0;
             Type type = this.GetDeclaringType(asset, ref startIndex, hintAssembly);
 
+            if (type == null)
+                return null;
+
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
-            var allMethods =
-                type.GetMethods(bindingFlags)
-                    .Concat<MethodBase>(type.GetConstructors(bindingFlags));
 
-            MethodBase[] methods =
-                allMethods.Where(
-                    m =>
-                    (m is ConstructorInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((ConstructorInfo) m),
-                                            StringComparison.Ordinal)) ||
-                    (m is MethodInfo &&
-                     assetId.AssetId.Equals(Naming.GetAssetId((MethodInfo) m), StringComparison.Ordinal)))
-                          .ToArray();
+            IEnumerable<MemberInfo> allMethods = type.GetMethods(bindingFlags);
+            allMethods = allMethods.Concat(type.GetConstructors(bindingFlags));
+
+            MemberInfo[] methods = allMethods.Where(m => (m is ConstructorInfo && assetId.AssetId == Naming.GetAssetId((ConstructorInfo)m)) ||
+                                                         (m is MethodInfo && assetId.AssetId == Naming.GetAssetId((MethodInfo)m)))
+                                             .ToArray();
 
 
+            return this.GetVisible(type, methods);
+        }
+
+        private T GetVisible<T>(Type type, T[] methods) where T : MemberInfo
+        {
             // if there is a "new" method on the type we'll find both it and the method it hides.
             if (methods.Length == 2 && methods[1].DeclaringType == type)
                 return methods[1];
 
-            Debug.Assert(methods.Length == 1 || methods.Length == 2,
-                         string.Format("Found {0} methods, expected 1 or 2.", methods.Length));
+            Debug.Assert(methods.Length <= 2,
+                         string.Format("Found {0} methods, expected 0, 1 or 2.", methods.Length));
 
-            return methods[0];
+            if (methods.Length > 0)
+                return methods[0];
+
+            return null;
         }
 
         private PropertyInfo ResolveProperty(AssetIdentifier assetId, Assembly hintAssembly)
@@ -281,28 +286,25 @@ namespace LBi.LostDoc
             int startIndex = 0;
             Type type = this.GetDeclaringType(asset, ref startIndex, hintAssembly);
 
-            PropertyInfo[] allProps =
-                type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
-                                   BindingFlags.Instance);
-            PropertyInfo[] properties =
-                allProps
-                    .Where(p => assetId.AssetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal))
-                    .ToArray();
+            if (type == null)
+                return null;
 
-            // if there is a "new" property on the type we'll find both it and the property it hides.
-            if (properties.Length == 2 && properties[1].DeclaringType == type)
-                return properties[1];
+            PropertyInfo[] allProps = type.GetProperties(BindingFlags.Public |
+                                                         BindingFlags.NonPublic |
+                                                         BindingFlags.Static |
+                                                         BindingFlags.Instance);
 
-            Debug.Assert(properties.Length == 1 || properties.Length == 2,
-                         string.Format("Found {0} properties, expected 1 or 2.", properties.Length));
+            PropertyInfo[] properties = allProps.Where(p => assetId.AssetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal))
+                                                .ToArray();
 
-            return properties[0];
+            return this.GetVisible(type, properties);
         }
 
         private bool TryGetType(string typeName, Assembly hintAssembly, out Type type)
         {
             List<Type> allMatches = new List<Type>();
 
+            // TODO maybe this should start with hintAssembly, then walk the chain and only after that fall back to everything in _assemblyLoader
             if (hintAssembly != null)
             {
                 type = hintAssembly.GetType(typeName, false, false);
@@ -313,16 +315,17 @@ namespace LBi.LostDoc
             foreach (var assembly in this._assemblyLoader)
             {
                 var tmp = assembly.GetType(typeName, false, false);
-                if (tmp != null)
+                if (tmp != null && !allMatches.Contains(tmp))
                     allMatches.Add(tmp);
             }
 
             if (allMatches.Count > 1)
             {
-                TraceSources.AssetResolverSource.TraceWarning("More than one type ({0}) found: {1}",
+                TraceSources.AssetResolverSource.TraceWarning("Found type {0} in {1}, using: {2}",
                                                               typeName,
                                                               string.Join(", ",
-                                                                          allMatches.Select(t => t.Assembly.GetName().Name)));
+                                                                          allMatches.Select(t => AssetIdentifier.FromAssembly(t.Assembly))),
+                                                              AssetIdentifier.FromAssembly(allMatches[0].Assembly));
             }
 
             if (allMatches.Count > 0)

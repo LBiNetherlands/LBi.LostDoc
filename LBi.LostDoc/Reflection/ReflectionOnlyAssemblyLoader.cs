@@ -26,8 +26,10 @@ using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Reflection
 {
+    // TODO the behavior of this class is no longer obvious, needs to be cleaned up
     public class ReflectionOnlyAssemblyLoader : IAssemblyLoader
     {
+        // TODO get rich of this Cache and just use a dictionary?
         private readonly ObjectCache _cache;
         private readonly string[] _locations;
         private HashSet<Assembly> _loadedAssemblies;
@@ -43,20 +45,7 @@ namespace LBi.LostDoc.Reflection
 
         public Assembly Load(string name)
         {
-            Assembly assembly;
-            try
-            {
-                assembly = Assembly.ReflectionOnlyLoad(name);
-            }
-            catch (FileLoadException)
-            {
-                var loadedAssemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
-                assembly = loadedAssemblies.Single(a => StringComparer.Ordinal.Equals(a.GetName().FullName, name));
-            }
-
-            this.RegisterAssembly(assembly);
-            
-            return assembly;
+            return this.LoadAssemblyInternal(name, true, this._locations);
         }
 
         private void RegisterAssembly(Assembly assembly, bool direct = true)
@@ -64,14 +53,14 @@ namespace LBi.LostDoc.Reflection
             if (assembly != null && this._loadedAssemblies.Add(assembly))
             {
                 TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheHit,
-                                         "Loading assembly {0}.",
-                                         assembly.FullName);
+                                                         "Loading assembly {0}.",
+                                                         assembly.FullName);
 
                 if (direct)
                 {
                     this.GetAssemblyChain(assembly);
                 }
-            } 
+            }
         }
 
         public Assembly LoadFrom(string path)
@@ -119,23 +108,13 @@ namespace LBi.LostDoc.Reflection
             }
             Stopwatch timer = Stopwatch.StartNew();
 
-            List<Assembly> ret = new List<Assembly> {assembly};
+            List<Assembly> ret = new List<Assembly> { assembly };
 
             TraceSources.AssemblyLoader.TraceVerbose(TraceEvents.CacheMiss,
-                                         "No assembly chain cached for assembly {0}.",
-                                         assembly.FullName);
+                                                     "No assembly chain cached for assembly {0}.",
+                                                     assembly.FullName);
 
-            foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
-            {
-                Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
-                                                            Path.GetDirectoryName(assembly.Location));
-
-                TraceSources.AssemblyLoader.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
-
-                Debug.Assert(refAsm != null);
-
-                ret.Add(refAsm);
-            }
+            this.GetAssemblyChain(assembly, ret);
 
             if (!this._cache.Add(assembly.FullName, ret.ToArray(), ObjectCache.InfiniteAbsoluteExpiration))
                 TraceSources.AssemblyLoader.TraceVerbose("Failed to add assembly chain to cache for assembly: {0}", assembly.FullName);
@@ -147,7 +126,27 @@ namespace LBi.LostDoc.Reflection
             return ret;
         }
 
-        private Assembly LoadAssemblyInternal(string fullName, params string[] probePaths)
+        private void GetAssemblyChain(Assembly assembly, List<Assembly> ret)
+        {
+            foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
+            {
+                Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
+                                                            false,
+                                                            Path.GetDirectoryName(assembly.Location));
+
+                TraceSources.AssemblyLoader.TraceVerbose("Loading referenced assembly: {0}", refAsm.FullName);
+
+                Debug.Assert(refAsm != null);
+
+                if (!ret.Contains(refAsm))
+                {
+                    ret.Add(refAsm);
+                    GetAssemblyChain(refAsm, ret);
+                }
+            }
+        }
+
+        private Assembly LoadAssemblyInternal(string fullName, bool direct, params string[] probePaths)
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies();
 
@@ -166,7 +165,7 @@ namespace LBi.LostDoc.Reflection
                         IEnumerable<string> allFiles;
                         allFiles = Directory.EnumerateFiles(asmPath, "*.dll");
                         allFiles = allFiles.Concat(Directory.EnumerateFiles(asmPath, "*.exe"));
-                        allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.dll"))); 
+                        allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.dll")));
                         allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.exe")));
 
                         foreach (string fileName in allFiles)
@@ -181,22 +180,88 @@ namespace LBi.LostDoc.Reflection
                         if (ret != null)
                             break;
                     }
+
+                    if (ret == null)
+                    {
+                        // TODO maybe we should apply the policy first
+                        string newFullName = AppDomain.CurrentDomain.ApplyPolicy(fullName);
+                        if (newFullName != fullName)
+                            ret = this.LoadAssemblyInternal(newFullName, direct, probePaths);
+
+                        // bypass RegisterAssembly so we don't call it twice
+                        if (ret != null)
+                            return ret;
+
+                        // TODO this is a little hacky, figure out how to pass in explicit assembly redirects
+                        // TODO make this optional, last-ditch attempt?
+                        // this doesn't check the GAC
+                        // this will just pick the first matching assembly which might not alwasy be the right one
+                        AssemblyName name = new AssemblyName(fullName);
+                        foreach (string asmPath in probePaths)
+                        {
+                            IEnumerable<string> allFiles;
+                            allFiles = Directory.EnumerateFiles(asmPath, "*.dll");
+                            allFiles = allFiles.Concat(Directory.EnumerateFiles(asmPath, "*.exe"));
+                            allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.dll")));
+                            allFiles = allFiles.Concat(this._locations.SelectMany(loc => Directory.EnumerateFiles(loc, "*.exe")));
+
+                            foreach (string fileName in allFiles)
+                            {
+                                AssemblyName otherName = AssemblyName.GetAssemblyName(fileName);
+
+                                if (otherName.Name != name.Name) 
+                                    continue;
+
+                                // only load it if the version is the same or higher
+                                if (otherName.Version < name.Version)
+                                    continue;
+
+                                var thisPubKey = name.GetPublicKeyToken();
+                                if (thisPubKey != null)
+                                {
+                                    var otherPubKey = otherName.GetPublicKeyToken();
+                                    if (otherPubKey != null)
+                                    {
+                                        if (thisPubKey.Length != otherPubKey.Length)
+                                            continue;
+
+                                        int i;
+                                        for (i = 0; i < thisPubKey.Length; i++)
+                                        {
+                                            if (thisPubKey[i] != otherPubKey[i])
+                                                break;
+                                        }
+                                        if (i < thisPubKey.Length)
+                                            continue;
+                                    }
+                                }
+                                ret = Assembly.ReflectionOnlyLoadFrom(fileName);
+                                break;
+                            }
+
+                            if (ret != null)
+                                break;
+                        }
+
+                        if (ret != null)
+                            TraceSources.AssemblyLoader.TraceWarning("Redirecting assembly '{0}' to version: {1}", fullName, ret.GetName().Version);
+                    }
                 }
             }
 
-            this.RegisterAssembly(ret, direct: false);
+            this.RegisterAssembly(ret, direct: direct);
 
             return ret;
         }
 
         private Assembly OnFailedAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            var asm = this.LoadAssemblyInternal(args.Name, Path.GetDirectoryName(args.RequestingAssembly.Location));
-            
+            var asm = this.LoadAssemblyInternal(args.Name, false, Path.GetDirectoryName(args.RequestingAssembly.Location));
+
             var obj = this._cache.Get(args.RequestingAssembly.FullName);
             if (asm != null && obj != null)
             {
-                Assembly[] assemblies = (Assembly[]) obj;
+                Assembly[] assemblies = (Assembly[])obj;
                 if (Array.IndexOf(assemblies, asm) < 0)
                 {
                     Array.Resize(ref assemblies, assemblies.Length + 1);
@@ -226,7 +291,7 @@ namespace LBi.LostDoc.Reflection
                 seen.UnionWith(clone);
                 clone = new HashSet<Assembly>(this._loadedAssemblies);
                 clone.ExceptWith(seen);
-                
+
             } while (clone.Count > 0);
         }
 

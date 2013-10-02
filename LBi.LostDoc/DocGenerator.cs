@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -367,8 +367,10 @@ namespace LBi.LostDoc
 
         public static void GenerateTypeRef(IProcessingContext context, Type pType, string attrName = null)
         {
+            // TODO rethink how we generate the typerefs, probably ensure we always output a root element rather than just the attribute for param/type
             if (pType.IsArray)
             {
+                // TODO arrayOf is the only capitalized element
                 var arrayElem = new XElement("arrayOf", new XAttribute("rank", pType.GetArrayRank()));
                 context.Element.Add(arrayElem);
                 GenerateTypeRef(context.Clone(arrayElem), pType.GetElementType());
@@ -511,6 +513,28 @@ namespace LBi.LostDoc
             if (type.ContainsGenericParameters)
             {
                 Type[] typeParams = type.GetGenericArguments();
+                if (type.IsNested && type.DeclaringType.ContainsGenericParameters)
+                {
+                    Type[] inheritedTypeParams = type.DeclaringType.GetGenericArguments();
+
+                    Debug.Assert(typeParams.Length >= inheritedTypeParams.Length);
+
+                    for (int paramPos = 0; paramPos < inheritedTypeParams.Length; paramPos++)
+                    {
+                        Debug.Assert(typeParams[paramPos].Name == inheritedTypeParams[paramPos].Name);
+                        Debug.Assert(typeParams[paramPos].GenericParameterAttributes == inheritedTypeParams[paramPos].GenericParameterAttributes);
+                    }
+
+                    Type[] declaredTypeParams = new Type[typeParams.Length - inheritedTypeParams.Length];
+
+                    for (int paramPos = inheritedTypeParams.Length; paramPos < typeParams.Length; paramPos++)
+                    {
+                        declaredTypeParams[paramPos - inheritedTypeParams.Length] = typeParams[paramPos];
+                    }
+
+                    typeParams = declaredTypeParams;
+                }
+
                 foreach (Type tp in typeParams)
                 {
                     this.GenerateTypeParamElement(context.Clone(ret), type, tp);
@@ -551,8 +575,23 @@ namespace LBi.LostDoc
         {
             var tpElem = new XElement("typeparam", new XAttribute("name", tp.Name));
 
-            context.Element.Add(tpElem);
+            if (tp.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant))
+                tpElem.Add(new XAttribute("isContravariant", XmlConvert.ToString(true)));
 
+            if (tp.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant))
+                tpElem.Add(new XAttribute("isCovariant", XmlConvert.ToString(true)));
+
+            if (tp.GenericParameterAttributes.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint))
+                tpElem.Add(new XAttribute("isValueType", XmlConvert.ToString(true)));
+
+            if (tp.GenericParameterAttributes.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint))
+                tpElem.Add(new XAttribute("isReferenceType", XmlConvert.ToString(true)));
+
+            if (tp.GenericParameterAttributes.HasFlag(GenericParameterAttributes.DefaultConstructorConstraint))
+                tpElem.Add(new XAttribute("hasDefaultConstructor", XmlConvert.ToString(true)));
+
+            context.Element.Add(tpElem);
+            
             foreach (Type constraint in tp.GetGenericParameterConstraints())
             {
                 var ctElement = new XElement("constraint");

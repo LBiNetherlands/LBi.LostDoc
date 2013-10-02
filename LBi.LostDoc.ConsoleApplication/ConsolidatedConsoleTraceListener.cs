@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,15 +24,34 @@ using System.Xml.XPath;
 
 namespace LBi.LostDoc.ConsoleApplication
 {
-    internal class ConsolidatedConsoleTraceListener : TraceListener
+    internal class ConsolidatedConsoleTraceListener : TraceListener, IEnumerable<TraceSource>
     {
-        private Dictionary<string, string> _sourceMap;
-        private ConcurrentDictionary<string, long> _startedTasks;
-
-        public ConsolidatedConsoleTraceListener(Dictionary<string, string> sourceMap)
+        private readonly List<TraceSource> _sources;
+        private readonly Dictionary<string, string> _aliasMap;
+        private readonly ConcurrentDictionary<string, long> _startedTasks;
+        
+        public ConsolidatedConsoleTraceListener()
         {
-            this._sourceMap = sourceMap;
+            this._sources = new List<TraceSource>();
+            this._aliasMap = new Dictionary<string, string>();
             this._startedTasks = new ConcurrentDictionary<string, long>();
+        }
+
+        public void Add(TraceSource traceSource, string alias)
+        {
+            _sources.Add(traceSource);
+            this._aliasMap.Add(traceSource.Name, alias);
+            traceSource.Listeners.Add(this);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (TraceSource traceSource in this._sources)
+                    traceSource.Listeners.Remove(this);
+            }
+            base.Dispose(disposing);
         }
 
         public override void Write(string message)
@@ -110,7 +130,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 msg = string.Format(format, args);
 
             string newSrc;
-            if (!this._sourceMap.TryGetValue(source, out newSrc))
+            if (!this._aliasMap.TryGetValue(source, out newSrc))
                 newSrc = source;
 
             ConsoleColor oldColor = Console.ForegroundColor;
@@ -173,6 +193,16 @@ namespace LBi.LostDoc.ConsoleApplication
                 return;
 
             this.WriteLine(source, eventType, message);
+        }
+
+        public IEnumerator<TraceSource> GetEnumerator()
+        {
+            return this._sources.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ namespace LBi.LostDoc.Filters
 
         public bool Filter(IFilterContext context, AssetIdentifier asset)
         {
-            object obj = context.AssetResolver.Resolve(asset);
-            if (!(obj is FieldInfo) || !((FieldInfo)obj).DeclaringType.IsEnum)
+            FieldInfo obj = context.AssetResolver.Resolve(asset) as FieldInfo;
+            if (obj == null || !obj.DeclaringType.IsEnum)
                 return false;
 
-            return !(((FieldInfo)obj).IsStatic && ((FieldInfo)obj).IsPublic);
+            return !(obj.IsStatic && obj.IsPublic);
         }
 
         #endregion

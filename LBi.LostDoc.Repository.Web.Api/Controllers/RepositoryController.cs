@@ -33,6 +33,7 @@ namespace LBi.LostDoc.Repository.Web.Api.Controllers
 {
     [ApiKeyAuthorize]
     [Export]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryController : ApiController
     {
         [ImportingConstructor]

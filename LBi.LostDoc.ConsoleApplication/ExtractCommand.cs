@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,14 +57,16 @@ namespace LBi.LostDoc.ConsoleApplication
 
         public override void Invoke(CompositionContainer container)
         {
-            var traceListener = new ConsolidatedConsoleTraceListener(new Dictionary<string, string>
-                                                                         {
-                                                                             {"LostDoc.Core.DocGenerator", "Build"},
-                                                                         });
-            try
+            var traceListener = new ConsolidatedConsoleTraceListener
+                                {
+                                    { TraceSources.GeneratorSource, "Build" },
+                                    { TraceSources.AssemblyLoader, "Loader" },
+                                    { TraceSources.AssetResolverSource, "Resolver" },
+                                };
+
+            using (traceListener)
             {
-                TraceSources.GeneratorSource.Listeners.Add(traceListener);
-                this.ConfigureTraceLevels(TraceSources.GeneratorSource);
+                this.ConfigureTraceLevels(traceListener);
 
                 DocGenerator gen = new DocGenerator(container);
                 gen.AssetFilters.Add(new ComObjectTypeFilter());
@@ -150,10 +152,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 rawDoc.Save(fileName);
 
             }
-            finally
-            {
-                TraceSources.GeneratorSource.Listeners.Remove(traceListener);
-            }
+
         }
 
         #endregion

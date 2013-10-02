@@ -18,6 +18,8 @@ using System;
 
 namespace LBi.LostDoc.Repository.Web.Areas.Administration
 {
+
+    // TODO this needs to be pushed into the front-end
     public static class Extensions
     {
         public static string ToHumanReadableString(this TimeSpan timeSpan)

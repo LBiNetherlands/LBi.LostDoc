@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Repository.Web.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Repository", "LBi.LostDoc.Repository\LBi.LostDoc.Repository.csproj", "{94D3A3E9-16A3-4E15-8CFE-24AF01FB1114}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.ConsoleApplication.Plugin.Repository", "LBi.LostDoc.ConsoleApplication.Plugin.Repository\LBi.LostDoc.ConsoleApplication.Plugin.Repository.csproj", "{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.Templating.Transforms.Less", "LBi.LostDoc.Templating.Transforms.Less\LBi.LostDoc.Templating.Transforms.Less.csproj", "{D61CB417-8623-4D7E-B458-B7D1409F7F3D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.ConsoleApplication.Extensibility", "LBi.LostDoc.ConsoleApplication.Extensibility\LBi.LostDoc.ConsoleApplication.Extensibility.csproj", "{937A6F0F-EFDC-4689-A88D-30954A92C027}"
@@ -142,16 +140,6 @@ Global
 		{94D3A3E9-16A3-4E15-8CFE-24AF01FB1114}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{94D3A3E9-16A3-4E15-8CFE-24AF01FB1114}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{94D3A3E9-16A3-4E15-8CFE-24AF01FB1114}.Release|x86.ActiveCfg = Release|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{7AC16988-3B6A-47A8-B2CD-27B52CA808C7}.Release|x86.ActiveCfg = Release|Any CPU
 		{D61CB417-8623-4D7E-B458-B7D1409F7F3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D61CB417-8623-4D7E-B458-B7D1409F7F3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D61CB417-8623-4D7E-B458-B7D1409F7F3D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

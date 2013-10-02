@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using LBi.Cli.Arguments;
@@ -30,7 +31,7 @@ namespace LBi.LostDoc.ConsoleApplication.Extensibility
 
         public abstract void Invoke(CompositionContainer container);
 
-        protected void ConfigureTraceLevels(params TraceSource[] traceSource)
+        protected void ConfigureTraceLevels(IEnumerable<TraceSource> sources)
         {
             SourceLevels currentLevel;
             if (this.Quiet.IsPresent)
@@ -49,8 +50,8 @@ namespace LBi.LostDoc.ConsoleApplication.Extensibility
                                SourceLevels.Critical |
                                SourceLevels.ActivityTracing;
             }
-            
-            foreach (TraceSource source in traceSource)
+
+            foreach (TraceSource source in sources)
                 source.Switch.Level = currentLevel;
         }
     }

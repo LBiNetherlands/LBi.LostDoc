@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -48,6 +49,27 @@ namespace LBi.LostDoc.Test
                          Naming.GetAssetId(typeof(SpecialClass).GetMethod("AnotherGeneric")));
         }
 
+
+        [Fact]
+        public void GenericMethodOnGenericClass_WithGenericArrayParameters()
+        {
+            Assert.Equal("M:Company.Project.Library.GenericClass`1.ConsumesArrayOfTypeParam``1(`0[],``0[])",
+                         Naming.GetAssetId(typeof(GenericClass<>).GetMethod("ConsumesArrayOfTypeParam")));
+        }
+
+        [Fact]
+        public void GenericMethodOnGenericClass_WithGenericArrayParametersWithRankGreaterThanOne()
+        {
+            Assert.Equal("M:Company.Project.Library.GenericClass`1.ConsumesArraysOfTypeParamWithRankGreatherThan1``1(`0[0:,0:],``0[0:,0:,0:])",
+                         Naming.GetAssetId(typeof(GenericClass<>).GetMethod("ConsumesArraysOfTypeParamWithRankGreatherThan1")));
+        }
+
+        [Fact]
+        public void GenericMethodOnGenericClass_WithGenericArrayOfArray()
+        {
+            Assert.Equal("M:Company.Project.Library.GenericClass`1.ConsumesArrayOfTypeParam2``1(`0[0:,0:,0:][0:,0:][],``0[0:,0:,0:][0:,0:][])",
+                         Naming.GetAssetId(typeof(GenericClass<>).GetMethod("ConsumesArrayOfTypeParam2")));
+        }
 
         [Fact(Skip = "Generic params no longer supported in Naming")]
         public void OverriddenGenericMethod__WithGenericParameter()
@@ -92,7 +114,7 @@ namespace LBi.LostDoc.Test
         [Fact]
         public void NestedClosedGenericType()
         {
-            string aid = Naming.GetAssetId(typeof(GenericClass<string>.NestedGeneric<int>));
+            string aid = Naming.GetAssetId(typeof(GenericClass<string>.NestedGeneric<Uri>));
             Assert.Equal("T:Company.Project.Library.GenericClass`1.NestedGeneric`1", aid);
         }
 
@@ -102,11 +124,11 @@ namespace LBi.LostDoc.Test
         {
             string aid =
                 Naming.GetAssetId(
-                                  typeof(GenericClass<string>.NestedGeneric<int>).GetMethods().First(
+                                  typeof(GenericClass<string>.NestedGeneric<Uri>).GetMethods().First(
                                                                                                      m =>
                                                                                                      m.Name.StartsWith
                                                                                                          ("ConsumeP")));
-            Assert.Equal("M:Company.Project.Library.GenericClass`1.NestedGeneric`1.ConsumeP(System.Int32)", aid);
+            Assert.Equal("M:Company.Project.Library.GenericClass`1.NestedGeneric`1.ConsumeP(System.Uri)", aid);
         }
 
 

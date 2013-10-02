@@ -22,8 +22,6 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl">
 
-  <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
-
   <xsl:template name="section-head-first" />
  
   <xsl:template name="section-head-last"/>

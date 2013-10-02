@@ -20,5 +20,7 @@ namespace LBi.LostDoc.Repository.Web.Host
     {
         public const string ArchiveRouteName = "Archive";
         public const string LibraryRouteName = "Library";
+        public const string AdministrationRouteName = "AdministrationRoot";
+
     }
 }

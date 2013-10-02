@@ -7,11 +7,11 @@ templates
   2. capture output in node-set
   3. Sort node-set on li/a/@sort-key
 
-* method/types with generics need constraints in the C# syntax!
+// * method/types with generics need constraints in the C# syntax!
 
-* fix html/js to allow for 
- * search (using websockets for suggestions?)
- * adjustable column width nav/content
+// * fix html/js to allow for 
+//  * search (using websockets for suggestions?)
+//  * adjustable column width nav/content
 
 * create service template
 
@@ -47,7 +47,7 @@ repository
 
 * capture nuget logging and redirect to app log
 
-* add settings to the repository for custom feeds, etc
+// * add settings to the repository for custom feeds, etc
 
 // * add ability down view/select & download templates (as zip package from)
 

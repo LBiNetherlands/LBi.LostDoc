@@ -22,6 +22,7 @@ using LBi.LostDoc.Repository.Web.Security;
 namespace LBi.LostDoc.Repository.Web.Api.Controllers
 {
     [Export]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class SiteController : ApiController
     {
         [ImportingConstructor]

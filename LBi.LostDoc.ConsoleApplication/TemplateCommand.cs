@@ -1,5 +1,5 @@
 /*
- * Copyright 2012,2013 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,6 @@ namespace LBi.LostDoc.ConsoleApplication
     [ParameterSet("Template", Command = "Template", HelpMessage = "Apply template to a set of ldoc files to generate output.")]
     public class TemplateCommand : Command
     {
-        [Parameter(HelpMessage = "Include errors and warning output only.")]
-        public LBi.Cli.Arguments.Switch Quiet { get; set; }
-
-        [Parameter(HelpMessage = "Include verbose output.")]
-        public LBi.Cli.Arguments.Switch Verbose { get; set; }
-
         [Parameter(HelpMessage = "Overwrites existing files.")]
         public LBi.Cli.Arguments.Switch Force { get; set; }
 
@@ -65,28 +59,16 @@ namespace LBi.LostDoc.ConsoleApplication
 
         public override void Invoke(CompositionContainer container)
         {
-            var traceListener = new ConsolidatedConsoleTraceListener(
-                new Dictionary<string, string>
-                    {
-                        {
-                            "LostDoc.Core.Template",
-                            "Template"
-                        },
-                        {
-                            "LostDoc.Core.Bundle",
-                            "Bundle"
-                        },
-                        {
-                            "LostDoc.Core.Template.AssetResolver",
-                            "Resolve"
-                        }
-                    });
-            
-            try
+            var traceListener = new ConsolidatedConsoleTraceListener
+                                {
+                                    { TraceSources.TemplateSource, "Template" },
+                                    { TraceSources.BundleSource, "Bundle" },
+                                    { TraceSources.AssetResolverSource, "Resolve" }
+                                };
+
+            using (traceListener)
             {
-                TraceSources.TemplateSource.Listeners.Add(traceListener);
-                TraceSources.AssetResolverSource.Listeners.Add(traceListener);
-                this.ConfigureTraceLevels(TraceSources.TemplateSource, TraceSources.AssetResolverSource);
+                this.ConfigureTraceLevels(traceListener);
 
                 LinkedList<FileInfo> includedFiles = new LinkedList<FileInfo>();
 
@@ -95,8 +77,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 else if (Directory.Exists(this.Path))
                 {
                     Directory.GetFiles(this.Path, "*.ldoc", SearchOption.AllDirectories)
-                             .Aggregate(includedFiles,
-                                        (l, f) => l.AddLast(new FileInfo(f)).List);
+                             .Aggregate(includedFiles, (l, f) => l.AddLast(new FileInfo(f)).List);
                 }
                 else
                     throw new FileNotFoundException(System.IO.Path.GetFullPath(this.Path));
@@ -138,11 +119,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
                 template.Generate(templateData);
             }
-            finally
-            {
-                TraceSources.TemplateSource.Listeners.Remove(traceListener);
-                TraceSources.AssetResolverSource.Listeners.Remove(traceListener);
-            }
+
         }
 
 

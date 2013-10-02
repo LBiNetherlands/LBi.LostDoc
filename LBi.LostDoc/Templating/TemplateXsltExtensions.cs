@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,6 +148,8 @@ namespace LBi.LostDoc.Templating
 
         public string asset(string aid)
         {
+            if (string.IsNullOrWhiteSpace(aid))
+                throw new ArgumentException("Asset id cannot be empty.");
             AssetIdentifier ai = this.Parse(aid);
             return ai.AssetId;
         }
@@ -197,6 +199,17 @@ namespace LBi.LostDoc.Templating
         {
             string ret = string.Join(sep, ((IEnumerable)iterator).Cast<XPathNavigator>().Select(n => n.ToString()));
             return ret;
+        }
+
+        public string replace(string str, string target, string replacement)
+        {
+            return str.Replace(target, replacement);
+        }
+
+        public string @break()
+        {
+            System.Diagnostics.Debugger.Break();
+            return string.Empty;
         }
 
         // ReSharper restore InconsistentNaming

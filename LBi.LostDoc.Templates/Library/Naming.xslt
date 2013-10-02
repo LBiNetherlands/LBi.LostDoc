@@ -133,26 +133,8 @@
     <xsl:apply-templates select="." mode="displayText"/>
   </xsl:template>
 
-  <xsl:template match="class" mode="displayText">
-    <xsl:if test="parent::*[not(self::namespace)]">
-      <xsl:apply-templates select="parent::*" mode="displayText"/>
-      <xsl:text>.</xsl:text>
-    </xsl:if>
-    <xsl:choose>
-      <xsl:when test="typeparam">
-        <xsl:value-of select="@name"/>
-        <xsl:text>&lt;</xsl:text>
-        <xsl:apply-templates select="typeparam" mode="displayText"/>
-        <xsl:text>&gt;</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="@name"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-
   <xsl:template match="@*" mode="displayText">
+    <xsl:param name="attributes" select="false()" />
     <xsl:choose>
       <xsl:when test="name() = 'param'">
         <xsl:value-of select="."/>
@@ -168,7 +150,9 @@
           </xsl:when>
           <xsl:otherwise>
             <!--<xsl:apply-templates select="//*[@assetId = current()]" mode="displayText"/>-->
-            <xsl:apply-templates select="ld:key('aid', current())" mode="displayText"/>
+            <xsl:apply-templates select="ld:key('aid', current())" mode="displayText">
+              <xsl:with-param name="attributes" select="$attributes" />
+            </xsl:apply-templates>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
@@ -270,7 +254,9 @@
     <xsl:if test="position() > 1">
       <xsl:text>, </xsl:text>
     </xsl:if>
-    <xsl:apply-templates select="@type | @param | arrayOf" mode="displayText"/>
+    <xsl:apply-templates select="@type | @param | arrayOf" mode="displayText">
+      <xsl:with-param name="attributes" select="attribute" />
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="arrayOf" mode="displayText">
@@ -299,6 +285,8 @@
   </xsl:template>
 
   <xsl:template match="class | interface | struct" mode="displayText">
+    <xsl:param name="attributes" select="false()" />
+    
     <xsl:if test="parent::*[not(self::namespace)]">
       <xsl:apply-templates select="parent::*" mode="displayText"/>
       <xsl:text>.</xsl:text>
@@ -309,6 +297,9 @@
         <xsl:text>&lt;</xsl:text>
         <xsl:apply-templates select="typeparam" mode="displayText"/>
         <xsl:text>&gt;</xsl:text>
+      </xsl:when>
+      <xsl:when test="ld:asset(@assetId) = 'T:System.Object' and $attributes and $attributes[ld:asset(@type) = 'T:System.Runtime.CompilerServices.DynamicAttribute']">
+        <xsl:text>dynamic</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="@name"/>
@@ -341,12 +332,11 @@
 
 
   <!-- SHORT NAMES -->
-
-  <xsl:template match="class" mode="shortName">
-    <xsl:value-of select="@name"/>
-  </xsl:template>
+  <!-- TODO is this really needed? -->
 
   <xsl:template match="@*" mode="shortName">
+    <xsl:param name="attributes" select="false()" />
+    
     <xsl:choose>
       <xsl:when test="name() = 'param'">
         <xsl:value-of select="."/>
@@ -360,7 +350,9 @@
             <xsl:text>&gt;</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates select="ld:key('aid', current())" mode="shortName"/>
+            <xsl:apply-templates select="ld:key('aid', current())" mode="shortName">
+              <xsl:with-param name="attributes" select="$attributes" />
+            </xsl:apply-templates>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
@@ -468,7 +460,9 @@
     <xsl:if test="position() > 1">
       <xsl:text>, </xsl:text>
     </xsl:if>
-    <xsl:apply-templates select="@type | @param | arrayOf" mode="shortName"/>
+    <xsl:apply-templates select="@type | @param | arrayOf" mode="shortName">
+      <xsl:with-param name="attributes" select="attribute" />
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="arrayOf" mode="shortName">
@@ -486,12 +480,17 @@
   </xsl:template>
 
   <xsl:template match="class | interface | struct" mode="shortName">
+    <xsl:param name="attributes" select="false()" />
+    
     <xsl:choose>
       <xsl:when test="typeparam">
         <xsl:value-of select="substring-before(@name, '`')"/>
         <xsl:text>&lt;</xsl:text>
         <xsl:apply-templates select="typeparam" mode="shortName"/>
         <xsl:text>&gt;</xsl:text>
+      </xsl:when>
+      <xsl:when test="ld:asset(@assetId) = 'T:System.Object' and $attributes and $attributes[ld:asset(@type) = 'T:System.Runtime.CompilerServices.DynamicAttribute']">
+        <xsl:text>dynamic</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="@name"/>

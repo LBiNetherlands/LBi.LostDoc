@@ -251,6 +251,15 @@ namespace LBi.LostDoc.Test
             Assert.False(aid.Equals(aid2));
         }
 
+        [Fact]
+        public void ParseComplexAssetIdWithArray()
+        {
+            AssetIdentifier aid =
+                AssetIdentifier.Parse(
+                    "{M:System.Web.Mvc.ViewDataDictionary.CopyTo(System.Collections.Generic.KeyValuePair{System.String,System.Object}[],System.Int32), V:4.0.0.0}");
+        
+            Assert.Equal("M:System.Web.Mvc.ViewDataDictionary.CopyTo(System.Collections.Generic.KeyValuePair{System.String,System.Object}[],System.Int32)", aid.AssetId);
+        }
 
         [Fact]
         public void Parse_With_Specific_Type()

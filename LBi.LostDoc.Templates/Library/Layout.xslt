@@ -22,8 +22,6 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl">
 
-  <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
-
   <xsl:include href="LayoutExtensions.xslt"/>
 
   <xsl:template match="/">

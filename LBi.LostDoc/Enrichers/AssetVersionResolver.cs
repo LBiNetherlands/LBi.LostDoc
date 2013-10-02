@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,16 @@ namespace LBi.LostDoc.Enrichers
         {
             AssetIdentifier aid = AssetIdentifier.Parse(assetId);
             AssetIdentifier hintAsmAid = null;
-            
+            AssetIdentifier ret = null;
+
             if (this._hintAssembly != null)
                 hintAsmAid = AssetIdentifier.FromAssembly(this._hintAssembly);
 
             if (aid.Type == AssetType.Assembly)
             {
                 Assembly asm = (Assembly)this._context.AssetResolver.Resolve(aid, hintAsmAid);
-                aid = AssetIdentifier.FromAssembly(asm);
+                if (asm != null)
+                    ret = AssetIdentifier.FromAssembly(asm);
             }
             else if (aid.Type == AssetType.Namespace)
             {
@@ -50,65 +52,61 @@ namespace LBi.LostDoc.Enrichers
 
                 var version = this.GetNamespaceVersion(this._hintAssembly, ns);
 
-                if (version == null)
-                    throw new Exception("Version not found for asset: " + assetId);
-
-                aid = AssetIdentifier.FromNamespace(ns, version);
+                if (version != null)
+                    ret = AssetIdentifier.FromNamespace(ns, version);
             }
             else
             {
                 object obj = this._context.AssetResolver.Resolve(aid, hintAsmAid);
-                if (aid.Type == AssetType.Unknown)
+
+                if (obj != null)
                 {
-                    MethodInfo[] arr = obj as MethodInfo[];
-                    if (arr != null)
+                    if (aid.Type == AssetType.Unknown)
                     {
-                        // TODO this isn't very nice but it should do the trick for now
-                        var dummyAid = AssetIdentifier.FromMemberInfo(arr[0]);
-                        aid = new AssetIdentifier(aid.AssetId, dummyAid.Version);
+                        MethodInfo[] arr = obj as MethodInfo[];
+                        if (arr != null)
+                        {
+                            // TODO this isn't very nice but it should do the trick for now
+                            var dummyAid = AssetIdentifier.FromMemberInfo(arr[0]);
+                            ret = new AssetIdentifier(aid.AssetId, dummyAid.Version);
+                        }
+                        else
+                            throw new NotSupportedException("Unknow AssetIdentifier marker: " + aid.TypeMarker);
                     }
                     else
-                        throw new NotSupportedException("Unknow AssetIdentifier marker: " + aid.TypeMarker);
+                        ret = AssetIdentifier.FromMemberInfo((MemberInfo)obj);
                 }
-                else
-                    aid = AssetIdentifier.FromMemberInfo((MemberInfo)obj);
             }
 
-            this._context.AddReference(aid);
-
-            return aid.ToString();
+            if (ret != null)
+                this._context.AddReference(ret);
+            else
+            {
+                // TODO log warning/error failed to resolve asset
+                ret = aid;
+            }
+            return ret.ToString();
         }
 
         private Version GetNamespaceVersion(Assembly assembly, string ns)
         {
-            // FIX this could throw a TypeLoadException
-            var types = assembly.GetTypes();
-            Version version = null;
-            for (int typeNum = 0; typeNum < types.Length; typeNum++)
+            foreach (Assembly asm in this._context.AssemblyLoader.GetAssemblyChain(assembly))
             {
-                if (ns.Equals(types[typeNum].Namespace) ||
-                    (types[typeNum].Namespace != null &&
-                     types[typeNum].Namespace.StartsWith(ns) &&
-                     types[typeNum].Namespace[ns.Length] == '.'))
+                var types = asm.GetTypes();
+
+                for (int typeNum = 0; typeNum < types.Length; typeNum++)
                 {
-                    version = this._hintAssembly.GetName().Version;
-                    break;
+                    if (ns.Equals(types[typeNum].Namespace) ||
+                        (types[typeNum].Namespace != null &&
+                         types[typeNum].Namespace.StartsWith(ns) &&
+                         types[typeNum].Namespace[ns.Length] == '.'))
+                    {
+                        return assembly.GetName().Version;
+                    }
                 }
             }
 
-            if (version == null)
-            {
-                AssemblyName[] referencedAssemblies = this._hintAssembly.GetReferencedAssemblies();
-
-                for (int refNum = 0; refNum < referencedAssemblies.Length; refNum++)
-                {
-                    Assembly asm = this._context.AssetResolver.Context.Single(a => a.GetName().FullName.Equals(referencedAssemblies[refNum].FullName, StringComparison.Ordinal));
-                    version = this.GetNamespaceVersion(asm, ns);
-                    if (version != null)
-                        break;
-                }
-            }
-            return version;
+            throw new Exception("Could not find namespace '" + ns + "' in any loaded assembly");
         }
     }
 }

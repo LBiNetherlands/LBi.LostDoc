@@ -39,6 +39,7 @@ using LBi.LostDoc.Repository.Web.Configuration.Xaml;
 using LBi.LostDoc.Repository.Web.Extensibility;
 using LBi.LostDoc.Repository.Web.Extensibility.Http;
 using LBi.LostDoc.Repository.Web.Extensibility.Mvc;
+using LBi.LostDoc.Repository.Web.Host.Areas.Administration;
 using LBi.LostDoc.Repository.Web.Notifications;
 using LBi.LostDoc.Templating;
 using ContractNames = LBi.LostDoc.Extensibility.ContractNames;
@@ -158,7 +159,7 @@ namespace LBi.LostDoc.Repository.Web.Host
             SettingsExportProvider settingsExportProvider = new SettingsExportProvider(settings);
 
             // create container
-            CompositionContainer container = new CompositionContainer(catalog, settingsExportProvider);
+            CompositionContainer container = new CompositionContainer(catalog, true, settingsExportProvider);
 
             // when the catalog changes, discover and route all ApiControllers
             // TODO could this be replaced with an ImportMany + recompositioning?
