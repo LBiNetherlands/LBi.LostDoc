@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using LBi.LostDoc.Cci;
+using Microsoft.Cci;
 
 namespace LBi.LostDoc
 {
@@ -342,6 +344,30 @@ namespace LBi.LostDoc
             return id.ToString(true);
         }
 
+        public static AssetIdentifier FromDefinition(INamedTypeDefinition typeReference)
+        {
+            return FromDefinition((ITypeReference)typeReference);
+        }
+
+        public static AssetIdentifier FromDefinition(ITypeReference typeReference)
+        {
+            string rawId = TypeHelper.GetTypeName(typeReference, NameFormattingOptions.DocumentationId);
+            ITypeDefinition typeDefinition = typeReference.ResolvedType;
+            IAssembly assembly = typeDefinition.GetAssembly();
+            return new AssetIdentifier(rawId, assembly.Version);
+        }
+
+        public static AssetIdentifier FromDefinition(IDefinition definition)
+        {
+            ITypeReference typeReference = definition as ITypeReference;
+            if (typeReference != null)
+                return FromDefinition(typeReference);
+
+            throw new ArgumentException("Not supported: " + definition.GetType().Name);
+        }
+
+
+
         public static AssetIdentifier FromNamespace(string namespaceName, Version version)
         {
             return new AssetIdentifier(Naming.GetAssetId(namespaceName),
@@ -445,5 +471,7 @@ namespace LBi.LostDoc
         {
             return this.ToString(true);
         }
+
+
     }
 }

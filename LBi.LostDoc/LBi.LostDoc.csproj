@@ -37,8 +37,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Cci.MetadataHelper">
+      <HintPath>..\3rdParty\CCI\Microsoft.Cci.MetadataHelper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Cci.MetadataModel">
       <HintPath>..\3rdParty\CCI\Microsoft.Cci.MetadataModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Cci.PeReader">
+      <HintPath>..\3rdParty\CCI\Microsoft.Cci.PeReader.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -59,6 +65,8 @@
     <Compile Include="AssetType.cs" />
     <Compile Include="Bundle.cs" />
     <Compile Include="Cci\CciDocGenerator.cs" />
+    <Compile Include="Cci\CciHelper.cs" />
+    <Compile Include="Cci\ICciAssemblyLoader.cs" />
     <Compile Include="Extensibility\ContractNames.cs" />
     <Compile Include="Composition\MetadataContractBasedImportDefinition.cs" />
     <Compile Include="Composition\MetadataContractBuilder.cs" />

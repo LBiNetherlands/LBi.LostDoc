@@ -10,41 +10,97 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Filters;
 using Microsoft.Cci;
+using AssemblyName = System.Reflection.AssemblyName;
 
 namespace LBi.LostDoc.Cci
 {
+    public class PeAssemblyLoader : ICciAssemblyLoader
+    {
+        public PeAssemblyLoader()
+        {
+            this.Host = new PeReader.DefaultHost();
+        }
+
+        public IAssembly Load(string name)
+        {
+            AssemblyName assemblyName = new AssemblyName(name);
+            AssemblyIdentity identity = UnitHelper.GetAssemblyIdentity(assemblyName, this.Host);
+            IAssembly ret = this.Host.FindAssembly(identity);
+            if (ret is Dummy)
+                ret = this.Host.LoadAssembly(identity);
+
+            if (ret is Dummy)
+                throw new FileNotFoundException("Couldn't load assembly: " + name);
+
+            return ret;
+        }
+
+        public IAssembly LoadFrom(string path)
+        {
+            AssemblyName assemblyName = AssemblyName.GetAssemblyName(path);
+            AssemblyIdentity identity = UnitHelper.GetAssemblyIdentity(assemblyName, this.Host);
+            AssemblyIdentity identityWithLocation = new AssemblyIdentity(identity, path);
+
+            IAssembly ret = this.Host.FindAssembly(identityWithLocation);
+            if (ret is Dummy)
+                ret = this.Host.LoadAssembly(identityWithLocation);
+
+            if (ret is Dummy)
+                throw new FileNotFoundException("Couldn't load assembly: " + path);
+
+            return ret;
+        }
+
+        public IMetadataHost Host { get; private set; }
+    }
+
+    public interface ICciAssetFilter
+    {
+        bool Filter(IFilterContext context, IDefinition definition);
+    }
+
+    public interface ICciEnricher
+    {
+        void EnrichEvent(IProcessingContext context, IDefinition definition);
+    }
+
     public class CciDocGenerator : IDocGenerator
     {
         private readonly List<string> _assemblyPaths;
-        private readonly List<IEnricher> _enrichers;
-        private readonly List<IAssetFilter> _filters;
-        private readonly ObjectCache _cache;
-        private readonly CompositionContainer _container;
-        private IAssembly[] _assemblies;
+        private readonly List<ICciEnricher> _enrichers;
+        private readonly List<ICciAssetFilter> _filters;
+        //private readonly CompositionContainer _container;
+        //private IAssembly[] _assemblies;
+        private readonly ICciAssemblyLoader _assemblyLoader;
+        private IMetadataHost _metadataHost;
 
-        public DocGenerator(CompositionContainer container)
+
+        public CciDocGenerator(ICciAssemblyLoader assemblyLoader)
         {
             this._assemblyPaths = new List<string>();
-            this._filters = new List<IAssetFilter>();
-            this._enrichers = new List<IEnricher>();
+            this._assemblyLoader = assemblyLoader;
+            this._filters = new List<ICciAssetFilter>();
+            this._enrichers = new List<ICciEnricher>();
+            this._metadataHost = this._assemblyLoader.Host;
             //this.Enrichers.Add(new AttributeDataEnricher());
-            this.AssetFilters.Add(new EnumMetadataFilter());
-            this._cache = new MemoryCache("DocGeneratorCache");
-            this._container = container;
+            //this.AssetFilters.Add(new EnumMetadataFilter());
+            //this._cache = new MemoryCache("DocGeneratorCache");
+            //this._container = container;
         }
 
-        public List<IAssetFilter> AssetFilters
+        public List<ICciAssetFilter> AssetFilters
         {
             get { return this._filters; }
         }
 
-        //public List<IEnricher> Enrichers
-        //{
-        //    get { return this._enrichers; }
-        //}
+        public List<ICciEnricher> Enrichers
+        {
+            get { return this._enrichers; }
+        }
 
         #region IDisposable Members
 
@@ -66,17 +122,17 @@ namespace LBi.LostDoc.Cci
 
         public XDocument Generate()
         {
-            //TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Enrichers:");
+            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Enrichers:");
 
-            //for (int i = 0; i < this.Enrichers.Count; i++)
-            //{
-            //    IEnricher enricher = this.Enrichers[i];
-            //    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
-            //                                            0,
-            //                                            "[{0}] {1}",
-            //                                            i,
-            //                                            enricher.GetType().FullName);
-            //}
+            for (int i = 0; i < this.Enrichers.Count; i++)
+            {
+                ICciEnricher enricher = this.Enrichers[i];
+                TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
+                                                        0,
+                                                        "[{0}] {1}",
+                                                        i,
+                                                        enricher.GetType().FullName);
+            }
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Filter:");
             for (int i = 0; i < this.AssetFilters.Count; i++)
@@ -88,20 +144,18 @@ namespace LBi.LostDoc.Cci
                                                         this.AssetFilters[i].GetType().FullName);
             }
 
+            ICciAssemblyLoader assemblyLoader = new PeAssemblyLoader();
+
             XDocument ret = new XDocument();
 
-            IAssemblyLoader assemblyLoader = new ReflectionOnlyAssemblyLoader(
-                this._cache,
-                this._assemblyPaths.Select(Path.GetDirectoryName));
-
-            this._assemblies = this._assemblyPaths.Select(assemblyLoader.LoadFrom).ToArray();
+            IAssembly[] assemblies = this._assemblyPaths.Select(assemblyLoader.LoadFrom).ToArray();
 
             XNamespace defaultNs = string.Empty;
             // pass in assemblyLoader instead
-            IAssetResolver assetResolver = new AssetResolver(assemblyLoader);
+            //IAssetResolver assetResolver = new AssetResolver(assemblyLoader);
 
             // collect phase zero assets
-            List<AssetIdentifier> assets = this.DiscoverAssets(assetResolver, this._assemblies).ToList();
+            List<IDefinition> assets = this.DiscoverAssets(assemblies).ToList();
 
             // initiate output document creation
             ret.Add(new XElement(defaultNs + "bundle"));
@@ -187,55 +241,50 @@ namespace LBi.LostDoc.Cci
             return ret;
         }
 
-
-        private IEnumerable<AssetIdentifier> DiscoverAssets(IAssetResolver assetResolver,
-                                                            IEnumerable<IAssembly> assemblies)
+        private IEnumerable<IDefinition> DiscoverAssets(IAssembly[] assemblies)
         {
+
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
             HashSet<AssetIdentifier> distinctSet = new HashSet<AssetIdentifier>();
-            IFilterContext filterContext = new FilterContext(this._cache, this._container, assetResolver, FilterState.Discovery);
+            IFilterContext filterContext = new FilterContext(null, null, null, FilterState.Discovery);
 
             // find and filter all types from all assemblies 
             foreach (IAssembly asm in assemblies)
             {
-                foreach (INamedTypeDefinition t in asm.GetAllTypes())
+                foreach (INamedTypeDefinition typeDefinition in asm.GetAllTypes())
                 {
                     // check if type survives filtering
-                    AssetIdentifier typeAsset = AssetIdentifier.FromMemberInfo(t);
-
-                    if (this.IsFiltered(filterContext, typeAsset))
+                    if (this.IsFiltered(filterContext, typeDefinition))
                         continue;
+
+                    AssetIdentifier typeAsset = AssetIdentifier.FromDefinition(typeDefinition);
 
                     /* type was not filtered */
                     TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.AssetId);
 
+                    INamespaceTypeDefinition namespaceTypeDef = typeDefinition as INamespaceTypeDefinition;
                     // generate namespace hierarchy
-                    if (!string.IsNullOrEmpty(t.Namespace))
+                    if (namespaceTypeDef != null)
                     {
-                        Version nsVersion = t.Module.Assembly.GetName().Version;
+                        INamespaceDefinition namespaceDefinition = namespaceTypeDef.ContainingUnitNamespace;
+                        AssetIdentifier nsAsset = AssetIdentifier.FromDefinition(namespaceDefinition);
 
-                        string[] fragments = t.Namespace.Split('.');
-                        for (int i = fragments.Length; i > 0; i--)
-                        {
-                            string ns = string.Join(".", fragments, 0, i);
-                            AssetIdentifier nsAsset = AssetIdentifier.FromNamespace(ns, nsVersion);
-                            if (distinctSet.Add(nsAsset))
-                                yield return nsAsset;
-                        }
+                        if (distinctSet.Add(nsAsset))
+                            yield return namespaceDefinition;
+
                     }
 
+
                     if (distinctSet.Add(typeAsset))
-                        yield return typeAsset;
+                        yield return typeDefinition;
 
-                    MemberInfo[] members = t.GetMembers(BindingFlags.Instance |
-                                                        BindingFlags.Static |
-                                                        BindingFlags.Public |
-                                                        BindingFlags.NonPublic);
+                    IEnumerable<ITypeDefinitionMember> members = typeDefinition.Members;
 
-                    foreach (MemberInfo member in members)
+                    foreach (ITypeDefinitionMember member in members)
                     {
-                        AssetIdentifier memberAsset = AssetIdentifier.FromMemberInfo(member);
-                        if (this.IsFiltered(filterContext, memberAsset))
+                        AssetIdentifier memberAsset = AssetIdentifier.FromDefinition(member);
+
+                        if (this.IsFiltered(filterContext, member))
                             continue;
 
                         TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
@@ -243,28 +292,31 @@ namespace LBi.LostDoc.Cci
                                                                 "{0}",
                                                                 memberAsset.AssetId);
                         if (distinctSet.Add(memberAsset))
-                            yield return memberAsset;
+                            yield return member;
                     }
                 }
 
-                yield return AssetIdentifier.FromAssembly(asm);
+                yield return asm;
             }
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Discovering assets");
         }
 
-        private bool IsFiltered(IFilterContext filterContext, AssetIdentifier typeAsset)
+        private bool IsFiltered(IFilterContext filterContext, IDefinition asset)
         {
+            AssetIdentifier assetId = AssetIdentifier.FromDefinition(asset);
             bool filtered = false;
-            foreach (IAssetFilter filter in this.AssetFilters)
+            foreach (ICciAssetFilter filter in this.AssetFilters)
             {
-                if (filter.Filter(filterContext, typeAsset))
+                if (filter.Filter(filterContext, asset))
                 {
+
                     filtered = true;
                     TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
                                                             0,
                                                             "{0} - Filtered by {1}",
-                                                            typeAsset.AssetId, filter);
+                                                            assetId.AssetId,
+                                                            filter);
 
                     break;
                 }

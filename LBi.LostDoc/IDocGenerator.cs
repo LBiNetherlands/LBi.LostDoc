@@ -24,7 +24,7 @@ namespace LBi.LostDoc
     {
         //List<IAssetEnricher> Enrichers { get; }
 
-        List<IAssetFilter> AssetFilters { get; }
+        //List<IAssetFilter> AssetFilters { get; }
 
         void AddAssembly(string path);
 
