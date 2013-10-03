@@ -1025,7 +1025,9 @@ namespace LBi.LostDoc.Templating
             return xpathContext;
         }
 
-        private static string ResultToString(object res)
+
+        // TODO move the ResultToXxx functions to an XPath utility class or something
+        protected internal static string ResultToString(object res)
         {
             string ret = res as string;
             if (ret == null)
@@ -1044,6 +1046,11 @@ namespace LBi.LostDoc.Templating
                             ret = ((XText)first).Value;
                         else if (first is XElement)
                             ret = ((XElement)first).Value;
+                        else if (first is XPathNavigator)
+                        {
+                            XPathNavigator navigator = (XPathNavigator)first;
+                            ret = navigator.Value;
+                        }
                     }
                 }
             }

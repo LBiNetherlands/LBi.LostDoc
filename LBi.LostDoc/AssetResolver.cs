@@ -108,9 +108,7 @@ namespace LBi.LostDoc
                     object resolve = this.Resolve(assetId);
                     MemberInfo mi = (MemberInfo)resolve;
 
-                    foreach (
-                        AssetIdentifier aid in
-                            this.GetAssetHierarchy(AssetIdentifier.FromMemberInfo(mi.ReflectedType)))
+                    foreach (AssetIdentifier aid in this.GetAssetHierarchy(AssetIdentifier.FromMemberInfo(mi.ReflectedType)))
                         yield return aid;
 
 
