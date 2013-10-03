@@ -40,7 +40,6 @@ namespace LBi.LostDoc.Templating.XPath
         /// </param>
         public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
         {
-            //return args.FirstOrDefault(t => !string.IsNullOrEmpty(t as string));
             bool b1 = Template.ResultToBool(args[0]);
 
             if (b1)

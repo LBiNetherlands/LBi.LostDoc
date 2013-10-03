@@ -42,8 +42,8 @@ namespace LBi.LostDoc.Templating.XPath
         public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
         {
             //return args.FirstOrDefault(t => !string.IsNullOrEmpty(t as string));
-            string s1 = args[0] as string;
-            string s2 = args[1] as string;
+            string s1 = Template.ResultToString(args[0]);
+            string s2 = Template.ResultToString(args[1]);
             int ix = s1.LastIndexOf(s2, StringComparison.Ordinal);
             if (ix >= 0)
                 return s1.Substring(ix + 1);

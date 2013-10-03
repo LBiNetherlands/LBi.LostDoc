@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,17 +34,7 @@ namespace LBi.LostDoc.Templating.XPath
 
         public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
         {
-            string rawAid = string.Empty;
-
-            if (args[0] is string)
-                rawAid = (string)args[0];
-            else if (args[0] is IEnumerable)
-            {
-                XPathNavigator nav = (XPathNavigator)((IEnumerable)args[0]).Cast<object>().First();
-                rawAid = nav.Value;
-            }
-
-            AssetIdentifier aid = AssetIdentifier.Parse(rawAid);
+            AssetIdentifier aid = AssetIdentifier.Parse(Template.ResultToString(args[0]));
 
             if (this._ignoredVersionComponent.HasValue)
                 return aid.Version.ToString((int)this._ignoredVersionComponent.Value);
