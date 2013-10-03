@@ -66,7 +66,9 @@
         </tr>
       </thead>
       <tbody>
-        <xsl:apply-templates select="/bundle/assembly[@phase = '0']"/>
+        <xsl:apply-templates select="/bundle/assembly[@phase = '0']">
+          <xsl:sort select="@name"/>
+        </xsl:apply-templates>
       </tbody>
     </table>
 
