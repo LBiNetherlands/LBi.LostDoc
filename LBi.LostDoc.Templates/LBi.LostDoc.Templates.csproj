@@ -51,7 +51,9 @@
     <EmbeddedResource Include="Library\DocComments.xslt" />
     <EmbeddedResource Include="Library\GlobalParameter.xslt" />
     <EmbeddedResource Include="Library\Layout.xslt" />
-    <EmbeddedResource Include="Library\Library.xslt" />
+    <EmbeddedResource Include="Library\Library.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Library\Member.xslt" />
     <EmbeddedResource Include="Library\Namespace.xslt" />
     <EmbeddedResource Include="Library\Naming.xslt" />

@@ -64,6 +64,7 @@
     <Compile Include="AssetResolver.cs" />
     <Compile Include="AssetType.cs" />
     <Compile Include="Bundle.cs" />
+    <Compile Include="Cci\AssetHierarchyBuilder.cs" />
     <Compile Include="Cci\CciDocGenerator.cs" />
     <Compile Include="Cci\CciHelper.cs" />
     <Compile Include="Cci\ICciAssemblyLoader.cs" />

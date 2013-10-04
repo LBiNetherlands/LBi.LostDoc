@@ -33,7 +33,7 @@ namespace LBi.LostDoc
 
         void EnrichField(IProcessingContext context, FieldInfo fieldInfo);
 
- r       void EnrichProperty(IProcessingContext context, PropertyInfo propertyInfo);
+        void EnrichProperty(IProcessingContext context, PropertyInfo propertyInfo);
 
         void EnrichReturnValue(IProcessingContext context, MethodInfo methodInfo);
 
