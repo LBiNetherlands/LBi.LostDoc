@@ -48,6 +48,12 @@ namespace LBi.LostDoc.Cci
             rootUnitNamespace.Unit.Dispatch(this);
         }
 
+        public override void Visit(IMethodDefinition method)
+        {
+            this._hierachy.Add(method);
+            method.ContainingType.Dispatch(this);
+        }
+
         public void Clear()
         {
             this._hierachy.Clear();
