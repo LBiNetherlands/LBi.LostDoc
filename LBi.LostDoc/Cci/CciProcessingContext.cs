@@ -8,18 +8,18 @@ namespace LBi.LostDoc.Cci
 {
     public class CciProcessingContext : ICciProcessingContext
     {
-        private readonly HashSet<IDefinition> _references;
+        private readonly HashSet<IReference> _references;
         private readonly ICciAssetFilter[] _filters;
 
         public CciProcessingContext(IEnumerable<ICciAssetFilter> filters, XElement element, int phase)
         {
-            this._references = new HashSet<IDefinition>();
+            this._references = new HashSet<IReference>();
             this.Element = element;
             this.Phase = phase;
             this._filters = filters.ToArray();
         }
 
-        protected CciProcessingContext(HashSet<IDefinition> references,
+        protected CciProcessingContext(HashSet<IReference> references,
                                        ICciAssetFilter[] filters,
                                        XElement element,
                                        int phase)
@@ -34,12 +34,12 @@ namespace LBi.LostDoc.Cci
 
         public int Phase { get; protected set; }
 
-        public bool AddReference(IDefinition asset)
+        public bool AddReference(IReference asset)
         {
             return this._references.Add(asset);
         }
 
-        public IEnumerable<IDefinition> References
+        public IEnumerable<IReference> References
         {
             get { return this._references.AsEnumerable(); }
         }

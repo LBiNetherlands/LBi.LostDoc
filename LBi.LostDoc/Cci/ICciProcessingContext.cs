@@ -8,8 +8,8 @@ namespace LBi.LostDoc.Cci
     {
         XElement Element { get; }
         int Phase { get; }
-        bool AddReference(IDefinition asset);
-        IEnumerable<IDefinition> References { get; }
+        bool AddReference(IReference asset);
+        IEnumerable<IReference> References { get; }
         ICciProcessingContext Clone(XElement newElement);
         ICciProcessingContext Clone(int newPhase);
         bool IsFiltered(IDefinition asset);

@@ -11,7 +11,7 @@ using Microsoft.Cci;
 
 namespace LBi.LostDoc.Cci
 {
-    public class CciDocGenerator : IDocGenerator
+    internal class CciDocGenerator : IDocGenerator
     {
         private readonly List<string> _assemblyPaths;
         private readonly List<ICciEnricher> _enrichers;
@@ -182,7 +182,7 @@ namespace LBi.LostDoc.Cci
                 hierarchyBuilder.SetContext(context);
                 asset.Dispatch(hierarchyBuilder);
                 assetElement = hierarchyBuilder.Result;
-
+                Debug.Assert(assetElement != null, "AssetHierarchyBuilder.Result is null");
                 context = context.Clone(assetElement);
             }
         }
@@ -273,21 +273,7 @@ namespace LBi.LostDoc.Cci
 
 
 
-        private XElement GenerateNamespaceElement(IProcessingContext context, AssetIdentifier assetId)
-        {
-            string ns = (string)context.AssetResolver.Resolve(assetId);
-            var ret = new XElement("namespace",
-                                   new XAttribute("name", ns),
-                                   new XAttribute("assetId", assetId),
-                                   new XAttribute("phase", context.Phase));
 
-            context.Element.Add(ret);
-
-            foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichNamespace(context.Clone(ret), ns);
-
-            return ret;
-        }
 
         private XElement GenerateTypeElement(IProcessingContext context, AssetIdentifier assetId)
         {
