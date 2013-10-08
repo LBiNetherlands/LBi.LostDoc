@@ -27,12 +27,21 @@ namespace LBi.LostDoc.Cci
             if (nsTypeDef != null)
                 return nsTypeDef.GetAssembly();
 
+            INestedTypeDefinition nestedTypeDef = typeDef as INestedTypeDefinition;
+            if (nestedTypeDef != null)
+                return nestedTypeDef.GetAssembly();
+
             throw new InvalidOperationException("cannot find assembly");
         }
 
         public static IAssembly GetAssembly(this INamespaceTypeDefinition typeDef)
         {
             return (IAssembly)typeDef.Container.RootOwner;
+        }
+
+        public static IAssembly GetAssembly(this INestedTypeDefinition typeDef)
+        {
+            return typeDef.Container.GetAssembly();
         }
         #endregion
     }

@@ -1,123 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Caching;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using LBi.LostDoc.Diagnostics;
-using LBi.LostDoc.Filters;
 using Microsoft.Cci;
-using AssemblyName = System.Reflection.AssemblyName;
 
 namespace LBi.LostDoc.Cci
 {
-    public interface ICciProcessingContext
-    {
-        XElement Element { get; }
-        int Phase { get; }
-        bool AddReference(IDefinition asset);
-        IEnumerable<IDefinition> References { get; } 
-        IProcessingContext Clone(XElement newElement);
-        bool IsFiltered(IDefinition interfaceAssetId);
-    }
-
-    public class CciProcessingContext : ICciProcessingContext
-    {
-        private readonly HashSet<IDefinition> _references;
-        private readonly ICciAssetFilter[] _filters;
-
-        public CciProcessingContext(IEnumerable<ICciAssetFilter> filters, XElement element, int phase)
-        {
-            this._references = new HashSet<IDefinition>();
-            this.Element = element;
-            this.Phase = phase;
-            this._filters = filters.ToArray();
-        }
-
-        public XElement Element { get; protected set; }
-
-        public int Phase { get; protected set; }
-
-        public bool AddReference(IDefinition asset)
-        {
-            return this._references.Add(asset);
-        }
-
-        public IEnumerable<IDefinition> References
-        {
-            get { return this._references.AsEnumerable(); }
-        }
-
-        public IProcessingContext Clone(XElement newElement)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsFiltered(IDefinition interfaceAssetId)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class PeAssemblyLoader : ICciAssemblyLoader
-    {
-        public PeAssemblyLoader()
-        {
-            this.Host = new PeReader.DefaultHost();
-        }
-
-        public IAssembly Load(string name)
-        {
-            AssemblyName assemblyName = new AssemblyName(name);
-            AssemblyIdentity identity = UnitHelper.GetAssemblyIdentity(assemblyName, this.Host);
-            IAssembly ret = this.Host.FindAssembly(identity);
-            if (ret is Dummy)
-                ret = this.Host.LoadAssembly(identity);
-
-            if (ret is Dummy)
-                throw new FileNotFoundException("Couldn't load assembly: " + name);
-
-            return ret;
-        }
-
-        public IAssembly LoadFrom(string path)
-        {
-            AssemblyName assemblyName = AssemblyName.GetAssemblyName(path);
-            AssemblyIdentity identity = UnitHelper.GetAssemblyIdentity(assemblyName, this.Host);
-            AssemblyIdentity identityWithLocation = new AssemblyIdentity(identity, path);
-
-            IAssembly ret = this.Host.FindAssembly(identityWithLocation);
-            if (ret is Dummy)
-                ret = this.Host.LoadAssembly(identityWithLocation);
-
-            if (ret is Dummy)
-                throw new FileNotFoundException("Couldn't load assembly: " + path);
-
-            return ret;
-        }
-
-        public IMetadataHost Host { get; private set; }
-    }
-
-    public interface ICciAssetFilter
-    {
-        bool Filter(IFilterContext context, IDefinition definition);
-    }
-
-    public interface ICciEnricher
-    {
-        void Enrich(ICciProcessingContext context, IDefinition definition);
-
-        void RegisterNamespace(ICciProcessingContext context);
-    }
-
     public class CciDocGenerator : IDocGenerator
     {
         private readonly List<string> _assemblyPaths;
@@ -224,10 +117,15 @@ namespace LBi.LostDoc.Cci
             int phase = 0;
             HashSet<IDefinition> referencedAssets = new HashSet<IDefinition>();
 
-            long lastProgressOutput = Stopwatch.GetTimestamp();
+            AssetHierarchyCollector hierarchyCollector = new AssetHierarchyCollector();
+
             // main output loop
             while (assets.Count > 0)
             {
+                ICciProcessingContext context = pctx.Clone(phase);
+
+                long lastProgressOutput = Stopwatch.GetTimestamp();
+
                 int phaseAssetCount = 0;
                 using (TraceSources.GeneratorSource.TraceActivity("Phase {0} ({1:N0} assets)", phase, assets.Count))
                 {
@@ -254,22 +152,11 @@ namespace LBi.LostDoc.Cci
                         TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Generating {0}", asset);
 
                         // get hierarchy
-                        AssetHierarchyBuilder hierarchyBuilder = new AssetHierarchyBuilder();
-                        asset.Dispatch(hierarchyBuilder);
+                        asset.Dispatch(hierarchyCollector);
 
-                        LinkedList<IDefinition> hierarchy = new LinkedList<IDefinition>();
-                        foreach (IDefinition assetDefinition in hierarchyBuilder)
-                            hierarchy.AddFirst(assetDefinition);
+                        this.BuildHierarchy(context, hierarchyCollector);
 
-                        if (hierarchy.First != null)
-                        {
-                            this.BuildHierarchy(null,
-                                                ret.Root,
-                                                hierarchy.First,
-                                                referencedAssets,
-                                                emittedAssets,
-                                                phase);
-                        }
+                        hierarchyCollector.Clear();
                     }
 
 
@@ -285,68 +172,49 @@ namespace LBi.LostDoc.Cci
             return ret;
         }
 
+        private void BuildHierarchy(ICciProcessingContext context, IEnumerable<IDefinition> hierarchy)
+        {
+            foreach (IDefinition asset in hierarchy)
+            {
+                XElement assetElement;
+                
+                AssetHierarchyBuilder hierarchyBuilder = new AssetHierarchyBuilder();
+                hierarchyBuilder.SetContext(context);
+                asset.Dispatch(hierarchyBuilder);
+                assetElement = hierarchyBuilder.Result;
+
+                context = context.Clone(assetElement);
+            }
+        }
+
         private IEnumerable<IDefinition> DiscoverAssets(IEnumerable<IAssembly> assemblies)
         {
-
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
-            HashSet<AssetIdentifier> distinctSet = new HashSet<AssetIdentifier>();
-            IFilterContext filterContext = new FilterContext(null, null, null, FilterState.Discovery);
 
-            // find and filter all types from all assemblies 
-            foreach (IAssembly asm in assemblies)
+            CciFilterContext filterContext = new CciFilterContext(FilterState.Discovery);
+            TypeMemberAssetCollector assetCollector = new TypeMemberAssetCollector();
+          
+            MetadataTraverser traverser = new MetadataTraverser
+                                          {
+                                              PreorderVisitor = assetCollector,
+                                              TraverseIntoMethodBodies = false
+                                          };
+
+            foreach (IAssembly assembly in assemblies)
             {
-                foreach (INamedTypeDefinition typeDefinition in asm.GetAllTypes())
-                {
-                    // check if type survives filtering
-                    if (this.IsFiltered(filterContext, typeDefinition))
-                        continue;
+                traverser.Traverse(assembly);
+            }
 
-                    AssetIdentifier typeAsset = AssetIdentifier.FromDefinition(typeDefinition);
-
-                    /* type was not filtered */
-                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.AssetId);
-
-                    INamespaceTypeDefinition namespaceTypeDef = typeDefinition as INamespaceTypeDefinition;
-                    // generate namespace hierarchy
-                    if (namespaceTypeDef != null)
-                    {
-                        INamespaceDefinition namespaceDefinition = namespaceTypeDef.ContainingUnitNamespace;
-                        AssetIdentifier nsAsset = AssetIdentifier.FromDefinition(namespaceDefinition);
-
-                        if (distinctSet.Add(nsAsset))
-                            yield return namespaceDefinition;
-
-                    }
-
-
-                    if (distinctSet.Add(typeAsset))
-                        yield return typeDefinition;
-
-                    IEnumerable<ITypeDefinitionMember> members = typeDefinition.Members;
-
-                    foreach (ITypeDefinitionMember member in members)
-                    {
-                        AssetIdentifier memberAsset = AssetIdentifier.FromDefinition(member);
-
-                        if (this.IsFiltered(filterContext, member))
-                            continue;
-
-                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
-                                                                0,
-                                                                "{0}",
-                                                                memberAsset.AssetId);
-                        if (distinctSet.Add(memberAsset))
-                            yield return member;
-                    }
-                }
-
-                yield return asm;
+            foreach (ITypeDefinitionMember typeDefinitionMember in assetCollector)
+            {
+                if (!this.IsFiltered(filterContext, typeDefinitionMember))
+                    yield return typeDefinitionMember;
             }
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Discovering assets");
         }
 
-        private bool IsFiltered(IFilterContext filterContext, IDefinition asset)
+        private bool IsFiltered(ICciFilterContext filterContext, IDefinition asset)
         {
             AssetIdentifier assetId = AssetIdentifier.FromDefinition(asset);
             bool filtered = false;
@@ -367,67 +235,6 @@ namespace LBi.LostDoc.Cci
             }
             return filtered;
         }
-
-        private void BuildHierarchy(IAssetResolver assetResolver, XElement parentNode, LinkedListNode<IDefinition> hierarchy, HashSet<IDefinition> references, HashSet<IDefinition> emittedAssets, int phase)
-        {
-            if (hierarchy == null)
-                return;
-
-     
-
-            var asset = hierarchy.Value;
-            ICciProcessingContext pctx = new CciProcessingContext(this.AssetFilters, parentNode, phase);
-
-            XElement newElement;
-
-            // add asset to list of generated assets
-            emittedAssets.Add(asset);
-
-            // dispatch depending on type
-            switch (aid.Type)
-            {
-                case AssetType.Namespace:
-                    newElement = parentNode.XPathSelectElement(string.Format("namespace[@assetId = '{0}']", aid));
-                    if (newElement == null)
-                        newElement = this.GenerateNamespaceElement(pctx, aid);
-                    break;
-                case AssetType.Type:
-                    newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", aid));
-                    if (newElement == null)
-                        newElement = this.GenerateTypeElement(pctx, aid);
-                    break;
-                case AssetType.Method:
-                    newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", aid));
-                    if (newElement == null)
-                        newElement = this.GenerateMethodElement(pctx, aid);
-                    break;
-                case AssetType.Field:
-                    newElement = parentNode.XPathSelectElement(string.Format("field[@assetId = '{0}']", aid));
-                    if (newElement == null)
-                        newElement = this.GenerateFieldElement(pctx, aid);
-                    break;
-                case AssetType.Event:
-                    newElement = parentNode.XPathSelectElement(string.Format("event[@assetId = '{0}']", aid));
-                    if (newElement == null)
-                        newElement = this.GenerateEventElement(pctx, aid);
-                    break;
-                case AssetType.Property:
-                    newElement = parentNode.XPathSelectElement(string.Format("property[@assetId = '{0}']", aid));
-                    if (newElement == null)
-                        newElement = this.GeneratePropertyElement(pctx, aid);
-                    break;
-                case AssetType.Assembly:
-                    newElement = parentNode.XPathSelectElement(string.Format("assembly[@assetId = '{0}']", aid));
-                    if (newElement == null)
-                        newElement = this.GenerateAssemblyElement(pctx, aid);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            this.BuildHierarchy(assetResolver, newElement, hierarchy.Next, references, emittedAssets, phase);
-        }
-
 
         public static void GenerateTypeRef(IProcessingContext context, Type pType, string attrName = null)
         {
@@ -464,30 +271,7 @@ namespace LBi.LostDoc.Cci
             }
         }
 
-        private XElement GenerateAssemblyElement(IProcessingContext context, AssetIdentifier assetId)
-        {
-            Assembly asm = (Assembly)context.AssetResolver.Resolve(assetId);
 
-            IEnumerable<XElement> references =
-                asm.GetReferencedAssemblies()
-                   .Select(an => new XElement("references",
-                                              new XAttribute("assembly",
-                                                             AssetIdentifier.FromAssembly(context.AssemblyLoader.Load(an.FullName)))));
-
-            XElement ret = new XElement("assembly",
-                                        new XAttribute("name", asm.GetName().Name),
-                                        new XAttribute("filename", asm.ManifestModule.Name),
-                                        new XAttribute("assetId", assetId),
-                                        new XAttribute("phase", context.Phase),
-                                        references);
-
-            context.Element.Add(ret);
-
-            foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichAssembly(context.Clone(ret), asm);
-
-            return ret;
-        }
 
         private XElement GenerateNamespaceElement(IProcessingContext context, AssetIdentifier assetId)
         {

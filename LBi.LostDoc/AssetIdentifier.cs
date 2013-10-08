@@ -363,10 +363,28 @@ namespace LBi.LostDoc
             if (typeReference != null)
                 return FromDefinition(typeReference);
 
+            ITypeMemberReference memberReference = definition as ITypeMemberReference;
+            if (memberReference != null)
+                return FromDefinition(memberReference);
+
+            IAssembly assembly = definition as IAssembly;
+            if (assembly != null)
+                return FromDefinition(assembly);
+
             throw new ArgumentException("Not supported: " + definition.GetType().Name);
         }
 
+        private static AssetIdentifier FromDefinition(ITypeMemberReference memberReference)
+        {
+            string rawId = MemberHelper.GetMemberSignature(memberReference, NameFormattingOptions.DocumentationId);
+            IAssembly assembly = memberReference.ContainingType.ResolvedType.GetAssembly();
+            return new AssetIdentifier(rawId, assembly.Version);
+        }
 
+        public static AssetIdentifier FromDefinition(IAssembly assembly)
+        {
+            return new AssetIdentifier("A:" + assembly.Name, assembly.Version);
+        }
 
         public static AssetIdentifier FromNamespace(string namespaceName, Version version)
         {
