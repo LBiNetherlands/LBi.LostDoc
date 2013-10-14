@@ -128,6 +128,7 @@ namespace LBi.LostDoc.Reflection
 
         private void GetAssemblyChain(Assembly assembly, List<Assembly> ret)
         {
+            List<Assembly> children = new List<Assembly>();
             foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
             {
                 Assembly refAsm = this.LoadAssemblyInternal(assemblyName.FullName,
@@ -141,8 +142,13 @@ namespace LBi.LostDoc.Reflection
                 if (!ret.Contains(refAsm))
                 {
                     ret.Add(refAsm);
-                    GetAssemblyChain(refAsm, ret);
+                    children.Add(refAsm);
                 }
+            }
+
+            foreach (Assembly child in children)
+            {
+                GetAssemblyChain(child, ret);
             }
         }
 
