@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012 LBi Netherlands B.V.
+  Copyright 2012-2013 LBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -287,7 +287,7 @@
     </ul>
   </xsl:template>
 
-  <xsl:template match="/bundle/assembly/namespace/*[(self::class | self::struct | self::enum | self::delegate)]//*[(self::method | self::property | self::field | self::event | self::constructor | self::operator)]" mode="xnav">
+  <xsl:template match="/bundle/assembly/namespace/*[(self::class | self::struct | self::enum | self::delegate | self::interface)]//*[(self::method | self::property | self::field | self::event | self::constructor | self::operator)]" mode="xnav">
     <ul>
       <xsl:choose>
         <xsl:when test="(self::method) and (preceding-sibling::method/@name = @name or following-sibling::method/@name = @name)">
