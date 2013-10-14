@@ -27,7 +27,7 @@ namespace LBi.LostDoc.Templating.XPath
 
         public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
         {
-            return AssetIdentifier.Parse(Template.ResultToString(args[0]));
+            return AssetIdentifier.Parse(Template.ResultToString(args[0])).AssetId;
         }
 
         public int Minargs
