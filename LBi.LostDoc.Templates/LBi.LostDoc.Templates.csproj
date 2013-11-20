@@ -83,6 +83,11 @@
     <EmbeddedResource Include="Library\js\lib\zepto.js" />
     <EmbeddedResource Include="Library\js\lostdoc.js" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\js\lostdoc.settings.js" />
+    <EmbeddedResource Include="Library\js\lostdoc.layout.js" />
+    <EmbeddedResource Include="Library\js\lostdoc.nav.js" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist $(ProjectDir)..\AddInPackages mkdir $(ProjectDir)..\AddInPackages

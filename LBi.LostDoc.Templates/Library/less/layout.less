@@ -1,8 +1,9 @@
 html {
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 body {
+  overflow-y: scroll;
   background-color: @white;
   font-size: 13px;
   font-family: 'Segoe UI', 'Lucida Grande',Verdana,Arial,Helvetica,sans-serif;
@@ -31,12 +32,13 @@ body {
     min-height: 100%;
     margin: 0 auto;
     width: 100%;
-    position: relative;
+    position: absolute;
   }
 
   .left-col-outer {
     float: left;
-    position: relative;
+    position: absolute;
+    min-height: 100%;
 
     &:after {
       content: '';
@@ -63,6 +65,7 @@ body {
     background-repeat: no-repeat;
     background-size: 6px 100%;
     float: right;
+    height: 100%;
     //mark: will be overrided by js;
     width: 80%;
     // end mark
@@ -70,7 +73,6 @@ body {
       border-left: 1px solid @grey_dark;
       padding-left: 20px;
       padding-right: 20px;
-      overflow-y: scroll;
     }
   }
 
@@ -88,11 +90,12 @@ body {
     cursor: grab;
     cursor: -webkit-grab;
     height: 40px;
-    position: absolute;
-    right: -3px;
+    position: fixed;
+    left: 20%;
     top: 40%;
     width: 9px;
     z-index: 10000;
+    margin-left: -5px;
 
     &:active {
       cursor: ew-resize;

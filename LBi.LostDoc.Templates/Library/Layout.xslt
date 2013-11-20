@@ -43,8 +43,8 @@
       <body>
         <xsl:call-template name="section-body-first"/>
         <div id="wrapper">
-          <div class="left-col-outer auto-height" >
-            <div class="left-col-inner auto-height">
+          <div class="left-col-outer" >
+            <div class="left-col-inner">
               <xsl:call-template name="section-header-before"/>
               <header>
                 <xsl:call-template name="section-header-first"/>
@@ -60,8 +60,8 @@
           </div>
           <!-- / Main navigation -->
 
-          <div class="right-col-outer auto-height">
-            <div class="right-col-inner auto-height">
+          <div class="right-col-outer">
+            <div class="right-col-inner">
               <xsl:call-template name="section-main-before"/>
               <main class="main-content">
                 <xsl:call-template name="section-main-first"/>
@@ -74,6 +74,9 @@
 
         </div>
         <script src="{ld:relative('js/lib/zepto.js')}" >&#160;</script>
+        <script src="{ld:relative('js/lostdoc.settings.js')}" >&#160;</script>
+        <script src="{ld:relative('js/lostdoc.layout.js')}" >&#160;</script>
+        <script src="{ld:relative('js/lostdoc.nav.js')}" >&#160;</script>
         <script src="{ld:relative('js/lostdoc.js')}" >&#160;</script>
         <xsl:call-template name="section-body-last"/>
       </body>
