@@ -15,7 +15,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -265,14 +264,22 @@ namespace LBi.LostDoc
         private T GetVisible<T>(Type type, T[] methods) where T : MemberInfo
         {
             // if there is a "new" method on the type we'll find both it and the method it hides.
-            if (methods.Length == 2 && methods[1].DeclaringType == type)
-                return methods[1];
 
-            Debug.Assert(methods.Length <= 2,
-                         string.Format("Found {0} methods, expected 0, 1 or 2.", methods.Length));
+            Type currentType = type;
 
-            if (methods.Length > 0)
-                return methods[0];
+            do
+            {
+                for (int i = 0; i < methods.Length; i++)
+                {
+                    if (methods[i].DeclaringType == currentType)
+                        return methods[i];
+                }
+
+                currentType = currentType.BaseType;
+
+            } while (currentType != null);
+
+            Debug.Fail("Unable to get visible member.");
 
             return null;
         }
@@ -302,12 +309,18 @@ namespace LBi.LostDoc
         {
             List<Type> allMatches = new List<Type>();
 
-            // TODO maybe this should start with hintAssembly, then walk the chain and only after that fall back to everything in _assemblyLoader
             if (hintAssembly != null)
             {
                 type = hintAssembly.GetType(typeName, false, false);
                 if (type != null)
                     return true;
+
+                foreach (var assembly in this._assemblyLoader.GetAssemblyChain(hintAssembly))
+                {
+                    type = assembly.GetType(typeName, false, false);
+                    if (type != null)
+                        return true;
+                }
             }
 
             foreach (var assembly in this._assemblyLoader)

@@ -23,7 +23,7 @@
  
   <!-- This script only targets version 11.0 since we use hooks from the Microsoft.Web.Publishing.targets -->
   <Target Name="VerifyVersion">
-    <Error Text="The publish script only support visual studio 11.0, use the following parameter: /p:VisualStudioVersion=11.0" Condition="$(VisualStudioVersion) != '11.0'" />
+    <Error Text="The publish script only support visual studio 11.0, use the following parameter: /p:VisualStudioVersion=11.0" Condition="$(VisualStudioVersion) != '11.0' and $(VisualStudioVersion) != '12.0'" />
   </Target>
 
   <Target Name="IncludeAcl">

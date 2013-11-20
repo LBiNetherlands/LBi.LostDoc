@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 LBi Netherlands B.V.
+ * Copyright 2012-2013 LBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,17 @@
 
 namespace Company.Project.Library
 {
+    public class InhertedRegularClass3 : InhertedRegularClass2
+    {
+       
+    }
+
+    public class InhertedRegularClass2 : InheritedRegularClass
+    {
+        public new string StringProperty { get; set; }
+    }
+
+
     /// <summary>
     /// Class that inherits from RegularClass
     /// </summary>
@@ -51,6 +62,8 @@ namespace Company.Project.Library
         {
             return base.ToString();
         }
+
+        public new string StringProperty { get; set; }
 
         /// <summary>
         /// I'm a "new"
