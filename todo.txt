@@ -2,6 +2,9 @@ TODO
 
 templates
 =========
+
+* add "debug" param to template to control less/js minification/compilation.
+
 * rework xsl:sort in navigation2.xslt
   1. Generate unsorted output _with_ sort-key
   2. capture output in node-set
@@ -21,6 +24,9 @@ cli
 
 core
 ====
+
+* add google closure compiler for js (via IKVM)
+  somehow support multiple files as input for transform
 
 * add StatisticsBuilder and expose it so Repository can get nice statistics
   also reduces the line count in Template.cs
