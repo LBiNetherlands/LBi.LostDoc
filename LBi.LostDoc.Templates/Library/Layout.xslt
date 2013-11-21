@@ -48,7 +48,7 @@
               <xsl:call-template name="section-header-before"/>
               <header>
                 <xsl:call-template name="section-header-first"/>
-                <xsl:text>LostDoc</xsl:text>
+                <img src="{ld:relative('images/lostdoc.svg')}" alt="LostDoc Logo" class="logo"/> 
                 <xsl:call-template name="section-header-last"/>
               </header>
               <xsl:call-template name="section-header-after"/>
