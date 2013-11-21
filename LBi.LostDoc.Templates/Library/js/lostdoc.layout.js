@@ -13,7 +13,7 @@ new function (LostDoc) {
             'resizingClass': 'resizing',
             'detachableContentSelector': '.detachable',
             'detachedContentClass': 'detached',
-            'detachedContentTop': '50'
+            'detachedContentTop': '25'
         };
 
         if (settings != null) {
@@ -129,22 +129,24 @@ new function (LostDoc) {
 
     LostDoc.Layout.prototype._sticky = function (content, contentTop, contentWidth) {
         var wndHeight = $(window).height();
-
+        var scrollTop = $(window).scrollTop();
         var contentHeight = content.height();
+
         if (contentHeight < wndHeight) {
-            // sticky left
-            console.log("detachable", content);
+            //console.log("detachable", content);
 
-            var currentTop = content.offset().top;
+            var offset = content.offset().top - scrollTop;
 
-            console.log("offset", currentTop);
+            //console.log("offset", offset);
+            //console.log("contentTop", contentTop);
+            //console.log("isDetached", this._isDetached(content));
 
-            if (!this._isDetached(content) && currentTop <= contentTop) {
+            if (!this._isDetached(content) && offset <= contentTop) {
                 this._detach(content, contentTop, contentWidth);
-                console.log("detaching", content);
-            } else if (this._isDetached(content) && currentTop <= contentTop) {
+                //console.log("detaching", content);
+            } else if (this._isDetached(content) && scrollTop <= contentTop) {
                 this._attach(content);
-                console.log("attaching", content);
+                //console.log("attaching", content);
             }
         } else {
             this._attach(content);
