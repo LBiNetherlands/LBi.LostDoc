@@ -9,7 +9,11 @@ new function (LostDoc) {
             'containerSelector': '#wrapper',
             'leftColumnSelector': 'div.left-col-outer',
             'rightColumnSelector': 'div.right-col-outer',
-            'resizingClass': 'resizing'
+            'explicitWidthSelector': '.explicit-width',
+            'resizingClass': 'resizing',
+            'detachableContentSelector': '.detachable',
+            'detachedContentClass': 'detached',
+            'detachedContentTop': '50'
         };
 
         if (settings != null) {
@@ -30,8 +34,16 @@ new function (LostDoc) {
         this._container = $(this._settings.containerSelector);
         this._leftColumn = $(this._settings.leftColumnSelector);
         this._rightColumn = $(this._settings.rightColumnSelector);
+        this._leftContent = this._leftColumn.find(this._settings.detachableContentSelector);
+        this._rightContent = this._rightColumn.find(this._settings.detachableContentSelector);
+        this._leftContentTop = this._leftContent.offset().top;
+        this._rightContentTop = this._rightContent.offset().top;
 
-        $(window).resize(this._resize.bind(this));
+        this._leftDetachedContentTop = Math.min(this._leftContentTop, this._settings.detachedContentTop);
+        this._rightDetachedContentTop = Math.min(this._rightContentTop, this._settings.detachedContentTop);
+
+        $(window).on("resize", this._onResize.bind(this));
+        $(window).on("scroll", this._onScroll.bind(this));
 
         var mouseDown = this._handle.bind('mousedown', function (e) {
             $('body').addClass(this._settings.resizingClass);
@@ -46,7 +58,7 @@ new function (LostDoc) {
                 // TODO move constants into settings
                 this._leftColWidthPercent = Math.max(10, Math.min(70, this._pxToPercentage(this._leftColtWidth - offset)));
                 // console.log(offset, this._leftColWidthPercent);
-                this._update();
+                this._resize();
             }.bind(this));
         }.bind(this));
 
@@ -58,26 +70,24 @@ new function (LostDoc) {
             $('body').removeClass(this._settings.resizingClass);
         }.bind(this));
 
-        this._update();
+        this._resize();
     };
 
-    LostDoc.Layout.prototype._resize = function (ev) {
+    LostDoc.Layout.prototype._onResize = function (ev) {
         var leftColWidth = this._container.width() * (this._leftColWidthPercent / 100);
         var newLeftColWidthPercent = this._pxToPercentage(leftColWidth);
 
         if (newLeftColWidthPercent != this._leftColWidthPercent) {
             this._leftColWidthPercent = newLeftColWidthPercent;
-            this._update();
+            this._resize();
         }
-
-        var windowHeight = $(window).height();
-
-        var handleTop = Math.round(windowHeight * .4);
-
-        this._handle.css({
-            'top': handleTop + 'px'
-        });
+        this._scroll();
     };
+
+    LostDoc.Layout.prototype._onScroll = function (ev) {
+        this._scroll();
+    };
+
 
     LostDoc.Layout.prototype._pxToPercentage = function (px) {
         var containerWidth = this._container.width();
@@ -86,9 +96,74 @@ new function (LostDoc) {
         return percentage;
     };
 
-    LostDoc.Layout.prototype._update = function () {
-        this._leftColumn.css('width', this._leftColWidthPercent + '%');
-        this._rightColumn.css('width', (100 - this._leftColWidthPercent) + '%');
-        this._handle.css('left', this._leftColWidthPercent + '%');
+    LostDoc.Layout.prototype._resize = function () {
+        var leftWidth = this._leftColWidthPercent + '%';
+        var rightWidth = (100 - this._leftColWidthPercent) + '%';
+
+        this._handle.css('left', leftWidth);
+
+        this._leftColumn.css('width', leftWidth);
+        if (this._leftContent && this._isDetached(this._leftContent)) {
+            this._leftContent.css('width', leftWidth);
+        }
+        
+        this._rightColumn.css('width', rightWidth);
+        if (this._rightContent && this._isDetached(this._rightContent)) {
+            this._rightContent.css('width', rightWidth);
+        }
+    };
+
+    LostDoc.Layout.prototype._scroll = function () {
+
+        var leftWidth = this._leftColWidthPercent + '%';
+        var rightWidth = (100 - this._leftColWidthPercent) + '%';
+
+        if (this._leftContent) {
+            this._sticky(this._leftContent, this._leftDetachedContentTop, leftWidth);
+        }
+
+        if (this._rightContent) {
+            this._sticky(this._rightContent, this._rightDetachedContentTop, rightWidth);
+        }
+    };
+
+    LostDoc.Layout.prototype._sticky = function (content, contentTop, contentWidth) {
+        var wndHeight = $(window).height();
+
+        var contentHeight = content.height();
+        if (contentHeight < wndHeight) {
+            // sticky left
+            console.log("detachable", content);
+
+            var currentTop = content.offset().top;
+
+            console.log("offset", currentTop);
+
+            if (!this._isDetached(content) && currentTop <= contentTop) {
+                this._detach(content, contentTop, contentWidth);
+                console.log("detaching", content);
+            } else if (this._isDetached(content) && currentTop <= contentTop) {
+                this._attach(content);
+                console.log("attaching", content);
+            }
+        } else {
+            this._attach(content);
+        }
+    };
+
+    LostDoc.Layout.prototype._isDetached = function (detachable) {
+        return detachable.hasClass(this._settings.detachedContentClass);
+    };
+
+    LostDoc.Layout.prototype._attach = function (detachable) {
+        detachable.removeClass(this._settings.detachedContentClass);
+        detachable.css('top', null);
+        detachable.css('width', null);
+    };
+
+    LostDoc.Layout.prototype._detach = function (detachable, top, width) {
+        detachable.addClass(this._settings.detachedContentClass);
+        detachable.css('top', top + 'px');
+        detachable.css('width', width + '%');
     };
 }(LostDoc); // note that the namespace is instantiated immediately

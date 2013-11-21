@@ -14,7 +14,8 @@ new function (LostDoc) {
                 'containerSelector': '#wrapper',
                 'leftColumnSelector': 'div.left-col-outer',
                 'rightColumnSelector': 'div.right-col-outer',
-                'resizingClass': 'resizing'
+                'resizingClass': 'resizing',
+                'detachableContentSelector': '.detachable'
             },
             this._settings);
 

@@ -13,6 +13,8 @@ new function (LostDoc) {
     };
 
     LostDoc.Settings.prototype.save = function () {
-        localStorage.setItem('settings', JSON.stringify(this));
+        var rawSettings = JSON.stringify(this);
+        localStorage.setItem('settings', rawSettings);
+        console.log("saving settings", rawSettings);
     };
 }(LostDoc);

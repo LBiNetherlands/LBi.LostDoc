@@ -52,7 +52,7 @@
                 <xsl:call-template name="section-header-last"/>
               </header>
               <xsl:call-template name="section-header-after"/>
-              <nav>
+              <nav class="detachable">
                 <xsl:call-template name="navigation"/>
               </nav>
             </div>
@@ -63,7 +63,7 @@
           <div class="right-col-outer">
             <div class="right-col-inner">
               <xsl:call-template name="section-main-before"/>
-              <main class="main-content">
+              <main class="main-content detachable">
                 <xsl:call-template name="section-main-first"/>
                 <xsl:call-template name="content"/>
                 <xsl:call-template name="section-main-last"/>
