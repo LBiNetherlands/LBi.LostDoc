@@ -1,3 +1,5 @@
+![Logo](LBi.LostDoc.Templates/Library/images/lostdoc.svg)
+
 LBi.LostDoc
 ===========
 LostDoc is a .Net documentation generator based on XML Documentation Comments, written in C# & XSLT. 
