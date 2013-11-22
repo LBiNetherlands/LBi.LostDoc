@@ -27,12 +27,12 @@
   <xsl:include href="LayoutExtensions.xslt"/>
 
   <xsl:template match="/">
-    <xsl:text disable-output-escaping="yes" xml:space="preserve">&lt;!DOCTYPE html&gt;
-    </xsl:text>
+    <xsl:text disable-output-escaping="yes" xml:space="preserve">&lt;!DOCTYPE html&gt;&#xA;</xsl:text>
     <html>
       <head>
         <xsl:call-template name="section-head-first"/>
         <meta name="generator" content="{ld:generator()}" />
+        <meta name="asset-id" content="{$assetId}" />
         <title>
           <xsl:call-template name="title"/>
         </title>

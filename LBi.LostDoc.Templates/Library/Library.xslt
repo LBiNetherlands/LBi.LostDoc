@@ -26,6 +26,8 @@
 
   <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
 
+  <xsl:param name="assetId" />
+  
   <xsl:include href="Layout.xslt"/>
   <xsl:include href="Naming.xslt"/>
   <xsl:include href="Common.xslt"/>
