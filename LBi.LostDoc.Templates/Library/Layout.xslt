@@ -30,6 +30,7 @@
     <html>
       <head>
         <xsl:call-template name="section-head-first"/>
+        <meta name="generator" content="{ld:generator()}" />
         <title>
           <xsl:call-template name="title"/>
         </title>

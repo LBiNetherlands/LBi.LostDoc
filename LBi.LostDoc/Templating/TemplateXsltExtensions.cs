@@ -18,6 +18,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Reflection;
 using System.Xml.XPath;
 using LBi.LostDoc.Diagnostics;
 
@@ -210,6 +211,14 @@ namespace LBi.LostDoc.Templating
         {
             System.Diagnostics.Debugger.Break();
             return string.Empty;
+        }
+
+        public string generator()
+        {
+            Assembly asm = Assembly.GetExecutingAssembly();
+            AssemblyName name = asm.GetName();
+            string appTitle = asm.GetCustomAttribute<AssemblyProductAttribute>().Product;
+            return string.Format("{0} {1}", appTitle, name.Version);
         }
 
         // ReSharper restore InconsistentNaming

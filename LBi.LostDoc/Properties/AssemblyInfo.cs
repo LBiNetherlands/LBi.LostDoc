@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LBi.LostDoc")]
-[assembly: AssemblyCopyright("Copyright © LBi Netherlands 2011, 2012, 2013")]
+[assembly: AssemblyProduct("LostDoc")]
+[assembly: AssemblyCopyright("Copyright © DigitasLBi Netherlands 2011-2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
