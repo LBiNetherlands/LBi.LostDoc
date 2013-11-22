@@ -14,14 +14,9 @@
  * limitations under the License. 
  */
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using LBi.LostDoc.Composition;
 using LBi.LostDoc.Extensibility;
 
 namespace LBi.LostDoc.Templating.FileProviders

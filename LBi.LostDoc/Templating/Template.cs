@@ -329,7 +329,11 @@ namespace LBi.LostDoc.Templating
                 Directory.CreateDirectory(tempFiles.TempDir);
 
             if (providers == null)
+            {
                 providers = new Stack<IFileProvider>();
+                providers.Push(new HttpFileProvider());
+                providers.Push(new DirectoryFileProvider());
+            }
 
             // clone orig doc
             XDocument workingDoc;
@@ -457,13 +461,6 @@ namespace LBi.LostDoc.Templating
         {
             string source = this.GetAttributeValue(elem, "path");
 
-            IFileProvider resourceProvider;
-            Uri sourceUri;
-            if (Uri.TryCreate(source, UriKind.Absolute, out sourceUri) && sourceUri.Scheme.StartsWith("http"))
-                resourceProvider = new HttpFileProvider();
-            else
-                resourceProvider = provider;
-
             XAttribute outputAttr = elem.Attribute("output");
 
             string output;
@@ -486,7 +483,7 @@ namespace LBi.LostDoc.Templating
 
             var resource = new Resource(this.GetAttributeValueOrDefault(elem, "condition"),
                                         this.ParseVariables(elem).ToArray(),
-                                        resourceProvider,
+                                        provider,
                                         source,
                                         output,
                                         transforms.ToArray());
