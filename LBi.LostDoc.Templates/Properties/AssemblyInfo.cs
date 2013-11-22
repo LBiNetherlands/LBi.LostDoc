@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("LBi.LostDoc.Templates")]
 [assembly: AssemblyDescription("LostDoc Base Template Pack")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("LBi Netherlands B.V.")]
+[assembly: AssemblyCompany("DigitasLBi Netherlands B.V.")]
 [assembly: AssemblyProduct("LBi.LostDoc.Templates")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]

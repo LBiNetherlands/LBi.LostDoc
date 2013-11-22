@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012-2013 LBi Netherlands B.V.
+  Copyright 2012-2013 DigitasLBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
     <transform name="less"/>
   </include-resource>
 
-  <include-resource path="js\search.js" output="js\search.js"/>
+  <include-resource path="js\lostdoc.search.js" output="js\lostdoc.search.js"/>
 
   <include-resource path="js\lib\knockout.js" output="js\lib\knockout.js"/>
   
