@@ -43,8 +43,13 @@ namespace LBi.LostDoc.Templating.FileProviders
         public virtual Stream OpenFile(string path, FileMode mode)
         {
             string dir = Path.GetDirectoryName(path);
-            if (!Directory.Exists(dir))
+            bool create = (mode == FileMode.Create ||
+                           mode == FileMode.OpenOrCreate ||
+                           mode == FileMode.CreateNew);
+            if (create && dir != null && !Directory.Exists(dir))
+            {
                 Directory.CreateDirectory(dir);
+            }
 
             return File.Open(path, mode);
         }
