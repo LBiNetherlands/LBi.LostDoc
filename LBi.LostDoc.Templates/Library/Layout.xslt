@@ -22,6 +22,8 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl">
 
+  <xsl:param name="logoUri"/>
+  
   <xsl:include href="LayoutExtensions.xslt"/>
 
   <xsl:template match="/">
@@ -49,7 +51,7 @@
               <xsl:call-template name="section-header-before"/>
               <header>
                 <xsl:call-template name="section-header-first"/>
-                <img src="{ld:relative('images/lostdoc.svg')}" alt="LostDoc Logo" class="logo"/> 
+                <img src="{ld:relative($logoUri)}" alt="LostDoc Logo" class="logo"/> 
                 <xsl:call-template name="section-header-last"/>
               </header>
               <xsl:call-template name="section-header-after"/>

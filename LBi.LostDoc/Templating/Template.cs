@@ -370,13 +370,22 @@ namespace LBi.LostDoc.Templating
             CustomXsltContext customContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
 
             XElement[] paramNodes = workingDoc.Root.Elements("parameter").ToArray();
-            var globalParams =
-                paramNodes.Select(paramNode =>
-                                  new ExpressionXPathVariable(this.GetAttributeValue(paramNode, "name"),
-                                                              this.GetAttributeValueOrDefault(paramNode, "select")))
-                          .ToArray();
+            List<XPathVariable> globalParams = new List<XPathVariable>();
 
-            customContext.PushVariableScope(workingDoc, globalParams);
+            foreach (XElement paramNode in paramNodes)
+            {
+                string name = this.GetAttributeValue(paramNode, "name");
+                object argValue;
+                if (templateData.Arguments.TryGetValue(name, out argValue))
+                    globalParams.Add(new ConstantXPathVariable(name, argValue));
+                else
+                {
+                    string expr = this.GetAttributeValueOrDefault(paramNode, "select");
+                    globalParams.Add(new ExpressionXPathVariable(name, expr));
+                }
+            }
+
+            customContext.PushVariableScope(workingDoc, globalParams.ToArray());
 
             var arguments = templateData.Arguments
                                         .Select(argument => new ConstantXPathVariable(argument.Key, argument.Value))
@@ -424,7 +433,7 @@ namespace LBi.LostDoc.Templating
 
             return new ParsedTemplate
                        {
-                           Parameters = globalParams,
+                           Parameters = globalParams.ToArray(),
                            Source = workingDoc,
                            Resources = resources.ToArray(),
                            Stylesheets = stylesheets.ToArray(),
@@ -446,7 +455,7 @@ namespace LBi.LostDoc.Templating
 
         private Resource ParseResouceDefinition(IFileProvider provider, XElement elem)
         {
-            var source = this.GetAttributeValue(elem, "path");
+            string source = this.GetAttributeValue(elem, "path");
 
             IFileProvider resourceProvider;
             Uri sourceUri;
@@ -589,6 +598,19 @@ namespace LBi.LostDoc.Templating
                 shouldApply = ResultToBool(value);
             }
             return shouldApply;
+        }
+
+        private static string EvalValue(CustomXsltContext customContext, XNode contextNode, string valueOrExpression)
+        {
+            // TODO this is quick and dirty
+            if (valueOrExpression.StartsWith("{") && valueOrExpression.EndsWith("}"))
+            {
+                string expression = valueOrExpression.Substring(1, valueOrExpression.Length - 2);
+                object value = contextNode.XPathEvaluate(expression, customContext);
+                return ResultToString(value);
+            }
+
+            return valueOrExpression;
         }
 
         private Stylesheet ParseStylesheet(IFileProvider provider, IEnumerable<Stylesheet> stylesheets, XElement elem)
@@ -952,13 +974,16 @@ namespace LBi.LostDoc.Templating
 
                 if (EvalCondition(xpathContext, templateData.Document.Root, resources[i].ConditionExpression))
                 {
+                    string expandedSource = EvalValue(xpathContext, templateData.Document.Root, resources[i].Source);
+                    string expandedOutput = EvalValue(xpathContext, templateData.Document.Root, resources[i].Output);
+
                     List<IResourceTransform> transforms = new List<IResourceTransform>();
 
                     foreach (var resourceTransform in resources[i].Transforms)
                     {
                         using (CompositionContainer localContainer = new CompositionContainer(this._container.Catalog))
                         {
-                            string dirName = Path.GetDirectoryName(resources[i].Source);
+                            string dirName = Path.GetDirectoryName(expandedSource);
                             CompositionBatch batch = new CompositionBatch();
                             var exportMetadata = new Dictionary<string, object>();
 
@@ -1001,8 +1026,8 @@ namespace LBi.LostDoc.Templating
 
                     yield return
                         new ResourceDeployment(resources[i].FileProvider,
-                                               resources[i].Source,
-                                               resources[i].Output, // TODO this needs a 'writable' file provider
+                                               expandedSource,
+                                               expandedOutput, // TODO this needs a 'writable' file provider
                                                transforms.ToArray());
                 }
                 xpathContext.PopVariableScope();

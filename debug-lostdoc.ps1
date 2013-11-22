@@ -40,8 +40,8 @@ $choices = @(
                                         A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html")
                                     }),
     (New-Object -TypeName PSObject @{
-                                        C = "Template with Search"; 
-                                        A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html -Arguments @{SearchUri = '/search/'}")
+                                        C = "Template with Custom logo"; 
+                                        A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html -Arguments @{LogoUrl = 'duck.jpg'}")
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Open output"; 
