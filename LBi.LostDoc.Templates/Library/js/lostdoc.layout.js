@@ -29,7 +29,7 @@ new function (LostDoc) {
             'resizingClass': 'resizing',
             'detachableContentSelector': '.detachable',
             'detachedContentClass': 'detached',
-            'detachedContentTop': '25'
+            'detachedContentTop': '15'
         };
 
         if (settings != null) {
@@ -135,34 +135,26 @@ new function (LostDoc) {
         var rightWidth = (100 - this._leftColWidthPercent) + '%';
 
         if (this._leftContent) {
-            this._sticky(this._leftContent, this._leftDetachedContentTop, leftWidth);
+            this._sticky(this._leftContent, this._leftContentTop, this._leftDetachedContentTop, leftWidth);
         }
 
         if (this._rightContent) {
-            this._sticky(this._rightContent, this._rightDetachedContentTop, rightWidth);
+            this._sticky(this._rightContent, this._rightContentTop, this._rightDetachedContentTop, rightWidth);
         }
     };
 
-    LostDoc.Layout.prototype._sticky = function (content, contentTop, contentWidth) {
+    LostDoc.Layout.prototype._sticky = function (content, originalContentTop, detachedContentTop, contentWidth) {
         var wndHeight = $(window).height();
         var scrollTop = $(window).scrollTop();
         var contentHeight = content.height();
 
         if (contentHeight < wndHeight) {
-            //console.log("detachable", content);
-
-            var offset = content.offset().top - scrollTop;
-
-            //console.log("offset", offset);
-            //console.log("contentTop", contentTop);
-            //console.log("isDetached", this._isDetached(content));
-
-            if (!this._isDetached(content) && offset <= contentTop) {
-                this._detach(content, contentTop, contentWidth);
-                //console.log("detaching", content);
-            } else if (this._isDetached(content) && scrollTop <= contentTop) {
+            if (!this._isDetached(content) && scrollTop > originalContentTop - detachedContentTop) {
+                this._detach(content, detachedContentTop, contentWidth);
+                console.log("detaching", content);
+            } else if (this._isDetached(content) && scrollTop <= originalContentTop - detachedContentTop) {
                 this._attach(content);
-                //console.log("attaching", content);
+                console.log("attaching", content);
             }
         } else {
             this._attach(content);

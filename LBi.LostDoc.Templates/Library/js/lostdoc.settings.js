@@ -21,16 +21,20 @@ new function (LostDoc) {
         if (defaultSettings) {
             $.extend(this, defaultSettings);
         }
-        var storedSettings = localStorage.getItem('settings');
-        if (storedSettings) {
-            var parsedSettings = JSON.parse(storedSettings);
-            $.extend(this, parsedSettings);
+        if (localStorage) {
+            var storedSettings = localStorage.getItem('settings');
+            if (storedSettings) {
+                var parsedSettings = JSON.parse(storedSettings);
+                $.extend(this, parsedSettings);
+            }
         }
     };
 
     LostDoc.Settings.prototype.save = function () {
-        var rawSettings = JSON.stringify(this);
-        localStorage.setItem('settings', rawSettings);
-        console.log("saving settings", rawSettings);
+        if (localStorage) {
+            var rawSettings = JSON.stringify(this);
+            localStorage.setItem('settings', rawSettings);
+            console.log("saving settings", rawSettings);
+        }
     };
 }(LostDoc);

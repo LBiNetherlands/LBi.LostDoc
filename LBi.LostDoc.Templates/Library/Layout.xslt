@@ -44,7 +44,7 @@
         <xsl:call-template name="section-body-first"/>
         <div id="wrapper">
           <div class="left-col-outer" >
-            <div class="left-col-inner">
+            <div class="left-col-inner detachable">
               <xsl:call-template name="section-header-before"/>
               <header>
                 <xsl:call-template name="section-header-first"/>
@@ -52,7 +52,7 @@
                 <xsl:call-template name="section-header-last"/>
               </header>
               <xsl:call-template name="section-header-after"/>
-              <nav class="detachable">
+              <nav>
                 <xsl:call-template name="navigation"/>
               </nav>
             </div>
