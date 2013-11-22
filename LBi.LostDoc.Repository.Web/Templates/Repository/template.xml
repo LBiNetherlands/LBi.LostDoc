@@ -32,7 +32,7 @@
     <transform name="less"/>
   </include-resource>
 
-  <include-resource path="js\lostdoc.search.js" output="js\lostdoc.search.js"/>
+  <include-resource path="js\search.js" output="js\search.js"/>
 
   <include-resource path="js\lib\knockout.js" output="js\lib\knockout.js"/>
   

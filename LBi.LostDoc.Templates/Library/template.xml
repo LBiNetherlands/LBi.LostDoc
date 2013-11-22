@@ -21,7 +21,6 @@
   <!-- parameters can be used to influence templates without having to modify them-->
   <!-- TODO: this does nothing -->
   <parameter name="LogoUrl" select="'images/lostdoc.svg'" />
-  <parameter name="Debug" select="false()" />
 
   <!-- indexed nodes, accessible through ld:key('indexName', value) -->
   <index name="aid" match="*[@assetId]" key="@assetId"/>
