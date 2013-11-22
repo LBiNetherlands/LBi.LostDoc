@@ -77,7 +77,6 @@
         <script src="{ld:relative('js/lib/zepto.js')}" >&#160;</script>
         <script src="{ld:relative('js/lostdoc.settings.js')}" >&#160;</script>
         <script src="{ld:relative('js/lostdoc.layout.js')}" >&#160;</script>
-        <script src="{ld:relative('js/lostdoc.nav.js')}" >&#160;</script>
         <script src="{ld:relative('js/lostdoc.js')}" >&#160;</script>
         <xsl:call-template name="section-body-last"/>
       </body>
