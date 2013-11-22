@@ -166,7 +166,7 @@
     <EmbeddedResource Include="Templates\Repository\js\lib\knockout.js" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Repository\js\search.js" />
+    <EmbeddedResource Include="Templates\Repository\js\lostdoc.search.js" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\Repository\LayoutExtensions.xslt" />

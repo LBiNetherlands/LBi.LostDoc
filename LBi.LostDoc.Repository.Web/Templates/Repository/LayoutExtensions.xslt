@@ -100,6 +100,6 @@
 
   <xsl:template name="section-body-last">
     <script src="{ld:relative('js/lib/knockout.js')}">&#160;</script>
-    <script src="{ld:relative('js/search.js')}">&#160;</script>
+    <script src="{ld:relative('js/lostdoc.search.js')}">&#160;</script>
   </xsl:template>
 </xsl:stylesheet>
