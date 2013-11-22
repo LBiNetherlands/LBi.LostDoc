@@ -1,4 +1,4 @@
-![Logo](LBi.LostDoc.Templates/Library/images/lostdoc.svg)
+![Logo](lostdoc.png)
 
 LBi.LostDoc
 ===========
