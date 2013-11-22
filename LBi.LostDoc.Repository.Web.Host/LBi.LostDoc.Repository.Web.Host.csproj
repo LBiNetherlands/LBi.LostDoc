@@ -237,6 +237,7 @@
     <Content Include="Areas\Administration\Static\Lib\less-1.3.0.min.js" />
     <Content Include="Areas\Administration\Static\lostdoc.admin.js" />
     <Content Include="Global.asax" />
+    <Content Include="Areas\Administration\Images\lostdoc.svg" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -253,7 +254,6 @@
     <Folder Include="App_Data\Content\" />
     <Folder Include="App_Data\Logs\" />
     <Folder Include="App_Data\Repository\temp\" />
-    <Folder Include="Images\" />
     <Folder Include="Static\" />
   </ItemGroup>
   <ItemGroup>
