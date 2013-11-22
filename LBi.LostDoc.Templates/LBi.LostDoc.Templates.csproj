@@ -86,7 +86,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Library\js\lostdoc.settings.js" />
     <EmbeddedResource Include="Library\js\lostdoc.layout.js" />
-    <EmbeddedResource Include="Library\js\lostdoc.nav.js" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Library\images\lostdoc.svg" />
