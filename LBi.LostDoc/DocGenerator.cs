@@ -546,7 +546,8 @@ namespace LBi.LostDoc
                 foreach (Type interfaceType in type.GetInterfaces())
                 {
                     InterfaceMapping mapping = type.GetInterfaceMap(interfaceType);
-                    if (mapping.TargetType == type)
+
+                    if (mapping.TargetMethods.Any(mi => mi.DeclaringType == type))
                     {
                         AssetIdentifier interfaceAssetId = AssetIdentifier.FromType(interfaceType.IsGenericType
                                                                                         ? interfaceType.GetGenericTypeDefinition()

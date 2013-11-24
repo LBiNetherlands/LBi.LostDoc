@@ -14,12 +14,15 @@
  * limitations under the License. 
  */
 
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Company.Project.Library
 {
     /// <summary>
     /// Class that inherits GenericClass[string]
     /// </summary>
-    public class InheritedGenericClass : GenericClass<string>
+    public class InheritedGenericClass : GenericClass<string>, IEnumerable<int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="InheritedGenericClass"/> class. Creates anew instance given a <see cref="string"/>
@@ -29,6 +32,16 @@ namespace Company.Project.Library
         public InheritedGenericClass(string str)
             : base(str)
         {
+        }
+
+        IEnumerator<int> IEnumerable<int>.GetEnumerator()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
