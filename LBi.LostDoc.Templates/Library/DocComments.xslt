@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012 DigitasLBi Netherlands B.V.
+  Copyright 2012-2013 DigitasLBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -43,6 +43,16 @@
     <em>
       <xsl:value-of select="@name"/>
     </em>
+  </xsl:template>
+
+  <xsl:template match="doc:example">
+    <xsl:apply-templates select="node()" mode="doc"/>
+  </xsl:template>
+
+  <xsl:template match="code" mode="doc">
+    <code>
+      <xsl:apply-templates select="node()" mode="doc"/>
+    </code>
   </xsl:template>
 
 

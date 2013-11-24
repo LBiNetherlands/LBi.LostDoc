@@ -28,9 +28,9 @@ namespace LBi.LostDoc.Enrichers
 {
     public class XmlDocEnricher : IEnricher
     {
-        private Dictionary<Assembly, XmlDocReader> _docReaders;
-        private List<string> _paths;
-        private XslCompiledTransform _xslTransform;
+        private readonly Dictionary<Assembly, XmlDocReader> _docReaders;
+        private readonly List<string> _paths;
+        private readonly XslCompiledTransform _xslTransform;
 
         public XmlDocEnricher()
         {
@@ -38,9 +38,9 @@ namespace LBi.LostDoc.Enrichers
             this._paths = new List<string>();
             this._xslTransform = new XslCompiledTransform();
             using (Stream resource = Assembly.GetExecutingAssembly().GetManifestResourceStream("LBi.LostDoc.Enrichers.enrich-doc-comments.xslt"))
+            using (XmlReader reader = XmlReader.Create(resource, new XmlReaderSettings { CloseInput = false }))
             {
-                XmlReader reader = XmlReader.Create(resource);
-                this._xslTransform.Load(reader);
+                this._xslTransform.Load(reader, new XsltSettings(false, true), null);
             }
         }
 
@@ -204,7 +204,7 @@ namespace LBi.LostDoc.Enrichers
                 {
                     this._docReaders.Add(assembly, reader = new XmlDocReader());
 
-                    using (XmlReader xreader = XmlReader.Create(path))
+                    using (XmlReader xreader = XmlReader.Create(path, new XmlReaderSettings { IgnoreWhitespace = false }))
                         reader.Load(xreader);
                 }
                 else

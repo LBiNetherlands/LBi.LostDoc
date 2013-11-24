@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,32 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using System.Xml;
 
 namespace Company.Project.Library
 {
+    /// <example>
+    /// <code>
+    /// string elemName;
+    /// if (type.IsClass)
+    ///     elemName = "class";
+    /// else if (type.IsEnum)
+    ///     elemName = "enum";
+    /// else if (type.IsValueType)
+    ///     elemName = "struct";
+    /// else if (type.IsInterface)
+    ///     elemName = "interface";
+    /// else
+    ///     throw new ArgumentException("Unknown asset type: " + assetId.Type.ToString(), "assetId");
+    /// 
+    /// ret = new XElement(elemName,
+    ///                     new XAttribute("name", type.Name),
+    ///                     new XAttribute("assetId", assetId),
+    ///                     new XAttribute("phase", context.Phase));
+    /// </code>
+    /// </example>
     /// <summary>
-    /// A regular class.
+    /// A regular class (with example).
     /// </summary>
     public class RegularClass : IDisposable
     {

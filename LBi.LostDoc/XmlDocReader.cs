@@ -29,7 +29,7 @@ namespace LBi.LostDoc
 
         public void Load(XmlReader reader)
         {
-            this._doc = XDocument.Load(reader, LoadOptions.None);
+            this._doc = XDocument.Load(reader, LoadOptions.SetLineInfo | LoadOptions.PreserveWhitespace);
         }
 
         public XElement GetDocComments(MethodInfo methodInfo)

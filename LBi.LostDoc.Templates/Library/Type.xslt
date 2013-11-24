@@ -68,7 +68,7 @@
                     <span class="current">
                       <xsl:apply-templates select="." mode="displayText"/>
                     </span>
-                    
+
                     <!--<xsl:if test="/bundle/assembly/namespace//*[inherits/@type = current()/@assetId]">-->
                     <xsl:if test="ld:key('aidInherits', current()/@assetId)">
                       <ul class="descendants">
@@ -328,6 +328,13 @@
       <p>
         <xsl:apply-templates select="doc:remarks"/>
       </p>
+    </xsl:if>
+
+    <xsl:if test="doc:example">
+      <section>
+        <h2>Example</h2>
+        <xsl:apply-templates select="doc:example"/>
+      </section>
     </xsl:if>
   </xsl:template>
 
