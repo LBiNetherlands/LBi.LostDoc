@@ -20,9 +20,8 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
                 xmlns:doc="urn:doc"
-                xmlns:hrc="urn:lostdoc-core:inheritance-hierarchy"
                 xmlns:ld="urn:lostdoc-core"
-                exclude-result-prefixes="msxsl doc hrc ld">
+                exclude-result-prefixes="msxsl doc ld">
   <xsl:output method="xml"/>
 
   <xsl:include href="Naming.xslt"/>

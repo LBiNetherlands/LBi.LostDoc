@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012 DigitasLBi Netherlands B.V.
+  Copyright 2012-2013 DigitasLBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,9 +20,8 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
                 xmlns:doc="urn:doc"
-                xmlns:hrc="urn:lostdoc-core:inheritance-hierarchy"
                 xmlns:ld="urn:lostdoc-core"
-                exclude-result-prefixes="msxsl doc hrc ld">
+                exclude-result-prefixes="msxsl doc ld">
 
   <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
 
