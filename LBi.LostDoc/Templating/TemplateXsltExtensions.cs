@@ -90,8 +90,7 @@ namespace LBi.LostDoc.Templating
                 AssetIdentifier targetAid;
                 if (this._context.TemplateData.AssetRedirects.TryGet(aid, out targetAid))
                 {
-                    assetId = targetAid.AssetId;
-                    version = targetAid.Version.ToString();
+                    aid = targetAid;
                     TraceSources.AssetResolverSource.TraceVerbose("Redirected assetd {0} => {1}", aid, targetAid);
                 }
             }
@@ -103,11 +102,11 @@ namespace LBi.LostDoc.Templating
 
             if (ret == null)
             {
-                ret = "urn:asset-not-found:" + assetId + "," + version;
-                TraceSources.AssetResolverSource.TraceWarning("{0}, {1} => {2}", assetId, version, ret);
+                ret = "urn:asset-not-found:" + aid.AssetId + "," + aid.Version;
+                TraceSources.AssetResolverSource.TraceWarning("{0}, {1} => {2}", aid.AssetId, aid.Version, ret);
             }
             else
-                TraceSources.AssetResolverSource.TraceVerbose("{0}, {1} => {2}", assetId, version, ret);
+                TraceSources.AssetResolverSource.TraceVerbose("{0}, {1} => {2}", aid.AssetId, aid.Version, ret);
 
             return ret;
         }
