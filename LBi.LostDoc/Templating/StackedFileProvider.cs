@@ -42,7 +42,7 @@ namespace LBi.LostDoc.Templating
 
             IFileProvider provider = this._stack.FirstOrDefault(fp => fp.FileExists(path));
             if (provider == null)
-                throw new FileNotFoundException("Resource not found: " + path);
+                throw new FileNotFoundException("Resource not found: " + path, path);
 
             return provider.OpenFile(path, mode);
         }
