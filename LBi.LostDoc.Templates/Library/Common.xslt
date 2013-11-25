@@ -35,6 +35,18 @@
     </dd>
   </xsl:template>
 
+  <!-- LINK -->
+  
+  <!-- TODO route all link generation to this template -->
+  <xsl:template name="link">
+    <xsl:param name="text" />
+    <xsl:param name="assetId" />
+    <a href="{ld:resolve($assetId)}" title="{$text}">
+      <xsl:value-of select="$text"/>
+    </a>
+  </xsl:template>
+                
+  
   <xsl:template match="bundle" mode="link" priority="101">
     <a title="Library" href="{ld:resolveAsset('*:*', '0.0.0.0')}">
       <xsl:text>Library</xsl:text>
@@ -90,6 +102,7 @@
     </a>
   </xsl:template>
 
+  <!-- this is for explicit interface implemenations -->
   <xsl:template match="*[@declaredAs and @isPrivate = 'true' and implements]" mode="link" priority="100">
     <xsl:param name="includeNoun" select="false()" />
     <xsl:choose>
@@ -167,6 +180,7 @@
     <xsl:apply-templates select="." mode="nounPlural"/>
   </xsl:template>
   
+  <!-- Member table row -->
   
   <xsl:template match="method | property | constructor | field | operator" mode="member-row">
     <tr>

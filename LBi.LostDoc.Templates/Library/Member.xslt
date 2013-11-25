@@ -186,11 +186,14 @@
 
   <xsl:template match="implements">
     <li>
-      <a href="{ld:resolve(@member)}">
-        <xsl:apply-templates select="ld:key('aid', current()/@member)/../@assetId" mode="displayText"/>
-        <xsl:text>.</xsl:text>
-        <xsl:apply-templates select="@member" mode="displayText"/>
-      </a>
+      <xsl:call-template name="link">
+        <xsl:with-param name="assetId" select="@member" />
+        <xsl:with-param name="text">
+          <xsl:apply-templates select="ld:key('aid', current()/@member)/../@assetId" mode="displayText"/>
+          <xsl:text>.</xsl:text>
+          <xsl:apply-templates select="@member" mode="displayText"/>
+        </xsl:with-param>
+      </xsl:call-template>
     </li>
   </xsl:template>
 
@@ -198,26 +201,38 @@
     <xsl:text>Type: </xsl:text>
     <xsl:choose>
       <xsl:when test="@param and (preceding-sibling::typeparam | following-sibling::typeparam)/@name = @param">
-        <a href="{ld:resolve($assetId)}">
-          <xsl:apply-templates select="@param" mode="displayText"/>
-        </a>
+        <xsl:call-template name="link">
+          <xsl:with-param name="assetId" select="$assetId" />
+          <xsl:with-param name="text">
+            <xsl:apply-templates select="@param" mode="displayText"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
       <xsl:when test="@param">
-        <a href="{ld:resolve(../../@assetId)}">
-          <xsl:apply-templates select="@param" mode="displayText"/>
-        </a>
+        <xsl:call-template name="link">
+          <xsl:with-param name="assetId" select="../../@assetId" />
+          <xsl:with-param name="text">
+            <xsl:apply-templates select="@param" mode="displayText"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
       <xsl:when test="@type">
-        <a href="{ld:resolve(@type)}">
-          <xsl:apply-templates select="@type" mode="displayText">
-            <xsl:with-param name="attributes" select="attribute" />
-          </xsl:apply-templates>
-        </a>
+        <xsl:call-template name="link">
+          <xsl:with-param name="assetId" select="@type" />
+          <xsl:with-param name="text">
+            <xsl:apply-templates select="@type" mode="displayText">
+              <xsl:with-param name="attributes" select="attribute" />
+            </xsl:apply-templates>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
       <xsl:when test="arrayOf">
-        <a href="{ld:resolve(descendant-or-self::arrayOf[@type]/@type | descendant-or-self::arrayOf[@param]/@param)}">
-          <xsl:apply-templates select="." mode="displayText"/>
-        </a>
+        <xsl:call-template name="link">
+          <xsl:with-param name="assetId" select="descendant-or-self::arrayOf[@type]/@type | descendant-or-self::arrayOf[@param]/@param" />
+          <xsl:with-param name="text">
+            <xsl:apply-templates select="." mode="displayText"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
     </xsl:choose>
     <br/>
@@ -233,9 +248,12 @@
   <xsl:template match="doc:exception">
     <tr>
       <td>
-        <a href="{ld:resolve(@cref)}">
-          <xsl:apply-templates select="@cref" mode="displayText"/>
-        </a>
+        <xsl:call-template name="link">
+          <xsl:with-param name="assetId" select="@cref" />
+          <xsl:with-param name="text">
+            <xsl:apply-templates select="@cref" mode="displayText"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </td>
       <td>
         <xsl:apply-templates select="node()"/>
