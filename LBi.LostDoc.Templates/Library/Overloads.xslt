@@ -124,92 +124,17 @@
       <tbody>
         <xsl:choose>
           <xsl:when test="$memberType = 'property'">
-            <xsl:apply-templates select="property[@name = $name]"/>
+            <xsl:apply-templates select="property[@name = $name]" mode="member-row"/>
           </xsl:when>
           <xsl:when test="$memberType = 'method'">
-            <xsl:apply-templates select="method[@name = $name]"/>
+            <xsl:apply-templates select="method[@name = $name]" mode="member-row"/>
           </xsl:when>
           <xsl:when test="$memberType = 'operator'">
-            <xsl:apply-templates select="operator[@name = $name]"/>
+            <xsl:apply-templates select="operator[@name = $name]" mode="member-row"/>
           </xsl:when>
         </xsl:choose>
       </tbody>
     </table>
-  </xsl:template>
-
-
-  <xsl:template match="method | property | operator">
-    <tr>
-      <td class="icons">
-        <span>
-          <xsl:attribute name="class">
-            <xsl:text>icon-</xsl:text>
-            <xsl:value-of select="local-name()"/>
-            <xsl:choose>
-              <xsl:when test="@isInternal">
-                <xsl:text>-internal</xsl:text>
-              </xsl:when>
-              <xsl:when test="@isPrivate">
-                <xsl:text>-private</xsl:text>
-              </xsl:when>
-              <xsl:when test="@isProtected">
-                <xsl:text>-protected</xsl:text>
-              </xsl:when>
-              <xsl:when test="@isSealed">
-                <xsl:text>-sealed</xsl:text>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:text>&#160;</xsl:text>
-        </span>
-        <xsl:if test="@isStatic">
-          <span class="icon-static">
-            <xsl:text>&#160;</xsl:text>
-          </span>
-        </xsl:if>
-      </td>
-      <td>
-        <xsl:apply-templates select="." mode="link"/>
-      </td>
-      <td>
-        <xsl:apply-templates select="doc:summary"/>
-        <xsl:choose>
-          <xsl:when test="@overrides">
-            <xsl:if test="not(doc:summary)">
-              <xsl:apply-templates select="ld:key('aid', current()/@overrides)/doc:summary"/>
-              <xsl:if test="not(ld:key('aid', current()/@overrides)/doc:summary)">
-                <xsl:call-template name="missing"/>
-              </xsl:if>
-            </xsl:if>
-            <xsl:text> (Overrides </xsl:text>
-            <a href="{ld:resolve(@overrides)}">
-              <xsl:apply-templates select="ld:key('aid', current()/@overrides)/parent::*" mode="displayText"/>
-              <xsl:text>.</xsl:text>
-              <xsl:apply-templates select="ld:key('aid', current()/@overrides)" mode="displayText"/>
-            </a>
-            <xsl:text>)</xsl:text>
-          </xsl:when>
-          <xsl:when test="@declaredAs">
-            <xsl:if test="not(doc:summary)">
-              <xsl:apply-templates select="ld:key('aid', current()/@declaredAs)/doc:summary"/>
-              <xsl:if test="not(ld:key('aid', current()/@declaredAs)/doc:summary)">
-                <xsl:call-template name="missing"/>
-              </xsl:if>
-            </xsl:if>
-            <xsl:text> (Inherited from </xsl:text>
-            <a href="{ld:resolve(ld:key('aid', current()/@declaredAs)/parent::*[@assetId]/@assetId)}">
-              <xsl:apply-templates select="ld:key('aid', current()/@declaredAs)/parent::*" mode="displayText"/>
-            </a>
-            <xsl:text>)</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:if test="not(doc:summary)">
-              <xsl:call-template name="missing"/>
-            </xsl:if>
-          </xsl:otherwise>
-        </xsl:choose>
-      </td>
-    </tr>
   </xsl:template>
 
   <xsl:template name="navigation">

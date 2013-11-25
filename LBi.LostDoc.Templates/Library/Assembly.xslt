@@ -162,9 +162,7 @@
         </span>
       </td>
       <td>
-        <a href="{ld:resolve(@assetId)}">
-          <xsl:apply-templates select="." mode="displayText"/>
-        </a>
+        <xsl:apply-templates select="." mode="link" />
       </td>
       <td>
         <xsl:apply-templates select="doc:summary"/>

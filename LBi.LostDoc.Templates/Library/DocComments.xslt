@@ -32,10 +32,7 @@
   </xsl:template>
   
   <xsl:template match="see" mode="doc">
-    <a href="{ld:resolve(@cref)}">
-      <!--<xsl:apply-templates select="//*[@assetId = current()/@cref]" mode="displayText"/>-->
-      <xsl:apply-templates select="ld:key('aid', current()/@cref)" mode="displayText"/>
-    </a>
+    <xsl:apply-templates select="ld:key('aid', @cref)" mode="link" />
   </xsl:template>
 
 

@@ -54,6 +54,10 @@ namespace LBi.LostDoc.Templating
                 foreach (KeyValuePair<string, object> kvp in this.XsltParams)
                     argList.AddParam(kvp.Key, string.Empty, kvp.Value);
 
+                // add default "assetId" parameter if it wasn't provided in the Template
+                if (argList.GetParam("assetId", string.Empty) == null)
+                    argList.AddParam("assetId", string.Empty, this.Asset.ToString());
+
                 argList.XsltMessageEncountered +=
                     (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
 

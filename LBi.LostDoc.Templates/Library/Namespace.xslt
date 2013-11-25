@@ -154,9 +154,7 @@
           </xsl:if>
         </td>
         <td>
-          <a href="{ld:resolve(@assetId)}">
-            <xsl:apply-templates select="." mode="displayText"/>
-          </a>
+          <xsl:apply-templates select="." mode="link"/>
         </td>
         <td>
           <xsl:apply-templates select="doc:summary"/>
@@ -178,12 +176,7 @@
           </span>
         </td>
         <td>
-          <a>
-            <xsl:attribute name="href">
-              <xsl:value-of select="ld:resolve(ld:nover(@assetId))"/>
-            </xsl:attribute>
-            <xsl:apply-templates select="." mode="displayText"/>
-          </a>
+          <xsl:apply-templates select="." mode="link" />
         </td>
         <td>
           <xsl:apply-templates select="doc:summary"/>
