@@ -36,9 +36,7 @@
         </xsl:if>
       </xsl:attribute>
 
-      <a title="Library" href="{ld:resolveAsset('*:*', '0.0.0.0')}">
-        <xsl:text>Library</xsl:text>
-      </a>
+      <xsl:apply-templates select="." mode="link"/>
 
       <xsl:if test="$children">
         <xsl:copy-of select="$children"/>
@@ -274,22 +272,8 @@
             <xsl:with-param name="children">
               <ul>
                 <li>
-                  <xsl:variable name="title">
-                    <xsl:value-of select="@name"/>
-                    <xsl:text> </xsl:text>
-                    <xsl:apply-templates select="." mode="nounPlural"/>
-                  </xsl:variable>
-                  <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
-                  <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-                  <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
-                  <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
-                  <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-                  <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
+                  <xsl:apply-templates select="." mode="link-overload"/>
                   
-                  <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
-                    <xsl:value-of select="$title"/>
-                  </a>
-
                   <ul>
                     <!-- list members -->
                     <xsl:apply-templates select="parent::*/method[@phase = '0' and @name = current()/@name]" mode="xnav-item-disambiguation">
@@ -308,21 +292,7 @@
             <xsl:with-param name="children">
               <ul>
                 <li>
-                  <xsl:variable name="title">
-                    <xsl:value-of select="@name"/>
-                    <xsl:text> </xsl:text>
-                    <xsl:apply-templates select="." mode="nounPlural"/>
-                  </xsl:variable>
-                  <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
-                  <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-                  <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
-                  <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
-                  <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-                  <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
-
-                  <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
-                    <xsl:value-of select="$title"/>
-                  </a>
+                  <xsl:apply-templates select="." mode="link-overload"/>
 
                   <ul>
                     <!-- list members -->
@@ -342,21 +312,7 @@
             <xsl:with-param name="children">
               <ul>
                 <li>
-                  <xsl:variable name="title">
-                    <xsl:value-of select="substring-after(@name, 'op_')"/>
-                    <xsl:text> </xsl:text>
-                    <xsl:apply-templates select="." mode="nounPlural"/>
-                  </xsl:variable>
-                  <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
-                  <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-                  <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
-                  <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
-                  <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-                  <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
-
-                  <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
-                    <xsl:value-of select="$title"/>
-                  </a>
+                  <xsl:apply-templates select="." mode="link-overload"/>
 
                   <ul>
                     <!-- list members -->
@@ -402,25 +358,11 @@
         <xsl:with-param name="children">
           <ul>
             <li class="nav-current">
-              <xsl:variable name="nodeType" select="local-name()"/>
-              <xsl:variable name="title">
-                <xsl:value-of select="ld:iif(self::operator, substring-after(@name, 'op_'), @name)"/>
-                <xsl:text> </xsl:text>
-                <xsl:apply-templates select="." mode="nounPlural"/>
-              </xsl:variable>
-              <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
-              <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-              <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
-              <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
-              <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-              <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
-
-              <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
-                <xsl:value-of select="$title"/>
-              </a>
+              <xsl:apply-templates select="." mode="link-overload" />
 
               <ul>
                 <!-- list members -->
+                <xsl:variable name="nodeType" select="local-name()"/>
                 <xsl:apply-templates select="parent::*/*[local-name() = $nodeType and @phase = '0' and @name = current()/@name]" mode="xnav-item-disambiguation">
                   <xsl:with-param name="current" select="false()"/>
                   <xsl:sort select="@name"/>
@@ -441,12 +383,7 @@
           <xsl:text>nav-current</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      <xsl:variable name="title">
-        <xsl:apply-templates select="." mode="title"/>
-      </xsl:variable>
-      <a title="{$title}" href="{ld:resolveAsset('*:*', '0.0.0.0')}">
-        <xsl:value-of select="$title"/>
-      </a>
+      <xsl:apply-templates select="." mode="link"/>
     </li>
   </xsl:template>
 
@@ -484,27 +421,14 @@
     <xsl:param name="current"/>
     <xsl:choose>
       <xsl:when test="not(preceding-sibling::method[@name = current()/@name]) and following-sibling::method[@name = current()/@name]">
-        <xsl:variable name="title">
-          <xsl:value-of select="@name"/>
-          <xsl:text> </xsl:text>
-          <xsl:apply-templates select="." mode="nounPlural"/>
-        </xsl:variable>
         <li>
           <xsl:if test="$current = @assetId">
             <xsl:attribute name="class">
               <xsl:text>nav-current</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
-          <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-          <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
-          <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
-          <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-          <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
-          <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
-            <xsl:value-of select="$title"/>
-          </a>
+          <xsl:apply-templates select="." mode="link-overload"/>
         </li>
       </xsl:when>
       <xsl:when test="not(preceding-sibling::method[@name = current()/@name]) and not(following-sibling::method[@name = current()/@name])" >
@@ -526,27 +450,14 @@
     <xsl:param name="current"/>
     <xsl:choose>
       <xsl:when test="not(preceding-sibling::property[@name = current()/@name]) and following-sibling::property[@name = current()/@name]">
-        <xsl:variable name="title">
-          <xsl:value-of select="@name"/>
-          <xsl:text> </xsl:text>
-          <xsl:apply-templates select="." mode="nounPlural"/>
-        </xsl:variable>
         <li>
           <xsl:if test="$current = @assetId">
             <xsl:attribute name="class">
               <xsl:text>nav-current</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
-          <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-          <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
-          <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
-          <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-          <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
-          <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
-            <xsl:value-of select="$title"/>
-          </a>
+          <xsl:apply-templates select="." mode="link-overload"/>
         </li>
       </xsl:when>
       <xsl:when test="not(preceding-sibling::property[@name = current()/@name]) and not(following-sibling::property[@name = current()/@name])" >
@@ -568,27 +479,14 @@
     <xsl:param name="current"/>
     <xsl:choose>
       <xsl:when test="not(preceding-sibling::operator[@name = current()/@name]) and following-sibling::operator[@name = current()/@name]">
-        <xsl:variable name="title">
-          <xsl:value-of select="substring-after(@name, 'op_')"/>
-          <xsl:text> </xsl:text>
-          <xsl:apply-templates select="." mode="nounPlural"/>
-        </xsl:variable>
         <li>
           <xsl:if test="$current = @assetId">
             <xsl:attribute name="class">
               <xsl:text>nav-current</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
-          <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
-          <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
-          <xsl:variable name="leading-clean" select="ld:iif($leading, concat($leading, '.'), '')"/>
-          <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
-          <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
-
-          <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
-            <xsl:value-of select="$title"/>
-          </a>
+          
+          <xsl:apply-templates select="." mode="link-overload" />
         </li>
       </xsl:when>
       <xsl:when test="not(preceding-sibling::operator[@name = current()/@name]) and not(following-sibling::operator[@name = current()/@name])" >

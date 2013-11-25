@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012 DigitasLBi Netherlands B.V.
+  Copyright 2012-2013 DigitasLBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -197,12 +197,12 @@
     <xsl:text> Conversion </xsl:text>
     <xsl:choose>
       <xsl:when test="param/@type = parent::*/@assetId">
-        <xsl:text> to </xsl:text>
+        <xsl:text>to </xsl:text>
         <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/returns/@type]" mode="displayText" />-->
         <xsl:apply-templates select="ld:key('aid', current()/returns/@type)" mode="displayText" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text> from </xsl:text>
+        <xsl:text>from </xsl:text>
         <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/param/@type]" mode="displayText" />-->
         <xsl:apply-templates select="ld:key('aid', current()/param/@type)" mode="displayText" />
       </xsl:otherwise>
