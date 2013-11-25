@@ -36,31 +36,24 @@
 
 
   <xsl:template name="navigation">
-    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = $assetId]" mode="xnav"/>-->
     <xsl:apply-templates select="ld:key('aid', $assetId)" mode="xnav"/>
   </xsl:template>
 
   <xsl:template name="title">
     <xsl:choose>
-      <!--<xsl:when test="/bundle/assembly/namespace//operator[@assetId = $assetId]">-->
       <xsl:when test="ld:key('aid', $assetId)[self::operator]">
-        <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[*/@assetId = $assetId]" mode="displayText"/>-->
         <xsl:apply-templates select="ld:key('aid', $assetId)/.." mode="displayText"/>
         <xsl:text> </xsl:text>        
       </xsl:when>
-      <!--<xsl:when test="/bundle/assembly/namespace//*[@assetId = $assetId and not(self::constructor)]">-->
       <xsl:when test="ld:key('aid', $assetId)[not(self::constructor)]">
-        <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[*/@assetId = $assetId]" mode="displayText"/>-->
         <xsl:apply-templates select="ld:key('aid', $assetId)/.." mode="displayText"/>
         <xsl:text>.</xsl:text>
       </xsl:when>
     </xsl:choose>
-    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*/*[@assetId = $assetId]" mode="title"/>-->
     <xsl:apply-templates select="ld:key('aid', $assetId)" mode="title"/>
   </xsl:template>
 
   <xsl:template name="content">
-    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*/*[@assetId = $assetId]"/>-->
     <xsl:apply-templates select="ld:key('aid', $assetId)"/>    
   </xsl:template>
 
@@ -72,7 +65,6 @@
       <span>
         Version <xsl:value-of select="ld:significantVersion(@assetId)"/>
       </span>
-      <!--<xsl:if test="/bundle/assembly[ld:cmpnover(@assetId, current()/ancestor::assembly/@assetId)]/namespace//*[@assetId and ld:cmpnover(@assetId, current()/@assetId)]/@assetId">-->
       <xsl:if test="count(ld:key('aidNoVer', ld:asset(@assetId))) &gt; 1">
         <xsl:text>&#160;|&#160;</xsl:text>
         <div class="version-selector">
@@ -124,7 +116,6 @@
       <dl>
         <dt>
           <xsl:text>Type: </xsl:text>
-          <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/@type]" mode="link" />-->
           <xsl:apply-templates select="ld:key('aid', current()/@type)" mode="link" />
         </dt>
         <dd>
@@ -196,7 +187,6 @@
   <xsl:template match="implements">
     <li>
       <a href="{ld:resolve(@member)}">
-        <!--<xsl:apply-templates select="//bundle/assembly/namespace//*[*/@assetId = current()/@member]/@assetId" mode="displayText"/>-->
         <xsl:apply-templates select="ld:key('aid', current()/@member)/../@assetId" mode="displayText"/>
         <xsl:text>.</xsl:text>
         <xsl:apply-templates select="@member" mode="displayText"/>
@@ -233,9 +223,7 @@
     <br/>
     <xsl:value-of select="doc:summary"/>
     <xsl:if test="parent::method[@declaredAs] and not(doc:summary)">
-      <!--<xsl:apply-templates select="//*[@assetId = current()/parent::*/@declaredAs]/param[@name = current()/@name]/doc:summary"/>-->
       <xsl:apply-templates select="ld:key('aid', current()/parent::*/@declaredAs)/param[@name = current()/@name]/doc:summary"/>
-      <!--<xsl:if test="not(//*[@assetId = current()/parent::*/@declaredAs]/doc:summary)">-->
       <xsl:if test="not(ld:key('aid', current()/parent::*/@declaredAs)/doc:summary)">
         <xsl:call-template name="missing"/>
       </xsl:if>

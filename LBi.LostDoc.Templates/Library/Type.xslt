@@ -35,17 +35,14 @@
   <xsl:include href="Syntax.xslt"/>
 
   <xsl:template name="navigation">
-    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = $assetId]" mode="xnav"/>-->
     <xsl:apply-templates select="ld:key('aid', $assetId)" mode="xnav"/>
   </xsl:template>
 
   <xsl:template name="title">
-    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = $assetId]" mode="title"/>-->
     <xsl:apply-templates select="ld:key('aid', $assetId)" mode="title"/>
   </xsl:template>
 
   <xsl:template name="content">
-    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = $assetId]"/>-->
     <xsl:apply-templates select="ld:key('aid', $assetId)"/>
   </xsl:template>
 
@@ -54,7 +51,6 @@
     <xsl:choose>
       <xsl:when test="inherits">
 
-        <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/inherits/@type]" mode="inheritance">-->
         <xsl:apply-templates select="ld:key('aid', current()/inherits/@type)" mode="inheritance">
           <xsl:with-param name="innerNodeSet">
             <ul>
@@ -69,7 +65,6 @@
                       <xsl:apply-templates select="." mode="displayText"/>
                     </span>
 
-                    <!--<xsl:if test="/bundle/assembly/namespace//*[inherits/@type = current()/@assetId]">-->
                     <xsl:if test="ld:key('aidInherits', current()/@assetId)">
                       <ul class="descendants">
                         <xsl:apply-templates select="ld:key('aidInherits', current()/@assetId)" mode="inheritance-descendants"/>
@@ -95,7 +90,6 @@
   </xsl:template>
 
   <xsl:template match="class | struct" mode="inheritance-descendants">
-    <!--<xsl:if test="not(preceding::*[@assetId and ld:cmpnover(@assetId, current()/@assetId)])">-->
     <xsl:if test="@assetId = ld:key('aidNoVer', ld:asset(current()/@assetId))[1]/@assetId">
       <li>
         <xsl:apply-templates select="." mode="link"/>
@@ -118,7 +112,6 @@
       <span>
         Version <xsl:value-of select="ld:significantVersion(@assetId)"/>
       </span>
-      <!--<xsl:if test="/bundle/assembly[ld:cmpnover(@assetId, current()/ancestor::assembly/@assetId)]/namespace/*[@assetId and ld:cmpnover(@assetId, current()/@assetId)]/@assetId">-->
       <xsl:if test="count(ld:key('aidNoVer', ld:asset(current()/@assetId))) &gt; 1">
         <xsl:text>&#160;|&#160;</xsl:text>
         <div class="version-selector">
@@ -126,7 +119,6 @@
             <xsl:text>Other Versions</xsl:text>
           </a>
           <ul>
-            <!--<xsl:apply-templates select="/bundle/assembly[ld:cmpnover(@assetId, current()/ancestor::assembly/@assetId)]/namespace/*[@assetId and ld:cmpnover(@assetId, current()/@assetId)]/@assetId" mode="version"/>-->
             <xsl:apply-templates select="ld:key('aidNoVer', ld:asset(current()/@assetId))/@assetId" mode="version"/>
           </ul>
         </div>
@@ -167,7 +159,6 @@
 
     <p>
       <xsl:text>The </xsl:text>
-      <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = $assetId]" mode="displayText"/>-->
       <xsl:apply-templates select="ld:key('aid', $assetId)" mode="displayText"/>
       <xsl:text> type exposes the following members.</xsl:text>
     </p>
@@ -298,7 +289,6 @@
         </thead>
         <tbody>
           <xsl:apply-templates select="*[@isPrivate = 'true' and implements]">
-            <!--<xsl:sort select="/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/@name"/>-->
             <xsl:sort select="ld:key('aid', current()/implements/@member)/@name"/>
           </xsl:apply-templates>
         </tbody>
@@ -403,7 +393,6 @@
         <xsl:choose>
           <xsl:when test="@overrides">
             <xsl:if test="not(doc:summary)">
-              <!--<xsl:apply-templates select="//*[@assetId = current()/@overrides]/doc:summary"/>-->
               <xsl:apply-templates select="ld:key('aid', current()/@overrides)/doc:summary"/>
               <xsl:if test="not(ld:key('aid', current()/@overrides)/doc:summary)">
                 <xsl:call-template name="missing"/>
