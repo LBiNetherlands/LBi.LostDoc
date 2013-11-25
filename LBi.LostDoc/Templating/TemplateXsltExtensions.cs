@@ -111,6 +111,11 @@ namespace LBi.LostDoc.Templating
             return ret;
         }
 
+        public string toAssetId(string asset, string version)
+        {
+            return new AssetIdentifier(asset, Version.Parse(version)).ToString();
+        }
+
         public bool canResolve(string assetId)
         {
             string ret = this.resolve(assetId);

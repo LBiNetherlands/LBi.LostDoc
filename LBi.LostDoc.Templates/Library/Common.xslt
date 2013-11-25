@@ -36,41 +36,49 @@
   </xsl:template>
 
   <!-- LINK -->
-  
-  <!-- TODO route all link generation to this template -->
+
+  <!-- all links are routed through this template -->
   <xsl:template name="link">
     <xsl:param name="text" />
     <xsl:param name="assetId" />
-    <a href="{ld:resolve($assetId)}" title="{$text}">
-      <xsl:value-of select="$text"/>
-    </a>
+    <xsl:choose>
+      <xsl:when test="ld:canResolve($assetId)">
+        <a href="{ld:resolve($assetId)}" title="{$text}">
+          <xsl:value-of select="$text"/>
+        </a>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
-                
-  
+
+
   <xsl:template match="bundle" mode="link" priority="101">
-    <a title="Library" href="{ld:resolveAsset('*:*', '0.0.0.0')}">
-      <xsl:text>Library</xsl:text>
-    </a>
-  </xsl:template> 
-  
+    <xsl:call-template name="link">
+      <xsl:with-param name="assetId" select="ld:toAssetId('*:*', '0.0.0.0')"/>
+      <xsl:with-param name="text" select="'Library'"/>
+    </xsl:call-template>
+  </xsl:template>
+
   <!-- this is for explicit interface implemenations -->
   <xsl:template match="*[not(@declaredAs) and @isPrivate = 'true' and implements]" mode="link" priority="100">
     <xsl:param name="includeNoun" select="false()" />
     <xsl:choose>
       <xsl:when test="ld:canResolve(@assetId)">
-        <xsl:variable name="title">
-          <xsl:apply-templates select="ld:key('aid',current()/implements/@member)/.." mode="displayText" />
-          <xsl:text>.</xsl:text>
-          <xsl:apply-templates select="ld:key('aid',current()/implements/@member)" mode="displayText"/>
-          <xsl:if test="$includeNoun">
-            <xsl:text> </xsl:text>
-            <xsl:apply-templates select="." mode="nounSingular" />
-          </xsl:if>
-        </xsl:variable>
-
-        <a href="{ld:resolve(@assetId)}" title="{$title}">
-          <xsl:value-of select="$title"/>
-        </a>
+        <xsl:call-template name="link">
+          <xsl:with-param name="assetId" select="@assetId"/>
+          <xsl:with-param name="text">
+            <xsl:apply-templates select="ld:key('aid',current()/implements/@member)/.." mode="displayText" />
+            <xsl:text>.</xsl:text>
+            <xsl:apply-templates select="ld:key('aid',current()/implements/@member)" mode="displayText"/>
+            <xsl:if test="$includeNoun">
+              <xsl:text> </xsl:text>
+              <xsl:apply-templates select="." mode="nounSingular" />
+            </xsl:if>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <!-- recursive call with implements/@member -->
@@ -85,21 +93,20 @@
     <xsl:param name="includeNoun" select="false()" />
     <xsl:param name="includeParent" select="false()" />
 
-    <xsl:variable name="title">
-      <xsl:if test="$includeParent">
-        <xsl:apply-templates select="parent::*" mode="displayText"/>
-        <xsl:text>.</xsl:text>
-      </xsl:if>
-      <xsl:apply-templates select="." mode="displayText"/>
-      <xsl:if test="$includeNoun">
-        <xsl:text> </xsl:text>
-        <xsl:apply-templates select="." mode="nounSingular" />
-      </xsl:if>
-    </xsl:variable>
-
-    <a href="{ld:resolve(@assetId)}" title="{$title}">
-      <xsl:value-of select="$title"/>
-    </a>
+    <xsl:call-template name="link">
+      <xsl:with-param name="assetId" select="@assetId"/>
+      <xsl:with-param name="text">
+        <xsl:if test="$includeParent">
+          <xsl:apply-templates select="parent::*" mode="displayText"/>
+          <xsl:text>.</xsl:text>
+        </xsl:if>
+        <xsl:apply-templates select="." mode="displayText"/>
+        <xsl:if test="$includeNoun">
+          <xsl:text> </xsl:text>
+          <xsl:apply-templates select="." mode="nounSingular" />
+        </xsl:if>
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
   <!-- this is for explicit interface implemenations -->
@@ -107,19 +114,18 @@
     <xsl:param name="includeNoun" select="false()" />
     <xsl:choose>
       <xsl:when test="ld:canResolve(@declaredAs)">
-        <xsl:variable name="title">
-          <xsl:apply-templates select="ld:key('aid', current()/implements/@member)/.." mode="displayText"/>
-          <xsl:text>.</xsl:text>
-          <xsl:apply-templates select="ld:key('aid', current()/implements/@member)" mode="displayText"/>
-          <xsl:if test="$includeNoun">
-            <xsl:text> </xsl:text>
-            <xsl:apply-templates select="." mode="nounSingular" />
-          </xsl:if>
-        </xsl:variable>
-
-        <a href="{ld:resolve(@declaredAs)}" title="{$title}">
-          <xsl:value-of select="$title"/>
-        </a>
+        <xsl:call-template name="link">
+          <xsl:with-param name="assetId" select="@declaredAs"/>
+          <xsl:with-param name="text">
+            <xsl:apply-templates select="ld:key('aid', current()/implements/@member)/.." mode="displayText"/>
+            <xsl:text>.</xsl:text>
+            <xsl:apply-templates select="ld:key('aid', current()/implements/@member)" mode="displayText"/>
+            <xsl:if test="$includeNoun">
+              <xsl:text> </xsl:text>
+              <xsl:apply-templates select="." mode="nounSingular" />
+            </xsl:if>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <!--recursive call with implements/@member-->
@@ -133,29 +139,24 @@
   <xsl:template match="*[@declaredAs]" mode="link" priority="99">
     <xsl:param name="includeNoun" select="false()" />
     <xsl:param name="includeParent" select="false()" />
-    
-    <xsl:variable name="title">
-      <xsl:if test="$includeParent">
-        <xsl:apply-templates select="parent::*" mode="displayText"/>
-        <xsl:text>.</xsl:text>
-      </xsl:if>
-      <xsl:apply-templates select="." mode="displayText"/>
-      <xsl:if test="$includeNoun">
-        <xsl:text> </xsl:text>
-        <xsl:apply-templates select="." mode="nounSingular" />
-      </xsl:if>
-    </xsl:variable>
 
-    <a href="{ld:resolve(@declaredAs)}" title="{$title}">
-      <xsl:value-of select="$title"/>
-    </a>
+    <xsl:call-template name="link">
+      <xsl:with-param name="assetId" select="@declaredAs"/>
+      <xsl:with-param name="text">
+        <xsl:if test="$includeParent">
+          <xsl:apply-templates select="parent::*" mode="displayText"/>
+          <xsl:text>.</xsl:text>
+        </xsl:if>
+        <xsl:apply-templates select="." mode="displayText"/>
+        <xsl:if test="$includeNoun">
+          <xsl:text> </xsl:text>
+          <xsl:apply-templates select="." mode="nounSingular" />
+        </xsl:if>
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template match="*" mode="link-overload">
-    <xsl:variable name="title">
-      <xsl:apply-templates select="." mode="overload-title" />
-    </xsl:variable>
-    
     <xsl:variable name="aid" select="substring-after(ld:asset(@assetId), ':')"/>
     <xsl:variable name="asset" select="ld:coalesce(substring-before($aid, '('), $aid)"/>
     <xsl:variable name="leading" select="ld:substringBeforeLast($asset, '.')"/>
@@ -163,9 +164,12 @@
     <xsl:variable name="trailing" select="ld:coalesce(ld:substringAfterLast($asset, '.'), $asset)"/>
     <xsl:variable name="trailing-clean" select="ld:coalesce(substring-before($trailing, '`'), $trailing)"/>
 
-    <a title="{$title}" href="{ld:resolveAsset(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))}">
-      <xsl:value-of select="$title"/>
-    </a>
+    <xsl:call-template name="link">
+      <xsl:with-param name="assetId" select="ld:toAssetId(concat('Overload:', $leading-clean, $trailing-clean), ld:version(@assetId))"/>
+      <xsl:with-param name="text">
+        <xsl:apply-templates select="." mode="overload-title" />
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template match="method | property" mode="overload-title">
@@ -179,9 +183,9 @@
     <xsl:text> </xsl:text>
     <xsl:apply-templates select="." mode="nounPlural"/>
   </xsl:template>
-  
+
   <!-- Member table row -->
-  
+
   <xsl:template match="method | property | constructor | field | operator" mode="member-row">
     <tr>
       <td class="icons">
@@ -279,16 +283,15 @@
     </tr>
   </xsl:template>
 
-
   <xsl:template match="@assetId" mode="version">
     <li>
-      <a href="{ld:resolve(.)}">
-        <xsl:text>Version&#160;</xsl:text>
-        <xsl:value-of select="ld:significantVersion(.)"/>
-      </a>
+      <xsl:call-template name="link">
+        <xsl:with-param name="assetId" select="."/>
+        <xsl:with-param name="text">
+          <xsl:text>Version&#160;</xsl:text>
+          <xsl:value-of select="ld:significantVersion(.)"/>
+        </xsl:with-param>
+      </xsl:call-template>
     </li>
   </xsl:template>
-
-
-
 </xsl:stylesheet>
