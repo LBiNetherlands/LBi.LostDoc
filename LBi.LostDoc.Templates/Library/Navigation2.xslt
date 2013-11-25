@@ -62,12 +62,9 @@
         </xsl:if>
       </xsl:attribute>
 
-      <xsl:variable name="title">
-        <xsl:apply-templates select="." mode="title"/>
-      </xsl:variable>
-      <a title="{$title}" href="{ld:resolve(@assetId)}">
-        <xsl:value-of select="$title"/>
-      </a>
+      <xsl:apply-templates select="." mode="link">
+        <xsl:with-param name="includeNoun" select="true()" />
+      </xsl:apply-templates>
 
       <xsl:if test="$children">
         <xsl:copy-of select="$children"/>
@@ -100,12 +97,9 @@
         </xsl:if>
       </xsl:attribute>
 
-      <xsl:variable name="title">
-        <xsl:apply-templates select="." mode="title"/>
-      </xsl:variable>
-      <a title="{$title}" href="{ld:resolve(@assetId)}">
-        <xsl:value-of select="$title"/>
-      </a>
+      <xsl:apply-templates select="." mode="link">
+        <xsl:with-param name="includeNoun" select="true()" />
+      </xsl:apply-templates>
 
       <xsl:if test="$children">
         <xsl:copy-of select="$children"/>
@@ -130,12 +124,9 @@
         </xsl:if>
       </xsl:attribute>
 
-      <xsl:variable name="title">
-        <xsl:apply-templates select="." mode="title"/>
-      </xsl:variable>
-      <a title="{$title}" href="{ld:resolve(@assetId)}">
-        <xsl:value-of select="$title"/>
-      </a>
+      <xsl:apply-templates select="." mode="link">
+        <xsl:with-param name="includeNoun" select="true()" />
+      </xsl:apply-templates>
 
       <xsl:if test="$children">
         <xsl:copy-of select="$children"/>
@@ -159,12 +150,9 @@
         </xsl:if>
       </xsl:attribute>
 
-      <xsl:variable name="title">
-        <xsl:apply-templates select="." mode="title"/>
-      </xsl:variable>
-      <a title="{$title}" href="{ld:resolve(@assetId)}">
-        <xsl:value-of select="$title"/>
-      </a>
+      <xsl:apply-templates select="." mode="link">
+        <xsl:with-param name="includeNoun" select="true()" />
+      </xsl:apply-templates>
 
       <xsl:if test="$children">
         <xsl:copy-of select="$children"/>
@@ -202,12 +190,9 @@
             <xsl:with-param name="children">
               <ul>
                 <li class="nav-current">
-                  <xsl:variable name="title">
-                    <xsl:apply-templates select="." mode="title"/>
-                  </xsl:variable>
-                  <a title="{$title}" href="{ld:resolve(@assetId)}">
-                    <xsl:value-of select="$title"/>
-                  </a>
+                  <xsl:apply-templates select="." mode="link">
+                    <xsl:with-param name="includeNoun" select="true()" />
+                  </xsl:apply-templates>
                   <ul>
                     <!-- list child namespaces -->
                     <xsl:apply-templates select="/bundle/assembly/namespace[@phase = '0' and current()/@name = ld:substringBeforeLast(@name, '.') and not(preceding::namespace/@name = @name)]" mode="xnav-item">
@@ -231,12 +216,9 @@
             <xsl:with-param name="children">
               <ul>
                 <li class="nav-current">
-                  <xsl:variable name="title">
-                    <xsl:apply-templates select="." mode="title"/>
-                  </xsl:variable>
-                  <a title="{$title}" href="{ld:resolve(@assetId)}">
-                    <xsl:value-of select="$title"/>
-                  </a>
+                  <xsl:apply-templates select="." mode="link">
+                    <xsl:with-param name="includeNoun" select="true()" />
+                  </xsl:apply-templates>
                   <ul>
                     <!-- list child namespaces -->
                     <xsl:apply-templates select="/bundle/assembly/namespace[@phase = '0' and current()/@name = ld:substringBeforeLast(@name, '.') and not(preceding::namespace/@name = @name)]" mode="xnav-item">
@@ -266,17 +248,13 @@
         <xsl:with-param name="children">
           <ul>
             <li class="nav-current">
-              <xsl:variable name="title">
-                    <xsl:apply-templates select="." mode="title"/>
-                  </xsl:variable>
-                  <a title="{$title}" href="{ld:resolve(@assetId)}">
-                <xsl:apply-templates select="." mode="title"/>
-              </a>
+              <xsl:apply-templates select="." mode="link">
+                <xsl:with-param name="includeNoun" select="true()" />
+              </xsl:apply-templates>
               <ul>
                 <!-- list members -->
                 <xsl:apply-templates select="*[@assetId and @phase = '0' and (self::method | self::property | self::field | self::event | self::constructor | self::operator)]" mode="xnav-item">
                   <xsl:with-param name="current" select="@assetId"/>
-                  <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
                   <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                 </xsl:apply-templates>
               </ul>
@@ -314,10 +292,8 @@
 
                   <ul>
                     <!-- list members -->
-                    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@phase = '0' and ld:nover(@assetId) = ld:nover(current()/parent::*/@assetId)]/*[@assetId and @phase = '0']" mode="xnav-item">-->
                     <xsl:apply-templates select="parent::*/method[@phase = '0' and @name = current()/@name]" mode="xnav-item-disambiguation">
                       <xsl:with-param name="current" select="@assetId"/>
-                      <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
                       <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                     </xsl:apply-templates>
                   </ul>
@@ -350,10 +326,8 @@
 
                   <ul>
                     <!-- list members -->
-                    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@phase = '0' and ld:nover(@assetId) = ld:nover(current()/parent::*/@assetId)]/*[@assetId and @phase = '0']" mode="xnav-item">-->
                     <xsl:apply-templates select="parent::*/property[@phase = '0' and @name = current()/@name]" mode="xnav-item-disambiguation">
                       <xsl:with-param name="current" select="@assetId"/>
-                      <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
                       <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                     </xsl:apply-templates>
                   </ul>
@@ -386,10 +360,8 @@
 
                   <ul>
                     <!-- list members -->
-                    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@phase = '0' and ld:nover(@assetId) = ld:nover(current()/parent::*/@assetId)]/*[@assetId and @phase = '0']" mode="xnav-item">-->
                     <xsl:apply-templates select="parent::*/operator[@phase = '0' and @name = current()/@name]" mode="xnav-item-disambiguation">
                       <xsl:with-param name="current" select="@assetId"/>
-                      <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
                       <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                     </xsl:apply-templates>
                   </ul>
@@ -404,19 +376,13 @@
             <xsl:with-param name="children">
               <ul>
                 <li>
-                  <xsl:variable name="title">
-                    <xsl:apply-templates select="parent::*" mode="title"/>
-                  </xsl:variable>
-                  <a title="{$title}" href="{ld:resolve(parent::*/@assetId)}">
-                    <xsl:value-of select="$title"/>
-                  </a>
+                  <xsl:apply-templates select="parent::*" mode="link">
+                    <xsl:with-param name="includeNoun" select="true()" />
+                  </xsl:apply-templates>
                   <ul>
                     <!-- list members -->
-                    <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@phase = '0' and ld:nover(@assetId) = ld:nover(current()/parent::*/@assetId)]/*[@assetId and @phase = '0']" mode="xnav-item">-->
-                    
                     <xsl:apply-templates select="parent::*/*[(self::method | self::property | self::field | self::event | self::constructor | self::operator) and @assetId and @phase = '0']" mode="xnav-item">
                       <xsl:with-param name="current" select="@assetId"/>
-                      <!--<xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (/bundle/assembly/namespace//*[@assetId = current()/implements/@member]/ancestor::*[ancestor::namespace] | /bundle/assembly/namespace//*[@assetId = current()/implements/@member])/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>-->
                       <xsl:sort select="ld:iif(@isPrivate = 'true' and implements, ld:join( (ld:key('aid', current()/implements/@member)/ancestor::*[ancestor::namespace] | ld:key('aid', current()/implements/@member))/@name, '.'), ld:iif(self::operator, substring-after(@name, 'op_'),  @name))"/>
                     </xsl:apply-templates>
                   </ul>
@@ -492,28 +458,14 @@
           <xsl:text>nav-current</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      <xsl:variable name="title">
-        <xsl:apply-templates select="." mode="title"/>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="@declaredAs">
-          <a title="{$title}" href="{ld:resolve(@declaredAs)}">
-            <xsl:value-of select="$title"/>
-          </a>
-        </xsl:when>
-        <xsl:otherwise>
-          <a title="{$title}" href="{ld:resolve(@assetId)}">
-            <xsl:value-of select="$title"/>
-          </a>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:apply-templates select="." mode="link">
+        <xsl:with-param name="includeNoun" select="true()" />
+      </xsl:apply-templates>
     </li>
   </xsl:template>
 
   <xsl:template match="/bundle/assembly/namespace//*[(self::class | self::struct | self::enum | self::delegate)]" mode="xnav-item">
     <xsl:param name="current"/>
-    <!--<xsl:if test="not(preceding::*[@assetId and ld:cmpnover(@assetId , current()/@assetId)])">-->
-    <!--<xsl:if test="count(ld:key('aidNoVer', ld:nover(@assetId))) = 1 or @assetId = ld:key('aidNoVer', ld:nover(@assetId))[1]/@assetId">-->
     <xsl:if test="count(ld:key('aidNoVer', ld:asset(@assetId))) = 1 or @assetId = ld:key('aidNoVer', ld:asset(@assetId))[1]/@assetId">
       <li>
         <xsl:if test="$current = @assetId">
@@ -521,12 +473,9 @@
             <xsl:text>nav-current</xsl:text>
           </xsl:attribute>
         </xsl:if>
-        <xsl:variable name="title">
-          <xsl:apply-templates select="." mode="title"/>
-        </xsl:variable>
-        <a title="{$title}" href="{ld:resolve(@assetId)}">
-          <xsl:value-of select="$title"/>
-        </a>
+        <xsl:apply-templates select="." mode="link">
+          <xsl:with-param name="includeNoun" select="true()" />
+        </xsl:apply-templates>
       </li>
     </xsl:if>
   </xsl:template>
@@ -568,21 +517,6 @@
           <xsl:apply-templates select="." mode="link">
             <xsl:with-param name="includeNoun" select="true()"/>
           </xsl:apply-templates>
-          <!--<xsl:variable name="title">
-            <xsl:apply-templates select="." mode="title"/>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="@declaredAs">
-              <a title="{$title}" href="{ld:resolve(@declaredAs)}">
-                <xsl:value-of select="$title"/>
-              </a>
-            </xsl:when>
-            <xsl:otherwise>
-              <a title="{$title}" href="{ld:resolve(@assetId)}">
-                <xsl:value-of select="$title"/>
-              </a>
-            </xsl:otherwise>
-          </xsl:choose>-->
         </li>
       </xsl:when>
     </xsl:choose>
@@ -622,21 +556,9 @@
               <xsl:text>nav-current</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="title">
-            <xsl:apply-templates select="." mode="title"/>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="@declaredAs">
-              <a title="{$title}" href="{ld:resolve(@declaredAs)}">
-                <xsl:value-of select="$title"/>
-              </a>
-            </xsl:when>
-            <xsl:otherwise>
-              <a title="{$title}" href="{ld:resolve(@assetId)}">
-                <xsl:value-of select="$title"/>
-              </a>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:apply-templates select="." mode="link">
+            <xsl:with-param name="includeNoun" select="true()" />
+          </xsl:apply-templates>
         </li>
       </xsl:when>
     </xsl:choose>
@@ -676,21 +598,9 @@
               <xsl:text>nav-current</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="title">
-            <xsl:apply-templates select="." mode="title"/>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="@declaredAs">
-              <a title="{$title}" href="{ld:resolve(@declaredAs)}">
-                <xsl:value-of select="$title"/>
-              </a>
-            </xsl:when>
-            <xsl:otherwise>
-              <a title="{$title}" href="{ld:resolve(@assetId)}">
-                <xsl:value-of select="$title"/>
-              </a>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:apply-templates select="." mode="link">
+            <xsl:with-param name="includeNoun" select="true()" />
+          </xsl:apply-templates>
         </li>
       </xsl:when>
     </xsl:choose>
@@ -705,22 +615,9 @@
         </xsl:attribute>
       </xsl:if>
 
-      <xsl:variable name="title">
-        <xsl:apply-templates select="." mode="title"/>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="@declaredAs">
-          <a title="{$title}" href="{ld:resolve(@declaredAs)}">
-            <xsl:value-of select="$title"/>
-          </a>
-        </xsl:when>
-        <xsl:otherwise>
-          <a title="{$title}" href="{ld:resolve(@assetId)}">
-            <xsl:value-of select="$title"/>
-          </a>
-        </xsl:otherwise>
-      </xsl:choose>
-
+      <xsl:apply-templates select="." mode="link">
+        <xsl:with-param name="includeNoun" select="true()" />
+      </xsl:apply-templates>
     </li>
   </xsl:template>
 </xsl:stylesheet>
