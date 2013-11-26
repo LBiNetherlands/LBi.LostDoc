@@ -142,14 +142,12 @@
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="parent::*/with">
-            <!--<xsl:value-of select="substring-before(//*[@assetId = current()]/@name, '`')"/>-->
             <xsl:value-of select="substring-before(ld:key('aid', current())/@name, '`')"/>
             <xsl:text>&lt;</xsl:text>
             <xsl:apply-templates select="parent::*/with" mode="displayText"/>
             <xsl:text>&gt;</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <!--<xsl:apply-templates select="//*[@assetId = current()]" mode="displayText"/>-->
             <xsl:apply-templates select="ld:key('aid', current())" mode="displayText">
               <xsl:with-param name="attributes" select="$attributes" />
             </xsl:apply-templates>
@@ -198,12 +196,10 @@
     <xsl:choose>
       <xsl:when test="param/@type = parent::*/@assetId">
         <xsl:text>to </xsl:text>
-        <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/returns/@type]" mode="displayText" />-->
         <xsl:apply-templates select="ld:key('aid', current()/returns/@type)" mode="displayText" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>from </xsl:text>
-        <!--<xsl:apply-templates select="/bundle/assembly/namespace//*[@assetId = current()/param/@type]" mode="displayText" />-->
         <xsl:apply-templates select="ld:key('aid', current()/param/@type)" mode="displayText" />
       </xsl:otherwise>
     </xsl:choose>
@@ -233,7 +229,6 @@
   </xsl:template>
 
   <xsl:template match="property[@declaredAs]" mode="displayText" priority="50">
-    <!--<xsl:apply-templates select="//*[@assetId = current()/@declaredAs]" mode="displayText"/>-->
     <xsl:apply-templates select="ld:key('aid', current()/@declaredAs)" mode="displayText"/>
   </xsl:template>
 
@@ -319,7 +314,6 @@
   </xsl:template>
 
   <xsl:template match="typearg" mode="displayText">
-    <!--<xsl:apply-templates select="//*[@assetId = current()/@type]" mode="displayText"/>-->
     <xsl:apply-templates select="ld:key('aid', current()/@type)" mode="displayText"/>
   </xsl:template>
 

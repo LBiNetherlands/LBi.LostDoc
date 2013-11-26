@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <!-- 
   
   Copyright 2012-2013 DigitasLBi Netherlands B.V.
@@ -23,47 +24,47 @@
                 xmlns:ld="urn:lostdoc-core"
                 exclude-result-prefixes="msxsl doc ld">
 
-  <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
+  <xsl:output method="html" indent="yes" omit-xml-declaration="yes" />
 
-  <xsl:param name="assetId"/>
+  <xsl:param name="assetId" />
 
-  <xsl:include href="Layout.xslt"/>
-  <xsl:include href="Naming.xslt"/>
-  <xsl:include href="Common.xslt"/>
-  <xsl:include href="DocComments.xslt"/>
-  <xsl:include href="Navigation2.xslt"/>
-  <xsl:include href="Syntax.xslt"/>
+  <xsl:include href="Layout.xslt" />
+  <xsl:include href="Naming.xslt" />
+  <xsl:include href="Common.xslt" />
+  <xsl:include href="DocComments.xslt" />
+  <xsl:include href="Navigation2.xslt" />
+  <xsl:include href="Syntax.xslt" />
 
 
   <xsl:template name="navigation">
-    <xsl:apply-templates select="ld:key('aid', $assetId)" mode="xnav"/>
+    <xsl:apply-templates select="ld:key('aid', $assetId)" mode="xnav" />
   </xsl:template>
 
   <xsl:template name="title">
     <xsl:choose>
       <xsl:when test="ld:key('aid', $assetId)[self::operator]">
-        <xsl:apply-templates select="ld:key('aid', $assetId)/.." mode="displayText"/>
-        <xsl:text> </xsl:text>        
+        <xsl:apply-templates select="ld:key('aid', $assetId)/.." mode="displayText" />
+        <xsl:text> </xsl:text>
       </xsl:when>
       <xsl:when test="ld:key('aid', $assetId)[not(self::constructor)]">
-        <xsl:apply-templates select="ld:key('aid', $assetId)/.." mode="displayText"/>
+        <xsl:apply-templates select="ld:key('aid', $assetId)/.." mode="displayText" />
         <xsl:text>.</xsl:text>
       </xsl:when>
     </xsl:choose>
-    <xsl:apply-templates select="ld:key('aid', $assetId)" mode="title"/>
+    <xsl:apply-templates select="ld:key('aid', $assetId)" mode="title" />
   </xsl:template>
 
   <xsl:template name="content">
-    <xsl:apply-templates select="ld:key('aid', $assetId)"/>    
+    <xsl:apply-templates select="ld:key('aid', $assetId)" />
   </xsl:template>
 
   <xsl:template match="constructor | method | property | field | event | operator">
     <h1>
-      <xsl:call-template name="title"/>
+      <xsl:call-template name="title" />
     </h1>
     <div class="version">
       <span>
-        Version <xsl:value-of select="ld:significantVersion(@assetId)"/>
+        Version <xsl:value-of select="ld:significantVersion(@assetId)" />
       </span>
       <xsl:if test="count(ld:key('aidNoVer', ld:asset(@assetId))) &gt; 1">
         <xsl:text>&#160;|&#160;</xsl:text>
@@ -72,42 +73,42 @@
             <xsl:text>Other Versions</xsl:text>
           </a>
           <ul>
-            <xsl:apply-templates select="ld:key('aidNoVer', ld:asset(@assetId))/@assetId" mode="version"/>
+            <xsl:apply-templates select="ld:key('aidNoVer', ld:asset(@assetId))/@assetId" mode="version" />
           </ul>
         </div>
       </xsl:if>
     </div>
     <p class="summary">
-      <xsl:apply-templates select="doc:summary"/>
+      <xsl:apply-templates select="doc:summary" />
       <xsl:if test="not(doc:summary)">
-        <xsl:call-template name="missing"/>
+        <xsl:call-template name="missing" />
       </xsl:if>
     </p>
     <dl class="origin">
       <dt>Namespace:</dt>
       <dd>
-        <xsl:value-of select="ancestor::namespace/@name"/>
+        <xsl:value-of select="ancestor::namespace/@name" />
       </dd>
       <dt>Assembly:</dt>
       <dd>
-        <xsl:value-of select="ancestor::assembly/@filename"/>
+        <xsl:value-of select="ancestor::assembly/@filename" />
       </dd>
     </dl>
 
     <h2>Syntax</h2>
-    <xsl:apply-templates select="." mode="syntax"/>
+    <xsl:apply-templates select="." mode="syntax" />
 
     <xsl:if test="typeparam">
       <h3>Type Parameters</h3>
       <dl>
-        <xsl:apply-templates select="typeparam"/>
+        <xsl:apply-templates select="typeparam" />
       </dl>
     </xsl:if>
 
     <xsl:if test="param">
       <h3>Parameters</h3>
       <dl class="parameters">
-        <xsl:apply-templates select="param"/>
+        <xsl:apply-templates select="param" />
       </dl>
     </xsl:if>
 
@@ -119,9 +120,9 @@
           <xsl:apply-templates select="ld:key('aid', current()/@type)" mode="link" />
         </dt>
         <dd>
-          <xsl:apply-templates select="doc:returns"/>
+          <xsl:apply-templates select="doc:returns" />
           <xsl:if test="not(doc:returns)">
-            <xsl:call-template name="missing"/>
+            <xsl:call-template name="missing" />
           </xsl:if>
         </dd>
       </dl>
@@ -130,14 +131,14 @@
     <xsl:if test="returns">
       <h3>Return Value</h3>
       <span>
-        <xsl:apply-templates select="returns" mode="typeInfo"/>
+        <xsl:apply-templates select="returns" mode="typeInfo" />
       </span>
     </xsl:if>
 
     <xsl:if test="implements">
       <h3>Implements</h3>
       <ul>
-        <xsl:apply-templates select="implements"/>
+        <xsl:apply-templates select="implements" />
       </ul>
     </xsl:if>
 
@@ -155,7 +156,7 @@
           </tr>
         </thead>
         <tbody>
-          <xsl:apply-templates select="doc:exception"/>
+          <xsl:apply-templates select="doc:exception" />
         </tbody>
       </table>
     </xsl:if>
@@ -163,24 +164,24 @@
     <xsl:if test="doc:remarks">
       <h2>Remarks</h2>
       <span>
-        <xsl:apply-templates select="doc:remarks"/>
+        <xsl:apply-templates select="doc:remarks" />
       </span>
     </xsl:if>
 
     <xsl:if test="doc:example">
       <h2>Example</h2>
       <span>
-        <xsl:apply-templates select="doc:example"/>
+        <xsl:apply-templates select="doc:example" />
       </span>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="param">
     <dt>
-      <xsl:value-of select="@name"/>
+      <xsl:value-of select="@name" />
     </dt>
     <dd>
-      <xsl:apply-templates select="." mode="typeInfo"/>
+      <xsl:apply-templates select="." mode="typeInfo" />
     </dd>
   </xsl:template>
 
@@ -189,9 +190,9 @@
       <xsl:call-template name="link">
         <xsl:with-param name="assetId" select="@member" />
         <xsl:with-param name="text">
-          <xsl:apply-templates select="ld:key('aid', current()/@member)/../@assetId" mode="displayText"/>
+          <xsl:apply-templates select="ld:key('aid', current()/@member)/../@assetId" mode="displayText" />
           <xsl:text>.</xsl:text>
-          <xsl:apply-templates select="@member" mode="displayText"/>
+          <xsl:apply-templates select="@member" mode="displayText" />
         </xsl:with-param>
       </xsl:call-template>
     </li>
@@ -241,15 +242,13 @@
         <xsl:call-template name="link">
           <xsl:with-param name="assetId" select="@cref" />
           <xsl:with-param name="text">
-            <xsl:apply-templates select="@cref" mode="displayText"/>
+            <xsl:apply-templates select="@cref" mode="displayText" />
           </xsl:with-param>
         </xsl:call-template>
       </td>
       <td>
-        <xsl:apply-templates select="node()"/>
+        <xsl:apply-templates select="node()" />
       </td>
     </tr>
   </xsl:template>
 </xsl:stylesheet>
-
-
