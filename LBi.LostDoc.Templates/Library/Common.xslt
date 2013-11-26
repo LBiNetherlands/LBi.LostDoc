@@ -48,12 +48,13 @@
         </a>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$text"/>
+        <!-- TODO should this be a link to bing/google? -->
+        <span class="unresolved-link">
+          <xsl:value-of select="$text"/>
+        </span>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
-
 
   <xsl:template match="bundle" mode="link" priority="101">
     <xsl:call-template name="link">

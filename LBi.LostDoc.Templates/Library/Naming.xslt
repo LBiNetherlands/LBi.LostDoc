@@ -72,7 +72,6 @@
     </xsl:choose>
   </xsl:template>
 
-
   <xsl:template match="*" mode="nounPlural">
     <xsl:variable name="type" select="name(.)"/>
     <xsl:choose>
@@ -121,7 +120,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
 
   <xsl:template match="*" mode="title">
     <xsl:apply-templates select="." mode="displayText"/>
@@ -210,17 +208,15 @@
   </xsl:template>
 
   <xsl:template match="method" mode="displayText">
-    <xsl:choose>
-      <xsl:when test="typeparam">
-        <xsl:value-of select="@name"/>
-        <xsl:text>&lt;</xsl:text>
-        <xsl:apply-templates select="typeparam" mode="displayText"/>
-        <xsl:text>&gt;</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="@name"/>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:value-of select="ld:substringAfterLast(@name, '.')"/>
+    <xsl:if test="not(@isPrivate and @isSealed and implements)">
+      <xsl:value-of select="@name" />
+    </xsl:if>
+    <xsl:if test="typeparam">
+      <xsl:text>&lt;</xsl:text>
+      <xsl:apply-templates select="typeparam" mode="displayText"/>
+      <xsl:text>&gt;</xsl:text>
+    </xsl:if>
     <xsl:if test="param">
       <xsl:text>(</xsl:text>
       <xsl:apply-templates select="param" mode="displayText"/>

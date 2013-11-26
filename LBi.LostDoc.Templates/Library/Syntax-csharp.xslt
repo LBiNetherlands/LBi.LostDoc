@@ -285,7 +285,7 @@
 
   <xsl:template match="typeparam" mode="syntax-cs-generic-constraints">
     <xsl:variable name="constraints" select="constraint[not(@type) or ld:asset(@type) != 'T:System.ValueType']|@isValueType|@isReferenceType|@hasDefaultConstructor[not(../@isValueType)]" />
-    
+
     <xsl:if test="$constraints">
       <span class="line">
         <span class="keyword">
@@ -359,6 +359,8 @@
   <xsl:template match="*" mode="syntax-cs-access">
     <xsl:variable name="keyword">
       <xsl:choose>
+        <!-- explicit interface implementation -->
+        <xsl:when test="@isPrivate and @isSealed and implements" />
         <xsl:when test="@isPublic = 'true'">
           <xsl:text>public </xsl:text>
         </xsl:when>
@@ -379,6 +381,8 @@
         </xsl:when>
       </xsl:choose>
       <xsl:choose>
+        <!-- explicit interface implementation -->
+        <xsl:when test="@isPrivate and @isSealed and implements" />
         <xsl:when test="@isSealed = 'true' and @isAbstract = 'true'">
           <xsl:text>static </xsl:text>
         </xsl:when>
@@ -396,7 +400,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    <xsl:if test="$keyword">
+    <xsl:if test="$keyword != ''">
       <span class="keyword">
         <xsl:value-of select="$keyword"/>
       </span>
@@ -584,7 +588,16 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:text> </xsl:text>
-      <xsl:value-of select="@name"/>
+      <xsl:choose>
+        <xsl:when test="@isPrivate and @isSealed and implements">
+          <xsl:apply-templates select="ld:key('aid', implements/@member)/parent::interface" mode="syntax-cs-naming"/>
+          <xsl:text>.</xsl:text>
+          <xsl:value-of select="ld:substringAfterLast(@name, '.')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@name"/>
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:if test="typeparam">
         <xsl:text>&lt;</xsl:text>
         <xsl:apply-templates select="typeparam" mode="syntax-cs-naming"/>
@@ -731,9 +744,9 @@
 
   <xsl:template match="attribute" mode="syntax-cs">
     <xsl:param name="prefix" select="''"/>
-    
+
     <!-- skip the DynamicAttribute -->
-    <xsl:if test="ld:asset(@type) != 'T:System.Runtime.CompilerServices.DynamicAttribute'">  
+    <xsl:if test="ld:asset(@type) != 'T:System.Runtime.CompilerServices.DynamicAttribute'">
       <!-- skip certain attributes -->
       <xsl:if test="ld:asset(@type) != 'T:System.Reflection.DefaultMemberAttribute' and ld:asset(@type) != 'T:System.Runtime.CompilerServices.ExtensionAttribute'">
         <span class="line">
