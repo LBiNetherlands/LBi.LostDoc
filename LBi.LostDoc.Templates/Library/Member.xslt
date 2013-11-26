@@ -197,52 +197,42 @@
     </li>
   </xsl:template>
 
-  <xsl:template match="*" mode="typeInfo">
+  <xsl:template match="param | returns" mode="typeInfo">
     <xsl:text>Type: </xsl:text>
+    <xsl:apply-templates select="descendant-or-self::*[@param |  @type][1]" mode="typeInfoLink">
+      <xsl:with-param name="text">
+        <xsl:apply-templates select="@param |  @type | arrayOf" mode="displayText">
+          <xsl:with-param name="attributes" select="attribute"/>
+        </xsl:apply-templates>
+          
+      </xsl:with-param>
+    </xsl:apply-templates>
+    <br />
+    <xsl:apply-templates select="doc:summary"/>
+    <xsl:if test="not(doc:summary) and parent::*[@declaredAs]">
+      <xsl:apply-templates select="ld:key('aid', current()/parent::*/@declaredAs)/param[@name = current()/@name]/doc:summary" />
+      <xsl:if test="not(ld:key('aid', current()/parent::*/@declaredAs)/doc:summary)">
+        <xsl:call-template name="missing" />
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="*[@param | @type]" mode="typeInfoLink">
+    <xsl:param name="text"/>
     <xsl:choose>
-      <xsl:when test="@param and (preceding-sibling::typeparam | following-sibling::typeparam)/@name = @param">
-        <xsl:call-template name="link">
-          <xsl:with-param name="assetId" select="$assetId" />
-          <xsl:with-param name="text">
-            <xsl:apply-templates select="@param" mode="displayText"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
       <xsl:when test="@param">
         <xsl:call-template name="link">
-          <xsl:with-param name="assetId" select="../../@assetId" />
-          <xsl:with-param name="text">
-            <xsl:apply-templates select="@param" mode="displayText"/>
-          </xsl:with-param>
+          <xsl:with-param name="assetId" select="ancestor::*[@assetId and typeparam[@name = current()/@param]][1]/@assetId" />
+          <xsl:with-param name="text" select="$text" />
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="@type">
         <xsl:call-template name="link">
           <xsl:with-param name="assetId" select="@type" />
-          <xsl:with-param name="text">
-            <xsl:apply-templates select="@type" mode="displayText">
-              <xsl:with-param name="attributes" select="attribute" />
-            </xsl:apply-templates>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="arrayOf">
-        <xsl:call-template name="link">
-          <xsl:with-param name="assetId" select="descendant-or-self::arrayOf[@type]/@type | descendant-or-self::arrayOf[@param]/@param" />
-          <xsl:with-param name="text">
-            <xsl:apply-templates select="." mode="displayText"/>
-          </xsl:with-param>
+          <xsl:with-param name="text" select="$text" />
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
-    <br/>
-    <xsl:value-of select="doc:summary"/>
-    <xsl:if test="parent::method[@declaredAs] and not(doc:summary)">
-      <xsl:apply-templates select="ld:key('aid', current()/parent::*/@declaredAs)/param[@name = current()/@name]/doc:summary"/>
-      <xsl:if test="not(ld:key('aid', current()/parent::*/@declaredAs)/doc:summary)">
-        <xsl:call-template name="missing"/>
-      </xsl:if>
-    </xsl:if>
   </xsl:template>
 
   <xsl:template match="doc:exception">
