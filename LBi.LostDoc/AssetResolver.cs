@@ -199,7 +199,11 @@ namespace LBi.LostDoc
                                                        BindingFlags.Static |
                                                        BindingFlags.Instance);
 
-                FieldInfo[] matchingFields = allFields.Where(f => Naming.GetAssetId(f).Equals(assetIdentifier.AssetId)).ToArray();
+                FieldInfo[] matchingFields = allFields.Where(f => Naming.GetAssetId(f).Equals(assetIdentifier.AssetId))
+                                                      .ToArray();
+
+                if (matchingFields.Length == 0)
+                    return null;
 
                 return this.GetVisible(type, matchingFields);
             }
@@ -257,6 +261,8 @@ namespace LBi.LostDoc
                                                          (m is MethodInfo && assetId.AssetId == Naming.GetAssetId((MethodInfo)m)))
                                              .ToArray();
 
+            if (methods.Length == 0)
+                return null;
 
             return this.GetVisible(type, methods);
         }
@@ -301,6 +307,9 @@ namespace LBi.LostDoc
 
             PropertyInfo[] properties = allProps.Where(p => assetId.AssetId.Equals(Naming.GetAssetId(p), StringComparison.Ordinal))
                                                 .ToArray();
+
+            if (properties.Length == 0)
+                return null;
 
             return this.GetVisible(type, properties);
         }
