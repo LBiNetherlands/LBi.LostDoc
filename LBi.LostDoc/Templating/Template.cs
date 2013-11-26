@@ -505,7 +505,7 @@ namespace LBi.LostDoc.Templating
                     XsltArgumentList xsltArgList = new XsltArgumentList();
 
                     // TODO this is a quick fix/hack
-                    xsltArgList.AddExtensionObject(Namespaces.TemplateExtensions, new TemplateXsltExtensions(null, null));
+                    xsltArgList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(null, null));
 
                     var metaParamNodes = metaNode.Elements("with-param");
 

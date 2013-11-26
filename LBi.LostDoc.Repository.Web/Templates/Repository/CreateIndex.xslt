@@ -19,9 +19,9 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
-                xmlns:doc="urn:doc"
-                xmlns:ld="urn:lostdoc-core"
-                exclude-result-prefixes="msxsl doc ld">
+                xmlns:xdc="urn:lostdoc:xml-doc-comment"
+                xmlns:ld="urn:lostdoc:template"
+                exclude-result-prefixes="msxsl xdc ld">
   <xsl:output method="xml"/>
 
   <xsl:include href="Naming.xslt"/>
@@ -43,7 +43,7 @@
       </title>
       <summary>
         <xsl:variable name="resultSet">
-          <xsl:apply-templates select="doc:summary" mode="doc"/>
+          <xsl:apply-templates select="xdc:summary" mode="doc"/>
         </xsl:variable>
 
         <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
@@ -51,7 +51,7 @@
 
       <text>
         <xsl:variable name="resultSet">
-          <xsl:apply-templates select=".//doc:*" mode="doc" />
+          <xsl:apply-templates select=".//xdc:*" mode="doc" />
         </xsl:variable>
 
         <xsl:copy-of select="msxsl:node-set($resultSet)//text()"/>
@@ -96,10 +96,10 @@
         <xsl:variable name="resultSet">
           <xsl:choose>
             <xsl:when test="ld:key('aid', @assetId)/@declaredAs">
-              <xsl:apply-templates select="ld:key('aid', ld:key('aid', @assetId)/@declaredAs)/doc:summary" mode="doc"/>
+              <xsl:apply-templates select="ld:key('aid', ld:key('aid', @assetId)/@declaredAs)/xdc:summary" mode="doc"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:apply-templates select="ld:key('aid', @assetId)/doc:summary" mode="doc"/>
+              <xsl:apply-templates select="ld:key('aid', @assetId)/xdc:summary" mode="doc"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>

@@ -20,7 +20,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
                 exclude-result-prefixes="msxsl"
-                xmlns:ld="urn:lostdoc-core">
+                xmlns:ld="urn:lostdoc:template">
 
   <xsl:output method="xml" indent="yes"/>
 <xsl:param name="name"/>

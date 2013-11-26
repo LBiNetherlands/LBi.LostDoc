@@ -19,9 +19,9 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
-                xmlns:doc="urn:doc"
-                xmlns:ld="urn:lostdoc-core"
-                exclude-result-prefixes="msxsl doc ld">
+                xmlns:xdc="urn:lostdoc:xml-doc-comment"
+                xmlns:ld="urn:lostdoc:template"
+                exclude-result-prefixes="msxsl xdc ld">
 
   <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
 
@@ -57,8 +57,8 @@
       <xsl:text> Namespace</xsl:text>
     </h1>
     <p>
-      <xsl:apply-templates select="doc:summary"/>
-      <xsl:if test="not(doc:summary)">
+      <xsl:apply-templates select="xdc:summary"/>
+      <xsl:if test="not(xdc:summary)">
         <xsl:call-template name="missing"/>
       </xsl:if>
     </p>
@@ -157,8 +157,8 @@
           <xsl:apply-templates select="." mode="link"/>
         </td>
         <td>
-          <xsl:apply-templates select="doc:summary"/>
-          <xsl:if test="not(doc:summary)">
+          <xsl:apply-templates select="xdc:summary"/>
+          <xsl:if test="not(xdc:summary)">
             <xsl:call-template name="missing"/>
           </xsl:if>
         </td>
@@ -179,8 +179,8 @@
           <xsl:apply-templates select="." mode="link" />
         </td>
         <td>
-          <xsl:apply-templates select="doc:summary"/>
-          <xsl:if test="not(doc:summary)">
+          <xsl:apply-templates select="xdc:summary"/>
+          <xsl:if test="not(xdc:summary)">
             <xsl:call-template name="missing"/>
           </xsl:if>
         </td>

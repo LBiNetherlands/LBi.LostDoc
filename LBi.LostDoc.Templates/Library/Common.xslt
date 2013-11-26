@@ -19,17 +19,17 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
-                xmlns:doc="urn:doc"
-                xmlns:ld="urn:lostdoc-core"
-                exclude-result-prefixes="msxsl doc ld">
+                xmlns:xdc="urn:lostdoc:xml-doc-comment"
+                xmlns:ld="urn:lostdoc:template"
+                exclude-result-prefixes="msxsl xdc ld">
 
   <xsl:template match="typeparam">
     <dt>
       <xsl:value-of select="@name"/>
     </dt>
     <dd>
-      <xsl:apply-templates select="doc:summary"/>
-      <xsl:if test="not(doc:summary)">
+      <xsl:apply-templates select="xdc:summary"/>
+      <xsl:if test="not(xdc:summary)">
         <xsl:call-template name="missing"/>
       </xsl:if>
     </dd>
@@ -247,12 +247,12 @@
         </xsl:choose>
       </td>
       <td>
-        <xsl:apply-templates select="doc:summary"/>
+        <xsl:apply-templates select="xdc:summary"/>
         <xsl:choose>
           <xsl:when test="@overrides">
-            <xsl:if test="not(doc:summary)">
-              <xsl:apply-templates select="ld:key('aid', current()/@overrides)/doc:summary"/>
-              <xsl:if test="not(ld:key('aid', current()/@overrides)/doc:summary)">
+            <xsl:if test="not(xdc:summary)">
+              <xsl:apply-templates select="ld:key('aid', current()/@overrides)/xdc:summary"/>
+              <xsl:if test="not(ld:key('aid', current()/@overrides)/xdc:summary)">
                 <xsl:call-template name="missing"/>
               </xsl:if>
             </xsl:if>
@@ -263,9 +263,9 @@
             <xsl:text>)</xsl:text>
           </xsl:when>
           <xsl:when test="@declaredAs">
-            <xsl:if test="not(doc:summary)">
-              <xsl:apply-templates select="ld:key('aid', current()/@declaredAs)/doc:summary"/>
-              <xsl:if test="not(ld:key('aid', current()/@declaredAs)/doc:summary)">
+            <xsl:if test="not(xdc:summary)">
+              <xsl:apply-templates select="ld:key('aid', current()/@declaredAs)/xdc:summary"/>
+              <xsl:if test="not(ld:key('aid', current()/@declaredAs)/xdc:summary)">
                 <xsl:call-template name="missing"/>
               </xsl:if>
             </xsl:if>
@@ -274,7 +274,7 @@
             <xsl:text>)</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="not(doc:summary)">
+            <xsl:if test="not(xdc:summary)">
               <xsl:call-template name="missing"/>
             </xsl:if>
           </xsl:otherwise>

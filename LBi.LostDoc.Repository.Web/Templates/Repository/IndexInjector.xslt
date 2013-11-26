@@ -20,8 +20,8 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
                 exclude-result-prefixes="msxsl"
-                xmlns:ld="urn:lostdoc-core"
-                xmlns:doc="urn:doc">
+                xmlns:ld="urn:lostdoc:template"
+                xmlns:xdc="urn:lostdoc:xml-doc-comment">
 
   <xsl:output method="xml" indent="yes"/>
 

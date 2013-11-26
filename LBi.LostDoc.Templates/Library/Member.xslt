@@ -20,9 +20,9 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
-                xmlns:doc="urn:doc"
-                xmlns:ld="urn:lostdoc-core"
-                exclude-result-prefixes="msxsl doc ld">
+                xmlns:xdc="urn:lostdoc:xml-doc-comment"
+                xmlns:ld="urn:lostdoc:template"
+                exclude-result-prefixes="msxsl xdc ld">
 
   <xsl:output method="html" indent="yes" omit-xml-declaration="yes" />
 
@@ -79,8 +79,8 @@
       </xsl:if>
     </div>
     <p class="summary">
-      <xsl:apply-templates select="doc:summary" />
-      <xsl:if test="not(doc:summary)">
+      <xsl:apply-templates select="xdc:summary" />
+      <xsl:if test="not(xdc:summary)">
         <xsl:call-template name="missing" />
       </xsl:if>
     </p>
@@ -120,8 +120,8 @@
           <xsl:apply-templates select="ld:key('aid', current()/@type)" mode="link" />
         </dt>
         <dd>
-          <xsl:apply-templates select="doc:returns" />
-          <xsl:if test="not(doc:returns)">
+          <xsl:apply-templates select="xdc:returns" />
+          <xsl:if test="not(xdc:returns)">
             <xsl:call-template name="missing" />
           </xsl:if>
         </dd>
@@ -142,7 +142,7 @@
       </ul>
     </xsl:if>
 
-    <xsl:if test="doc:exception">
+    <xsl:if test="xdc:exception">
       <h2>Exceptions</h2>
       <table>
         <thead>
@@ -156,22 +156,22 @@
           </tr>
         </thead>
         <tbody>
-          <xsl:apply-templates select="doc:exception" />
+          <xsl:apply-templates select="xdc:exception" />
         </tbody>
       </table>
     </xsl:if>
 
-    <xsl:if test="doc:remarks">
+    <xsl:if test="xdc:remarks">
       <h2>Remarks</h2>
       <span>
-        <xsl:apply-templates select="doc:remarks" />
+        <xsl:apply-templates select="xdc:remarks" />
       </span>
     </xsl:if>
 
-    <xsl:if test="doc:example">
+    <xsl:if test="xdc:example">
       <h2>Example</h2>
       <span>
-        <xsl:apply-templates select="doc:example" />
+        <xsl:apply-templates select="xdc:example" />
       </span>
     </xsl:if>
   </xsl:template>
@@ -209,10 +209,10 @@
       </xsl:with-param>
     </xsl:apply-templates>
     <br />
-    <xsl:apply-templates select="doc:summary"/>
-    <xsl:if test="not(doc:summary) and parent::*[@declaredAs]">
-      <xsl:apply-templates select="ld:key('aid', current()/parent::*/@declaredAs)/param[@name = current()/@name]/doc:summary" />
-      <xsl:if test="not(ld:key('aid', current()/parent::*/@declaredAs)/doc:summary)">
+    <xsl:apply-templates select="xdc:summary"/>
+    <xsl:if test="not(xdc:summary) and parent::*[@declaredAs]">
+      <xsl:apply-templates select="ld:key('aid', current()/parent::*/@declaredAs)/param[@name = current()/@name]/xdc:summary" />
+      <xsl:if test="not(ld:key('aid', current()/parent::*/@declaredAs)/xdc:summary)">
         <xsl:call-template name="missing" />
       </xsl:if>
     </xsl:if>
@@ -236,7 +236,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="doc:exception">
+  <xsl:template match="xdc:exception">
     <tr>
       <td>
         <xsl:call-template name="link">

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,6 @@ namespace LBi.LostDoc.Enrichers
             XmlDocReader reader = this.GetDocReader(parameter.Member.ReflectedType.Assembly);
             if (reader != null)
             {
-                XNamespace ns = "urn:doc";
                 XElement element = reader.GetDocComments(parameter);
                 if (element != null)
                     this.RewriteXmlContent(context, parameter.Member.ReflectedType.Assembly, "summary", element);
@@ -86,7 +85,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void RegisterNamespace(IProcessingContext context)
         {
-            context.Element.Add(new XAttribute(XNamespace.Xmlns + "doc", "urn:doc"));
+            context.Element.Add(new XAttribute(XNamespace.Xmlns + "xdc", Namespaces.XmlDocComment));
         }
 
         public void EnrichMethod(IProcessingContext context, MethodInfo mInfo)
@@ -148,7 +147,6 @@ namespace LBi.LostDoc.Enrichers
             XmlDocReader reader = this.GetDocReader(methodInfo.ReflectedType.Assembly);
             if (reader != null)
             {
-                XNamespace ns = "urn:doc";
                 XElement element = reader.GetDocCommentsReturnParameter(methodInfo.ReturnParameter);
                 if (element != null)
                     this.RewriteXmlContent(context, methodInfo.ReflectedType.Assembly, "summary", element);
@@ -217,7 +215,7 @@ namespace LBi.LostDoc.Enrichers
         private void RewriteXml(IProcessingContext context, Assembly hintAssembly, XElement element, params string[] exclude)
         {
             element = this.EnrichXml(context, hintAssembly, element);
-            XNamespace ns = Namespaces.BundleDocComments;
+            XNamespace ns = Namespaces.XmlDocComment;
             foreach (XElement elem in element.Elements())
             {
                 if (exclude.Contains(elem.Name.LocalName))
@@ -230,7 +228,7 @@ namespace LBi.LostDoc.Enrichers
         private void RewriteXmlContent(IProcessingContext context, Assembly hintAssembly, string container, XElement element)
         {
             element = this.EnrichXml(context, hintAssembly, element);
-            XNamespace ns = Namespaces.BundleDocComments;
+            XNamespace ns = Namespaces.XmlDocComment;
             if (element.Nodes().Any())
                 context.Element.Add(new XElement(ns + container, element.Attributes(), element.Nodes()));
         }
@@ -242,7 +240,7 @@ namespace LBi.LostDoc.Enrichers
             using (XmlWriter nodeWriter = ret.CreateWriter())
             {
                 XsltArgumentList argList = new XsltArgumentList();
-                argList.AddExtensionObject(Namespaces.TemplateExtensions, new AssetVersionResolver(context, hintAssembly));
+                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, hintAssembly));
 
                 this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
                 nodeWriter.Close();

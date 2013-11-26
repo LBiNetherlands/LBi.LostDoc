@@ -18,10 +18,8 @@ namespace LBi.LostDoc
 {
     public static class Namespaces
     {
-        public const string TemplateDefinition = "";
         public const string TemplateVariable = "urn:lost-doc:template.variable";
-        public const string Bundle = "";
-        public const string BundleDocComments = "urn:doc";
-        public const string TemplateExtensions = "urn:lostdoc-core";
+        public const string XmlDocComment = "urn:lostdoc:xml-doc-comment";
+        public const string Template = "urn:lostdoc:template";
     }
 }

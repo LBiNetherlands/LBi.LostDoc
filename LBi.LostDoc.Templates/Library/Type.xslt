@@ -19,9 +19,9 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
-                xmlns:doc="urn:doc"
-                xmlns:ld="urn:lostdoc-core"
-                exclude-result-prefixes="msxsl doc ld">
+                xmlns:xdc="urn:lostdoc:xml-doc-comment"
+                xmlns:ld="urn:lostdoc:template"
+                exclude-result-prefixes="msxsl xdc ld">
 
   <xsl:output method="html" indent="yes" omit-xml-declaration="yes"/>
 
@@ -125,8 +125,8 @@
       </xsl:if>
     </div>
     <p class="summary">
-      <xsl:apply-templates select="doc:summary"/>
-      <xsl:if test="not(doc:summary)">
+      <xsl:apply-templates select="xdc:summary"/>
+      <xsl:if test="not(xdc:summary)">
         <xsl:call-template name="missing"/>
       </xsl:if>
     </p>
@@ -313,17 +313,17 @@
       </table>
     </xsl:if>
 
-    <xsl:if test="doc:remarks">
+    <xsl:if test="xdc:remarks">
       <h2>Remarks</h2>
       <p>
-        <xsl:apply-templates select="doc:remarks"/>
+        <xsl:apply-templates select="xdc:remarks"/>
       </p>
     </xsl:if>
 
-    <xsl:if test="doc:example">
+    <xsl:if test="xdc:example">
       <section>
         <h2>Example</h2>
-        <xsl:apply-templates select="doc:example"/>
+        <xsl:apply-templates select="xdc:example"/>
       </section>
     </xsl:if>
   </xsl:template>

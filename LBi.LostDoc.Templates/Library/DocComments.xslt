@@ -19,15 +19,15 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
-                xmlns:doc="urn:doc"
-                xmlns:ld="urn:lostdoc-core"
-                exclude-result-prefixes="msxsl">
+                xmlns:xdc="urn:lostdoc:xml-doc-comment"
+                xmlns:ld="urn:lostdoc:template"
+                exclude-result-prefixes="msxsl xdc ld">
 
-  <xsl:template match="doc:summary">
+  <xsl:template match="xdc:summary">
     <xsl:apply-templates select="node()" mode="doc"/>
   </xsl:template>
 
-  <xsl:template match="doc:returns">
+  <xsl:template match="xdc:returns">
     <xsl:apply-templates select="node()" mode="doc"/>
   </xsl:template>
   
@@ -42,7 +42,7 @@
     </em>
   </xsl:template>
 
-  <xsl:template match="doc:example">
+  <xsl:template match="xdc:example">
     <xsl:apply-templates select="node()" mode="doc"/>
   </xsl:template>
 
@@ -51,8 +51,6 @@
       <xsl:apply-templates select="node()" mode="doc"/>
     </code>
   </xsl:template>
-
-
 
   <xsl:template name="missing">
     <span class="error">missing</span>

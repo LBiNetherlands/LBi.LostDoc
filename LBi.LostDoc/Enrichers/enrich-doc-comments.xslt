@@ -21,7 +21,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:msxsl="urn:schemas-microsoft-com:xslt"
                 exclude-result-prefixes="msxsl ld ext"
-                xmlns:ld="urn:lostdoc-core"
+                xmlns:ld="urn:lostdoc:template"
                 xmlns:ext="urn:lostdoc-core:ext">
   <xsl:output method="xml" indent="yes" />
 

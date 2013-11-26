@@ -92,7 +92,7 @@ namespace LBi.LostDoc.Enrichers
             if (element != null)
             {
                 element = this.EnrichXml(context, element);
-                XNamespace xns = "urn:doc";
+                XNamespace xns = Namespaces.XmlDocComment;
                 context.Element.Add(new XElement(xns + "summary", element.Nodes()));
             }
         }
@@ -110,7 +110,7 @@ namespace LBi.LostDoc.Enrichers
             XmlWriter nodeWriter = ret.CreateWriter();
 
             XsltArgumentList argList = new XsltArgumentList();
-            argList.AddExtensionObject("urn:lostdoc-core", new AssetVersionResolver(context, null));
+            argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, null));
             this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
             nodeWriter.Close();
             return ret.Root;
