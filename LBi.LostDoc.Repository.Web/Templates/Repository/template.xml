@@ -16,7 +16,7 @@
   limitations under the License. 
   
 -->
-<template xmlns:var="urn:lost-doc:template.variable"
+<template xmlns:var="urn:lostdoc:variable"
           inherits="Library">
 
   <apply-stylesheet name="Index"

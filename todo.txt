@@ -10,12 +10,6 @@ templates
   2. capture output in node-set
   3. Sort node-set on li/a/@sort-key
 
-// * method/types with generics need constraints in the C# syntax!
-
-// * fix html/js to allow for 
-//  * search (using websockets for suggestions?)
-//  * adjustable column width nav/content
-
 * create service template
 
 cli
@@ -31,9 +25,6 @@ core
 * add StatisticsBuilder and expose it so Repository can get nice statistics
   also reduces the line count in Template.cs
 
-* sort out messed up Lostdoc URN Namespacing
-  should be: urn:schemas-lbi-nl:lostdoc:template ??
-
 * add support for intermediary xslt output/input
   add optional "input" attribute to apply-stylesheet
   create "apply-stylesheet" counterpart for generating intermediary files
@@ -41,21 +32,11 @@ core
 repository
 ==========
 
-// * create site-wide admin notifications
-
 * implement SignalR for the notifications?
-
-// * set up app logging
-
-// * set up API-controllers through MEF/add-ins as well
 
 * extract ContentRepositoryController logic into LBi.LostDoc.Repository.Xxx
 
 * capture nuget logging and redirect to app log
-
-// * add settings to the repository for custom feeds, etc
-
-// * add ability down view/select & download templates (as zip package from)
 
 * add ability to upload zip template packages?
   could be done via a ZipFileProvider pointing to a "Templates" folder

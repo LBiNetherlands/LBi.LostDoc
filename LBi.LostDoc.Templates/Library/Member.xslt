@@ -64,7 +64,8 @@
     </h1>
     <div class="version">
       <span>
-        Version <xsl:value-of select="ld:significantVersion(@assetId)" />
+        <xsl:text>Version </xsl:text>
+        <xsl:value-of select="ld:significantVersion(@assetId)" />
       </span>
       <xsl:if test="count(ld:key('aidNoVer', ld:asset(@assetId))) &gt; 1">
         <xsl:text>&#160;|&#160;</xsl:text>

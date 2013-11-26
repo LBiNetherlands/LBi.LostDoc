@@ -130,7 +130,7 @@ namespace LBi.LostDoc.Templating
         {
             return
                 element.Attributes()
-                       .Where(a => a.Name.NamespaceName == Namespaces.TemplateVariable)
+                       .Where(a => a.Name.NamespaceName == Namespaces.Variable)
                        .Select(a => new ExpressionXPathVariable(a.Name.LocalName, a.Value));
         }
 

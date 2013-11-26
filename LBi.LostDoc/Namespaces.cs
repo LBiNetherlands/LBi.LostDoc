@@ -18,7 +18,7 @@ namespace LBi.LostDoc
 {
     public static class Namespaces
     {
-        public const string TemplateVariable = "urn:lost-doc:template.variable";
+        public const string Variable = "urn:lostdoc:variable";
         public const string XmlDocComment = "urn:lostdoc:xml-doc-comment";
         public const string Template = "urn:lostdoc:template";
     }

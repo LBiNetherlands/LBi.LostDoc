@@ -17,9 +17,8 @@
   
 -->
 
-<template xmlns:var="urn:lost-doc:template.variable">
+<template xmlns:var="urn:lostdoc:variable">
   <!-- parameters can be used to influence templates without having to modify them-->
-  <!-- TODO: this does nothing -->
   <parameter name="LogoUrl" select="'images\lostdoc.svg'" />
 
   <!-- indexed nodes, accessible through ld:key('indexName', value) -->
