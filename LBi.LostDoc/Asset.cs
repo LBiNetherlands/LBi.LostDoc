@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,11 @@ namespace LBi.LostDoc
         public override bool Equals(object obj)
         {
             return this.Equals(obj as Asset);
+        }
+
+        public override string ToString()
+        {
+            return this.Id.ToString(includeVersion: true);
         }
     }
 }

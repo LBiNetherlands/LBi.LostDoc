@@ -404,9 +404,9 @@ namespace LBi.LostDoc
             }
         }
 
-        private XElement GenerateAssemblyElement(IProcessingContext context, AssetIdentifier assetId)
+        private XElement GenerateAssemblyElement(IProcessingContext context, Asset asset)
         {
-            Assembly asm = (Assembly)context.AssetResolver.Resolve(assetId);
+            Assembly asm = (Assembly)asset.Target;
 
             IEnumerable<XElement> references =
                 asm.GetReferencedAssemblies()
@@ -417,7 +417,7 @@ namespace LBi.LostDoc
             XElement ret = new XElement("assembly",
                                         new XAttribute("name", asm.GetName().Name),
                                         new XAttribute("filename", asm.ManifestModule.Name),
-                                        new XAttribute("assetId", assetId),
+                                        new XAttribute("assetId", asset.Id),
                                         new XAttribute("phase", context.Phase),
                                         references);
 
@@ -431,7 +431,6 @@ namespace LBi.LostDoc
 
         private XElement GenerateNamespaceElement(IProcessingContext context, Asset asset)
         {
-            //string ns = (string)context.AssetResolver.Resolve(assetId);
             NamespaceInfo nsInfo = (NamespaceInfo)asset.Target;
             var ret = new XElement("namespace",
                                    new XAttribute("name", nsInfo.Name),
@@ -441,7 +440,7 @@ namespace LBi.LostDoc
             context.Element.Add(ret);
 
             foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichNamespace(context.Clone(ret), ns);
+                enricher.EnrichNamespace(context.Clone(ret), nsInfo.Name);
 
             return ret;
         }
@@ -697,7 +696,7 @@ namespace LBi.LostDoc
 
             XElement ret = new XElement(elemName,
                                         new XAttribute("name", mInfo.Name),
-                                        new XAttribute("assetId", assetId),
+                                        new XAttribute("assetId", asset.Id),
                                         new XAttribute("phase", context.Phase));
 
             context.Element.Add(ret);
@@ -895,9 +894,9 @@ namespace LBi.LostDoc
 
         private XElement GenerateConstructorElement(IProcessingContext context, Asset asset)
         {
-            ConstructorInfo constructorInfo = (ConstructorInfo)context.AssetResolver.Resolve(assetId);
+            ConstructorInfo constructorInfo = (ConstructorInfo)asset.Target;
             XElement ret = new XElement("constructor",
-                                        new XAttribute("assetId", assetId),
+                                        new XAttribute("assetId", asset.Id),
                                         new XAttribute("phase", context.Phase));
 
             if (constructorInfo.IsStatic)
@@ -923,13 +922,12 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        private XElement GenerateFieldElement(IProcessingContext context, AssetIdentifier assetId)
+        private XElement GenerateFieldElement(IProcessingContext context, Asset asset)
         {
-            object resolve = context.AssetResolver.Resolve(assetId);
-            FieldInfo fieldInfo = (FieldInfo)resolve;
+            FieldInfo fieldInfo = (FieldInfo)asset.Target;
             XElement ret = new XElement("field",
                                         new XAttribute("name", fieldInfo.Name),
-                                        new XAttribute("assetId", assetId),
+                                        new XAttribute("assetId", asset.Id),
                                         new XAttribute("phase", context.Phase));
 
             if (fieldInfo.IsStatic)
@@ -964,12 +962,12 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        private XElement GenerateEventElement(IProcessingContext context, AssetIdentifier assetId)
+        private XElement GenerateEventElement(IProcessingContext context, Asset asset)
         {
-            EventInfo eventInfo = (EventInfo)context.AssetResolver.Resolve(assetId);
+            EventInfo eventInfo = (EventInfo)asset.Target;
             XElement ret = new XElement("event",
                                         new XAttribute("name", eventInfo.Name),
-                                        new XAttribute("assetId", assetId),
+                                        new XAttribute("assetId", asset.Id),
                                         new XAttribute("phase", context.Phase));
 
 
@@ -1017,12 +1015,12 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        private XElement GeneratePropertyElement(IProcessingContext context, AssetIdentifier assetId)
+        private XElement GeneratePropertyElement(IProcessingContext context, Asset asset)
         {
-            PropertyInfo propInfo = (PropertyInfo)context.AssetResolver.Resolve(assetId);
+            PropertyInfo propInfo = (PropertyInfo)asset.Target;
             XElement ret = new XElement("property",
                                         new XAttribute("name", propInfo.Name),
-                                        new XAttribute("assetId", assetId),
+                                        new XAttribute("assetId", asset.Id),
                                         new XAttribute("phase", context.Phase));
 
             GenerateTypeRef(context.Clone(ret), propInfo.PropertyType);
