@@ -55,61 +55,40 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        public IEnumerable<AssetIdentifier> GetAssetHierarchy(AssetIdentifier assetId)
+        public IEnumerable<Asset> GetAssetHierarchy(Asset asset)
         {
-            if (assetId.Type == AssetType.Unknown)
+            if (asset.Id.Type == AssetType.Unknown)
                 yield break;
 
-            yield return assetId;
+            yield return asset;
 
-            switch (assetId.Type)
+            switch (asset.Id.Type)
             {
                 case AssetType.Namespace:
-                    string ns = (string)this.Resolve(assetId);
-                    Assembly[] matchingAssemblies =
-                        this._assemblyLoader.Where(a => a.GetName().Version == assetId.Version)
-                            .Where(a => a.GetTypes().Any(
-                                t1 =>
-                                t1.Namespace != null &&
-                                (StringComparer.Ordinal.Equals(t1.Namespace, ns) ||
-                                t1.Namespace.StartsWith(ns + ".", StringComparison.Ordinal))))
-                            .ToArray();
-
-                    if (matchingAssemblies.Length == 0)
-                        throw new InvalidOperationException("Found no assembly containing namespace: " + ns);
-
-                    if (matchingAssemblies.Length > 1)
-                    {
-                        TraceSources.AssetResolverSource.TraceWarning(
-                            "Namespace {0} found in more than one assembly: {1}",
-                            ns,
-                            string.Join(", ", matchingAssemblies.Select(a => a.GetName().Name)));
-                    }
-                    yield return AssetIdentifier.FromAssembly(matchingAssemblies[0]);
+                    NamespaceInfo nsInfo =  (NamespaceInfo)asset.Target;
+                    yield return new Asset(AssetIdentifier.FromAssembly(nsInfo.Assembly), nsInfo.Assembly);
                     break;
                 case AssetType.Type:
 
-                    Type t = (Type)this.Resolve(assetId);
+                    Type t = (Type)asset.Target;
                     while (t.IsNested)
                     {
                         t = t.DeclaringType;
-                        yield return AssetIdentifier.FromMemberInfo(t);
+                        yield return new Asset(AssetIdentifier.FromMemberInfo(t), t);
                     }
 
-                    yield return AssetIdentifier.FromNamespace(t.Namespace, t.Assembly.GetName().Version);
-                    yield return AssetIdentifier.FromAssembly(t.Assembly);
-
+                    yield return new Asset(AssetIdentifier.FromNamespace(t.Namespace, t.Assembly.GetName().Version),
+                                           new NamespaceInfo(t.Assembly, t.Namespace));
+                    yield return new Asset(AssetIdentifier.FromAssembly(t.Assembly), t.Assembly);
                     break;
                 case AssetType.Method:
                 case AssetType.Field:
                 case AssetType.Event:
                 case AssetType.Property:
-                    object resolve = this.Resolve(assetId);
-                    MemberInfo mi = (MemberInfo)resolve;
+                    MemberInfo mi = (MemberInfo)asset.Target;
 
-                    foreach (AssetIdentifier aid in this.GetAssetHierarchy(AssetIdentifier.FromMemberInfo(mi.ReflectedType)))
-                        yield return aid;
-
+                    foreach (Asset a in this.GetAssetHierarchy(new Asset(AssetIdentifier.FromMemberInfo(mi.ReflectedType), mi.ReflectedType)))
+                        yield return a;
 
                     break;
                 case AssetType.Assembly:

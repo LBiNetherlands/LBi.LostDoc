@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2012-2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,23 +14,35 @@
  * limitations under the License. 
  */
 
-using System.Reflection;
+using System;
 
-namespace LBi.LostDoc.Filters
+namespace LBi.LostDoc
 {
-    public class EnumMetadataFilter : IAssetFilter
+    public class Asset : IEquatable<Asset>
     {
-        #region IAssetFilter Members
-
-        public bool Filter(IFilterContext context, Asset asset)
+        public Asset(AssetIdentifier id, object target)
         {
-            FieldInfo obj = asset.Target as FieldInfo;
-            if (obj == null || !obj.DeclaringType.IsEnum)
-                return false;
-
-            return !(obj.IsStatic && obj.IsPublic);
+            this.Id = id;
+            this.Target = target;
         }
 
-        #endregion
+        public object Target { get; private set; }
+
+        public AssetIdentifier Id { get; private set; }
+
+        public bool Equals(Asset other)
+        {
+            return other != null && other.Id.Equals(this.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as Asset);
+        }
     }
 }

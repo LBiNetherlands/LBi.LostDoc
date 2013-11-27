@@ -100,17 +100,22 @@ namespace LBi.LostDoc.Enrichers
         {
             foreach (CustomAttributeData custAttr in attrData)
             {
-                AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(custAttr.Constructor.ReflectedType
-                                                                             ?? custAttr.Constructor.DeclaringType);
+                Type originatingType = custAttr.Constructor.ReflectedType
+                                       ?? custAttr.Constructor.DeclaringType;
+                AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(originatingType);
+                
+                Asset typeAsset = new Asset(typeAssetId, originatingType);
 
-                if (context.IsFiltered(typeAssetId))
+                if (context.IsFiltered(typeAsset))
                     continue;
 
-                context.AddReference(AssetIdentifier.FromMemberInfo(custAttr.Constructor));
+                AssetIdentifier ctorAssetId = AssetIdentifier.FromMemberInfo(custAttr.Constructor);
+                Asset ctorAsset = new Asset(ctorAssetId, custAttr.Constructor);
+                context.AddReference(ctorAsset);
 
                 var attrElem = new XElement("attribute",
                                             new XAttribute("type", typeAssetId),
-                                            new XAttribute("constructor", AssetIdentifier.FromMemberInfo(custAttr.Constructor)));
+                                            new XAttribute("constructor", ctorAssetId));
 
                 foreach (CustomAttributeTypedArgument cta in custAttr.ConstructorArguments)
                 {
@@ -124,7 +129,7 @@ namespace LBi.LostDoc.Enrichers
                 foreach (CustomAttributeNamedArgument cta in custAttr.NamedArguments)
                 {
                     AssetIdentifier namedMember = AssetIdentifier.FromMemberInfo(cta.MemberInfo);
-                    context.AddReference(namedMember);
+                    context.AddReference(new Asset(namedMember, cta.MemberInfo));
 
                     XElement argElem = new XElement("argument",
                                                     new XAttribute("member", namedMember));

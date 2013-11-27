@@ -25,9 +25,9 @@ namespace LBi.LostDoc
     {
         #region IAssetFilter Members
 
-        public bool Filter(IFilterContext context, AssetIdentifier asset)
+        public bool Filter(IFilterContext context, Asset asset)
         {
-            MemberInfo mi = context.AssetResolver.Resolve(asset) as MemberInfo;
+            MemberInfo mi = asset.Target as MemberInfo;
             if (mi != null)
                 return Filter(context, mi);
 

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,19 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using System.Xml.Linq;
-using LBi.LostDoc.Reflection;
+using System.Reflection;
 
-namespace LBi.LostDoc
+namespace LBi.LostDoc.Reflection
 {
-    public interface IProcessingContext : IContextBase
+    public class NamespaceInfo
     {
-        IAssemblyLoader AssemblyLoader { get; }
-        XElement Element { get; }
-        IEnumerable<Asset> References { get; }
-        IAssetResolver AssetResolver { get; }
-        int Phase { get; }
-        bool AddReference(Asset asset);
-        IProcessingContext Clone(XElement newElement);
-        bool IsFiltered(Asset asset);
+        public NamespaceInfo(Assembly assembly, string name)
+        {
+            this.Assembly = assembly;
+            this.Name = name;
+        }
+
+        public string Name { get; protected set; }
+        public Assembly Assembly { get; protected set; }
     }
 }

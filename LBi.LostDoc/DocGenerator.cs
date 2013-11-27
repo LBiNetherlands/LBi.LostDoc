@@ -109,7 +109,7 @@ namespace LBi.LostDoc
             IAssemblyLoader assemblyLoader = new ReflectionOnlyAssemblyLoader(
                 this._cache,
                 this._assemblyPaths.Select(Path.GetDirectoryName));
-            
+
             this._assemblies = this._assemblyPaths.Select(assemblyLoader.LoadFrom).ToArray();
 
             XNamespace defaultNs = string.Empty;
@@ -117,7 +117,7 @@ namespace LBi.LostDoc
             IAssetResolver assetResolver = new AssetResolver(assemblyLoader);
 
             // collect phase zero assets
-            List<AssetIdentifier> assets = this.DiscoverAssets(assetResolver, this._assemblies).ToList();
+            List<Asset> assets = this.DiscoverAssets(assetResolver, this._assemblies).ToList();
 
             // initiate output document creation
             ret.Add(new XElement(defaultNs + "bundle"));
@@ -136,12 +136,12 @@ namespace LBi.LostDoc
                 enricher.RegisterNamespace(pctx);
 
             // asset related classes
-            HashSet<AssetIdentifier> emittedAssets = new HashSet<AssetIdentifier>();
+            HashSet<Asset> emittedAssets = new HashSet<Asset>();
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Generating document");
 
             int phase = 0;
-            HashSet<AssetIdentifier> referencedAssets = new HashSet<AssetIdentifier>();
+            HashSet<Asset> referencedAssets = new HashSet<Asset>();
 
             long lastProgressOutput = Stopwatch.GetTimestamp();
             // main output loop
@@ -150,7 +150,7 @@ namespace LBi.LostDoc
                 int phaseAssetCount = 0;
                 using (TraceSources.GeneratorSource.TraceActivity("Phase {0} ({1:N0} assets)", phase, assets.Count))
                 {
-                    foreach (AssetIdentifier asset in assets)
+                    foreach (Asset asset in assets)
                     {
                         // skip already emitted assets
                         if (!emittedAssets.Add(asset))
@@ -158,12 +158,12 @@ namespace LBi.LostDoc
 
                         phaseAssetCount++;
 
-                        if (((Stopwatch.GetTimestamp() - lastProgressOutput)/(double) Stopwatch.Frequency) > 5.0)
+                        if (((Stopwatch.GetTimestamp() - lastProgressOutput) / (double)Stopwatch.Frequency) > 5.0)
                         {
                             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0,
                                                                     "Phase {0} progress {1:P1} ({2:N0}/{3:N0})",
                                                                     phase,
-                                                                    phaseAssetCount/(double) assets.Count,
+                                                                    phaseAssetCount / (double)assets.Count,
                                                                     phaseAssetCount,
                                                                     assets.Count);
 
@@ -173,17 +173,16 @@ namespace LBi.LostDoc
                         TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Generating {0}", asset);
 
                         // get hierarchy
-                        LinkedList<AssetIdentifier> hierarchy = new LinkedList<AssetIdentifier>();
+                        LinkedList<Asset> hierarchy = new LinkedList<Asset>();
 
-                        foreach (AssetIdentifier assetIdentifier in assetResolver.GetAssetHierarchy(asset))
-                            hierarchy.AddFirst(assetIdentifier);
+                        foreach (Asset hierarchyAsset in assetResolver.GetAssetHierarchy(asset))
+                            hierarchy.AddFirst(hierarchyAsset);
 
                         if (hierarchy.First != null)
                         {
                             this.BuildHierarchy(assetResolver,
                                                 ret.Root,
                                                 hierarchy.First,
-                                                asset,
                                                 referencedAssets,
                                                 emittedAssets,
                                                 phase);
@@ -204,11 +203,10 @@ namespace LBi.LostDoc
         }
 
 
-        private IEnumerable<AssetIdentifier> DiscoverAssets(IAssetResolver assetResolver,
-                                                            IEnumerable<Assembly> assemblies)
+        private IEnumerable<Asset> DiscoverAssets(IAssetResolver assetResolver, IEnumerable<Assembly> assemblies)
         {
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
-            HashSet<AssetIdentifier> distinctSet = new HashSet<AssetIdentifier>();
+            HashSet<Asset> distinctSet = new HashSet<Asset>();
             IFilterContext filterContext = new FilterContext(this._cache, this._container, assetResolver, FilterState.Discovery);
 
             // find and filter all types from all assemblies 
@@ -217,13 +215,14 @@ namespace LBi.LostDoc
                 foreach (Type t in asm.GetTypes())
                 {
                     // check if type survives filtering
-                    AssetIdentifier typeAsset = AssetIdentifier.FromMemberInfo(t);
+                    AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(t);
+                    Asset typeAsset = new Asset(typeAssetId, t);
 
-                    if (this.IsFiltered(filterContext, typeAsset)) 
+                    if (this.IsFiltered(filterContext, typeAsset))
                         continue;
 
                     /* type was not filtered */
-                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.AssetId);
+                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.Id.AssetId);
 
                     // generate namespace hierarchy
                     if (!string.IsNullOrEmpty(t.Namespace))
@@ -234,7 +233,9 @@ namespace LBi.LostDoc
                         for (int i = fragments.Length; i > 0; i--)
                         {
                             string ns = string.Join(".", fragments, 0, i);
-                            AssetIdentifier nsAsset = AssetIdentifier.FromNamespace(ns, nsVersion);
+                            AssetIdentifier nsAssetId = AssetIdentifier.FromNamespace(ns, nsVersion);
+                            NamespaceInfo nsInfo = new NamespaceInfo(t.Assembly, ns);
+                            Asset nsAsset = new Asset(nsAssetId, nsInfo);
                             if (distinctSet.Add(nsAsset))
                                 yield return nsAsset;
                         }
@@ -250,37 +251,38 @@ namespace LBi.LostDoc
 
                     foreach (MemberInfo member in members)
                     {
-                        AssetIdentifier memberAsset = AssetIdentifier.FromMemberInfo(member);
-                        if (this.IsFiltered(filterContext, memberAsset)) 
+                        AssetIdentifier memberAssetId = AssetIdentifier.FromMemberInfo(member);
+                        Asset memberAsset = new Asset(memberAssetId, member);
+                        if (this.IsFiltered(filterContext, memberAsset))
                             continue;
 
                         TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
                                                                 0,
                                                                 "{0}",
-                                                                memberAsset.AssetId);
+                                                                memberAsset.Id.AssetId);
                         if (distinctSet.Add(memberAsset))
                             yield return memberAsset;
                     }
                 }
 
-                yield return AssetIdentifier.FromAssembly(asm);
+                yield return new Asset(AssetIdentifier.FromAssembly(asm), asm);
             }
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Discovering assets");
         }
 
-        private bool IsFiltered(IFilterContext filterContext, AssetIdentifier typeAsset)
+        private bool IsFiltered(IFilterContext filterContext, Asset asset)
         {
             bool filtered = false;
             foreach (IAssetFilter filter in this.AssetFilters)
             {
-                if (filter.Filter(filterContext, typeAsset))
+                if (filter.Filter(filterContext, asset))
                 {
                     filtered = true;
                     TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
                                                             0,
                                                             "{0} - Filtered by {1}",
-                                                            typeAsset.AssetId, filter);
+                                                            asset.Id.AssetId, filter);
 
                     break;
                 }
@@ -288,12 +290,11 @@ namespace LBi.LostDoc
             return filtered;
         }
 
-        private void BuildHierarchy(IAssetResolver assetResolver,
-                                    XElement parentNode,
-                                    LinkedListNode<AssetIdentifier> hierarchy,
-                                    AssetIdentifier asset,
-                                    HashSet<AssetIdentifier> references,
-                                    HashSet<AssetIdentifier> emittedAssets,
+        private void BuildHierarchy(IAssetResolver assetResolver, 
+                                    XElement parentNode, 
+                                    LinkedListNode<Asset> hierarchy, 
+                                    HashSet<Asset> references, 
+                                    HashSet<Asset> emittedAssets, 
                                     int phase)
         {
             if (hierarchy == null)
@@ -304,7 +305,7 @@ namespace LBi.LostDoc
                                                  this._assemblyPaths.Select(Path.GetDirectoryName));
 
 
-            AssetIdentifier aid = hierarchy.Value;
+            Asset asset = hierarchy.Value;
             IProcessingContext pctx = new ProcessingContext(this._cache,
                                                             this._container,
                                                             this._filters,
@@ -317,51 +318,51 @@ namespace LBi.LostDoc
             XElement newElement;
 
             // add asset to list of generated assets
-            emittedAssets.Add(aid);
+            emittedAssets.Add(asset);
 
             // dispatch depending on type
-            switch (aid.Type)
+            switch (asset.Id.Type)
             {
                 case AssetType.Namespace:
-                    newElement = parentNode.XPathSelectElement(string.Format("namespace[@assetId = '{0}']", aid));
+                    newElement = parentNode.XPathSelectElement(string.Format("namespace[@assetId = '{0}']", asset));
                     if (newElement == null)
-                        newElement = this.GenerateNamespaceElement(pctx, aid);
+                        newElement = this.GenerateNamespaceElement(pctx, asset);
                     break;
                 case AssetType.Type:
-                    newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", aid));
+                    newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", asset));
                     if (newElement == null)
-                        newElement = this.GenerateTypeElement(pctx, aid);
+                        newElement = this.GenerateTypeElement(pctx, asset);
                     break;
                 case AssetType.Method:
-                    newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", aid));
+                    newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", asset));
                     if (newElement == null)
-                        newElement = this.GenerateMethodElement(pctx, aid);
+                        newElement = this.GenerateMethodElement(pctx, asset);
                     break;
                 case AssetType.Field:
-                    newElement = parentNode.XPathSelectElement(string.Format("field[@assetId = '{0}']", aid));
+                    newElement = parentNode.XPathSelectElement(string.Format("field[@assetId = '{0}']", asset));
                     if (newElement == null)
-                        newElement = this.GenerateFieldElement(pctx, aid);
+                        newElement = this.GenerateFieldElement(pctx, asset);
                     break;
                 case AssetType.Event:
-                    newElement = parentNode.XPathSelectElement(string.Format("event[@assetId = '{0}']", aid));
+                    newElement = parentNode.XPathSelectElement(string.Format("event[@assetId = '{0}']", asset));
                     if (newElement == null)
-                        newElement = this.GenerateEventElement(pctx, aid);
+                        newElement = this.GenerateEventElement(pctx, asset);
                     break;
                 case AssetType.Property:
-                    newElement = parentNode.XPathSelectElement(string.Format("property[@assetId = '{0}']", aid));
+                    newElement = parentNode.XPathSelectElement(string.Format("property[@assetId = '{0}']", asset));
                     if (newElement == null)
-                        newElement = this.GeneratePropertyElement(pctx, aid);
+                        newElement = this.GeneratePropertyElement(pctx, asset);
                     break;
                 case AssetType.Assembly:
-                    newElement = parentNode.XPathSelectElement(string.Format("assembly[@assetId = '{0}']", aid));
+                    newElement = parentNode.XPathSelectElement(string.Format("assembly[@assetId = '{0}']", asset));
                     if (newElement == null)
-                        newElement = this.GenerateAssemblyElement(pctx, aid);
+                        newElement = this.GenerateAssemblyElement(pctx, asset);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            this.BuildHierarchy(assetResolver, newElement, hierarchy.Next, asset, references, emittedAssets, phase);
+            this.BuildHierarchy(assetResolver, newElement, hierarchy.Next, references, emittedAssets, phase);
         }
 
 
@@ -381,8 +382,9 @@ namespace LBi.LostDoc
                     context.Element.Add(new XAttribute("param", pType.Name));
                 else if (pType.IsGenericType)
                 {
-                    AssetIdentifier aid = AssetIdentifier.FromType(pType.GetGenericTypeDefinition());
-                    context.AddReference(aid);
+                    Type typeDefinition = pType.GetGenericTypeDefinition();
+                    AssetIdentifier aid = AssetIdentifier.FromType(typeDefinition);
+                    context.AddReference(new Asset(aid, typeDefinition));
 
                     context.Element.Add(new XAttribute(attrName ?? "type", aid));
                     foreach (Type genArg in pType.GetGenericArguments())
@@ -395,7 +397,7 @@ namespace LBi.LostDoc
                 else
                 {
                     AssetIdentifier aid = AssetIdentifier.FromMemberInfo(pType);
-                    context.AddReference(aid);
+                    context.AddReference(new Asset(aid, pType));
 
                     context.Element.Add(new XAttribute(attrName ?? "type", aid));
                 }
@@ -427,12 +429,13 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        private XElement GenerateNamespaceElement(IProcessingContext context, AssetIdentifier assetId)
+        private XElement GenerateNamespaceElement(IProcessingContext context, Asset asset)
         {
-            string ns = (string)context.AssetResolver.Resolve(assetId);
+            //string ns = (string)context.AssetResolver.Resolve(assetId);
+            NamespaceInfo nsInfo = (NamespaceInfo)asset.Target;
             var ret = new XElement("namespace",
-                                   new XAttribute("name", ns),
-                                   new XAttribute("assetId", assetId),
+                                   new XAttribute("name", nsInfo.Name),
+                                   new XAttribute("assetId", asset.Id),
                                    new XAttribute("phase", context.Phase));
 
             context.Element.Add(ret);
@@ -443,11 +446,10 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        private XElement GenerateTypeElement(IProcessingContext context, AssetIdentifier assetId)
+        private XElement GenerateTypeElement(IProcessingContext context, Asset asset)
         {
             XElement ret;
-            Type type = (Type)context.AssetResolver.Resolve(assetId);
-
+            Type type = (Type)asset.Target;
 
             string elemName;
 
@@ -460,18 +462,19 @@ namespace LBi.LostDoc
             else if (type.IsInterface)
                 elemName = "interface";
             else
-                throw new ArgumentException("Unknown asset type: " + assetId.Type.ToString(), "assetId");
+                throw new ArgumentException("Unknown asset type: " + asset.Id.Type.ToString(), "asset");
 
             ret = new XElement(elemName,
                                new XAttribute("name", type.Name),
-                               new XAttribute("assetId", assetId),
+                               new XAttribute("assetId", asset.Id),
                                new XAttribute("phase", context.Phase));
 
             if (type.IsEnum)
             {
-                AssetIdentifier aid = AssetIdentifier.FromType(type.GetEnumUnderlyingType());
+                Type underlyingType = type.GetEnumUnderlyingType();
+                AssetIdentifier aid = AssetIdentifier.FromType(underlyingType);
                 ret.Add(new XAttribute("underlyingType", aid));
-                context.AddReference(aid);
+                context.AddReference(new Asset(aid, underlyingType));
             }
 
 
@@ -502,7 +505,8 @@ namespace LBi.LostDoc
             if (type.BaseType != null)
             {
                 AssetIdentifier baseAid = AssetIdentifier.FromType(type.BaseType);
-                if (!context.IsFiltered(baseAid))
+                Asset baseAsset = new Asset(baseAid, type.BaseType);
+                if (!context.IsFiltered(baseAsset))
                 {
                     var inheritsElem = new XElement("inherits");
                     ret.Add(inheritsElem);
@@ -549,10 +553,14 @@ namespace LBi.LostDoc
 
                     if (mapping.TargetMethods.Any(mi => mi.DeclaringType == type))
                     {
-                        AssetIdentifier interfaceAssetId = AssetIdentifier.FromType(interfaceType.IsGenericType
-                                                                                        ? interfaceType.GetGenericTypeDefinition()
-                                                                                        : interfaceType);
-                        if (!context.IsFiltered(interfaceAssetId))
+                        Type ifType = interfaceType.IsGenericType
+                                          ? interfaceType.GetGenericTypeDefinition()
+                                          : interfaceType;
+                        AssetIdentifier interfaceAssetId = AssetIdentifier.FromType(ifType);
+
+                        Asset interfaceAsset = new Asset(interfaceAssetId, ifType);
+
+                        if (!context.IsFiltered(interfaceAsset))
                         {
                             var implElement = new XElement("implements");
                             ret.Add(implElement);
@@ -592,7 +600,7 @@ namespace LBi.LostDoc
                 tpElem.Add(new XAttribute("hasDefaultConstructor", XmlConvert.ToString(true)));
 
             context.Element.Add(tpElem);
-            
+
             foreach (Type constraint in tp.GetGenericParameterConstraints())
             {
                 var ctElement = new XElement("constraint");
@@ -670,12 +678,12 @@ namespace LBi.LostDoc
             return false;
         }
 
-        private XElement GenerateMethodElement(IProcessingContext context, AssetIdentifier assetId)
+        private XElement GenerateMethodElement(IProcessingContext context, Asset asset)
         {
-            MethodBase mBase = (MethodBase)context.AssetResolver.Resolve(assetId);
+            MethodBase mBase = (MethodBase)asset.Target;
 
             if (mBase is ConstructorInfo)
-                return this.GenerateConstructorElement(context, assetId);
+                return this.GenerateConstructorElement(context, asset);
 
             MethodInfo mInfo = (MethodInfo)mBase;
 
@@ -710,7 +718,7 @@ namespace LBi.LostDoc
             if (declaringType != mInfo.ReflectedType)
             {
                 ret.Add(new XAttribute("declaredAs", declaredAs));
-                context.AddReference(declaredAs);
+                context.AddReference(new Asset(declaredAs, realMethodInfo));
             }
             else if (realMethodInfo.GetBaseDefinition() != realMethodInfo)
             {
@@ -729,7 +737,7 @@ namespace LBi.LostDoc
 
                 declaredAs = AssetIdentifier.FromMemberInfo(baseMethod);
                 ret.Add(new XAttribute("overrides", declaredAs));
-                context.AddReference(declaredAs);
+                context.AddReference(new Asset(declaredAs, baseMethod));
             }
 
             this.GenerateImplementsElement(context.Clone(ret), mInfo);
@@ -776,7 +784,9 @@ namespace LBi.LostDoc
                 Type[] interfaces = declaringType.GetInterfaces();
                 foreach (Type ifType in interfaces)
                 {
-                    if (context.IsFiltered(AssetIdentifier.FromMemberInfo(ifType)))
+                    AssetIdentifier ifAssetId = AssetIdentifier.FromMemberInfo(ifType);
+                    Asset ifAsset = new Asset(ifAssetId, ifType);
+                    if (context.IsFiltered(ifAsset))
                         continue;
 
                     InterfaceMapping ifMap = declaringType.GetInterfaceMap(ifType);
@@ -790,7 +800,7 @@ namespace LBi.LostDoc
                     {
                         int mIx = Array.IndexOf(ifMap.TargetMethods, targetMethod);
 
-                        AssetIdentifier miAid;
+                        Asset miAsset;
                         if (ifMap.InterfaceMethods[mIx].DeclaringType.IsGenericType)
                         {
                             Type declType = ifMap.InterfaceMethods[mIx].DeclaringType.GetGenericTypeDefinition();
@@ -802,15 +812,16 @@ namespace LBi.LostDoc
                             MethodInfo memberInfo = allMethods.Single(mi =>
                                                                       mi.MetadataToken == ifMap.InterfaceMethods[mIx].MetadataToken &&
                                                                       mi.Module == ifMap.InterfaceMethods[mIx].Module);
-                            miAid = AssetIdentifier.FromMemberInfo(memberInfo);
+                            miAsset = new Asset(AssetIdentifier.FromMemberInfo(memberInfo), memberInfo);
                         }
                         else
                         {
-                            miAid = AssetIdentifier.FromMemberInfo(ifMap.InterfaceMethods[mIx]);
+                            miAsset = new Asset(AssetIdentifier.FromMemberInfo(ifMap.InterfaceMethods[mIx]),
+                                                ifMap.InterfaceMethods[mIx]);
                         }
 
-                        context.Element.Add(new XElement("implements", new XAttribute("member", miAid)));
-                        context.AddReference(miAid);
+                        context.Element.Add(new XElement("implements", new XAttribute("member", miAsset.Id)));
+                        context.AddReference(miAsset);
                     }
                 }
             }
@@ -882,7 +893,7 @@ namespace LBi.LostDoc
             }
         }
 
-        private XElement GenerateConstructorElement(IProcessingContext context, AssetIdentifier assetId)
+        private XElement GenerateConstructorElement(IProcessingContext context, Asset asset)
         {
             ConstructorInfo constructorInfo = (ConstructorInfo)context.AssetResolver.Resolve(assetId);
             XElement ret = new XElement("constructor",

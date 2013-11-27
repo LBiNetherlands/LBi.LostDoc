@@ -24,6 +24,6 @@ namespace LBi.LostDoc
         IEnumerable<Assembly> Context { get; }
         object Resolve(AssetIdentifier assetId);
         object Resolve(AssetIdentifier assetId, AssetIdentifier assemblyHint);
-        IEnumerable<AssetIdentifier> GetAssetHierarchy(AssetIdentifier assetId);
+        IEnumerable<Asset> GetAssetHierarchy(Asset assetId);
     }
 }
