@@ -107,7 +107,7 @@ namespace LBi.LostDoc
 
         public bool IsFiltered(Asset asset)
         {
-            IFilterContext filterContext = new FilterContext(this.Cache, this.Container, this.AssetResolver, FilterState.Generating);
+            IFilterContext filterContext = new FilterContext(this.Cache, this.Container, FilterState.Generating);
             for (int i = 0; i < this._filters.Length; i++)
             {
                 if (this._filters[i].Filter(filterContext, asset))

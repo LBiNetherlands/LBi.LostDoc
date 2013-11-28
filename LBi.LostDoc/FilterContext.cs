@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,15 @@ namespace LBi.LostDoc
 {
     public class FilterContext : IFilterContext
     {
-        public FilterContext(ObjectCache cache, CompositionContainer container, IAssetResolver assetResolver, FilterState state)
+        public FilterContext(ObjectCache cache, CompositionContainer container, FilterState state)
         {
             this.Container = container;
             this.Cache = cache;
-            this.AssetResolver = assetResolver;
             this.State = state;
         }
 
         #region IFilterContext Members
 
-        public IAssetResolver AssetResolver { get; private set; }
         public FilterState State { get; private set; }
 
         #endregion

@@ -117,7 +117,7 @@ namespace LBi.LostDoc
             IAssetResolver assetResolver = new AssetResolver(assemblyLoader);
 
             // collect phase zero assets
-            List<Asset> assets = this.DiscoverAssets(assetResolver, this._assemblies).ToList();
+            List<Asset> assets = this.DiscoverAssets(this._assemblies).ToList();
 
             // initiate output document creation
             ret.Add(new XElement(defaultNs + "bundle"));
@@ -203,11 +203,11 @@ namespace LBi.LostDoc
         }
 
 
-        private IEnumerable<Asset> DiscoverAssets(IAssetResolver assetResolver, IEnumerable<Assembly> assemblies)
+        private IEnumerable<Asset> DiscoverAssets(IEnumerable<Assembly> assemblies)
         {
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
             HashSet<Asset> distinctSet = new HashSet<Asset>();
-            IFilterContext filterContext = new FilterContext(this._cache, this._container, assetResolver, FilterState.Discovery);
+            IFilterContext filterContext = new FilterContext(this._cache, this._container, FilterState.Discovery);
 
             // find and filter all types from all assemblies 
             foreach (Assembly asm in assemblies)

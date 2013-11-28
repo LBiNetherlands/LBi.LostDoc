@@ -158,7 +158,7 @@ namespace LBi.LostDoc.Enrichers
             if (typeParameter.DeclaringMethod != null)
                 this.EnrichTypeParameter(context, (MethodInfo)typeParameter.DeclaringMethod, typeParameter);
             else
-                EnrichTypeParameter(context, typeParameter.DeclaringType, typeParameter);
+                this.EnrichTypeParameter(context, typeParameter.DeclaringType, typeParameter);
         }
 
         public void EnrichNamespace(IProcessingContext context, string ns)
