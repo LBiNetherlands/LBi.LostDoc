@@ -73,7 +73,9 @@
     <Compile Include="Filters\DynamicallyInvokableAttributeFilter.cs" />
     <Compile Include="Filters\EnumMetadataFilter.cs" />
     <Compile Include="Filters\PrivateImplementationDetailsFilter.cs" />
+    <Compile Include="IAssetExplorer.cs" />
     <Compile Include="IAssetResolver.cs" />
+    <Compile Include="IAssetVisitor.cs" />
     <Compile Include="IContextBase.cs" />
     <Compile Include="IFilterContext.cs" />
     <Compile Include="LostDocFileInfo.cs" />
@@ -91,6 +93,7 @@
     <Compile Include="ProcessingContextExtensions.cs" />
     <Compile Include="Reflection\IAssemblyLoader.cs" />
     <Compile Include="Reflection\NamespaceInfo.cs" />
+    <Compile Include="Reflection\ReflectionExplorer.cs" />
     <Compile Include="Reflection\ReflectionOnlyAssemblyLoader.cs" />
     <Compile Include="Service References\MsdnContentService\Reference.cs">
       <AutoGen>True</AutoGen>

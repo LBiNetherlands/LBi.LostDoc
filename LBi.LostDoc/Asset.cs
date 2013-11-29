@@ -30,6 +30,39 @@ namespace LBi.LostDoc
 
         public AssetIdentifier Id { get; private set; }
 
+        public void Visit(IAssetVisitor visitor)
+        {
+            switch (this.Id.Type)
+            {
+                case AssetType.Unknown:
+                    visitor.VisitUnknown(this);
+                    break;
+                case AssetType.Namespace:
+                    visitor.VisitNamespace(this);
+                    break;
+                case AssetType.Type:
+                    visitor.VisitType(this);
+                    break;
+                case AssetType.Method:
+                    visitor.VisitMethod(this);
+                    break;
+                case AssetType.Field:
+                    visitor.VisitField(this);
+                    break;
+                case AssetType.Event:
+                    visitor.VisitEvent(this);
+                    break;
+                case AssetType.Property:
+                    visitor.VisitProperty(this);
+                    break;
+                case AssetType.Assembly:
+                    visitor.VisitAssembly(this);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         public bool Equals(Asset other)
         {
             return other != null && other.Id.Equals(this.Id);
