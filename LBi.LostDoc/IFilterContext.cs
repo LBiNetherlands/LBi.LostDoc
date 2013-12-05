@@ -19,5 +19,6 @@ namespace LBi.LostDoc
     public interface IFilterContext : IContextBase
     {
         FilterState State { get; }
+        bool IsFiltered(Asset asset);
     }
 }

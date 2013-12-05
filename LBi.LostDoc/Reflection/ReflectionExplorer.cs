@@ -17,161 +17,117 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Reflection
 {
-    public static class ReflectionServices
+    public class ReflectionExplorer : IAssetExplorer
     {
-        public static Assembly GetAssembly(this Asset asset)
+        public IEnumerable<Asset> Discover(Asset root, IFilterContext filter)
         {
-            switch (asset.Id.Type)
-            {
-                case AssetType.Namespace:
-                    return ((NamespaceInfo)asset.Target).Assembly;
-                case AssetType.Type:
-                    return ((Type)asset.Target).Assembly;
-                case AssetType.Method:
-                case AssetType.Field:
-                case AssetType.Event:
-                case AssetType.Property:
-                    return ((MemberInfo)asset.Target).ReflectedType.Assembly;
-                case AssetType.Assembly:
-                    return (Assembly)asset.Target;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
+            if (root.Id.Type != AssetType.Assembly)
+                throw new ArgumentException("Only AssetType.Assembly supported.", "root");
 
-        public static Type GetType(this Asset asset)
-        {
-            switch (asset.Id.Type)
-            {
-                case AssetType.Type:
-                    return (Type)asset.Target;
-                case AssetType.Method:
-                case AssetType.Field:
-                case AssetType.Event:
-                case AssetType.Property:
-                    return ((MemberInfo)asset.Target).ReflectedType;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public static Asset GetAsset(Assembly assembly)
-        {
-            return new Asset(AssetIdentifier.FromAssembly(assembly), assembly);
-        }
-
-        public static Asset GetAsset(Assembly assembly, string ns)
-        {
-            return new Asset(AssetIdentifier.FromNamespace(ns, assembly.GetName().Version),
-                             new NamespaceInfo(assembly, ns));
-        }
-    }
-
-    public class ReflectionExplorer : IAssetExplorer, IAssetVisitor
-    {
-        private IAssetFilter[] _filters;
-        private BlockingCollection<Asset> _blocking;
-        private ExceptionDispatchInfo _exception;
-
-        public IEnumerable<Asset> Discover(Asset root, IAssetFilter[] filters)
-        {
-            this._filters = filters;
+            ExceptionDispatchInfo exception = null;
+            
             ConcurrentQueue<Asset> queue = new ConcurrentQueue<Asset>();
+            using(BlockingCollection<Asset> blocking = new BlockingCollection<Asset>(queue))
+            {
+                Action<object> func =
+                    a =>
+                    {
+                        try
+                        {
+                            Discover(((Asset)a).GetAssembly(), blocking, filter);
+                        }
+                        catch (Exception ex)
+                        {
+                            exception = ExceptionDispatchInfo.Capture(ex);
+                        }
+                        blocking.CompleteAdding();
+                    };
 
-            Action<object> func =
-                a =>
+
+                using(Task task = Task.Factory.StartNew(func, root))
                 {
-                    try
-                    {
-                        ((Asset)a).Visit(this);
-                    }
-                    catch (Exception ex)
-                    {
-                        this._exception = ExceptionDispatchInfo.Capture(ex);
-                    }
-                    this._blocking.CompleteAdding();
-                };
+                    foreach (var asset in blocking.GetConsumingEnumerable())
+                        yield return asset;
 
-            using (this._blocking = new BlockingCollection<Asset>(queue))
-            using (Task task = Task.Factory.StartNew(func, root))
-            {
-                foreach (var asset in _blocking.GetConsumingEnumerable())
-                    yield return asset;
+                    task.Wait();
 
-                task.Wait();
-
-                if (this._exception != null)
-                    this._exception.Throw();
+                    if (exception != null)
+                        exception.Throw();
+                }
             }
-            this._filters = null;
         }
 
-        private IEnumerable<string> DiscoverNamespaces(Assembly assembly, string prefix = "")
+        private void Discover(Assembly assembly, BlockingCollection<Asset> collection, IFilterContext filter)
         {
-            Type[] types = assembly.GetTypes();
-            var unique = types.Select(t => t.Namespace)
-                              .Where(t => t.StartsWith(prefix) && t.Length > prefix.Length && t[prefix.Length] == '.')
-                              .Select(t => t.Substring(prefix.Length + 1))
-                              .Distinct(StringComparer.Ordinal);
+            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
 
-            var rootNamespaces = unique.Select(n => n.Split('.')[0]).Distinct(StringComparer.Ordinal);
+            Asset assemblyAsset = ReflectionServices.GetAsset(assembly);
+            if (filter.IsFiltered(assemblyAsset))
+                return;
 
-            return rootNamespaces.Select(ns => prefix + ns);
-        }
+            collection.Add(assemblyAsset);
 
-        void IAssetVisitor.VisitAssembly(Asset asset)
-        {
-            Assembly assembly = asset.GetAssembly();
-
-            foreach (string ns in this.DiscoverNamespaces(assembly))
+            HashSet<Asset> distinctSet = new HashSet<Asset>();
+            foreach (Type type in assembly.GetTypes())
             {
-                this._blocking.Add(ReflectionServices.GetAsset(assembly, ns));
+                // check if type survives filtering
+                AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(type);
+                Asset typeAsset = new Asset(typeAssetId, type);
+
+                if (filter.IsFiltered(typeAsset))
+                    continue;
+
+                /* type was not filtered */
+                TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.Id.AssetId);
+
+                // generate namespace hierarchy
+                if (!string.IsNullOrEmpty(type.Namespace))
+                {
+                    Version nsVersion = type.Module.Assembly.GetName().Version;
+
+                    string[] fragments = type.Namespace.Split('.');
+                    for (int i = fragments.Length; i > 0; i--)
+                    {
+                        string ns = string.Join(".", fragments, 0, i);
+                        AssetIdentifier nsAssetId = AssetIdentifier.FromNamespace(ns, nsVersion);
+                        NamespaceInfo nsInfo = new NamespaceInfo(type.Assembly, ns);
+                        Asset nsAsset = new Asset(nsAssetId, nsInfo);
+                        if (distinctSet.Add(nsAsset))
+                            collection.Add(nsAsset);
+                    }
+                }
+
+                if (distinctSet.Add(typeAsset))
+                    collection.Add(typeAsset);
+
+                MemberInfo[] members = type.GetMembers(BindingFlags.Instance |
+                                                       BindingFlags.Static |
+                                                       BindingFlags.Public |
+                                                       BindingFlags.NonPublic);
+
+                foreach (MemberInfo member in members)
+                {
+                    Asset memberAsset = ReflectionServices.GetAsset(member);
+                    if (filter.IsFiltered(memberAsset))
+                        continue;
+
+                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
+                                                            0,
+                                                            "{0}",
+                                                            memberAsset.Id.AssetId);
+                    if (distinctSet.Add(memberAsset))
+                        collection.Add(memberAsset);
+                }
             }
-
-        }
-
-        void IAssetVisitor.VisitNamespace(Asset asset)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IAssetVisitor.VisitType(Asset asset)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IAssetVisitor.VisitField(Asset asset)
-        {
-
-        }
-
-        void IAssetVisitor.VisitEvent(Asset asset)
-        {
-
-        }
-
-        void IAssetVisitor.VisitProperty(Asset asset)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IAssetVisitor.VisitUnknown(Asset asset)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IAssetVisitor.VisitMethod(Asset asset)
-        {
-            throw new NotImplementedException();
+            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Discovering assets");
         }
     }
 }

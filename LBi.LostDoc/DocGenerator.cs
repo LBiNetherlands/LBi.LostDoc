@@ -115,9 +115,19 @@ namespace LBi.LostDoc
             XNamespace defaultNs = string.Empty;
             // pass in assemblyLoader instead
             IAssetResolver assetResolver = new AssetResolver(assemblyLoader);
-
+            IAssetExplorer assetExplorer = new ReflectionExplorer();
+            IFilterContext filterContext = new FilterContext(this._cache,
+                                                             this._container,
+                                                             FilterState.Discovery,
+                                                             this._filters.ToArray());
             // collect phase zero assets
-            List<Asset> assets = this.DiscoverAssets(this._assemblies).ToList();
+            List<Asset> assets = new List<Asset>();
+            
+            foreach (var assembly in this._assemblies)
+            {
+                Asset asmAsset = ReflectionServices.GetAsset(assembly);
+                assets.AddRange(assetExplorer.Discover(asmAsset, filterContext));
+            }
 
             // initiate output document creation
             ret.Add(new XElement(defaultNs + "bundle"));
@@ -189,7 +199,6 @@ namespace LBi.LostDoc
                         }
                     }
 
-
                     ++phase;
                     assets.Clear();
                     referencedAssets.ExceptWith(emittedAssets);
@@ -200,94 +209,6 @@ namespace LBi.LostDoc
 
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Generating document");
             return ret;
-        }
-
-
-        private IEnumerable<Asset> DiscoverAssets(IEnumerable<Assembly> assemblies)
-        {
-            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
-            HashSet<Asset> distinctSet = new HashSet<Asset>();
-            IFilterContext filterContext = new FilterContext(this._cache, this._container, FilterState.Discovery);
-
-            // find and filter all types from all assemblies 
-            foreach (Assembly asm in assemblies)
-            {
-                foreach (Type t in asm.GetTypes())
-                {
-                    // check if type survives filtering
-                    AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(t);
-                    Asset typeAsset = new Asset(typeAssetId, t);
-
-                    if (this.IsFiltered(filterContext, typeAsset))
-                        continue;
-
-                    /* type was not filtered */
-                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.Id.AssetId);
-
-                    // generate namespace hierarchy
-                    if (!string.IsNullOrEmpty(t.Namespace))
-                    {
-                        Version nsVersion = t.Module.Assembly.GetName().Version;
-
-                        string[] fragments = t.Namespace.Split('.');
-                        for (int i = fragments.Length; i > 0; i--)
-                        {
-                            string ns = string.Join(".", fragments, 0, i);
-                            AssetIdentifier nsAssetId = AssetIdentifier.FromNamespace(ns, nsVersion);
-                            NamespaceInfo nsInfo = new NamespaceInfo(t.Assembly, ns);
-                            Asset nsAsset = new Asset(nsAssetId, nsInfo);
-                            if (distinctSet.Add(nsAsset))
-                                yield return nsAsset;
-                        }
-                    }
-
-                    if (distinctSet.Add(typeAsset))
-                        yield return typeAsset;
-
-                    MemberInfo[] members = t.GetMembers(BindingFlags.Instance |
-                                                        BindingFlags.Static |
-                                                        BindingFlags.Public |
-                                                        BindingFlags.NonPublic);
-
-                    foreach (MemberInfo member in members)
-                    {
-                        AssetIdentifier memberAssetId = AssetIdentifier.FromMemberInfo(member);
-                        Asset memberAsset = new Asset(memberAssetId, member);
-                        if (this.IsFiltered(filterContext, memberAsset))
-                            continue;
-
-                        TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
-                                                                0,
-                                                                "{0}",
-                                                                memberAsset.Id.AssetId);
-                        if (distinctSet.Add(memberAsset))
-                            yield return memberAsset;
-                    }
-                }
-
-                yield return new Asset(AssetIdentifier.FromAssembly(asm), asm);
-            }
-
-            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Discovering assets");
-        }
-
-        private bool IsFiltered(IFilterContext filterContext, Asset asset)
-        {
-            bool filtered = false;
-            foreach (IAssetFilter filter in this.AssetFilters)
-            {
-                if (filter.Filter(filterContext, asset))
-                {
-                    filtered = true;
-                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
-                                                            0,
-                                                            "{0} - Filtered by {1}",
-                                                            asset.Id.AssetId, filter);
-
-                    break;
-                }
-            }
-            return filtered;
         }
 
         private void BuildHierarchy(IAssetResolver assetResolver, 

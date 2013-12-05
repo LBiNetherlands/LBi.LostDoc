@@ -95,6 +95,7 @@
     <Compile Include="Reflection\NamespaceInfo.cs" />
     <Compile Include="Reflection\ReflectionExplorer.cs" />
     <Compile Include="Reflection\ReflectionOnlyAssemblyLoader.cs" />
+    <Compile Include="Reflection\ReflectionServices.cs" />
     <Compile Include="Service References\MsdnContentService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

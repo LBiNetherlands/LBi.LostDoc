@@ -20,6 +20,6 @@ namespace LBi.LostDoc
 {
     public interface IAssetExplorer
     {
-        IEnumerable<Asset> Discover(Asset root, IAssetFilter[] filters);
+        IEnumerable<Asset> Discover(Asset root, IFilterContext filters);
     }
 }

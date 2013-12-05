@@ -15,22 +15,47 @@
  */
 
 using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics;
 using System.Runtime.Caching;
+using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc
 {
     public class FilterContext : IFilterContext
     {
-        public FilterContext(ObjectCache cache, CompositionContainer container, FilterState state)
+        private IAssetFilter[] _filters;
+
+        public FilterContext(ObjectCache cache, CompositionContainer container, FilterState state, params IAssetFilter[] filters)
         {
             this.Container = container;
             this.Cache = cache;
             this.State = state;
+            this._filters = filters;
         }
 
         #region IFilterContext Members
 
         public FilterState State { get; private set; }
+        
+        public bool IsFiltered(Asset asset)
+        {
+            bool filtered = false;
+            foreach (IAssetFilter filter in this._filters)
+            {
+                if (filter.Filter(this, asset))
+                {
+                    filtered = true;
+                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
+                                                            0,
+                                                            "{0} - Filtered by {1}",
+                                                            asset.Id.AssetId,
+                                                            filter);
+
+                    break;
+                }
+            }
+            return filtered;
+        }
 
         #endregion
 
