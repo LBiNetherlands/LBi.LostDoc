@@ -66,10 +66,10 @@ namespace LBi.LostDoc
 
     //    void EnrichParameter(IProcessingContext context, Asset methodAsset, string parameterName);
 
-    //    void EnrichTypeParameter(IProcessingContext context, Asset typeParameterAsset);
+    //    void EnrichTypeParameter(IProcessingContext context, Asset typeOrMethodAsset, string name);
 
-    //    void EnrichNamespace(IProcessingContext context, string ns);
+    //    void EnrichNamespace(IProcessingContext context, Asset namespaceAsset);
 
-    //    void EnrichEvent(IProcessingContext context, EventInfo eventInfo);
+    //    void EnrichEvent(IProcessingContext context, Asset eventAsset);
     //}
 }

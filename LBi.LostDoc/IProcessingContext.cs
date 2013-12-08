@@ -15,6 +15,7 @@
  */
 
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using LBi.LostDoc.Reflection;
 
@@ -22,10 +23,11 @@ namespace LBi.LostDoc
 {
     public interface IProcessingContext : IContextBase
     {
+        IAssetExplorer AssetExplorer { get; }
+
         IAssemblyLoader AssemblyLoader { get; }
         XElement Element { get; }
         IEnumerable<Asset> References { get; }
-        IAssetResolver AssetResolver { get; }
         int Phase { get; }
         bool AddReference(Asset asset);
         IProcessingContext Clone(XElement newElement);

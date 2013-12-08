@@ -31,12 +31,12 @@ namespace LBi.LostDoc
         private readonly IAssetFilter[] _filters;
         private readonly HashSet<Asset> _references;
 
-        public ProcessingContext(ObjectCache cache, CompositionContainer container, IEnumerable<IAssetFilter> filters, IAssemblyLoader assemblyLoader, IAssetResolver assetResolver, XElement element, HashSet<Asset> references, int phase)
+        public ProcessingContext(ObjectCache cache, CompositionContainer container, IEnumerable<IAssetFilter> filters, IAssemblyLoader assemblyLoader, XElement element, HashSet<Asset> references, int phase, IAssetExplorer assetExplorer)
         {
             this._filters = filters.ToArray();
-            this.AssetResolver = assetResolver;
             this.Element = element;
             this._references = references;
+            AssetExplorer = assetExplorer;
             Container = container;
             this.Phase = phase;
             this.Cache = cache;
@@ -44,6 +44,8 @@ namespace LBi.LostDoc
         }
 
         #region IProcessingContext Members
+
+        public IAssetExplorer AssetExplorer { get; private set; }
 
         public IAssemblyLoader AssemblyLoader { get; private set; }
 
@@ -89,8 +91,6 @@ namespace LBi.LostDoc
             return false;
         }
 
-        public IAssetResolver AssetResolver { get; protected set; }
-
         public int Phase { get; private set; }
 
         public IProcessingContext Clone(XElement newElement)
@@ -99,10 +99,10 @@ namespace LBi.LostDoc
                                          this.Container,
                                          this._filters,
                                          this.AssemblyLoader,
-                                         this.AssetResolver,
                                          newElement,
                                          this._references,
-                                         this.Phase);
+                                         this.Phase,
+                                         this.AssetExplorer);
         }
 
         public bool IsFiltered(Asset asset)

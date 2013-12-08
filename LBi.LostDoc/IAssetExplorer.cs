@@ -20,6 +20,14 @@ namespace LBi.LostDoc
 {
     public interface IAssetExplorer
     {
+        /// <summary>
+        /// Returns the assemblies referenced by <paramref name="assemblyAsset"/>.
+        /// </summary>
+        /// <param name="assemblyAsset">Must be of type <see cref="AssetType.Assembly"/>.</param>
+        /// <param name="filters"><see cref="IFilterContext"/> used to determine which assets to return. Can be <value>null</value>.</param>
+        /// <returns>The referenced assemblies as <see cref="Asset"/>.</returns>
+        IEnumerable<Asset> GetReferences(Asset assemblyAsset, IFilterContext filters);
+
         IEnumerable<Asset> Discover(Asset root, IFilterContext filters);
     }
 }

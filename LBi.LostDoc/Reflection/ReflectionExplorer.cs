@@ -18,6 +18,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
@@ -27,15 +28,46 @@ namespace LBi.LostDoc.Reflection
 {
     public class ReflectionExplorer : IAssetExplorer
     {
+        private readonly IAssemblyLoader _assemblyLoader;
+
+        public ReflectionExplorer(IAssemblyLoader assemblyLoader)
+        {
+            this._assemblyLoader = assemblyLoader;
+        }
+
+        public IEnumerable<Asset> GetReferences(Asset assemblyAsset, IFilterContext filter)
+        {
+            if (assemblyAsset.Id.Type != AssetType.Assembly)
+                throw new ArgumentException("Asset must be of type Assembly", "assemblyAsset");
+
+            Assembly assembly = assemblyAsset.GetAssembly();
+
+            AssemblyName[] references = assembly.GetReferencedAssemblies();
+
+            foreach (AssemblyName reference in references)
+            {
+                Assembly asm = this._assemblyLoader.Load(reference.ToString());
+
+                if (asm == null)
+                    throw new FileNotFoundException("Assembly not found: " + reference.ToString());
+
+                Asset asset = ReflectionServices.GetAsset(asm);
+
+                if (filter == null || !filter.IsFiltered(asset))
+                    yield return asset;
+            }
+        }
+
+
         public IEnumerable<Asset> Discover(Asset root, IFilterContext filter)
         {
             if (root.Id.Type != AssetType.Assembly)
                 throw new ArgumentException("Only AssetType.Assembly supported.", "root");
 
             ExceptionDispatchInfo exception = null;
-            
+
             ConcurrentQueue<Asset> queue = new ConcurrentQueue<Asset>();
-            using(BlockingCollection<Asset> blocking = new BlockingCollection<Asset>(queue))
+            using (BlockingCollection<Asset> blocking = new BlockingCollection<Asset>(queue))
             {
                 Action<object> func =
                     a =>
@@ -52,7 +84,7 @@ namespace LBi.LostDoc.Reflection
                     };
 
 
-                using(Task task = Task.Factory.StartNew(func, root))
+                using (Task task = Task.Factory.StartNew(func, root))
                 {
                     foreach (var asset in blocking.GetConsumingEnumerable())
                         yield return asset;
@@ -70,7 +102,7 @@ namespace LBi.LostDoc.Reflection
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
 
             Asset assemblyAsset = ReflectionServices.GetAsset(assembly);
-            if (filter.IsFiltered(assemblyAsset))
+            if (filter != null && filter.IsFiltered(assemblyAsset))
                 return;
 
             collection.Add(assemblyAsset);
@@ -82,7 +114,7 @@ namespace LBi.LostDoc.Reflection
                 AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(type);
                 Asset typeAsset = new Asset(typeAssetId, type);
 
-                if (filter.IsFiltered(typeAsset))
+                if (filter != null && filter.IsFiltered(typeAsset))
                     continue;
 
                 /* type was not filtered */
@@ -116,7 +148,7 @@ namespace LBi.LostDoc.Reflection
                 foreach (MemberInfo member in members)
                 {
                     Asset memberAsset = ReflectionServices.GetAsset(member);
-                    if (filter.IsFiltered(memberAsset))
+                    if (filter != null && filter.IsFiltered(memberAsset))
                         continue;
 
                     TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,

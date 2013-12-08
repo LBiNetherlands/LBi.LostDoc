@@ -115,7 +115,7 @@ namespace LBi.LostDoc
             XNamespace defaultNs = string.Empty;
             // pass in assemblyLoader instead
             IAssetResolver assetResolver = new AssetResolver(assemblyLoader);
-            IAssetExplorer assetExplorer = new ReflectionExplorer();
+            IAssetExplorer assetExplorer = new ReflectionExplorer(assemblyLoader);
             IFilterContext filterContext = new FilterContext(this._cache,
                                                              this._container,
                                                              FilterState.Discovery,
@@ -137,10 +137,10 @@ namespace LBi.LostDoc
                                                             this._container,
                                                             this._filters,
                                                             assemblyLoader,
-                                                            assetResolver,
                                                             ret.Root,
                                                             null,
-                                                            -1);
+                                                            -1,
+                                                            assetExplorer);
 
             foreach (IEnricher enricher in this._enrichers)
                 enricher.RegisterNamespace(pctx);
@@ -190,12 +190,11 @@ namespace LBi.LostDoc
 
                         if (hierarchy.First != null)
                         {
-                            this.BuildHierarchy(assetResolver,
-                                                ret.Root,
+                            this.BuildHierarchy(ret.Root,
                                                 hierarchy.First,
                                                 referencedAssets,
                                                 emittedAssets,
-                                                phase);
+                                                phase, assetExplorer);
                         }
                     }
 
@@ -211,12 +210,7 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        private void BuildHierarchy(IAssetResolver assetResolver, 
-                                    XElement parentNode, 
-                                    LinkedListNode<Asset> hierarchy, 
-                                    HashSet<Asset> references, 
-                                    HashSet<Asset> emittedAssets, 
-                                    int phase)
+        private void BuildHierarchy(XElement parentNode, LinkedListNode<Asset> hierarchy, HashSet<Asset> references, HashSet<Asset> emittedAssets, int phase, IAssetExplorer assetExplorer)
         {
             if (hierarchy == null)
                 return;
@@ -231,10 +225,10 @@ namespace LBi.LostDoc
                                                             this._container,
                                                             this._filters,
                                                             assemblyLoader,
-                                                            assetResolver,
                                                             parentNode,
                                                             references,
-                                                            phase);
+                                                            phase,
+                                                            assetExplorer);
 
             XElement newElement;
 
@@ -283,7 +277,7 @@ namespace LBi.LostDoc
                     throw new ArgumentOutOfRangeException();
             }
 
-            this.BuildHierarchy(assetResolver, newElement, hierarchy.Next, references, emittedAssets, phase);
+            this.BuildHierarchy(newElement, hierarchy.Next, references, emittedAssets, phase, assetExplorer);
         }
 
 

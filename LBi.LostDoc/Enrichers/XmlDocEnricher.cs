@@ -23,6 +23,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc.Enrichers
 {
@@ -202,9 +203,24 @@ namespace LBi.LostDoc.Enrichers
                 {
                     this._docReaders.Add(assembly, reader = new XmlDocReader());
 
-                    using (XmlReader xreader = XmlReader.Create(path, new XmlReaderSettings { IgnoreWhitespace = false }))
-                        reader.Load(xreader);
+                    XPathDocument document;
+                    XDocument transformedDoc = new XDocument();
+                    using (XmlReader xreader = XmlReader.Create(path, new XmlReaderSettings {IgnoreWhitespace = false}))
+                        document = new XPathDocument(xreader);
+
+                    using (XmlWriter transformWriter = transformedDoc.CreateWriter())
+                    {
+                        XsltArgumentList argList = new XsltArgumentList();
+                        argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, ReflectionServices.GetAsset(assembly)));
+
+                        this._xslTransform.Transform(document.CreateNavigator(), transformWriter);
+                        transformWriter.Close();
+                    }
+                    
+                    using (XmlReader transformReader = transformedDoc.CreateReader())
+                        reader.Load(transformReader);
                 }
+
                 else
                     reader = null;
             }
@@ -233,14 +249,14 @@ namespace LBi.LostDoc.Enrichers
                 context.Element.Add(new XElement(ns + container, element.Attributes(), element.Nodes()));
         }
 
-        private XElement EnrichXml(IProcessingContext context, Assembly hintAssembly, XElement nodes)
+        private XElement EnrichXml(IProcessingContext context, Assembly assembly, XElement nodes)
         {
             XDocument ret = new XDocument();
 
             using (XmlWriter nodeWriter = ret.CreateWriter())
             {
                 XsltArgumentList argList = new XsltArgumentList();
-                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, hintAssembly));
+                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, ReflectionServices.GetAsset(assembly)));
 
                 this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
                 nodeWriter.Close();
