@@ -110,7 +110,7 @@ namespace LBi.LostDoc.Enrichers
             XmlWriter nodeWriter = ret.CreateWriter();
 
             XsltArgumentList argList = new XsltArgumentList();
-            argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, null));
+            argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context.AssetExplorer, null));
             this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
             nodeWriter.Close();
             return ret.Root;

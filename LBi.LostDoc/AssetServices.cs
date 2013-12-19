@@ -33,6 +33,11 @@ namespace LBi.LostDoc
             } while (asset != null);
         }
 
+        public static IEnumerable<Asset> Discover(this IAssetExplorer assetExplorer, Asset root)
+        {
+            return assetExplorer.Discover(root, null);
+        }
+
         public static IEnumerable<Asset> Discover(this IAssetExplorer assetExplorer, Asset root, IFilterContext filter)
         {
             ExceptionDispatchInfo exception = null;

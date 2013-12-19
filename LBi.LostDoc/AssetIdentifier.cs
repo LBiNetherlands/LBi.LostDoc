@@ -53,11 +53,6 @@ namespace LBi.LostDoc
                 case "N":
                     this._type = AssetType.Namespace;
                     break;
-
-
-                // case "C":
-                // this._type = AssetType.Constructor;
-                // break;
                 case "A":
                     this._type = AssetType.Assembly;
                     break;

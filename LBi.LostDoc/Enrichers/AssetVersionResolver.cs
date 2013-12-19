@@ -18,110 +18,64 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Enrichers
 {
     internal class AssetVersionResolver
     {
-        private readonly IProcessingContext _context;
+        private readonly IAssetExplorer _assetExplorer;
         private readonly Asset _assembly;
-        private Asset[][] _accessibleAssets;
+        private readonly AssetIdentifier[][] _accessibleAssets;
 
-        public AssetVersionResolver(IProcessingContext context, Asset assembly)
+        public AssetVersionResolver(IAssetExplorer assetExplorer, Asset assembly)
         {
-            this._context = context;
+            this._assetExplorer = assetExplorer;
             this._assembly = assembly;
-            List<Asset[]> phases =new List<Asset[]>();
-            
-            // TODO this is wrong, needs to be recursive call
-            XXXXX
-            foreach (var reference in this._context.AssetExplorer.GetReferences(assembly, null))
-            {
-                phases.Add(this._context.AssetExplorer.Discover(reference, null).ToArray());
-            }
-            this._accessibleAssets = phases.ToArray();
+            List<List<AssetIdentifier>> phases = new List<List<AssetIdentifier>>();
+
+            FindAccessibleAssets(phases, assetExplorer, assembly, 0);
+
+            this._accessibleAssets = phases.Select(l => l.ToArray()).ToArray();
         }
+
+        private static void FindAccessibleAssets(List<List<AssetIdentifier>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
+        {
+            List<AssetIdentifier> currentPhase;
+
+            if (assets.Count <= depth)
+                assets.Add(currentPhase = new List<AssetIdentifier>());
+            else
+                currentPhase = assets[depth];
+
+            currentPhase.AddRange(assetExplorer.Discover(assembly).Select(a => a.Id));
+
+            foreach (var reference in assetExplorer.GetReferences(assembly, null))
+                FindAccessibleAssets(assets, assetExplorer, reference, depth + 1);
+        }
+
 
         public string getVersionedId(string assetId)
         {
-            AssetIdentifier aid = AssetIdentifier.Parse(assetId);
-            
-
-        //    AssetIdentifier hintAsmAid = null;
-        //    AssetIdentifier ret = null;
-
-        //    if (this._hintAssembly != null)
-        //        hintAsmAid = AssetIdentifier.FromAssembly(this._hintAssembly);
-
-        //    if (aid.Type == AssetType.Assembly)
-        //    {
-        //        Assembly asm = (Assembly)this._context.AssetResolver.Resolve(aid, hintAsmAid);
-        //        if (asm != null)
-        //            ret = AssetIdentifier.FromAssembly(asm);
-        //    }
-        //    else if (aid.Type == AssetType.Namespace)
-        //    {
-        //        string ns = aid.AssetId.Substring(aid.TypeMarker.Length + 1);
-
-        //        var version = this.GetNamespaceVersion(this._hintAssembly, ns);
-
-        //        if (version != null)
-        //            ret = AssetIdentifier.FromNamespace(ns, version);
-        //    }
-        //    else
-        //    {
-        //        object obj = this._context.AssetResolver.Resolve(aid, hintAsmAid);
-
-        //        if (obj != null)
-        //        {
-        //            if (aid.Type == AssetType.Unknown)
-        //            {
-        //                MethodInfo[] arr = obj as MethodInfo[];
-        //                if (arr != null)
-        //                {
-        //                    // TODO this isn't very nice but it should do the trick for now
-        //                    var dummyAid = AssetIdentifier.FromMemberInfo(arr[0]);
-        //                    ret = new AssetIdentifier(aid.AssetId, dummyAid.Version);
-        //                }
-        //                else
-        //                    throw new NotSupportedException("Unknow AssetIdentifier marker: " + aid.TypeMarker);
-        //            }
-        //            else
-        //                ret = AssetIdentifier.FromMemberInfo((MemberInfo)obj);
-        //        }
-        //    }
-
-        //    if (ret != null)
-        //        this._context.AddReference(ret);
-        //    else
-        //    {
-        //        // TODO log warning/error failed to resolve asset
-        //        ret = aid;
-        //    }
-        //    return ret.ToString();
-            return "";
-        }
-
-        private Version GetNamespaceVersion(Assembly assembly, string ns)
-        {
-            foreach (Assembly asm in this._context.AssemblyLoader.GetAssemblyChain(assembly))
+            for (int depth = 0; depth < this._accessibleAssets.Length; depth++)
             {
-                var types = asm.GetTypes();
+                var matches = this._accessibleAssets[depth].Where(a => a.AssetId.Equals(assetId, StringComparison.Ordinal)).ToArray();
 
-                for (int typeNum = 0; typeNum < types.Length; typeNum++)
+                if (matches.Length > 1)
                 {
-                    if (ns.Equals(types[typeNum].Namespace) ||
-                        (types[typeNum].Namespace != null &&
-                         types[typeNum].Namespace.StartsWith(ns) &&
-                         types[typeNum].Namespace[ns.Length] == '.'))
+                    IGrouping<Version, AssetIdentifier>[] groups = matches.GroupBy(ai => ai.Version).ToArray();
+                    if (groups.Length > 1)
                     {
-                        return assembly.GetName().Version;
+                        // TODO output WARNING/INFO
                     }
+                    return groups.OrderByDescending(g => g.Count()).First().First();
                 }
+                if (matches.Length > 0)
+                    return matches[0].ToString();
             }
 
-            throw new Exception("Could not find namespace '" + ns + "' in any loaded assembly");
+            return assetId;
         }
     }
 }
