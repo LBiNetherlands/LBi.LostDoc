@@ -15,14 +15,10 @@
  */
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
-using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Reflection
 {
@@ -37,7 +33,7 @@ namespace LBi.LostDoc.Reflection
 
         public IEnumerable<Asset> GetReferences(Asset assemblyAsset, IFilterContext filter)
         {
-            if (assemblyAsset.Id.Type != AssetType.Assembly)
+            if (assemblyAsset.Type != AssetType.Assembly)
                 throw new ArgumentException("Asset must be of type Assembly", "assemblyAsset");
 
             Assembly assembly = assemblyAsset.GetAssembly();
@@ -58,108 +54,87 @@ namespace LBi.LostDoc.Reflection
             }
         }
 
-
-        public IEnumerable<Asset> Discover(Asset root, IFilterContext filter)
+        public Asset GetParent(Asset asset)
         {
-            if (root.Id.Type != AssetType.Assembly)
-                throw new ArgumentException("Only AssetType.Assembly supported.", "root");
-
-            ExceptionDispatchInfo exception = null;
-
-            ConcurrentQueue<Asset> queue = new ConcurrentQueue<Asset>();
-            using (BlockingCollection<Asset> blocking = new BlockingCollection<Asset>(queue))
+            Asset ret;
+            switch (asset.Type)
             {
-                Action<object> func =
-                    a =>
-                    {
-                        try
-                        {
-                            Discover(((Asset)a).GetAssembly(), blocking, filter);
-                        }
-                        catch (Exception ex)
-                        {
-                            exception = ExceptionDispatchInfo.Capture(ex);
-                        }
-                        blocking.CompleteAdding();
-                    };
-
-
-                using (Task task = Task.Factory.StartNew(func, root))
-                {
-                    foreach (var asset in blocking.GetConsumingEnumerable())
-                        yield return asset;
-
-                    task.Wait();
-
-                    if (exception != null)
-                        exception.Throw();
-                }
+                case AssetType.Namespace:
+                    NamespaceInfo nsInfo = (NamespaceInfo)asset.Target;
+                    ret = ReflectionServices.GetAsset(nsInfo.Assembly);
+                    break;
+                case AssetType.Type:
+                    Type type = (Type)asset.Target;
+                    if (type.IsNested)
+                        ret = ReflectionServices.GetAsset(type.DeclaringType);
+                    else
+                        ret = ReflectionServices.GetAsset(type.Assembly, type.Namespace);
+                    break;
+                case AssetType.Method:
+                case AssetType.Field:
+                case AssetType.Event:
+                case AssetType.Property:
+                    Type parent = ((MemberInfo)asset.Target).ReflectedType;
+                    ret = ReflectionServices.GetAsset(parent);
+                    break;
+                case AssetType.Assembly:
+                    ret = null;
+                    break;
+                default:
+                    throw new ArgumentException(string.Format("Cannot find parent of asset of type {0}", asset.Type));
             }
+
+            return ret;
         }
 
-        private void Discover(Assembly assembly, BlockingCollection<Asset> collection, IFilterContext filter)
+        public IEnumerable<Asset> GetChildren(Asset asset)
         {
-            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Start, 0, "Discovering assets");
-
-            Asset assemblyAsset = ReflectionServices.GetAsset(assembly);
-            if (filter != null && filter.IsFiltered(assemblyAsset))
-                return;
-
-            collection.Add(assemblyAsset);
-
-            HashSet<Asset> distinctSet = new HashSet<Asset>();
-            foreach (Type type in assembly.GetTypes())
+            IEnumerable<Asset> ret;
+            switch (asset.Type)
             {
-                // check if type survives filtering
-                AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(type);
-                Asset typeAsset = new Asset(typeAssetId, type);
+                case AssetType.Namespace:
+                    NamespaceInfo nsInfo = (NamespaceInfo)asset.Target;
+                    ret = nsInfo.Assembly.GetTypes()
+                                .Where(t => t.Namespace == nsInfo.Name)
+                                .Select(ReflectionServices.GetAsset);
+                    break;
+                case AssetType.Type:
+                    Type type = (Type)asset.Target;
+                    ret = type.GetMembers().Concat(type.GetNestedTypes()).Select(ReflectionServices.GetAsset);
+                    break;
+                
+                case AssetType.Method:
+                case AssetType.Field:
+                case AssetType.Event:
+                case AssetType.Property:
+                    ret = Enumerable.Empty<Asset>();
+                    break;
+                case AssetType.Assembly:
+                    Assembly asm = (Assembly)asset.Target;
+                    string[] namespaces = asm.GetTypes()
+                                             .Select(t => t.Namespace)
+                                             .Distinct(StringComparer.Ordinal)
+                                             .ToArray();
 
-                if (filter != null && filter.IsFiltered(typeAsset))
-                    continue;
+                    HashSet<string> uniqueNamespaces = new HashSet<string>(namespaces, StringComparer.Ordinal);
 
-                /* type was not filtered */
-                TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information, 0, "{0}", typeAsset.Id.AssetId);
-
-                // generate namespace hierarchy
-                if (!string.IsNullOrEmpty(type.Namespace))
-                {
-                    Version nsVersion = type.Module.Assembly.GetName().Version;
-
-                    string[] fragments = type.Namespace.Split('.');
-                    for (int i = fragments.Length; i > 0; i--)
+                    foreach (var ns in namespaces)
                     {
-                        string ns = string.Join(".", fragments, 0, i);
-                        AssetIdentifier nsAssetId = AssetIdentifier.FromNamespace(ns, nsVersion);
-                        NamespaceInfo nsInfo = new NamespaceInfo(type.Assembly, ns);
-                        Asset nsAsset = new Asset(nsAssetId, nsInfo);
-                        if (distinctSet.Add(nsAsset))
-                            collection.Add(nsAsset);
+                        string[] parts = ns.Split('.');
+                        if (parts.Length > 1)
+                        {
+                            for (int i = 1; i <= parts.Length; i++)
+                                uniqueNamespaces.Add(string.Join(".", parts, 0, i));
+                        }
                     }
-                }
 
-                if (distinctSet.Add(typeAsset))
-                    collection.Add(typeAsset);
-
-                MemberInfo[] members = type.GetMembers(BindingFlags.Instance |
-                                                       BindingFlags.Static |
-                                                       BindingFlags.Public |
-                                                       BindingFlags.NonPublic);
-
-                foreach (MemberInfo member in members)
-                {
-                    Asset memberAsset = ReflectionServices.GetAsset(member);
-                    if (filter != null && filter.IsFiltered(memberAsset))
-                        continue;
-
-                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Information,
-                                                            0,
-                                                            "{0}",
-                                                            memberAsset.Id.AssetId);
-                    if (distinctSet.Add(memberAsset))
-                        collection.Add(memberAsset);
-                }
+                    ret = uniqueNamespaces.Select(ns => ReflectionServices.GetAsset(asm, ns));
+                    break;
+                default:
+                    throw new ArgumentException(string.Format("Cannot find children of asset of type {0}", asset.Type));
             }
-            TraceSources.GeneratorSource.TraceEvent(TraceEventType.Stop, 0, "Discovering assets");
-        }
+
+            return ret;
+        }       
     }
 }

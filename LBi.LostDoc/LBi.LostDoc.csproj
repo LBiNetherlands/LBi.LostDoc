@@ -53,7 +53,7 @@
   <ItemGroup>
     <Compile Include="Asset.cs" />
     <Compile Include="AssetIdentifier.cs" />
-    <Compile Include="AssetResolver.cs" />
+    <Compile Include="AssetServices.cs" />
     <Compile Include="AssetType.cs" />
     <Compile Include="Bundle.cs" />
     <Compile Include="Extensibility\ContractNames.cs" />
@@ -74,7 +74,6 @@
     <Compile Include="Filters\EnumMetadataFilter.cs" />
     <Compile Include="Filters\PrivateImplementationDetailsFilter.cs" />
     <Compile Include="IAssetExplorer.cs" />
-    <Compile Include="IAssetResolver.cs" />
     <Compile Include="IAssetVisitor.cs" />
     <Compile Include="IContextBase.cs" />
     <Compile Include="IFilterContext.cs" />

@@ -23,7 +23,7 @@ namespace LBi.LostDoc.Reflection
     {
         public static Assembly GetAssembly(this Asset asset)
         {
-            switch (asset.Id.Type)
+            switch (asset.Type)
             {
                 case AssetType.Namespace:
                     return ((NamespaceInfo)asset.Target).Assembly;
@@ -43,7 +43,7 @@ namespace LBi.LostDoc.Reflection
 
         public static Type GetType(this Asset asset)
         {
-            switch (asset.Id.Type)
+            switch (asset.Type)
             {
                 case AssetType.Type:
                     return (Type)asset.Target;

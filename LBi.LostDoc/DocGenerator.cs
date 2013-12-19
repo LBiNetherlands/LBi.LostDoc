@@ -114,7 +114,6 @@ namespace LBi.LostDoc
 
             XNamespace defaultNs = string.Empty;
             // pass in assemblyLoader instead
-            IAssetResolver assetResolver = new AssetResolver(assemblyLoader);
             IAssetExplorer assetExplorer = new ReflectionExplorer(assemblyLoader);
             IFilterContext filterContext = new FilterContext(this._cache,
                                                              this._container,
@@ -185,7 +184,7 @@ namespace LBi.LostDoc
                         // get hierarchy
                         LinkedList<Asset> hierarchy = new LinkedList<Asset>();
 
-                        foreach (Asset hierarchyAsset in assetResolver.GetAssetHierarchy(asset))
+                        foreach (Asset hierarchyAsset in assetExplorer.GetAssetHierarchy(asset))
                             hierarchy.AddFirst(hierarchyAsset);
 
                         if (hierarchy.First != null)
@@ -236,7 +235,7 @@ namespace LBi.LostDoc
             emittedAssets.Add(asset);
 
             // dispatch depending on type
-            switch (asset.Id.Type)
+            switch (asset.Type)
             {
                 case AssetType.Namespace:
                     newElement = parentNode.XPathSelectElement(string.Format("namespace[@assetId = '{0}']", asset));
@@ -376,7 +375,11 @@ namespace LBi.LostDoc
             else if (type.IsInterface)
                 elemName = "interface";
             else
-                throw new ArgumentException("Unknown asset type: " + asset.Id.Type.ToString(), "asset");
+                throw new ArgumentException("Unknown asset type: " + asset.Type.ToString(), "asset");
+
+            //XTypeBuilder typeBuilder = new XTypeBuilder(type.Name, asset.Id, context.Phase);
+            //typeBuilder.A
+            //ret = typeBuilder.ToElement();
 
             ret = new XElement(elemName,
                                new XAttribute("name", type.Name),

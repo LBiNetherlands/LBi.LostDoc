@@ -15,6 +15,9 @@
  */
 
 using System.Collections.Generic;
+using System.Diagnostics;
+using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc
 {
@@ -28,6 +31,8 @@ namespace LBi.LostDoc
         /// <returns>The referenced assemblies as <see cref="Asset"/>.</returns>
         IEnumerable<Asset> GetReferences(Asset assemblyAsset, IFilterContext filters);
 
-        IEnumerable<Asset> Discover(Asset root, IFilterContext filters);
+        Asset GetParent(Asset asset);
+
+        IEnumerable<Asset> GetChildren(Asset asset);
     }
 }

@@ -30,9 +30,11 @@ namespace LBi.LostDoc
 
         public AssetIdentifier Id { get; private set; }
 
+        public AssetType Type { get { return this.Id.Type; } }
+
         public void Visit(IAssetVisitor visitor)
         {
-            switch (this.Id.Type)
+            switch (this.Type)
             {
                 case AssetType.Unknown:
                     visitor.VisitUnknown(this);
