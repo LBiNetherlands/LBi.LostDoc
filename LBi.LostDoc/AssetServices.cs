@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
@@ -24,6 +25,18 @@ namespace LBi.LostDoc
 {
     public static class AssetServices
     {
+        public static Asset GetRoot(this IAssetExplorer assetExplorer, Asset asset)
+        {
+            for (;;)
+            {
+                Asset parent = assetExplorer.GetParent(asset);
+                if (parent == null)
+                    return asset;
+
+                asset = parent;
+            }
+        }
+
         public static IEnumerable<Asset> GetAssetHierarchy(this IAssetExplorer assetExplorer, Asset asset)
         {
             do

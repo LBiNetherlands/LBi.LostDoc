@@ -27,7 +27,7 @@ namespace LBi.LostDoc.Enrichers
     {
         private readonly IAssetExplorer _assetExplorer;
         private readonly Asset _assembly;
-        private readonly AssetIdentifier[][] _accessibleAssets;
+        private readonly Dictionary<string, AssetIdentifier[]>[] _accessibleAssets;
 
         public AssetVersionResolver(IAssetExplorer assetExplorer, Asset assembly)
         {
@@ -35,12 +35,20 @@ namespace LBi.LostDoc.Enrichers
             this._assembly = assembly;
             List<List<AssetIdentifier>> phases = new List<List<AssetIdentifier>>();
 
-            FindAccessibleAssets(phases, assetExplorer, assembly, 0);
+            HashSet<Asset> processedAssemblies = new HashSet<Asset>();
 
-            this._accessibleAssets = phases.Select(l => l.ToArray()).ToArray();
+            FindAccessibleAssets(processedAssemblies, phases, assetExplorer, assembly, 0);
+
+
+            this._accessibleAssets = phases.Select(phase =>
+                                                   phase.GroupBy(ai => ai.AssetId, StringComparer.Ordinal)
+                                                        .ToDictionary(g => g.Key,
+                                                                      g => g.ToArray(),
+                                                                      StringComparer.Ordinal))
+                                           .ToArray();
         }
 
-        private static void FindAccessibleAssets(List<List<AssetIdentifier>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
+        private static void FindAccessibleAssets(HashSet<Asset> processedAssemblies, List<List<AssetIdentifier>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
         {
             List<AssetIdentifier> currentPhase;
 
@@ -52,7 +60,12 @@ namespace LBi.LostDoc.Enrichers
             currentPhase.AddRange(assetExplorer.Discover(assembly).Select(a => a.Id));
 
             foreach (var reference in assetExplorer.GetReferences(assembly, null))
-                FindAccessibleAssets(assets, assetExplorer, reference, depth + 1);
+            {
+                if (processedAssemblies.Add(reference))
+                {
+                    FindAccessibleAssets(processedAssemblies, assets, assetExplorer, reference, depth + 1);
+                }
+            }
         }
 
 
@@ -60,7 +73,9 @@ namespace LBi.LostDoc.Enrichers
         {
             for (int depth = 0; depth < this._accessibleAssets.Length; depth++)
             {
-                var matches = this._accessibleAssets[depth].Where(a => a.AssetId.Equals(assetId, StringComparison.Ordinal)).ToArray();
+                AssetIdentifier[] matches;
+                if (!this._accessibleAssets[depth].TryGetValue(assetId, out matches))
+                    continue;
 
                 if (matches.Length > 1)
                 {

@@ -112,7 +112,7 @@ namespace LBi.LostDoc.Reflection
                 case AssetType.Assembly:
                     Assembly asm = (Assembly)asset.Target;
                     string[] namespaces = asm.GetTypes()
-                                             .Select(t => t.Namespace)
+                                             .Select(t => t.Namespace ?? string.Empty)
                                              .Distinct(StringComparer.Ordinal)
                                              .ToArray();
 
