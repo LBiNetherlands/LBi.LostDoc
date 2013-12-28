@@ -211,7 +211,7 @@ namespace LBi.LostDoc.Enrichers
                     {
                         XsltArgumentList argList = new XsltArgumentList();
                         argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context.AssetExplorer, ReflectionServices.GetAsset(assembly)));
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
                         this._xslTransform.Transform(document.CreateNavigator(), argList, transformWriter);
                         transformWriter.Close();
                     }
@@ -244,22 +244,6 @@ namespace LBi.LostDoc.Enrichers
             XNamespace ns = Namespaces.XmlDocComment;
             if (element.Nodes().Any())
                 context.Element.Add(new XElement(ns + container, element.Attributes(), element.Nodes()));
-        }
-
-        private XElement EnrichXml(IProcessingContext context, Assembly assembly, XElement nodes)
-        {
-            XDocument ret = new XDocument();
-
-            using (XmlWriter nodeWriter = ret.CreateWriter())
-            {
-                XsltArgumentList argList = new XsltArgumentList();
-                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context.AssetExplorer, ReflectionServices.GetAsset(assembly)));
-
-                this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
-                nodeWriter.Close();
-            }
-
-            return ret.Root;
         }
 
         private XElement GetMethodDocComments(MethodInfo mInfo, IProcessingContext context)
