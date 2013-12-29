@@ -98,9 +98,16 @@ namespace LBi.LostDoc.Reflection
                                 .Where(t => t.Namespace == nsInfo.Name)
                                 .Select(ReflectionServices.GetAsset);
                     break;
+
                 case AssetType.Type:
                     Type type = (Type)asset.Target;
-                    ret = type.GetMembers().Concat(type.GetNestedTypes()).Select(ReflectionServices.GetAsset);
+                    MemberInfo[] allMembers = type.GetMembers(BindingFlags.Public |
+                                                              BindingFlags.NonPublic |
+                                                              BindingFlags.Static |
+                                                              BindingFlags.Instance);
+
+                    ret = allMembers.Concat(type.GetNestedTypes())
+                                    .Select(ReflectionServices.GetAsset);
                     break;
                 
                 case AssetType.Method:

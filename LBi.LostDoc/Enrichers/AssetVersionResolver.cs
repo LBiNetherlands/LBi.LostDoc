@@ -17,47 +17,44 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using LBi.LostDoc.Templating;
 
 namespace LBi.LostDoc.Enrichers
 {
     internal class AssetVersionResolver
     {
-        private readonly IAssetExplorer _assetExplorer;
         private readonly Asset _assembly;
-        private readonly Dictionary<string, AssetIdentifier[]>[] _accessibleAssets;
+        private readonly Dictionary<string, Asset[]>[] _accessibleAssets;
+        private IProcessingContext _context;
 
-        public AssetVersionResolver(IAssetExplorer assetExplorer, Asset assembly)
+        public AssetVersionResolver(IProcessingContext context, Asset assembly)
         {
-            this._assetExplorer = assetExplorer;
+            this._context = context;
             this._assembly = assembly;
-            List<List<AssetIdentifier>> phases = new List<List<AssetIdentifier>>();
+            List<List<Asset>> phases = new List<List<Asset>>();
 
             HashSet<Asset> processedAssemblies = new HashSet<Asset>();
 
-            FindAccessibleAssets(processedAssemblies, phases, assetExplorer, assembly, 0);
+            FindAccessibleAssets(processedAssemblies, phases, context.AssetExplorer, assembly, 0);
 
 
             this._accessibleAssets = phases.Select(phase =>
-                                                   phase.GroupBy(ai => ai.AssetId, StringComparer.Ordinal)
+                                                   phase.GroupBy(ai => ai.Id.AssetId, StringComparer.Ordinal)
                                                         .ToDictionary(g => g.Key,
                                                                       g => g.ToArray(),
                                                                       StringComparer.Ordinal))
                                            .ToArray();
         }
 
-        private static void FindAccessibleAssets(HashSet<Asset> processedAssemblies, List<List<AssetIdentifier>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
+        private static void FindAccessibleAssets(HashSet<Asset> processedAssemblies, List<List<Asset>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
         {
-            List<AssetIdentifier> currentPhase;
+            List<Asset> currentPhase;
 
             if (assets.Count <= depth)
-                assets.Add(currentPhase = new List<AssetIdentifier>());
+                assets.Add(currentPhase = new List<Asset>());
             else
                 currentPhase = assets[depth];
 
-            currentPhase.AddRange(assetExplorer.Discover(assembly).Select(a => a.Id));
+            currentPhase.AddRange(assetExplorer.Discover(assembly));
 
             foreach (var reference in assetExplorer.GetReferences(assembly, null))
             {
@@ -71,23 +68,30 @@ namespace LBi.LostDoc.Enrichers
 
         public string getVersionedId(string assetId)
         {
+            Asset asset = null;
             for (int depth = 0; depth < this._accessibleAssets.Length; depth++)
             {
-                AssetIdentifier[] matches;
+                Asset[] matches;
                 if (!this._accessibleAssets[depth].TryGetValue(assetId, out matches))
                     continue;
 
                 if (matches.Length > 1)
                 {
-                    IGrouping<Version, AssetIdentifier>[] groups = matches.GroupBy(ai => ai.Version).ToArray();
+                    IGrouping<Version, Asset>[] groups = matches.GroupBy(ai => ai.Id.Version).ToArray();
                     if (groups.Length > 1)
                     {
                         // TODO output WARNING/INFO
                     }
-                    return groups.OrderByDescending(g => g.Count()).First().First();
+                    asset = groups.OrderByDescending(g => g.Count()).First().First();
                 }
                 if (matches.Length > 0)
-                    return matches[0].ToString();
+                    asset = matches[0];
+            }
+
+            if (asset != null)
+            {
+                this._context.AddReference(asset);
+                assetId = asset.Id.ToString();
             }
 
             return assetId;
