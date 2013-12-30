@@ -27,7 +27,7 @@ namespace LBi.LostDoc.Enrichers
     {
         private readonly Asset _assembly;
         private readonly Dictionary<string, Asset[]>[] _accessibleAssets;
-        private IProcessingContext _context;
+        private readonly IProcessingContext _context;
 
         public AssetVersionResolver(IProcessingContext context, Asset assembly)
         {

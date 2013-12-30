@@ -53,50 +53,22 @@ namespace LBi.LostDoc
 
         public static IEnumerable<Asset> Discover(this IAssetExplorer assetExplorer, Asset root, IFilterContext filter)
         {
-            ExceptionDispatchInfo exception = null;
-
-            ConcurrentQueue<Asset> queue = new ConcurrentQueue<Asset>();
-            using (BlockingCollection<Asset> blocking = new BlockingCollection<Asset>(queue))
-            {
-                Action<object> func =
-                    a =>
-                    {
-                        try
-                        {
-                            Discover(assetExplorer, (Asset)a, blocking, filter);
-                        }
-                        catch (Exception ex)
-                        {
-                            exception = ExceptionDispatchInfo.Capture(ex);
-                        }
-                        blocking.CompleteAdding();
-                    };
-
-
-                using (Task task = Task.Factory.StartNew(func, root))
-                {
-                    foreach (var asset in blocking.GetConsumingEnumerable())
-                        yield return asset;
-
-                    task.Wait();
-
-                    if (exception != null)
-                        exception.Throw();
-                }
-            }
+            List<Asset> ret = new List<Asset>();
+            Discover(assetExplorer, root, ret, filter);
+            return ret;
         }
 
-        private static void Discover(IAssetExplorer assetExplorer, Asset asset, BlockingCollection<Asset> collection, IFilterContext filter)
+        private static void Discover(IAssetExplorer assetExplorer, Asset asset, List<Asset> ret, IFilterContext filter)
         {
             if (filter != null && filter.IsFiltered(asset))
                 return;
 
-            collection.Add(asset);
+            ret.Add(asset);
 
             IEnumerable<Asset> childAssets = assetExplorer.GetChildren(asset);
 
             foreach (Asset childAsset in childAssets)
-                Discover(assetExplorer, childAsset, collection, filter);
+                Discover(assetExplorer, childAsset, ret, filter);
         }
     }
 }
