@@ -120,13 +120,7 @@ namespace LBi.LostDoc
                                                              FilterState.Discovery,
                                                              this._filters.ToArray());
             // collect phase zero assets
-            List<Asset> assets = new List<Asset>();
-            
-            foreach (var assembly in this._assemblies)
-            {
-                Asset asmAsset = ReflectionServices.GetAsset(assembly);
-                assets.AddRange(assetExplorer.Discover(asmAsset, filterContext));
-            }
+            var assets = this.DiscoverAssets(assetExplorer, filterContext);
 
             // initiate output document creation
             ret.Add(new XElement(defaultNs + "bundle"));
@@ -209,7 +203,32 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        private void BuildHierarchy(XElement parentNode, LinkedListNode<Asset> hierarchy, HashSet<Asset> references, HashSet<Asset> emittedAssets, int phase, IAssetExplorer assetExplorer)
+        protected virtual List<Asset> DiscoverAssets(IAssetExplorer assetExplorer, IFilterContext filterContext)
+        {
+            List<Asset> assets = new List<Asset>();
+
+            using (TraceSources.GeneratorSource.TraceActivity("Discovering assets"))
+            {
+                foreach (var assembly in this._assemblies)
+                {
+                    Asset asmAsset = ReflectionServices.GetAsset(assembly);
+
+                    if (TraceSources.GeneratorSource.Switch.ShouldTrace(TraceEventType.Verbose))
+                    {
+                        foreach (Asset asset in assetExplorer.Discover(asmAsset, filterContext))
+                        {
+                            TraceSources.GeneratorSource.TraceVerbose(asset.Id);
+                            assets.Add(asset);
+                        }
+                    }
+                    else
+                        assets.AddRange(assetExplorer.Discover(asmAsset, filterContext));
+                }
+            }
+            return assets;
+        }
+
+        protected virtual void BuildHierarchy(XElement parentNode, LinkedListNode<Asset> hierarchy, HashSet<Asset> references, HashSet<Asset> emittedAssets, int phase, IAssetExplorer assetExplorer)
         {
             if (hierarchy == null)
                 return;
