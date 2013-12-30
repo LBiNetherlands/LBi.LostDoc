@@ -15,9 +15,6 @@
  */
 
 using System.Collections.Generic;
-using System.Diagnostics;
-using LBi.LostDoc.Diagnostics;
-using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc
 {
@@ -27,9 +24,8 @@ namespace LBi.LostDoc
         /// Returns the assemblies referenced by <paramref name="assemblyAsset"/>.
         /// </summary>
         /// <param name="assemblyAsset">Must be of type <see cref="AssetType.Assembly"/>.</param>
-        /// <param name="filters"><see cref="IFilterContext"/> used to determine which assets to return. Can be <value>null</value>.</param>
         /// <returns>The referenced assemblies as <see cref="Asset"/>.</returns>
-        IEnumerable<Asset> GetReferences(Asset assemblyAsset, IFilterContext filters);
+        IEnumerable<Asset> GetReferences(Asset assemblyAsset);
 
         Asset GetParent(Asset asset);
 

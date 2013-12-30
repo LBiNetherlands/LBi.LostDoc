@@ -81,7 +81,7 @@ namespace LBi.LostDoc.Enrichers
 
             currentPhase.AddRange(assetExplorer.Discover(assembly));
 
-            foreach (var reference in assetExplorer.GetReferences(assembly, null))
+            foreach (var reference in assetExplorer.GetReferences(assembly))
             {
                 if (processedAssemblies.Add(reference))
                 {

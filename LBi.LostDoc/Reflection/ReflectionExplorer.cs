@@ -31,7 +31,7 @@ namespace LBi.LostDoc.Reflection
             this._assemblyLoader = assemblyLoader;
         }
 
-        public IEnumerable<Asset> GetReferences(Asset assemblyAsset, IFilterContext filter)
+        public IEnumerable<Asset> GetReferences(Asset assemblyAsset)
         {
             if (assemblyAsset.Type != AssetType.Assembly)
                 throw new ArgumentException("Asset must be of type Assembly", "assemblyAsset");
@@ -49,8 +49,7 @@ namespace LBi.LostDoc.Reflection
 
                 Asset asset = ReflectionServices.GetAsset(asm);
 
-                if (filter == null || !filter.IsFiltered(asset))
-                    yield return asset;
+                yield return asset;
             }
         }
 
@@ -109,7 +108,7 @@ namespace LBi.LostDoc.Reflection
                     ret = allMembers.Concat(type.GetNestedTypes())
                                     .Select(ReflectionServices.GetAsset);
                     break;
-                
+
                 case AssetType.Method:
                 case AssetType.Field:
                 case AssetType.Event:
@@ -142,6 +141,6 @@ namespace LBi.LostDoc.Reflection
             }
 
             return ret;
-        }       
+        }
     }
 }

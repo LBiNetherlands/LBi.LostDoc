@@ -114,7 +114,7 @@ namespace LBi.LostDoc
 
             XNamespace defaultNs = string.Empty;
             // pass in assemblyLoader instead
-            IAssetExplorer assetExplorer = new ReflectionExplorer(assemblyLoader);
+            IAssetExplorer assetExplorer = new AssetExplorerCache(new ReflectionExplorer(assemblyLoader));
             IFilterContext filterContext = new FilterContext(this._cache,
                                                              this._container,
                                                              FilterState.Discovery,
