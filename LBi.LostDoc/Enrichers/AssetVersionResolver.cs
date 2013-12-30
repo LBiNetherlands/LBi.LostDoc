@@ -16,7 +16,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Caching;
+using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Enrichers
 {
@@ -30,19 +33,41 @@ namespace LBi.LostDoc.Enrichers
         {
             this._context = context;
             this._assembly = assembly;
-            List<List<Asset>> phases = new List<List<Asset>>();
+            this._accessibleAssets = (Dictionary<string, Asset[]>[])context.Cache.Get(assembly.Id.ToString());
 
-            HashSet<Asset> processedAssemblies = new HashSet<Asset>();
+            if (this._accessibleAssets == null)
+            {
+                TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheMiss, "Finding accessible assets for assembly: " + assembly.Id);
 
-            FindAccessibleAssets(processedAssemblies, phases, context.AssetExplorer, assembly, 0);
+                Stopwatch timer = Stopwatch.StartNew();
+
+                List<List<Asset>> phases = new List<List<Asset>>();
+
+                HashSet<Asset> processedAssemblies = new HashSet<Asset>();
+
+                FindAccessibleAssets(processedAssemblies, phases, context.AssetExplorer, assembly, 0);
 
 
-            this._accessibleAssets = phases.Select(phase =>
-                                                   phase.GroupBy(ai => ai.Id.AssetId, StringComparer.Ordinal)
-                                                        .ToDictionary(g => g.Key,
-                                                                      g => g.ToArray(),
-                                                                      StringComparer.Ordinal))
-                                           .ToArray();
+
+                this._accessibleAssets = phases.Select(phase =>
+                                                       phase.GroupBy(ai => ai.Id.AssetId, StringComparer.Ordinal)
+                                                            .ToDictionary(g => g.Key,
+                                                                          g => g.ToArray(),
+                                                                          StringComparer.Ordinal))
+                                               .ToArray();
+
+                context.Cache.Add(assembly.Id.ToString(), this._accessibleAssets, new CacheItemPolicy());
+
+                timer.Stop();
+
+                TraceSources.AssetResolverSource.TraceData(TraceEventType.Verbose,
+                                                           TraceEvents.CachePenalty,
+                                                           timer.ElapsedMilliseconds);
+            }
+            else
+            {
+                TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheHit, "Using cached accessible assets for assembly: " + assembly.Id);
+            }
         }
 
         private static void FindAccessibleAssets(HashSet<Asset> processedAssemblies, List<List<Asset>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
@@ -78,11 +103,17 @@ namespace LBi.LostDoc.Enrichers
                 if (matches.Length > 1)
                 {
                     IGrouping<Version, Asset>[] groups = matches.GroupBy(ai => ai.Id.Version).ToArray();
+                    asset = groups.OrderByDescending(g => g.Count()).First().First();
+
                     if (groups.Length > 1)
                     {
-                        // TODO output WARNING/INFO
+                        TraceSources.AssetResolverSource.TraceWarning("Asset {0} found in with several versions ({1}) using {2} from {3}",
+                                                                      assetId,
+                                                                      string.Join(", ", groups.Select(g => g.Key)),
+                                                                      asset.Id.Version,
+                                                                      this._context.AssetExplorer.GetRoot(asset).Id.ToString());
                     }
-                    asset = groups.OrderByDescending(g => g.Count()).First().First();
+                    
                 }
                 if (matches.Length > 0)
                     asset = matches[0];
@@ -90,6 +121,7 @@ namespace LBi.LostDoc.Enrichers
 
             if (asset != null)
             {
+                TraceSources.AssetResolverSource.TraceVerbose("Resolved {0} to version: {1}", assetId, asset.Id.Version);
                 this._context.AddReference(asset);
                 assetId = asset.Id.ToString();
             }

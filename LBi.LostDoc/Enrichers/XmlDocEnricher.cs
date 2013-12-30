@@ -54,7 +54,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetDocComments(type);
                 if (element != null)
-                    this.RewriteXml(context, element, "typeparam");
+                    this.RewriteXml(context, type.Assembly, element, "typeparam");
             }
         }
 
@@ -65,7 +65,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetDocComments(ctor);
                 if (element != null)
-                    this.RewriteXml(context, element, "param", "typeparam");
+                    this.RewriteXml(context, ctor.ReflectedType.Assembly, element, "param", "typeparam");
             }
         }
 
@@ -76,7 +76,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetDocComments(parameter);
                 if (element != null)
-                    this.RewriteXmlContent(context, "summary", element);
+                    this.RewriteXmlContent(context, parameter.Member.ReflectedType.Assembly, "summary", element);
             }
         }
 
@@ -112,6 +112,7 @@ namespace LBi.LostDoc.Enrichers
             if (element != null)
             {
                 this.RewriteXml(context,
+                                mInfo.ReflectedType.Assembly,
                                 element,
                                 "param",
                                 "typeparam",
@@ -127,7 +128,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetDocComments(fieldInfo);
                 if (element != null)
-                    this.RewriteXml(context, element);
+                    this.RewriteXml(context, fieldInfo.ReflectedType.Assembly, element);
             }
         }
 
@@ -138,7 +139,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetDocComments(propertyInfo);
                 if (element != null)
-                    this.RewriteXml(context, element);
+                    this.RewriteXml(context, propertyInfo.ReflectedType.Assembly, element);
             }
         }
 
@@ -149,7 +150,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetDocCommentsReturnParameter(methodInfo.ReturnParameter);
                 if (element != null)
-                    this.RewriteXmlContent(context, "summary", element);
+                    this.RewriteXmlContent(context, methodInfo.ReflectedType.Assembly, "summary", element);
             }
         }
 
@@ -172,7 +173,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetDocComments(eventInfo);
                 if (element != null)
-                    this.RewriteXml(context, element);
+                    this.RewriteXml(context, eventInfo.ReflectedType.Assembly, element);
             }
         }
 
@@ -201,23 +202,8 @@ namespace LBi.LostDoc.Enrichers
                 if (File.Exists(path))
                 {
                     this._docReaders.Add(assembly, reader = new XmlDocReader());
-
-                    XPathDocument document;
-                    XDocument transformedDoc = new XDocument();
-                    using (XmlReader xreader = XmlReader.Create(path, new XmlReaderSettings {IgnoreWhitespace = false}))
-                        document = new XPathDocument(xreader);
-
-                    using (XmlWriter transformWriter = transformedDoc.CreateWriter())
-                    {
-                        XsltArgumentList argList = new XsltArgumentList();
-                        argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, ReflectionServices.GetAsset(assembly)));
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-                        this._xslTransform.Transform(document.CreateNavigator(), argList, transformWriter);
-                        transformWriter.Close();
-                    }
-                    
-                    using (XmlReader transformReader = transformedDoc.CreateReader())
-                        reader.Load(transformReader);
+                    using (XmlReader xreader = XmlReader.Create(path, new XmlReaderSettings { IgnoreWhitespace = false }))
+                        reader.Load(xreader);
                 }
 
                 else
@@ -227,8 +213,9 @@ namespace LBi.LostDoc.Enrichers
             return reader;
         }
 
-        private void RewriteXml(IProcessingContext context, XElement element, params string[] exclude)
+        private void RewriteXml(IProcessingContext context, Assembly assembly, XElement element, params string[] exclude)
         {
+            element = this.EnrichXml(context, assembly, element);
             XNamespace ns = Namespaces.XmlDocComment;
             foreach (XElement elem in element.Elements())
             {
@@ -239,11 +226,28 @@ namespace LBi.LostDoc.Enrichers
             }
         }
 
-        private void RewriteXmlContent(IProcessingContext context, string container, XElement element)
+        private void RewriteXmlContent(IProcessingContext context, Assembly assembly, string container, XElement element)
         {
+            element = this.EnrichXml(context, assembly, element);
             XNamespace ns = Namespaces.XmlDocComment;
             if (element.Nodes().Any())
                 context.Element.Add(new XElement(ns + container, element.Attributes(), element.Nodes()));
+        }
+
+        private XElement EnrichXml(IProcessingContext context, Assembly assembly, XElement nodes)
+        {
+            XDocument ret = new XDocument();
+
+            using (XmlWriter nodeWriter = ret.CreateWriter())
+            {
+                XsltArgumentList argList = new XsltArgumentList();
+                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, ReflectionServices.GetAsset(assembly)));
+
+                this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
+                nodeWriter.Close();
+            }
+
+            return ret.Root;
         }
 
         private XElement GetMethodDocComments(MethodInfo mInfo, IProcessingContext context)
@@ -261,7 +265,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetTypeParameterSummary(methodInfo, typeParameter);
                 if (element != null)
-                    this.RewriteXmlContent(context, "summary", element);
+                    this.RewriteXmlContent(context, methodInfo.ReflectedType.Assembly, "summary", element);
             }
         }
 
@@ -272,7 +276,7 @@ namespace LBi.LostDoc.Enrichers
             {
                 XElement element = reader.GetTypeParameterSummary(type, typeParameter);
                 if (element != null)
-                    this.RewriteXmlContent(context, "summary", element);
+                    this.RewriteXmlContent(context, typeParameter.Assembly, "summary", element);
             }
         }
 
