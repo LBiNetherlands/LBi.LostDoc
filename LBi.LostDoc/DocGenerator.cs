@@ -39,7 +39,6 @@ namespace LBi.LostDoc
         private readonly List<IAssetFilter> _filters;
         private readonly ObjectCache _cache;
         private readonly CompositionContainer _container;
-        private Assembly[] _assemblies;
 
         public DocGenerator(CompositionContainer container)
         {
@@ -72,15 +71,7 @@ namespace LBi.LostDoc
 
         #endregion
 
-        public void AddAssembly(string path)
-        {
-            if (!File.Exists(path))
-                throw new FileNotFoundException(path);
-
-            this._assemblyPaths.Add(path);
-        }
-
-        public XDocument Generate()
+        public XDocument Generate(string path)
         {
             TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 0, "Enrichers:");
 
@@ -110,7 +101,8 @@ namespace LBi.LostDoc
                 this._cache,
                 this._assemblyPaths.Select(Path.GetDirectoryName));
 
-            this._assemblies = this._assemblyPaths.Select(assemblyLoader.LoadFrom).ToArray();
+            Assembly assembly = assemblyLoader.LoadFrom(path);
+            Asset assemblyAsset = ReflectionServices.GetAsset(assembly);
 
             XNamespace defaultNs = string.Empty;
             // pass in assemblyLoader instead
@@ -120,7 +112,7 @@ namespace LBi.LostDoc
                                                              FilterState.Discovery,
                                                              this._filters.ToArray());
             // collect phase zero assets
-            var assets = this.DiscoverAssets(assetExplorer, filterContext);
+            var assets = this.DiscoverAssets(assemblyAsset, assetExplorer, filterContext);
 
             // initiate output document creation
             ret.Add(new XElement(defaultNs + "bundle"));
@@ -203,28 +195,27 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        protected virtual List<Asset> DiscoverAssets(IAssetExplorer assetExplorer, IFilterContext filterContext)
+        protected virtual List<Asset> DiscoverAssets(Asset assemblyAsset, IAssetExplorer assetExplorer, IFilterContext filterContext)
         {
             List<Asset> assets = new List<Asset>();
 
             using (TraceSources.GeneratorSource.TraceActivity("Discovering assets"))
             {
-                foreach (var assembly in this._assemblies)
+                if (TraceSources.GeneratorSource.Switch.ShouldTrace(TraceEventType.Verbose))
                 {
-                    Asset asmAsset = ReflectionServices.GetAsset(assembly);
-
-                    if (TraceSources.GeneratorSource.Switch.ShouldTrace(TraceEventType.Verbose))
+                    foreach (Asset asset in assetExplorer.Discover(assemblyAsset, filterContext))
                     {
-                        foreach (Asset asset in assetExplorer.Discover(asmAsset, filterContext))
-                        {
-                            TraceSources.GeneratorSource.TraceVerbose(asset.Id);
-                            assets.Add(asset);
-                        }
+                        TraceSources.GeneratorSource.TraceVerbose(asset.Id);
+                        assets.Add(asset);
                     }
-                    else
-                        assets.AddRange(assetExplorer.Discover(asmAsset, filterContext));
                 }
+                else
+                    assets.AddRange(assetExplorer.Discover(assemblyAsset, filterContext));
             }
+
+            // remove all namespaces, they will be added through the HierarchyBuilder anyway so this is an easy way to prevent empty namespaces
+            assets.RemoveAll(a => a.Type == AssetType.Namespace);
+
             return assets;
         }
 
