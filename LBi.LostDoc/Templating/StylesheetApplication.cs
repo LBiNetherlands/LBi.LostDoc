@@ -76,18 +76,18 @@ namespace LBi.LostDoc.Templating
                     }
                     else
                     {
-                        TraceSources.TemplateSource.TraceInformation("{0}, {1} => {2}",
-                                                                     this.Asset.AssetId,
-                                                                     this.Asset.Version,
-                                                                     this.SaveAs);
+                        TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}",
+                                                                 this.Asset.AssetId,
+                                                                 this.Asset.Version,
+                                                                 this.SaveAs);
                     }
                     long tickStart = localTimer.ElapsedTicks;
                     this.Transform.Transform(context.Document,
                                              argList,
                                              writer);
                     TraceSources.TemplateSource.TraceVerbose("Transform applied in: {0:N0} ms",
-                                                             ((localTimer.ElapsedTicks - tickStart)/
-                                                              (double) Stopwatch.Frequency)*1000);
+                                                             ((localTimer.ElapsedTicks - tickStart) /
+                                                              (double)Stopwatch.Frequency) * 1000);
 
                     writer.Close();
                     stream.Close();
