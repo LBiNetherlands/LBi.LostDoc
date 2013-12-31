@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc.ConsoleApplication", "LBi.LostDoc.ConsoleApplication\LBi.LostDoc.ConsoleApplication.csproj", "{9AA8D187-75E5-4472-81BA-5BE5CFCCECC5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBi.LostDoc", "LBi.LostDoc\LBi.LostDoc.csproj", "{B411734E-B768-422F-BA1C-5B9AEEF97C52}"

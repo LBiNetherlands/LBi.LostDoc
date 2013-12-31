@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,21 @@
  */
 
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
+using LBi.LostDoc.Reflection;
+using Xunit;
 
-namespace LBi.LostDoc
+namespace LBi.LostDoc.Test.Reflection
 {
-    public interface IAssetResolver
+    public class ReflectionExplorerTests
     {
-        IEnumerable<Assembly> Context { get; }
-        object Resolve(AssetIdentifier assetId);
-        object Resolve(AssetIdentifier assetId, AssetIdentifier assemblyHint);
-        IEnumerable<AssetIdentifier> GetAssetHierarchy(AssetIdentifier assetId);
+        [Fact]
+        public void ObjectAssetChildren()
+        {
+            IAssetExplorer explorer = new ReflectionExplorer(null);
+            Asset objectAsset = ReflectionServices.GetAsset(typeof (object));
+            Asset[] members = explorer.GetChildren(objectAsset).ToArray();
+            Assert.Equal(12, members.Length);
+        }
     }
 }

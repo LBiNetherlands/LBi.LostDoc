@@ -22,9 +22,9 @@ namespace LBi.LostDoc
     {
         #region IAssetFilter Members
 
-        public bool Filter(IFilterContext context, AssetIdentifier asset)
+        public bool Filter(IFilterContext context, Asset asset)
         {
-            Type t = context.AssetResolver.Resolve(asset) as Type;
+            Type t = asset.Target as Type;
             if (t != null)
                 return Filter(context, t);
 
@@ -38,6 +38,6 @@ namespace LBi.LostDoc
 
     public interface IAssetFilter
     {
-        bool Filter(IFilterContext context, AssetIdentifier asset);
+        bool Filter(IFilterContext context, Asset asset);
     }
 }

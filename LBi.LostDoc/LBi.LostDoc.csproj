@@ -51,8 +51,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Asset.cs" />
+    <Compile Include="AssetExplorerCache.cs" />
     <Compile Include="AssetIdentifier.cs" />
-    <Compile Include="AssetResolver.cs" />
+    <Compile Include="AssetServices.cs" />
     <Compile Include="AssetType.cs" />
     <Compile Include="Bundle.cs" />
     <Compile Include="Extensibility\ContractNames.cs" />
@@ -72,7 +74,8 @@
     <Compile Include="Filters\DynamicallyInvokableAttributeFilter.cs" />
     <Compile Include="Filters\EnumMetadataFilter.cs" />
     <Compile Include="Filters\PrivateImplementationDetailsFilter.cs" />
-    <Compile Include="IAssetResolver.cs" />
+    <Compile Include="IAssetExplorer.cs" />
+    <Compile Include="IAssetVisitor.cs" />
     <Compile Include="IContextBase.cs" />
     <Compile Include="IFilterContext.cs" />
     <Compile Include="LostDocFileInfo.cs" />
@@ -89,7 +92,10 @@
     <Compile Include="Naming.cs" />
     <Compile Include="ProcessingContextExtensions.cs" />
     <Compile Include="Reflection\IAssemblyLoader.cs" />
+    <Compile Include="Reflection\NamespaceInfo.cs" />
+    <Compile Include="Reflection\ReflectionExplorer.cs" />
     <Compile Include="Reflection\ReflectionOnlyAssemblyLoader.cs" />
+    <Compile Include="Reflection\ReflectionServices.cs" />
     <Compile Include="Service References\MsdnContentService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

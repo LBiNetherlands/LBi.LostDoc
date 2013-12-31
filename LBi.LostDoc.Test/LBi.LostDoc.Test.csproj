@@ -59,10 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetIdentifierTests.cs" />
-    <Compile Include="AssetResolverTests.cs" />
     <Compile Include="MsdnResolverTest.cs" />
     <Compile Include="NamingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reflection\ReflectionExplorerTests.cs" />
     <Compile Include="UriTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,17 @@
 
 using System.Reflection;
 
-namespace LBi.LostDoc.Filters
+namespace LBi.LostDoc.Reflection
 {
-    public class EnumMetadataFilter : IAssetFilter
+    public class NamespaceInfo
     {
-        #region IAssetFilter Members
-
-        public bool Filter(IFilterContext context, Asset asset)
+        public NamespaceInfo(Assembly assembly, string name)
         {
-            FieldInfo obj = asset.Target as FieldInfo;
-            if (obj == null || !obj.DeclaringType.IsEnum)
-                return false;
-
-            return !(obj.IsStatic && obj.IsPublic);
+            this.Assembly = assembly;
+            this.Name = name;
         }
 
-        #endregion
+        public string Name { get; protected set; }
+        public Assembly Assembly { get; protected set; }
     }
 }

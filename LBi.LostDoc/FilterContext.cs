@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,47 @@
  */
 
 using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics;
 using System.Runtime.Caching;
+using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc
 {
     public class FilterContext : IFilterContext
     {
-        public FilterContext(ObjectCache cache, CompositionContainer container, IAssetResolver assetResolver, FilterState state)
+        private IAssetFilter[] _filters;
+
+        public FilterContext(ObjectCache cache, CompositionContainer container, FilterState state, params IAssetFilter[] filters)
         {
             this.Container = container;
             this.Cache = cache;
-            this.AssetResolver = assetResolver;
             this.State = state;
+            this._filters = filters;
         }
 
         #region IFilterContext Members
 
-        public IAssetResolver AssetResolver { get; private set; }
         public FilterState State { get; private set; }
+        
+        public bool IsFiltered(Asset asset)
+        {
+            bool filtered = false;
+            foreach (IAssetFilter filter in this._filters)
+            {
+                if (filter.Filter(this, asset))
+                {
+                    filtered = true;
+                    TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
+                                                            0,
+                                                            "{0} - Filtered by {1}",
+                                                            asset.Id.AssetId,
+                                                            filter);
+
+                    break;
+                }
+            }
+            return filtered;
+        }
 
         #endregion
 

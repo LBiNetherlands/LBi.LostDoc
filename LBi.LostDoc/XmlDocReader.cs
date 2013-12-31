@@ -15,21 +15,36 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc
 {
     public class XmlDocReader
     {
         private XDocument _doc;
+        private Dictionary<string, XElement> _members;
 
         public void Load(XmlReader reader)
         {
             this._doc = XDocument.Load(reader, LoadOptions.SetLineInfo | LoadOptions.PreserveWhitespace);
+            this._members = new Dictionary<string, XElement>(StringComparer.Ordinal);
+            foreach (XElement member in _doc.Element("doc").Element("members").Elements("member"))
+            {
+                try
+                {
+                    this._members.Add(member.Attribute("name").Value, member);
+                }
+                catch (ArgumentException)
+                {
+                    TraceSources.GeneratorSource.TraceWarning("Duplicate member in xml documentation file: " + member.Attribute("name").Value);
+                }
+            }
         }
 
         public XElement GetDocComments(MethodInfo methodInfo)
@@ -103,7 +118,11 @@ namespace LBi.LostDoc
 
         private XElement GetMemberElement(string signature)
         {
-            return this._doc.XPathSelectElement(string.Format("/doc/members/member[@name='{0}']", signature));
+            XElement ret;
+            if (!this._members.TryGetValue(signature, out ret))
+                ret = null;
+
+            return ret;
         }
 
         public XElement GetDocComments(PropertyInfo propertyInfo)

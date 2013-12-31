@@ -36,10 +36,10 @@ namespace LBi.LostDoc.Filters
             }
         }
 
-        public bool Filter(IFilterContext context, AssetIdentifier asset)
+        public bool Filter(IFilterContext context, Asset asset)
         {
             return context.State == FilterState.Discovery &&
-                   !this._regex.IsMatch(asset.AssetId.Substring(2));
+                   !this._regex.IsMatch(asset.Id.AssetId.Substring(2));
         }
     }
 }

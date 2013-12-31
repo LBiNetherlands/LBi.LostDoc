@@ -29,14 +29,14 @@ namespace LBi.LostDoc
     public class ProcessingContext : IProcessingContext
     {
         private readonly IAssetFilter[] _filters;
-        private readonly HashSet<AssetIdentifier> _references;
+        private readonly HashSet<Asset> _references;
 
-        public ProcessingContext(ObjectCache cache, CompositionContainer container, IEnumerable<IAssetFilter> filters, IAssemblyLoader assemblyLoader, IAssetResolver assetResolver, XElement element, HashSet<AssetIdentifier> references, int phase)
+        public ProcessingContext(ObjectCache cache, CompositionContainer container, IEnumerable<IAssetFilter> filters, IAssemblyLoader assemblyLoader, XElement element, HashSet<Asset> references, int phase, IAssetExplorer assetExplorer)
         {
             this._filters = filters.ToArray();
-            this.AssetResolver = assetResolver;
             this.Element = element;
             this._references = references;
+            AssetExplorer = assetExplorer;
             Container = container;
             this.Phase = phase;
             this.Cache = cache;
@@ -44,6 +44,8 @@ namespace LBi.LostDoc
         }
 
         #region IProcessingContext Members
+
+        public IAssetExplorer AssetExplorer { get; private set; }
 
         public IAssemblyLoader AssemblyLoader { get; private set; }
 
@@ -53,40 +55,41 @@ namespace LBi.LostDoc
 
         public XElement Element { get; private set; }
 
-        public IEnumerable<AssetIdentifier> References
+        public IEnumerable<Asset> References
         {
             get { return this._references; }
         }
 
-        public bool AddReference(string assetId)
+        public bool AddReference(Asset asset)
         {
-            if (string.IsNullOrEmpty(assetId))
-                throw new ArgumentException("Argument cannot be null or empty.", "assetId");
+            if (asset == null)
+                throw new ArgumentNullException("asset");
 
-            AssetIdentifier aid = AssetIdentifier.Parse(assetId);
+            //if (string.IsNullOrEmpty(asset))
+            //    throw new ArgumentException("Argument cannot be null or empty.", "asset");
 
-            Debug.Assert(aid.ToString().Equals(assetId, StringComparison.Ordinal),
-                         "AssetIdentifier '{0}' failed to roundtrip.", assetId);
+            //AssetIdentifier aid = AssetIdentifier.Parse(asset);
 
-            if (aid.AssetId[aid.AssetId.Length - 1] == ']')
-                aid = new AssetIdentifier(aid.AssetId.Substring(0, aid.AssetId.LastIndexOf('[')),
-                                          aid.Version);
+            //Debug.Assert(aid.ToString().Equals(asset, StringComparison.Ordinal),
+            //             "AssetIdentifier '{0}' failed to roundtrip.", asset);
 
-            object resolve = this.AssetResolver.Resolve(aid);
-            Debug.Assert(resolve != null);
+            //if (aid.AssetId[aid.AssetId.Length - 1] == ']')
+            //    aid = new AssetIdentifier(aid.AssetId.Substring(0, aid.AssetId.LastIndexOf('[')),
+            //                              aid.Version);
 
-            Debug.Assert(!string.IsNullOrWhiteSpace(aid.AssetId));
+            //object resolve = this.AssetResolver.Resolve(aid);
+            //Debug.Assert(resolve != null);
 
-            if (this._references.Add(aid))
+            //Debug.Assert(!string.IsNullOrWhiteSpace(aid.AssetId));
+
+            if (this._references.Add(asset))
             {
-                TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 1, "Reference: {0}", aid);
+                TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose, 1, "Reference: {0}", asset.Id);
                 return true;
             }
 
             return false;
         }
-
-        public IAssetResolver AssetResolver { get; protected set; }
 
         public int Phase { get; private set; }
 
@@ -96,23 +99,23 @@ namespace LBi.LostDoc
                                          this.Container,
                                          this._filters,
                                          this.AssemblyLoader,
-                                         this.AssetResolver,
                                          newElement,
                                          this._references,
-                                         this.Phase);
+                                         this.Phase,
+                                         this.AssetExplorer);
         }
 
-        public bool IsFiltered(AssetIdentifier assetId)
+        public bool IsFiltered(Asset asset)
         {
-            IFilterContext filterContext = new FilterContext(this.Cache, this.Container, this.AssetResolver, FilterState.Generating);
+            IFilterContext filterContext = new FilterContext(this.Cache, this.Container, FilterState.Generating);
             for (int i = 0; i < this._filters.Length; i++)
             {
-                if (this._filters[i].Filter(filterContext, assetId))
+                if (this._filters[i].Filter(filterContext, asset))
                 {
                     TraceSources.GeneratorSource.TraceEvent(TraceEventType.Verbose,
                                         0,
                                         "{0} - Filtered by {1}",
-                                        assetId.AssetId, this._filters[i]);
+                                        asset.Id.AssetId, this._filters[i]);
                     return true;
                 }
             }

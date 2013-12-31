@@ -15,98 +15,118 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
+using System.Runtime.Caching;
+using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Enrichers
 {
     internal class AssetVersionResolver
     {
+        private readonly Asset _assembly;
+        private readonly Dictionary<string, Asset[]>[] _accessibleAssets;
         private readonly IProcessingContext _context;
-        private readonly Assembly _hintAssembly;
 
-        public AssetVersionResolver(IProcessingContext context, Assembly hintAssembly)
+        public AssetVersionResolver(IProcessingContext context, Asset assembly)
         {
             this._context = context;
-            this._hintAssembly = hintAssembly;
+            this._assembly = assembly;
+            this._accessibleAssets = (Dictionary<string, Asset[]>[])context.Cache.Get(assembly.Id.ToString());
+
+            if (this._accessibleAssets == null)
+            {
+                TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheMiss, "Finding accessible assets for assembly: " + assembly.Id);
+
+                Stopwatch timer = Stopwatch.StartNew();
+
+                List<List<Asset>> phases = new List<List<Asset>>();
+
+                HashSet<Asset> processedAssemblies = new HashSet<Asset>();
+
+                FindAccessibleAssets(processedAssemblies, phases, context.AssetExplorer, assembly, 0);
+
+
+
+                this._accessibleAssets = phases.Select(phase =>
+                                                       phase.GroupBy(ai => ai.Id.AssetId, StringComparer.Ordinal)
+                                                            .ToDictionary(g => g.Key,
+                                                                          g => g.ToArray(),
+                                                                          StringComparer.Ordinal))
+                                               .ToArray();
+
+                context.Cache.Add(assembly.Id.ToString(), this._accessibleAssets, new CacheItemPolicy());
+
+                timer.Stop();
+
+                TraceSources.AssetResolverSource.TraceData(TraceEventType.Verbose,
+                                                           TraceEvents.CachePenalty,
+                                                           timer.ElapsedMilliseconds);
+            }
+            else
+            {
+                TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheHit, "Using cached accessible assets for assembly: " + assembly.Id);
+            }
         }
+
+        private static void FindAccessibleAssets(HashSet<Asset> processedAssemblies, List<List<Asset>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
+        {
+            List<Asset> currentPhase;
+
+            if (assets.Count <= depth)
+                assets.Add(currentPhase = new List<Asset>());
+            else
+                currentPhase = assets[depth];
+
+            currentPhase.AddRange(assetExplorer.Discover(assembly));
+
+            foreach (var reference in assetExplorer.GetReferences(assembly))
+            {
+                if (processedAssemblies.Add(reference))
+                {
+                    FindAccessibleAssets(processedAssemblies, assets, assetExplorer, reference, depth + 1);
+                }
+            }
+        }
+
 
         public string getVersionedId(string assetId)
         {
-            AssetIdentifier aid = AssetIdentifier.Parse(assetId);
-            AssetIdentifier hintAsmAid = null;
-            AssetIdentifier ret = null;
-
-            if (this._hintAssembly != null)
-                hintAsmAid = AssetIdentifier.FromAssembly(this._hintAssembly);
-
-            if (aid.Type == AssetType.Assembly)
+            Asset asset = null;
+            for (int depth = 0; depth < this._accessibleAssets.Length; depth++)
             {
-                Assembly asm = (Assembly)this._context.AssetResolver.Resolve(aid, hintAsmAid);
-                if (asm != null)
-                    ret = AssetIdentifier.FromAssembly(asm);
-            }
-            else if (aid.Type == AssetType.Namespace)
-            {
-                string ns = aid.AssetId.Substring(aid.TypeMarker.Length + 1);
+                Asset[] matches;
+                if (!this._accessibleAssets[depth].TryGetValue(assetId, out matches))
+                    continue;
 
-                var version = this.GetNamespaceVersion(this._hintAssembly, ns);
-
-                if (version != null)
-                    ret = AssetIdentifier.FromNamespace(ns, version);
-            }
-            else
-            {
-                object obj = this._context.AssetResolver.Resolve(aid, hintAsmAid);
-
-                if (obj != null)
+                if (matches.Length > 1)
                 {
-                    if (aid.Type == AssetType.Unknown)
+                    IGrouping<Version, Asset>[] groups = matches.GroupBy(ai => ai.Id.Version).ToArray();
+                    asset = groups.OrderByDescending(g => g.Count()).First().First();
+
+                    if (groups.Length > 1)
                     {
-                        MethodInfo[] arr = obj as MethodInfo[];
-                        if (arr != null)
-                        {
-                            // TODO this isn't very nice but it should do the trick for now
-                            var dummyAid = AssetIdentifier.FromMemberInfo(arr[0]);
-                            ret = new AssetIdentifier(aid.AssetId, dummyAid.Version);
-                        }
-                        else
-                            throw new NotSupportedException("Unknow AssetIdentifier marker: " + aid.TypeMarker);
+                        TraceSources.AssetResolverSource.TraceWarning("Asset {0} found in with several versions ({1}) using {2} from {3}",
+                                                                      assetId,
+                                                                      string.Join(", ", groups.Select(g => g.Key)),
+                                                                      asset.Id.Version,
+                                                                      this._context.AssetExplorer.GetRoot(asset).Id.ToString());
                     }
-                    else
-                        ret = AssetIdentifier.FromMemberInfo((MemberInfo)obj);
+                    
                 }
+                if (matches.Length > 0)
+                    asset = matches[0];
             }
 
-            if (ret != null)
-                this._context.AddReference(ret);
-            else
+            if (asset != null)
             {
-                // TODO log warning/error failed to resolve asset
-                ret = aid;
-            }
-            return ret.ToString();
-        }
-
-        private Version GetNamespaceVersion(Assembly assembly, string ns)
-        {
-            foreach (Assembly asm in this._context.AssemblyLoader.GetAssemblyChain(assembly))
-            {
-                var types = asm.GetTypes();
-
-                for (int typeNum = 0; typeNum < types.Length; typeNum++)
-                {
-                    if (ns.Equals(types[typeNum].Namespace) ||
-                        (types[typeNum].Namespace != null &&
-                         types[typeNum].Namespace.StartsWith(ns) &&
-                         types[typeNum].Namespace[ns.Length] == '.'))
-                    {
-                        return assembly.GetName().Version;
-                    }
-                }
+                TraceSources.AssetResolverSource.TraceVerbose("Resolved {0} to version: {1}", assetId, asset.Id.Version);
+                this._context.AddReference(asset);
+                assetId = asset.Id.ToString();
             }
 
-            throw new Exception("Could not find namespace '" + ns + "' in any loaded assembly");
+            return assetId;
         }
     }
 }

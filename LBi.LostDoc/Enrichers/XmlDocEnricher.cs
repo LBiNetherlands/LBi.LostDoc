@@ -23,6 +23,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc.Enrichers
 {
@@ -48,7 +49,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichType(IProcessingContext context, Type type)
         {
-            XmlDocReader reader = this.GetDocReader(type.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, type.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetDocComments(type);
@@ -59,7 +60,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichConstructor(IProcessingContext context, ConstructorInfo ctor)
         {
-            XmlDocReader reader = this.GetDocReader(ctor.DeclaringType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ctor.DeclaringType.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetDocComments(ctor);
@@ -70,7 +71,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichParameter(IProcessingContext context, ParameterInfo parameter)
         {
-            XmlDocReader reader = this.GetDocReader(parameter.Member.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, parameter.Member.ReflectedType.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetDocComments(parameter);
@@ -90,7 +91,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichMethod(IProcessingContext context, MethodInfo mInfo)
         {
-            XElement element = this.GetMethodDocComments(mInfo);
+            XElement element = this.GetMethodDocComments(mInfo, context);
             if (element == null)
             {
                 HashSet<MethodInfo> seen = new HashSet<MethodInfo>();
@@ -99,13 +100,13 @@ namespace LBi.LostDoc.Enrichers
                 MethodInfo baseMethod = mInfo.GetBaseDefinition();
                 while (seen.Add(baseMethod))
                 {
-                    element = this.GetMethodDocComments(baseMethod);
+                    element = this.GetMethodDocComments(baseMethod, context);
                     if (element != null)
                         break;
                 }
 
                 if (element == null && !mInfo.DeclaringType.IsInterface)
-                    element = this.GetMethodDocComments(baseMethod);
+                    element = this.GetMethodDocComments(baseMethod, context);
             }
 
             if (element != null)
@@ -122,7 +123,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichField(IProcessingContext context, FieldInfo fieldInfo)
         {
-            XmlDocReader reader = this.GetDocReader(fieldInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, fieldInfo.ReflectedType.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetDocComments(fieldInfo);
@@ -133,7 +134,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichProperty(IProcessingContext context, PropertyInfo propertyInfo)
         {
-            XmlDocReader reader = this.GetDocReader(propertyInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, propertyInfo.ReflectedType.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetDocComments(propertyInfo);
@@ -144,7 +145,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichReturnValue(IProcessingContext context, MethodInfo methodInfo)
         {
-            XmlDocReader reader = this.GetDocReader(methodInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, methodInfo.ReflectedType.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetDocCommentsReturnParameter(methodInfo.ReturnParameter);
@@ -158,7 +159,7 @@ namespace LBi.LostDoc.Enrichers
             if (typeParameter.DeclaringMethod != null)
                 this.EnrichTypeParameter(context, (MethodInfo)typeParameter.DeclaringMethod, typeParameter);
             else
-                EnrichTypeParameter(context, typeParameter.DeclaringType, typeParameter);
+                this.EnrichTypeParameter(context, typeParameter.DeclaringType, typeParameter);
         }
 
         public void EnrichNamespace(IProcessingContext context, string ns)
@@ -167,7 +168,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichEvent(IProcessingContext context, EventInfo eventInfo)
         {
-            XmlDocReader reader = this.GetDocReader(eventInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, eventInfo.ReflectedType.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetDocComments(eventInfo);
@@ -178,7 +179,7 @@ namespace LBi.LostDoc.Enrichers
 
         #endregion
 
-        private XmlDocReader GetDocReader(Assembly assembly)
+        private XmlDocReader GetDocReader(IProcessingContext context, Assembly assembly)
         {
             XmlDocReader reader;
 
@@ -201,10 +202,10 @@ namespace LBi.LostDoc.Enrichers
                 if (File.Exists(path))
                 {
                     this._docReaders.Add(assembly, reader = new XmlDocReader());
-
                     using (XmlReader xreader = XmlReader.Create(path, new XmlReaderSettings { IgnoreWhitespace = false }))
                         reader.Load(xreader);
                 }
+
                 else
                     reader = null;
             }
@@ -212,9 +213,9 @@ namespace LBi.LostDoc.Enrichers
             return reader;
         }
 
-        private void RewriteXml(IProcessingContext context, Assembly hintAssembly, XElement element, params string[] exclude)
+        private void RewriteXml(IProcessingContext context, Assembly assembly, XElement element, params string[] exclude)
         {
-            element = this.EnrichXml(context, hintAssembly, element);
+            element = this.EnrichXml(context, assembly, element);
             XNamespace ns = Namespaces.XmlDocComment;
             foreach (XElement elem in element.Elements())
             {
@@ -225,22 +226,22 @@ namespace LBi.LostDoc.Enrichers
             }
         }
 
-        private void RewriteXmlContent(IProcessingContext context, Assembly hintAssembly, string container, XElement element)
+        private void RewriteXmlContent(IProcessingContext context, Assembly assembly, string container, XElement element)
         {
-            element = this.EnrichXml(context, hintAssembly, element);
+            element = this.EnrichXml(context, assembly, element);
             XNamespace ns = Namespaces.XmlDocComment;
             if (element.Nodes().Any())
                 context.Element.Add(new XElement(ns + container, element.Attributes(), element.Nodes()));
         }
 
-        private XElement EnrichXml(IProcessingContext context, Assembly hintAssembly, XElement nodes)
+        private XElement EnrichXml(IProcessingContext context, Assembly assembly, XElement nodes)
         {
             XDocument ret = new XDocument();
 
             using (XmlWriter nodeWriter = ret.CreateWriter())
             {
                 XsltArgumentList argList = new XsltArgumentList();
-                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, hintAssembly));
+                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, ReflectionServices.GetAsset(assembly)));
 
                 this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
                 nodeWriter.Close();
@@ -249,9 +250,9 @@ namespace LBi.LostDoc.Enrichers
             return ret.Root;
         }
 
-        private XElement GetMethodDocComments(MethodInfo mInfo)
+        private XElement GetMethodDocComments(MethodInfo mInfo, IProcessingContext context)
         {
-            XmlDocReader reader = this.GetDocReader(mInfo.DeclaringType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, mInfo.DeclaringType.Assembly);
             if (reader != null)
                 return reader.GetDocComments(mInfo);
             return null;
@@ -259,7 +260,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichTypeParameter(IProcessingContext context, MethodInfo methodInfo, Type typeParameter)
         {
-            XmlDocReader reader = this.GetDocReader(methodInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, methodInfo.ReflectedType.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetTypeParameterSummary(methodInfo, typeParameter);
@@ -270,7 +271,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichTypeParameter(IProcessingContext context, Type type, Type typeParameter)
         {
-            XmlDocReader reader = this.GetDocReader(type.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, type.Assembly);
             if (reader != null)
             {
                 XElement element = reader.GetTypeParameterSummary(type, typeParameter);

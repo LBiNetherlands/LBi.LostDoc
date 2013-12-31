@@ -1,5 +1,5 @@
-﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+/*
+ * Copyright 2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,20 @@
  */
 
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml.Linq;
-using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc
 {
-    public interface IProcessingContext : IContextBase
+    public interface IAssetExplorer
     {
-        IAssetExplorer AssetExplorer { get; }
+        /// <summary>
+        /// Returns the assemblies referenced by <paramref name="assemblyAsset"/>.
+        /// </summary>
+        /// <param name="assemblyAsset">Must be of type <see cref="AssetType.Assembly"/>.</param>
+        /// <returns>The referenced assemblies as <see cref="Asset"/>.</returns>
+        IEnumerable<Asset> GetReferences(Asset assemblyAsset);
 
-        IAssemblyLoader AssemblyLoader { get; }
-        XElement Element { get; }
-        IEnumerable<Asset> References { get; }
-        int Phase { get; }
-        bool AddReference(Asset asset);
-        IProcessingContext Clone(XElement newElement);
-        bool IsFiltered(Asset asset);
+        Asset GetParent(Asset asset);
+
+        IEnumerable<Asset> GetChildren(Asset asset);
     }
 }

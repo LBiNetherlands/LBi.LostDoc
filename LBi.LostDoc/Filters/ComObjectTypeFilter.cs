@@ -20,9 +20,9 @@ namespace LBi.LostDoc.Filters
 {
     public class ComObjectTypeFilter : IAssetFilter
     {
-        public bool Filter(IFilterContext context, AssetIdentifier asset)
+        public bool Filter(IFilterContext context, Asset asset)
         {
-            return asset.AssetId.Equals("T:System.__ComObject", StringComparison.Ordinal);
+            return asset.Id.AssetId.Equals("T:System.__ComObject", StringComparison.Ordinal);
         }
     }
 }

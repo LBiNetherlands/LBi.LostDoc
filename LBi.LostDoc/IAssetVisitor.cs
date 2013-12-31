@@ -1,5 +1,5 @@
-﻿/*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+/*
+ * Copyright 2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
  * limitations under the License. 
  */
 
-using System.Reflection;
-
-namespace LBi.LostDoc.Filters
+namespace LBi.LostDoc
 {
-    public class EnumMetadataFilter : IAssetFilter
+    public interface IAssetVisitor
     {
-        #region IAssetFilter Members
-
-        public bool Filter(IFilterContext context, Asset asset)
-        {
-            FieldInfo obj = asset.Target as FieldInfo;
-            if (obj == null || !obj.DeclaringType.IsEnum)
-                return false;
-
-            return !(obj.IsStatic && obj.IsPublic);
-        }
-
-        #endregion
+        void VisitAssembly(Asset asset);
+        void VisitNamespace(Asset asset);
+        void VisitType(Asset asset);
+        void VisitField(Asset asset);
+        void VisitEvent(Asset asset);
+        void VisitProperty(Asset asset);
+        void VisitUnknown(Asset asset);
+        void VisitMethod(Asset asset);
     }
 }

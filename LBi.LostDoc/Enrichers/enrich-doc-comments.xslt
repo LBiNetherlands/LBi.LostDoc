@@ -44,33 +44,33 @@
     <msxsl:assembly name="System.Core" />
     <msxsl:using namespace="System.Linq"/>
 
-    public string trimStart(XPathNavigator node) {
+    public string trimStart(XPathNavigator node, bool trimStart, bool trimEnd) {
+      string ret;
       IXmlLineInfo lineInfo = node as IXmlLineInfo;
       string code = node.Value.Trim('\n');
-      string[] lines = code.Split('\n');
-      int trim = lines.Where(l => l.Length &gt; 0).Min(l => l.Length - l.TrimStart().Length);
-      for (int l = 0; l &lt; lines.Length; l++) {
+      if (trimStart) {
+        string[] lines = code.Split('\n');
+        int trim = lines.Where(l => l.Length &gt; 0).Min(l => l.Length - l.TrimStart().Length);
+        for (int l = 0; l &lt; lines.Length; l++) {
           if (lines[l].Length > 0) {
             lines[l] = lines[l].Substring(trim);
           }
+        }
+        ret = string.Join("\n", lines).TrimStart();
+      } else {
+        ret = code;
       }
-      return string.Join("\n", lines);
+     
+      if (trimEnd) {
+        ret = ret.TrimEnd();
+      }
+        
+      return ret;
     }
   </msxsl:script>
 
-  <xsl:template match="code" priority="100">
-    <code>
-      <xsl:apply-templates select="node()" mode="code"/>
-    </code>
-  </xsl:template>
-
-  <xsl:template match="text()" mode="code" priority="100">
-    <!-- TODO: should this be applied to all text in the doc comments file? -->
-    <xsl:value-of select="ext:trimStart(.)"/>
-  </xsl:template>
-
-  <xsl:template match="node()" mode="code">
-    <xsl:apply-templates select="."/>
+  <xsl:template match="text()" priority="100">
+    <xsl:value-of select="ext:trimStart(., not(preceding-sibling::*), not(following-sibling::*))"/>
   </xsl:template>
 
 </xsl:stylesheet>

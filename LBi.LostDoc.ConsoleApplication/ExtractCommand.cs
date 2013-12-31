@@ -133,12 +133,11 @@ namespace LBi.LostDoc.ConsoleApplication
                     docEnricher.AddPath(bclDocPath);
                 }
 
-                gen.AddAssembly(this.Path);
-
 
                 var assemblyName = AssemblyName.GetAssemblyName(this.Path);
 
-                XDocument rawDoc = gen.Generate();
+                XDocument rawDoc = gen.Generate(this.Path);
+
                 string fileName = System.IO.Path.Combine(this.Output ?? System.IO.Path.GetDirectoryName(this.Path),
                                                          string.Format("{0}_{1}.ldoc",
                                                                        System.IO.Path.GetFileName(this.Path),

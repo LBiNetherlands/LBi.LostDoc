@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc.Enrichers
 {
@@ -100,17 +101,20 @@ namespace LBi.LostDoc.Enrichers
         {
             foreach (CustomAttributeData custAttr in attrData)
             {
-                AssetIdentifier typeAssetId = AssetIdentifier.FromMemberInfo(custAttr.Constructor.ReflectedType
-                                                                             ?? custAttr.Constructor.DeclaringType);
+                Type originatingType = custAttr.Constructor.ReflectedType
+                                       ?? custAttr.Constructor.DeclaringType;
 
-                if (context.IsFiltered(typeAssetId))
+                Asset typeAsset = ReflectionServices.GetAsset(originatingType);
+
+                if (context.IsFiltered(typeAsset))
                     continue;
 
-                context.AddReference(AssetIdentifier.FromMemberInfo(custAttr.Constructor));
+                Asset ctorAsset = ReflectionServices.GetAsset(custAttr.Constructor);
+                context.AddReference(ctorAsset);
 
                 var attrElem = new XElement("attribute",
-                                            new XAttribute("type", typeAssetId),
-                                            new XAttribute("constructor", AssetIdentifier.FromMemberInfo(custAttr.Constructor)));
+                                            new XAttribute("type", typeAsset.Id),
+                                            new XAttribute("constructor", ctorAsset.Id));
 
                 foreach (CustomAttributeTypedArgument cta in custAttr.ConstructorArguments)
                 {
@@ -123,11 +127,11 @@ namespace LBi.LostDoc.Enrichers
 
                 foreach (CustomAttributeNamedArgument cta in custAttr.NamedArguments)
                 {
-                    AssetIdentifier namedMember = AssetIdentifier.FromMemberInfo(cta.MemberInfo);
-                    context.AddReference(namedMember);
+                    Asset asset = ReflectionServices.GetAsset(cta.MemberInfo);
+                    context.AddReference(asset);
 
                     XElement argElem = new XElement("argument",
-                                                    new XAttribute("member", namedMember));
+                                                    new XAttribute("member", asset.Id));
 
                     this.GenerateValueLiteral(context.Clone(argElem), cta.TypedValue);
 
