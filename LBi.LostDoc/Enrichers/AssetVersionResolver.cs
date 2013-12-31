@@ -23,6 +23,7 @@ using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Enrichers
 {
+    // TODO see if this can't be optimized
     internal class AssetVersionResolver
     {
         private readonly Asset _assembly;

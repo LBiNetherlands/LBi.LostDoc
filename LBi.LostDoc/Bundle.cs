@@ -21,15 +21,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using LBi.LostDoc.Templating;
 using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc
 {
     public class Bundle
     {
-        private XDocument _bundle;
-        private VersionComponent? _ignoreVersionComponent;
+        private readonly XDocument _bundle;
+        private readonly VersionComponent? _ignoreVersionComponent;
 
         public Bundle(VersionComponent? ignoreVersionComponent)
         {

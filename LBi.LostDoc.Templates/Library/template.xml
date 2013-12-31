@@ -51,12 +51,30 @@
     <with-param name="value" select="concat('images/logo.', substring-after-last($LogoUrl, '.'))"/>
   </meta-template>
 
-  <apply-stylesheet name="Library" select="/bundle" assetId="'*:*'" version="'0.0.0.0'" output="'Library.html'"
+  <apply-stylesheet name="Navigation"
+                    select="/"
+                    output="'Navigation.xml'"
+                    stylesheet="Navigation.xslt">
+  </apply-stylesheet>
+
+  <apply-stylesheet name="Navigation"
+                    input="'Navigation.xml'"
+                    select="/"
+                    output="'Navigation2.xml'"
+                    stylesheet="Navigation.xslt">
+  </apply-stylesheet>
+
+
+  <apply-stylesheet name="Library"
+                    select="/bundle"
+                    assetId="'*:*'"
+                    version="'0.0.0.0'"
+                    output="'Library.html'"
                     stylesheet="Library.xslt">
   </apply-stylesheet>
 
-  <apply-stylesheet name="Assembly summary" 
-                    select="/bundle/assembly[@phase = '0']" 
+  <apply-stylesheet name="Assembly summary"
+                    select="/bundle/assembly[@phase = '0']"
                     assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(@filename, '/', get-significant-version(@assetId), '.html')"
@@ -69,7 +87,7 @@
                     assetId="get-id(@assetId)"
                     version="'0.0.0.0'"
                     var:ns="@name"
-                    output="concat(@name, '.html')"
+                    output="concat(coalesce(@name, 'Global'), '.html')"
                     stylesheet="Namespace.xslt">
     <with-param name="assetId" select="@assetId" />
     <with-param name="namespace" select="@name" />
@@ -82,7 +100,7 @@
 
   <apply-stylesheet name="Types"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface) and @phase = '0']"
-                    assetId="get-id(@assetId)" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.&lt;&gt;', '-/()'), '.html')"
                     stylesheet="Type.xslt">
@@ -90,7 +108,7 @@
   </apply-stylesheet>
 
 
-  <apply-stylesheet name="Enumerations" 
+  <apply-stylesheet name="Enumerations"
                     select="/bundle/assembly/namespace//enum[@phase = '0']"
                     assetId="get-id(@assetId)"
                     version="get-version(@assetId)"

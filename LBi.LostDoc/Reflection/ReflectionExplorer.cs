@@ -118,7 +118,7 @@ namespace LBi.LostDoc.Reflection
                 case AssetType.Assembly:
                     Assembly asm = (Assembly)asset.Target;
                     string[] namespaces = asm.GetTypes()
-                                             .Select(t => t.Namespace ?? string.Empty)
+                                             .Select(t => t.Namespace)
                                              .Distinct(StringComparer.Ordinal)
                                              .ToArray();
 
@@ -126,6 +126,9 @@ namespace LBi.LostDoc.Reflection
 
                     foreach (var ns in namespaces)
                     {
+                        if (ns == null)
+                            continue;
+                        
                         string[] parts = ns.Split('.');
                         if (parts.Length > 1)
                         {
@@ -135,6 +138,7 @@ namespace LBi.LostDoc.Reflection
                     }
 
                     ret = uniqueNamespaces.Select(ns => ReflectionServices.GetAsset(asm, ns));
+
                     break;
                 default:
                     throw new ArgumentException(string.Format("Cannot find children of asset of type {0}", asset.Type));

@@ -75,7 +75,7 @@
     <xsl:param name="children" select="false()"/>
 
     <xsl:choose>
-      <xsl:when test="/bundle/assembly/namespace[@phase = '0' and @name = ld:substringBeforeLast(current()/@name, '.')]">
+      <xsl:when test="@name != '' and /bundle/assembly/namespace[@phase = '0' and @name = ld:substringBeforeLast(current()/@name, '.')]">
         <xsl:apply-templates select="(/bundle/assembly/namespace[@phase = '0' and @name = ld:substringBeforeLast(current()/@name, '.')])[1]" mode="xnav-ancestor">
           <xsl:with-param name="current" select="$current"/>
         </xsl:apply-templates>

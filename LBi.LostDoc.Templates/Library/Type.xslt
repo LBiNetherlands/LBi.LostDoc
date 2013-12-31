@@ -139,7 +139,7 @@
     <dl class="origin">
       <dt>Namespace:</dt>
       <dd>
-        <xsl:value-of select="ancestor::namespace/@name"/>
+        <xsl:value-of select="ld:coalesce(ancestor::namespace/@name, '[global]')"/>
       </dd>
       <dt>Assembly:</dt>
       <dd>

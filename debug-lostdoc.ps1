@@ -37,7 +37,7 @@ $choices = @(
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Template"; 
-                                        A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html")
+                                        A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html -IgnoreVersionComponent Patch")
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Template with Custom logo"; 

@@ -51,6 +51,7 @@
     <Compile Include="ExtensionMethodTest.cs" />
     <Compile Include="Foo.cs" />
     <Compile Include="GenericClass.cs" />
+    <Compile Include="GlobalClass.cs" />
     <Compile Include="IGenericInterface.cs" />
     <Compile Include="IMaStruct.cs" />
     <Compile Include="InheritedGenericClass.cs" />

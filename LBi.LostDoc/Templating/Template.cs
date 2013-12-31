@@ -165,7 +165,7 @@ namespace LBi.LostDoc.Templating
             using (Stream str = fileProvider.OpenFile(name, FileMode.Open))
             {
                 XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
-                XsltSettings settings = new XsltSettings(false, true);
+                XsltSettings settings = new XsltSettings(true, true);
                 XmlResolver resolver = new XmlFileProviderResolver(fileProvider);
                 ret.Load(reader, settings, resolver);
             }
@@ -638,14 +638,15 @@ namespace LBi.LostDoc.Templating
             else
                 transform = this.LoadStylesheet(provider, src);
 
-            return new Stylesheet
+            var ret=  new Stylesheet
                        {
                            Source = src,
                            Transform = transform,
                            SelectExpression = this.GetAttributeValue(elem, "select"),
-                           AssetIdExpression = this.GetAttributeValue(elem, "assetId"),
+                           AssetIdExpression = this.GetAttributeValueOrDefault(elem, "assetId"),
+                           InputExpression = this.GetAttributeValueOrDefault(elem, "input"),
                            OutputExpression = this.GetAttributeValue(elem, "output"),
-                           VersionExpression = this.GetAttributeValue(elem, "version"),
+                           VersionExpression = this.GetAttributeValueOrDefault(elem, "version"),
                            XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
                            Variables = this.ParseVariables(elem).ToArray(),
                            Name = name,
@@ -653,6 +654,15 @@ namespace LBi.LostDoc.Templating
                            AssetAliases = this.ParseAliasRegistration(elem.Elements("register-alias")).ToArray(),
                            ConditionExpression = GetAttributeValueOrDefault(elem, "condition")
                        };
+
+            if (ret.AssetIdExpression != null ^ ret.VersionExpression != null)
+            {
+                throw new TemplateException(this._templateSourcePath,
+                                            elem,
+                                            "Invalid combination of 'assetId' and 'version'.");
+            }
+
+            return ret;
         }
 
         private string GetAttributeValueOrDefault(XElement elem, string attName, string defaultValue = null)

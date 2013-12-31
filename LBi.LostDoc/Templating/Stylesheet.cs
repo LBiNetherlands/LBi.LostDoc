@@ -26,6 +26,7 @@ namespace LBi.LostDoc.Templating
         public string Name { get; set; }
         public string SelectExpression { get; set; }
         public string AssetIdExpression { get; set; }
+        public string InputExpression { get; set; }
         public string OutputExpression { get; set; }
         public XPathVariable[] XsltParams { get; set; }
         public XPathVariable[] Variables { get; set; }

@@ -36,14 +36,17 @@
 
   <xsl:template name="title">
     <xsl:if test="not($namespace)">
-      <xsl:message terminate="yes">$namespace is empty!</xsl:message>
+      <xsl:text>Global </xsl:text>
     </xsl:if>
-    <xsl:text>Namespace </xsl:text>
-    <xsl:value-of select="$namespace"/>
+    <xsl:text>Namespace</xsl:text>
+    <xsl:if test="$namespace">
+      <xsl:text> </xsl:text>
+      <xsl:value-of select="$namespace"/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="navigation">
-    
+
     <xsl:apply-templates select="ld:key('aid', $assetId)[1]" mode="xnav"/>
   </xsl:template>
 
@@ -123,7 +126,7 @@
   <xsl:template match="class | struct | interface | delegate | enum | assembly" mode="list-item">
     <xsl:variable name="aid" select="ld:nover(@assetId)"/>
     <xsl:if test="count(ld:key('aidNoVer', ld:asset(@assetId))) = 1 or @assetId = ld:key('aidNoVer', ld:asset(@assetId))[1]/@assetId">
-    <!--<xsl:if test="not(preceding::*[@assetId and ld:nover(@assetId) = $aid])">-->
+      <!--<xsl:if test="not(preceding::*[@assetId and ld:nover(@assetId) = $aid])">-->
       <tr>
         <td class="icons">
           <span>

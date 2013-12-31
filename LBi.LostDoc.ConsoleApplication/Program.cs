@@ -19,6 +19,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.ComponentModel.Composition.Registration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;

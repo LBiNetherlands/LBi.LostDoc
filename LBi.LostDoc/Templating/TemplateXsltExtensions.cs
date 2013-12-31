@@ -36,7 +36,7 @@ namespace LBi.LostDoc.Templating
             this._context = context;
             this._currentUri = currentUri;
 
-            this._aidCache = new ConcurrentDictionary<string, AssetIdentifier>();
+            this._aidCache = new ConcurrentDictionary<string, AssetIdentifier>(StringComparer.Ordinal);
             this._resolveCache = new ConcurrentDictionary<AssetIdentifier, string>();
         }
 

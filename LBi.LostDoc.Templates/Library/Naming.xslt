@@ -185,6 +185,9 @@
 
   <xsl:template match="namespace" mode="displayText">
     <xsl:value-of select="@name"/>
+    <xsl:if test="@name = ''">
+      <xsl:text>global::</xsl:text>
+    </xsl:if>
   </xsl:template>
 
   <!-- operators -->

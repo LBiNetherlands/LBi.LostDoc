@@ -357,7 +357,7 @@ namespace LBi.LostDoc
         {
             NamespaceInfo nsInfo = (NamespaceInfo)asset.Target;
             var ret = new XElement("namespace",
-                                   new XAttribute("name", nsInfo.Name),
+                                   new XAttribute("name", nsInfo.Name ?? string.Empty),
                                    new XAttribute("assetId", asset.Id),
                                    new XAttribute("phase", context.Phase));
 

@@ -90,6 +90,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Library\images\lostdoc.svg" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Library\Navigation.xslt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist $(ProjectDir)..\AddInPackages mkdir $(ProjectDir)..\AddInPackages
