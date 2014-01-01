@@ -70,7 +70,7 @@ namespace LBi.LostDoc.Templating
 
 
 
-        // TODO maybe move some (or all) of this to the TemplateResolver
+        // TODO maybe move some (or all) of this to the TemplateResolver/Parser
         public static TemplateInfo Load(TemplateResolver resolver, IFileProvider source, string name)
         {
             string specPath = System.IO.Path.Combine(name, Template.TemplateDefinitionFileName);

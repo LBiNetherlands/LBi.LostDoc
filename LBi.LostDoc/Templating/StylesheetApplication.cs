@@ -36,6 +36,7 @@ namespace LBi.LostDoc.Templating
         public AssetIdentifier Asset { get; set; }
         public string StylesheetName { get; set; }
         public List<AssetSection> Sections { get; set; }
+        public string Input { get; set; }
 
         public override WorkUnitResult Execute(ITemplatingContext context)
         {

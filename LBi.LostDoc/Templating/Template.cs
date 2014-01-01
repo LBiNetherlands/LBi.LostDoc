@@ -191,9 +191,15 @@ namespace LBi.LostDoc.Templating
             {
                 xpathContext.PushVariableScope(inputElement, stylesheet.Variables); // 2
 
+                string input = null;
+                if (stylesheet.InputExpression != null)
+                    input = ResultToString(inputElement.XPathEvaluate(stylesheet.InputExpression, xpathContext));
+
                 string saveAs = ResultToString(inputElement.XPathEvaluate(stylesheet.OutputExpression, xpathContext));
-                string version = ResultToString(inputElement.XPathEvaluate(stylesheet.VersionExpression, xpathContext));
+
                 string assetId = ResultToString(inputElement.XPathEvaluate(stylesheet.AssetIdExpression, xpathContext));
+                string version = ResultToString(inputElement.XPathEvaluate(stylesheet.VersionExpression, xpathContext));
+                
                 List<AssetIdentifier> aliases = new List<AssetIdentifier>();
                 List<AssetSection> sections = new List<AssetSection>();
 
@@ -215,24 +221,22 @@ namespace LBi.LostDoc.Templating
                 // aliases
                 foreach (AliasRegistration alias in stylesheet.AssetAliases)
                 {
-                    XElement[] aliasInputElements =
-                        inputElement.XPathSelectElements(alias.SelectExpression, xpathContext).ToArray();
+                    XElement[] aliasInputElements = inputElement.XPathSelectElements(alias.SelectExpression, xpathContext).ToArray();
 
                     foreach (XElement aliasInputElement in aliasInputElements)
                     {
                         xpathContext.PushVariableScope(aliasInputElement, alias.Variables); // 3
 
-                        string aliasVersion =
-                            ResultToString(aliasInputElement.XPathEvaluate(alias.VersionExpression, xpathContext));
-                        string aliasAssetId =
-                            ResultToString(aliasInputElement.XPathEvaluate(alias.AssetIdExpression, xpathContext));
+                        string aliasVersion = ResultToString(aliasInputElement.XPathEvaluate(alias.VersionExpression, xpathContext));
+                        string aliasAssetId = ResultToString(aliasInputElement.XPathEvaluate(alias.AssetIdExpression, xpathContext));
 
                         // eval condition
                         if (EvalCondition(xpathContext, aliasInputElement, alias.ConditionExpression))
                         {
                             this._fileResolver.Add(aliasAssetId, new Version(aliasVersion), newUri);
                             aliases.Add(AssetIdentifier.Parse(aliasAssetId));
-                            TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => {2}", aliasAssetId,
+                            TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => {2}",
+                                                                     aliasAssetId,
                                                                      aliasVersion,
                                                                      newUri.ToString());
                         }
@@ -255,12 +259,9 @@ namespace LBi.LostDoc.Templating
                     {
                         xpathContext.PushVariableScope(sectionInputElement, section.Variables); // 4
 
-                        string sectionName =
-                            ResultToString(sectionInputElement.XPathEvaluate(section.NameExpression, xpathContext));
-                        string sectionVersion =
-                            ResultToString(sectionInputElement.XPathEvaluate(section.VersionExpression, xpathContext));
-                        string sectionAssetId =
-                            ResultToString(sectionInputElement.XPathEvaluate(section.AssetIdExpression, xpathContext));
+                        string sectionName = ResultToString(sectionInputElement.XPathEvaluate(section.NameExpression, xpathContext));
+                        string sectionVersion = ResultToString(sectionInputElement.XPathEvaluate(section.VersionExpression, xpathContext));
+                        string sectionAssetId = ResultToString(sectionInputElement.XPathEvaluate(section.AssetIdExpression, xpathContext));
 
                         // eval condition
                         if (EvalCondition(xpathContext, sectionInputElement, section.ConditionExpression))
@@ -293,6 +294,7 @@ namespace LBi.LostDoc.Templating
 
                 yield return new StylesheetApplication
                                  {
+                                     Input = input,
                                      StylesheetName = stylesheet.Name,
                                      Asset = new AssetIdentifier(assetId, new Version(version)),
                                      Aliases = aliases, /* list of AssetIdentifiers */
@@ -655,7 +657,7 @@ namespace LBi.LostDoc.Templating
                            ConditionExpression = GetAttributeValueOrDefault(elem, "condition")
                        };
 
-            if (ret.AssetIdExpression != null ^ ret.VersionExpression != null)
+            if (!(ret.AssetIdExpression == null ^ ret.VersionExpression == null))
             {
                 throw new TemplateException(this._templateSourcePath,
                                             elem,
@@ -713,16 +715,14 @@ namespace LBi.LostDoc.Templating
                     stylesheetApplications.AddRange(this.DiscoverWork(templateData, tmpl.Parameters, stylesheet));
                 }
 
-                var duplicates =
-                    stylesheetApplications.GroupBy(sa => sa.SaveAs, StringComparer.OrdinalIgnoreCase)
-                                          .Where(g => g.Count() > 1);
+                var duplicates = stylesheetApplications.GroupBy(sa => sa.SaveAs, StringComparer.OrdinalIgnoreCase)
+                                                       .Where(g => g.Count() > 1);
 
                 foreach (var group in duplicates)
                 {
                     TraceSources.TemplateSource.TraceError("Duplicate work unit target ({0}) generated from: {1}",
                                                            group.Key,
-                                                           string.Join(", ",
-                                                                       group.Select(sa => '\'' + sa.StylesheetName + '\'')));
+                                                           string.Join(", ", group.Select(sa => '\'' + sa.StylesheetName + '\'')));
 
                     foreach (var workunit in group.Skip(1))
                     {
@@ -1016,14 +1016,13 @@ namespace LBi.LostDoc.Templating
                                                    };
 
                             ImportDefinition importDefinition =
-                                new MetadataContractBasedImportDefinition(
-                                    typeof(IResourceTransform),
-                                    null,
-                                    requiredMetadata,
-                                    ImportCardinality.ExactlyOne,
-                                    false,
-                                    true,
-                                    CreationPolicy.NonShared);
+                                new MetadataContractBasedImportDefinition(typeof (IResourceTransform),
+                                                                          null,
+                                                                          requiredMetadata,
+                                                                          ImportCardinality.ExactlyOne,
+                                                                          false,
+                                                                          true,
+                                                                          CreationPolicy.NonShared);
 
                             Export transformExport = localContainer.GetExports(importDefinition).Single();
 
@@ -1031,11 +1030,10 @@ namespace LBi.LostDoc.Templating
                         }
                     }
 
-                    yield return
-                        new ResourceDeployment(resources[i].FileProvider,
-                                               expandedSource,
-                                               expandedOutput, // TODO this needs a 'writable' file provider
-                                               transforms.ToArray());
+                    yield return new ResourceDeployment(resources[i].FileProvider,
+                                                        expandedSource,
+                                                        expandedOutput, // TODO this needs a 'writable' file provider
+                                                        transforms.ToArray());
                 }
                 xpathContext.PopVariableScope();
             }
