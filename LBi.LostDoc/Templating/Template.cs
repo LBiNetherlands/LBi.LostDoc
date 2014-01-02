@@ -43,6 +43,14 @@ using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
+    public class OnDemandTaskScheduler
+    {
+        public void Add(Task task)
+        {
+            
+        }
+    }
+
     // TODO consider moving parsing code into a TemplateParser class
     // TODO fix error handling, a bad template.xml file will just throw random exceptions, xml schema validation?
     public class Template
@@ -657,11 +665,11 @@ namespace LBi.LostDoc.Templating
                            ConditionExpression = GetAttributeValueOrDefault(elem, "condition")
                        };
 
-            if (!(ret.AssetIdExpression == null ^ ret.VersionExpression == null))
+            if (ret.AssetIdExpression == null ^ ret.VersionExpression == null)
             {
                 throw new TemplateException(this._templateSourcePath,
                                             elem,
-                                            "Invalid combination of 'assetId' and 'version'.");
+                                            "Invalid combination of 'assetId' and 'version' attributes.");
             }
 
             return ret;

@@ -51,19 +51,19 @@
     <with-param name="value" select="concat('images/logo.', substring-after-last($LogoUrl, '.'))"/>
   </meta-template>
 
-  <!--<apply-stylesheet name="Navigation"
+  <apply-stylesheet name="Navigation"
                     select="/"
                     output="'Navigation.xml'"
                     stylesheet="Navigation.xslt"/>
 
-  <apply-stylesheet name="Navigation"
+  <!-- <apply-stylesheet name="Navigation"
                     input="'Navigation.xml'"
                     select="/"
                     output="'Navigation2.xml'"
                     stylesheet="Navigation.xslt"/>-->
 
   <apply-stylesheet name="Library"
-                    select="/bundle"
+                    select="document('nav')/bundle"
                     assetId="'*:*'"
                     version="'0.0.0.0'"
                     output="'Library.html'"
