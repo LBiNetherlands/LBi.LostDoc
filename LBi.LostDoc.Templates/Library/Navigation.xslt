@@ -26,7 +26,7 @@
   <xsl:output method="xml" indent="yes"/>
 
   <xsl:template match="/bundle">
-    <node text="Library">
+    <node text="Library" assetId="">
       <!-- target="ld:resolveAsset('*:*', '0.0.0.0')" assetId="{{*:*,0.0.0.0}} -->
       
       <!-- assemblies -->
@@ -51,14 +51,18 @@
   </xsl:template>
 
   <xsl:template match="namespace">
-    <xsl:if test="not(preceding::namespace[@name=current()/@name and @phase = '0'])">
+    <xsl:if test="not(preceding::namespace[@name=current()/@name and @phase = '0'] | //namespace[starts-with(current()/@name, concat(@name, '.'))])">
       <node text="{@name}" assetId="{@assetId}">
-        
+        <!-- child namespaces -->
+        <xsl:apply-templates select="/bundle/assembly/namespace[starts-with(@name, concat(current()/@name, '.')) and @phase = '0']">
+          <xsl:sort select="@name"/>
+        </xsl:apply-templates>
       </node>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="@* | node()">
+
+  <xsl:template match="@* | node()" mode="copy">
     <xsl:copy>
       <xsl:apply-templates select="@* | node()"/>
     </xsl:copy>
