@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,16 @@ namespace LBi.LostDoc
         private readonly string _assetId;
         private readonly AssetType _type;
         private readonly Version _version;
+
+        private AssetIdentifier(string assetId) 
+            : this(assetId, (Version)null)
+        {
+        }
+
+        public AssetIdentifier(string assetId, string version)
+            : this(assetId, new Version(version))
+        {
+        }
 
         public AssetIdentifier(string assetId, Version version)
         {
@@ -199,7 +209,7 @@ namespace LBi.LostDoc
             if (typeMarker == -1)
                 retAssetId = "T:" + retAssetId;
 
-            var ret = new AssetIdentifier(retAssetId, null);
+            var ret = new AssetIdentifier(retAssetId);
 
             return ret;
         }

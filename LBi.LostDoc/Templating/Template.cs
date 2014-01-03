@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,6 +62,7 @@ namespace LBi.LostDoc.Templating
         private readonly CompositionContainer _container;
         private readonly FileResolver _fileResolver;
         private readonly List<IAssetUriResolver> _resolvers;
+        private readonly IUniqueUriFactory _uriFactory;
         private string _basePath;
         private XDocument _templateDefinition;
         private string _templateSourcePath;
@@ -82,6 +84,7 @@ namespace LBi.LostDoc.Templating
             this._resolvers = new List<IAssetUriResolver>();
             this._resolvers.Add(this._fileResolver);
             this._resolvers.Add(new MsdnResolver());
+            this._uriFactory = new DefaultUniqueUriFactory();
             this._container = container;
         }
 
@@ -102,12 +105,12 @@ namespace LBi.LostDoc.Templating
             return new ScopedFileProvider(this._templateInfo.Source, this._basePath);
         }
 
-        private IEnumerable<AliasRegistration> ParseAliasRegistration(IEnumerable<XElement> elements)
+        private IEnumerable<AssetRegistration> ParseAssetRegistration(IEnumerable<XElement> elements)
         {
             foreach (XElement elem in elements)
             {
                 yield return
-                    new AliasRegistration
+                    new AssetRegistration
                         {
                             Variables = this.ParseVariables(elem).ToArray(),
                             SelectExpression = this.GetAttributeValueOrDefault(elem, "select", "."),
@@ -192,65 +195,59 @@ namespace LBi.LostDoc.Templating
 
             xpathContext.PushVariableScope(templateData.Document.Root, parameters); // 1
 
-            XElement[] inputElements =
-                templateData.Document.XPathSelectElements(stylesheet.SelectExpression, xpathContext).ToArray();
+            IEnumerable<XNode> inputNodes = XPathServices.ToNodeSequence(templateData.Document.XPathEvaluate(stylesheet.SelectExpression, xpathContext));
 
-            foreach (XElement inputElement in inputElements)
+            foreach (XNode inputNode in inputNodes)
             {
-                xpathContext.PushVariableScope(inputElement, stylesheet.Variables); // 2
+                xpathContext.PushVariableScope(inputNode, stylesheet.Variables); // 2
 
                 string input = null;
                 if (stylesheet.InputExpression != null)
-                    input = ResultToString(inputElement.XPathEvaluate(stylesheet.InputExpression, xpathContext));
+                    input = XPathServices.ResultToString(inputNode.XPathEvaluate(stylesheet.InputExpression, xpathContext));
 
-                string saveAs = ResultToString(inputElement.XPathEvaluate(stylesheet.OutputExpression, xpathContext));
+                string saveAs = XPathServices.ResultToString(inputNode.XPathEvaluate(stylesheet.OutputExpression, xpathContext));
 
-                string assetId = ResultToString(inputElement.XPathEvaluate(stylesheet.AssetIdExpression, xpathContext));
-                string version = ResultToString(inputElement.XPathEvaluate(stylesheet.VersionExpression, xpathContext));
-                
-                List<AssetIdentifier> aliases = new List<AssetIdentifier>();
+                List<AssetIdentifier> assetIdentifiers = new List<AssetIdentifier>();
                 List<AssetSection> sections = new List<AssetSection>();
 
                 // eval condition, shortcut and log instead of wrapping entire loop in if
-                if (!EvalCondition(xpathContext, inputElement, stylesheet.ConditionExpression))
+                if (!EvalCondition(xpathContext, inputNode, stylesheet.ConditionExpression))
                 {
-                    TraceSources.TemplateSource.TraceVerbose("{0}, {1} => Condition not met", assetId, version);
+                    TraceSources.TemplateSource.TraceVerbose("Condition not met: {0}", saveAs);
                     xpathContext.PopVariableScope(); // 2
                     continue;
                 }
 
                 Uri newUri = new Uri(saveAs, UriKind.RelativeOrAbsolute);
 
-                // register url
-                this._fileResolver.Add(assetId, new Version(version), ref newUri);
+                // ensure url is unique
+                this._uriFactory.EnsureUnique(ref newUri);
 
-                TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}", assetId, version, newUri.ToString());
-
-                // aliases
-                foreach (AliasRegistration alias in stylesheet.AssetAliases)
+                // asset identifiers
+                foreach (AssetRegistration assetRegistration in stylesheet.AssetRegistrations)
                 {
-                    XElement[] aliasInputElements = inputElement.XPathSelectElements(alias.SelectExpression, xpathContext).ToArray();
+                    XElement[] assetInputElements = inputNode.XPathSelectElements(assetRegistration.SelectExpression, xpathContext).ToArray();
 
-                    foreach (XElement aliasInputElement in aliasInputElements)
+                    foreach (XElement assetInputElement in assetInputElements)
                     {
-                        xpathContext.PushVariableScope(aliasInputElement, alias.Variables); // 3
+                        xpathContext.PushVariableScope(assetInputElement, assetRegistration.Variables); // 3
 
-                        string aliasVersion = ResultToString(aliasInputElement.XPathEvaluate(alias.VersionExpression, xpathContext));
-                        string aliasAssetId = ResultToString(aliasInputElement.XPathEvaluate(alias.AssetIdExpression, xpathContext));
+                        string version = XPathServices.ResultToString(assetInputElement.XPathEvaluate(assetRegistration.VersionExpression, xpathContext));
+                        string assetId = XPathServices.ResultToString(assetInputElement.XPathEvaluate(assetRegistration.AssetIdExpression, xpathContext));
 
                         // eval condition
-                        if (EvalCondition(xpathContext, aliasInputElement, alias.ConditionExpression))
+                        if (EvalCondition(xpathContext, assetInputElement, assetRegistration.ConditionExpression))
                         {
-                            this._fileResolver.Add(aliasAssetId, new Version(aliasVersion), newUri);
-                            aliases.Add(AssetIdentifier.Parse(aliasAssetId));
-                            TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => {2}",
-                                                                     aliasAssetId,
-                                                                     aliasVersion,
+                            this._fileResolver.Add(assetId, new Version(version), newUri);
+                            assetIdentifiers.Add(AssetIdentifier.Parse(assetId));
+                            TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}",
+                                                                     assetId,
+                                                                     version,
                                                                      newUri.ToString());
                         }
                         else
                         {
-                            TraceSources.TemplateSource.TraceVerbose("{0}, {1} (Alias) => Condition not met",
+                            TraceSources.TemplateSource.TraceVerbose("{0}, {1} => Condition not met",
                                                                      assetId,
                                                                      version);
                         }
@@ -261,15 +258,15 @@ namespace LBi.LostDoc.Templating
                 // sections
                 foreach (SectionRegistration section in stylesheet.Sections)
                 {
-                    XElement[] sectionInputElements = inputElement.XPathSelectElements(section.SelectExpression, xpathContext).ToArray();
+                    XElement[] sectionInputElements = inputNode.XPathSelectElements(section.SelectExpression, xpathContext).ToArray();
 
                     foreach (XElement sectionInputElement in sectionInputElements)
                     {
                         xpathContext.PushVariableScope(sectionInputElement, section.Variables); // 4
 
-                        string sectionName = ResultToString(sectionInputElement.XPathEvaluate(section.NameExpression, xpathContext));
-                        string sectionVersion = ResultToString(sectionInputElement.XPathEvaluate(section.VersionExpression, xpathContext));
-                        string sectionAssetId = ResultToString(sectionInputElement.XPathEvaluate(section.AssetIdExpression, xpathContext));
+                        string sectionName = XPathServices.ResultToString(sectionInputElement.XPathEvaluate(section.NameExpression, xpathContext));
+                        string sectionVersion = XPathServices.ResultToString(sectionInputElement.XPathEvaluate(section.VersionExpression, xpathContext));
+                        string sectionAssetId = XPathServices.ResultToString(sectionInputElement.XPathEvaluate(section.AssetIdExpression, xpathContext));
 
                         // eval condition
                         if (EvalCondition(xpathContext, sectionInputElement, section.ConditionExpression))
@@ -296,7 +293,7 @@ namespace LBi.LostDoc.Templating
                     }
                 }
 
-                var xsltParams = ResolveXsltParams(stylesheet.XsltParams, inputElement, xpathContext).ToArray();
+                var xsltParams = ResolveXsltParams(stylesheet.XsltParams, inputNode, xpathContext).ToArray();
 
                 xpathContext.PopVariableScope(); // 2
 
@@ -304,12 +301,11 @@ namespace LBi.LostDoc.Templating
                                  {
                                      Input = input,
                                      StylesheetName = stylesheet.Name,
-                                     Asset = new AssetIdentifier(assetId, new Version(version)),
-                                     Aliases = aliases, /* list of AssetIdentifiers */
+                                     AssetIdentifiers = assetIdentifiers.ToArray(), /* list of AssetIdentifiers */
                                      Sections = sections, /* list of AssetSection */
                                      SaveAs = newUri.ToString(),
                                      Transform = stylesheet.Transform,
-                                     InputElement = inputElement,
+                                     InputNode = inputNode,
                                      XsltParams = xsltParams
                                  };
             }
@@ -317,13 +313,15 @@ namespace LBi.LostDoc.Templating
             xpathContext.PopVariableScope(); // 1
         }
 
+
+
         private static IEnumerable<KeyValuePair<string, object>> ResolveXsltParams(IEnumerable<XPathVariable> xsltParams,
-                                                                                   XElement contextElement,
+                                                                                   XNode contextNode,
                                                                                    XsltContext xpathContext)
         {
             foreach (var param in xsltParams)
             {
-                var contextVariable = param.Evaluate(contextElement, xpathContext);
+                var contextVariable = param.Evaluate(contextNode, xpathContext);
                 object val = contextVariable.Evaluate(xpathContext);
                 yield return new KeyValuePair<string, object>(param.Name, val);
             }
@@ -602,7 +600,7 @@ namespace LBi.LostDoc.Templating
             else
             {
                 object value = contextNode.XPathEvaluate(condition, customContext);
-                shouldApply = ResultToBool(value);
+                shouldApply = XPathServices.ResultToBool(value);
             }
             return shouldApply;
         }
@@ -614,7 +612,7 @@ namespace LBi.LostDoc.Templating
             {
                 string expression = valueOrExpression.Substring(1, valueOrExpression.Length - 2);
                 object value = contextNode.XPathEvaluate(expression, customContext);
-                return ResultToString(value);
+                return XPathServices.ResultToString(value);
             }
 
             return valueOrExpression;
@@ -653,24 +651,15 @@ namespace LBi.LostDoc.Templating
                            Source = src,
                            Transform = transform,
                            SelectExpression = this.GetAttributeValue(elem, "select"),
-                           AssetIdExpression = this.GetAttributeValueOrDefault(elem, "assetId"),
                            InputExpression = this.GetAttributeValueOrDefault(elem, "input"),
                            OutputExpression = this.GetAttributeValue(elem, "output"),
-                           VersionExpression = this.GetAttributeValueOrDefault(elem, "version"),
                            XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
                            Variables = this.ParseVariables(elem).ToArray(),
                            Name = name,
                            Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
-                           AssetAliases = this.ParseAliasRegistration(elem.Elements("register-alias")).ToArray(),
+                           AssetRegistrations = this.ParseAssetRegistration(elem.Elements("register-asset")).ToArray(),
                            ConditionExpression = GetAttributeValueOrDefault(elem, "condition")
                        };
-
-            if (ret.AssetIdExpression == null ^ ret.VersionExpression == null)
-            {
-                throw new TemplateException(this._templateSourcePath,
-                                            elem,
-                                            "Invalid combination of 'assetId' and 'version' attributes.");
-            }
 
             return ret;
         }
@@ -705,6 +694,7 @@ namespace LBi.LostDoc.Templating
         {
             Stopwatch timer = Stopwatch.StartNew();
 
+            this._uriFactory.Clear();
             this._fileResolver.Clear();
 
             ParsedTemplate tmpl = this.PrepareTemplate(templateData);
@@ -1052,6 +1042,7 @@ namespace LBi.LostDoc.Templating
         private static CustomXsltContext CreateCustomXsltContext(VersionComponent? ignoredVersionComponent)
         {
             CustomXsltContext xpathContext = new CustomXsltContext();
+            xpathContext.RegisterFunction(string.Empty, "get-asset", new XsltContextAssetIdGetter());
             xpathContext.RegisterFunction(string.Empty, "get-id", new XsltContextAssetIdGetter());
             xpathContext.RegisterFunction(string.Empty, "get-version", new XsltContextAssetVersionGetter());
             xpathContext.RegisterFunction(string.Empty, "substring-before-last", new XsltContextSubstringBeforeLastFunction());
@@ -1061,72 +1052,6 @@ namespace LBi.LostDoc.Templating
             xpathContext.RegisterFunction(string.Empty, "coalesce", new XsltContextCoalesceFunction());
             xpathContext.RegisterFunction(string.Empty, "join", new XsltContextJoinFunction());
             return xpathContext;
-        }
-
-
-        // TODO move the ResultToXxx functions to an XPath utility class or something
-        protected internal static string ResultToString(object res)
-        {
-            string ret = res as string;
-            if (ret == null)
-            {
-                if (res is IEnumerable)
-                {
-                    object first = ((IEnumerable)res).Cast<object>().FirstOrDefault();
-                    ret = first as string;
-                    if (ret == null)
-                    {
-                        if (first is XAttribute)
-                            ret = ((XAttribute)first).Value;
-                        else if (first is XCData)
-                            ret = ((XCData)first).Value;
-                        else if (first is XText)
-                            ret = ((XText)first).Value;
-                        else if (first is XElement)
-                            ret = ((XElement)first).Value;
-                        else if (first is XPathNavigator)
-                        {
-                            XPathNavigator navigator = (XPathNavigator)first;
-                            ret = navigator.Value;
-                        }
-                    }
-                }
-            }
-
-            return ret;
-        }
-
-
-        /*
-         * a number is true if and only if it is neither positive or negative zero nor NaN
-         * a node-set is true if and only if it is non-empty
-         * a string is true if and only if its length is non-zero
-         * an object of a type other than the four basic types is converted to a boolean in a way that is dependent on that type
-         */
-        protected internal static bool ResultToBool(object res)
-        {
-            bool ret;
-            if (res == null)
-                ret = false;
-            else if (res is string)
-                ret = ((string)res).Length > 0;
-            else if (res is bool)
-                ret = (bool)res;
-            else if (res is double)
-            {
-                double d = (double)res;
-                ret = (d > 0.0 || d < 0.0) && !double.IsNaN(d);
-            }
-            else if (res is IEnumerable)
-            {
-                object first = ((IEnumerable)res).Cast<object>().FirstOrDefault();
-                ret = ResultToBool(first);
-            }
-            else
-                ret = false;
-
-
-            return ret;
         }
     }
 }

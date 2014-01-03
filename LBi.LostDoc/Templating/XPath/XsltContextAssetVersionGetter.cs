@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License. 
  */
 
-using System.Collections;
-using System.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
@@ -34,7 +32,7 @@ namespace LBi.LostDoc.Templating.XPath
 
         public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
         {
-            AssetIdentifier aid = AssetIdentifier.Parse(Template.ResultToString(args[0]));
+            AssetIdentifier aid = AssetIdentifier.Parse(XPathServices.ResultToString(args[0]));
 
             if (this._ignoredVersionComponent.HasValue)
                 return aid.Version.ToString((int)this._ignoredVersionComponent.Value);

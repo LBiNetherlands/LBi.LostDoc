@@ -91,7 +91,7 @@
     <EmbeddedResource Include="Library\images\lostdoc.svg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Library\Navigation.xslt" />
+    <EmbeddedResource Include="Library\Navigation.xslt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

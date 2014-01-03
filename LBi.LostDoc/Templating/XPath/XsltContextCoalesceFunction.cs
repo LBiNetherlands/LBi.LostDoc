@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </param>
         public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
         {
-            return args.FirstOrDefault(t => !string.IsNullOrEmpty(Template.ResultToString(t)));
+            return args.FirstOrDefault(t => !string.IsNullOrEmpty(XPathServices.ResultToString(t)));
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 DigitasLBi Netherlands B.V.
+ * Copyright 2012 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 
 namespace LBi.LostDoc.Templating
 {
-    public class SectionRegistration : AssetRegistration
+    public class AssetRegistration
     {
-        public string NameExpression { get; set; }
+        public string ConditionExpression { get; set; }
+        public XPathVariable[] Variables { get; set; }
+        public string SelectExpression { get; set; }
+        public string AssetIdExpression { get; set; }
+        public string VersionExpression { get; set; }
     }
 }

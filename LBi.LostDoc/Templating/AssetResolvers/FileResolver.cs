@@ -24,7 +24,6 @@ namespace LBi.LostDoc.Templating.AssetResolvers
     public class FileResolver : IAssetUriResolver, IEnumerable<KeyValuePair<AssetIdentifier, Uri>>, IEqualityComparer<Uri>
     {
         private readonly Dictionary<string, Dictionary<Version, Uri>> _lookupCache;
-        private readonly HashSet<Uri> _seenUris;
         private readonly StringComparer _comparer;
 
         public FileResolver()
@@ -36,7 +35,6 @@ namespace LBi.LostDoc.Templating.AssetResolvers
         {
             _lookupCache = new Dictionary<string, Dictionary<Version, Uri>>();
             _comparer = caseSensitiveFs ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
-            _seenUris = new HashSet<Uri>(this);
         }
 
         #region IAssetUriResolver Members
@@ -64,31 +62,7 @@ namespace LBi.LostDoc.Templating.AssetResolvers
             if (!innerDict.ContainsKey(version))
                 innerDict.Add(version, uri);
         }
-        
-
-        public void Add(string assetId, Version version, ref Uri uri)
-        {
-            Uri origUri = uri;
-            int i = 0;
-            while (!_seenUris.Add(uri))
-            {
-                string uriStr = origUri .ToString();
-                int ix = uriStr.LastIndexOf('.');
-                if (ix >= 0)
-                {
-                    uriStr = string.Format("{0}-{1}{2}", uriStr.Substring(0, ix), ++i, uriStr.Substring(ix));
-                    uri = new Uri(uriStr, UriKind.RelativeOrAbsolute);
-                }
-                else
-                    throw new Exception("uri doesn't contains a dot: " + uriStr);
-            }
-            Dictionary<Version, Uri> innerDict;
-            if (!this._lookupCache.TryGetValue(assetId, out innerDict))
-                this._lookupCache.Add(assetId, innerDict = new Dictionary<Version, Uri>());
-
-            if (!innerDict.ContainsKey(version))
-                innerDict.Add(version, uri);
-        }
+       
 
         public IEnumerator<KeyValuePair<AssetIdentifier, Uri>> GetEnumerator()
         {
@@ -119,7 +93,6 @@ namespace LBi.LostDoc.Templating.AssetResolvers
         public void Clear()
         {
             this._lookupCache.Clear();
-            this._seenUris.Clear();
         }
     }
 }

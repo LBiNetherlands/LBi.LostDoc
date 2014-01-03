@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,15 @@ namespace LBi.LostDoc.Templating
     public class Stylesheet
     {
         public string ConditionExpression { get; set; }
-        public string VersionExpression { get; set; }
         public XslCompiledTransform Transform { get; set; }
         public string Name { get; set; }
         public string SelectExpression { get; set; }
-        public string AssetIdExpression { get; set; }
         public string InputExpression { get; set; }
         public string OutputExpression { get; set; }
         public XPathVariable[] XsltParams { get; set; }
         public XPathVariable[] Variables { get; set; }
         public SectionRegistration[] Sections { get; set; }
-        public AliasRegistration[] AssetAliases { get; set; }
+        public AssetRegistration[] AssetRegistrations { get; set; }
         public string Source { get; set; }
     }
 }

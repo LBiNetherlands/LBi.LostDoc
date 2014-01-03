@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License. 
  */
 
+using System;
+
 namespace LBi.LostDoc.Templating
 {
-    public class AliasRegistration
+    public interface IUniqueUriFactory
     {
-        public string ConditionExpression { get; set; }
-        public XPathVariable[] Variables { get; set; }
-        public string SelectExpression { get; set; }
-        public string AssetIdExpression { get; set; }
-        public string VersionExpression { get; set; }
+        void EnsureUnique(ref Uri uri);
+
+        void Clear();
     }
 }

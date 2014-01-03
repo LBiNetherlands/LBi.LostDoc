@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2013 DigitasLBi Netherlands B.V.
+  Copyright 2014 DigitasLBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@
   <xsl:template match="/bundle">
     <node text="Library">
       <!-- target="ld:resolveAsset('*:*', '0.0.0.0')" assetId="{{*:*,0.0.0.0}} -->
+      
+      <!-- assemblies -->
       <xsl:apply-templates select="assembly[@phase = '0']">
         <xsl:sort select="@name"/>
       </xsl:apply-templates>

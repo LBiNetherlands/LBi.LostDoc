@@ -101,9 +101,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Templating\AliasRegistration.cs" />
+    <Compile Include="Templating\AssetRegistration.cs" />
     <Compile Include="Templating\AssetSection.cs" />
     <Compile Include="Templating\ConstantXPathVariable.cs" />
+    <Compile Include="Templating\DefaultUniqueUriFactory.cs" />
     <Compile Include="Templating\ExportTransformAttribute.cs" />
     <Compile Include="Templating\ExpressionXPathVariable.cs" />
     <Compile Include="Templating\FileProviders\DirectoryFileProvider.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Templating\FileProviders\HttpFileProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
+    <Compile Include="Templating\IUniqueUriFactory.cs" />
     <Compile Include="Templating\ParameterExport.cs" />
     <Compile Include="Templating\ResourceTransform.cs" />
     <Compile Include="Templating\ScopedFileProvider.cs" />
@@ -147,6 +149,8 @@
     <Compile Include="Templating\IAssetUriResolver.cs" />
     <Compile Include="ProcessingContext.cs" />
     <Compile Include="Templating\XPath\XPathNavigatorIndex.cs" />
+    <Compile Include="Templating\XPath\XPathServices.cs" />
+    <Compile Include="Templating\XPath\XsltContextAssetGetter.cs" />
     <Compile Include="Templating\XPath\XsltContextSubstringAfterLastFunction.cs" />
     <Compile Include="Templating\XPath\XsltContextSubstringBeforeLastFunction.cs" />
     <Compile Include="Templating\XPath\XsltContextTernaryOperator.cs" />

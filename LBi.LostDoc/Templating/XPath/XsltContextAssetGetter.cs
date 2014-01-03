@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 DigitasLBi Netherlands B.V.
+ * Copyright 2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,33 @@
  * limitations under the License. 
  */
 
-using System.Collections;
-using System.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
 namespace LBi.LostDoc.Templating.XPath
 {
-    public class XsltContextAssetIdGetter : IXsltContextFunction
+    public class XsltContextAssetGetter : IXsltContextFunction
     {
-        #region IXsltContextFunction Members
+        private static readonly XPathResultType[] _ArgTypes;
+
+        static XsltContextAssetGetter()
+        {
+            _ArgTypes = new[] { XPathResultType.String, XPathResultType.String };
+        }
 
         public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
         {
-            return AssetIdentifier.Parse(XPathServices.ResultToString(args[0])).AssetId;
+            return new AssetIdentifier(XPathServices.ResultToString(args[0]), XPathServices.ResultToString(args[1])).ToString();
         }
 
         public int Minargs
         {
-            get { return 1; }
+            get { return 2; }
         }
 
         public int Maxargs
         {
-            get { return 1; }
+            get { return 2; }
         }
 
         public XPathResultType ReturnType
@@ -47,9 +50,7 @@ namespace LBi.LostDoc.Templating.XPath
 
         public XPathResultType[] ArgTypes
         {
-            get { return new[] {XPathResultType.String}; }
+            get { return _ArgTypes; }
         }
-
-        #endregion
     }
 }

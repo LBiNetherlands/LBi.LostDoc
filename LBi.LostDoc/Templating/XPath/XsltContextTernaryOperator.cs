@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 DigitasLBi Netherlands B.V.
+ * Copyright 2013-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </param>
         public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
         {
-            bool b1 = Template.ResultToBool(args[0]);
+            bool b1 = XPathServices.ResultToBool(args[0]);
 
             if (b1)
                 return args[1];

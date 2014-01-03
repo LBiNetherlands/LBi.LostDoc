@@ -180,7 +180,13 @@ namespace LBi.LostDoc.Repository
                         var saResults =
                             templateOutput.Results.Select(wur => wur.WorkUnit).OfType<StylesheetApplication>();
 
-                        Dictionary<AssetIdentifier, StylesheetApplication> saDict = saResults.ToDictionary(sa => sa.Asset);
+                        Dictionary<AssetIdentifier, StylesheetApplication> saDict = new Dictionary<AssetIdentifier, StylesheetApplication>();
+
+                        foreach (var result in saResults)
+                        {
+                            foreach (AssetIdentifier aid in result.AssetIdentifiers)
+                                saDict.Add(aid, result);
+                        }
 
                         var indexResults = saDict.Values.Where(sa => sa.SaveAs.EndsWith(".xml"));
 
@@ -221,7 +227,9 @@ namespace LBi.LostDoc.Repository
                                                   new Uri(ssApplication.SaveAs, UriKind.Relative).ToString(),
                                                   Field.Store.YES,
                                                   Field.Index.NO));
-                                doc.Add(new Field("aid", ssApplication.Asset, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
+                                foreach (AssetIdentifier aid in ssApplication.AssetIdentifiers)
+                                    doc.Add(new Field("aid", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
 
                                 doc.Add(new Field("type", type, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
@@ -229,9 +237,6 @@ namespace LBi.LostDoc.Repository
                                 {
                                     doc.Add(new Field("typeFlag", typeFlag, Field.Store.YES, Field.Index.NOT_ANALYZED));
                                 }
-
-                                foreach (AssetIdentifier aid in ssApplication.Aliases)
-                                    doc.Add(new Field("alias", aid, Field.Store.NO, Field.Index.NOT_ANALYZED));
 
                                 foreach (var section in ssApplication.Sections)
                                 {
@@ -320,16 +325,11 @@ namespace LBi.LostDoc.Repository
         {
             StylesheetApplication ssWu = (StylesheetApplication)wu.WorkUnit;
             return new XElement("document",
-                                new XAttribute("assetId", ssWu.Asset),
+                                ssWu.AssetIdentifiers.Select(wual => new XElement("assetId", new XAttribute("assetId", wual))),
                                 new XAttribute("output", ssWu.SaveAs),
-                                ssWu.Aliases.Select(
-                                    wual =>
-                                    new XElement("alias", new XAttribute("assetId", wual))),
-                                ssWu.Sections.Select(
-                                    wuse =>
-                                    new XElement("section",
-                                                 new XAttribute("name", wuse.Name),
-                                                 new XAttribute("assetId", wuse.AssetIdentifier))),
+                                ssWu.Sections.Select(wuse => new XElement("section",
+                                                                          new XAttribute("name", wuse.Name),
+                                                                          new XAttribute("assetId", wuse.AssetIdentifier))),
                                 new XElement("template",
                                              new XAttribute("name", ssWu.StylesheetName)));
         }
