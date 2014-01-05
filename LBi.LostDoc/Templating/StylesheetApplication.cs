@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Xsl;
 using LBi.LostDoc.Diagnostics;
@@ -36,7 +37,7 @@ namespace LBi.LostDoc.Templating
         public List<AssetSection> Sections { get; set; }
         public string Input { get; set; }
 
-        public override WorkUnitResult Execute(ITemplatingContext context)
+        protected virtual WorkUnitResult Execute(ITemplatingContext context)
         {
             Stopwatch localTimer = Stopwatch.StartNew();
 
@@ -87,12 +88,16 @@ namespace LBi.LostDoc.Templating
 
             localTimer.Stop();
 
-            WorkUnitResult result = new WorkUnitResult
-                                        {
-                                            WorkUnit = this,
-                                            Duration = (long)Math.Round(localTimer.ElapsedTicks/(double)Stopwatch.Frequency*1000000)
-                                        };
-            return result;
+            return new WorkUnitResult(this,
+                                      (long)
+                                      Math.Round(localTimer.ElapsedTicks / (double)Stopwatch.Frequency * 1000000),
+                                      context.OutputFileProvider,
+                                      this.SaveAs);
+        }
+
+        public override Task<WorkUnitResult> CreateTask(ITemplatingContext context)
+        {
+            return new Task<WorkUnitResult>(() => this.Execute(context));
         }
     }
 }

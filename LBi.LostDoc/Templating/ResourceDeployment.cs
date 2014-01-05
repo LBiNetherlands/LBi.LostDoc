@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Templating
@@ -39,7 +40,49 @@ namespace LBi.LostDoc.Templating
 
         public string ResourcePath { get; protected set; }
 
-        public override WorkUnitResult Execute(ITemplatingContext context)
+        public WorkUnitResult Execute(ITemplatingContext context)
+        {
+            Stopwatch localTimer = new Stopwatch();
+
+            // copy resources to output dir
+            string target = this.Destination ?? this.ResourcePath;
+
+            if (this.Destination != null)
+            {
+                TraceSources.TemplateSource.TraceInformation("Copying resource: {0} => {1}",
+                                                             this.ResourcePath,
+                                                             this.Destination);
+            }
+            else
+                TraceSources.TemplateSource.TraceInformation("Copying resource: {0}", this.ResourcePath);
+
+
+            using (Stream streamSrc = this.FileProvider.OpenFile(this.ResourcePath, FileMode.Open))
+            using (Stream streamDest = context.OutputFileProvider.OpenFile(target, FileMode.Create))
+            {
+                Stream outStream = streamSrc;
+                for (int i = 0; i < this.Transforms.Length; i++)
+                {
+                    TraceSources.TemplateSource.TraceInformation("Applying '{0}' to resource: {1}",
+                                                                 this.Transforms[i].GetType().Name,
+                                                                 this.ResourcePath);
+                    Stream oldStream = outStream;
+                    outStream = this.Transforms[i].Transform(outStream);
+                    oldStream.Dispose();
+                }
+                outStream.CopyTo(streamDest);
+                streamDest.Close();
+                outStream.Dispose();
+            }
+
+            return new WorkUnitResult(this,
+                                      (long)
+                                      Math.Round(((double)localTimer.ElapsedTicks / Stopwatch.Frequency) * 1, 000, 000),
+                                      context.OutputFileProvider,
+                                      target);
+        }
+
+        public override Task<WorkUnitResult> CreateTask(ITemplatingContext context)
         {
             Stopwatch localTimer = new Stopwatch();
 
@@ -74,11 +117,11 @@ namespace LBi.LostDoc.Templating
                 outStream.Dispose();
             }
 
-            return new WorkUnitResult
-                       {
-                           WorkUnit = this,
-                           Duration = (long)Math.Round(((double)localTimer.ElapsedTicks / Stopwatch.Frequency) * 1,000,000)
-                       };
+            return new WorkUnitResult(this,
+                                      (long)
+                                      Math.Round(((double) localTimer.ElapsedTicks/Stopwatch.Frequency)*1, 000, 000),
+                                      context.OutputFileProvider,
+                                      target);
         }
     }
 }

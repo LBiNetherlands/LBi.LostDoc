@@ -44,15 +44,7 @@ using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
-    public class OnDemandTaskScheduler
-    {
-        public void Add(Task task)
-        {
-            
-        }
-    }
-
-    // TODO consider moving parsing code into a TemplateParser class
+    // TODO figure out how to untangle this mess of a class, extract parsing to TemplateParser
     // TODO fix error handling, a bad template.xml file will just throw random exceptions, xml schema validation?
     public class Template
     {
@@ -67,6 +59,8 @@ namespace LBi.LostDoc.Templating
         private XDocument _templateDefinition;
         private string _templateSourcePath;
         private TemplateInfo _templateInfo;
+        private readonly DependencyProvider _dependencyProvider;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public event EventHandler<ProgressArgs> Progress;
 
@@ -86,6 +80,8 @@ namespace LBi.LostDoc.Templating
             this._resolvers.Add(new MsdnResolver());
             this._uriFactory = new DefaultUniqueUriFactory();
             this._container = container;
+            this._cancellationTokenSource = new CancellationTokenSource();
+            this._dependencyProvider = new DependencyProvider(this._cancellationTokenSource.Token);
         }
 
         #region LoadFrom Template
@@ -109,14 +105,13 @@ namespace LBi.LostDoc.Templating
         {
             foreach (XElement elem in elements)
             {
-                yield return
-                    new AssetRegistration
-                        {
-                            Variables = this.ParseVariables(elem).ToArray(),
-                            SelectExpression = this.GetAttributeValueOrDefault(elem, "select", "."),
-                            AssetIdExpression = this.GetAttributeValue(elem, "assetId"),
-                            VersionExpression = this.GetAttributeValue(elem, "version"),
-                        };
+                yield return new AssetRegistration
+                             {
+                                 Variables = this.ParseVariables(elem).ToArray(),
+                                 SelectExpression = elem.GetAttributeValueOrDefault("select", "."),
+                                 AssetIdExpression = elem.GetAttributeValue("assetId"),
+                                 VersionExpression = elem.GetAttributeValue("version"),
+                             };
             }
         }
 
@@ -124,25 +119,23 @@ namespace LBi.LostDoc.Templating
         {
             foreach (XElement elem in elements)
             {
-                yield return
-                    new SectionRegistration
-                        {
-                            SelectExpression = this.GetAttributeValue(elem, "select"),
-                            NameExpression = this.GetAttributeValue(elem, "name"),
-                            AssetIdExpression = this.GetAttributeValue(elem, "assetId"),
-                            VersionExpression = this.GetAttributeValue(elem, "version"),
-                            ConditionExpression = GetAttributeValueOrDefault(elem, "condition"),
-                            Variables = this.ParseVariables(elem).ToArray(),
-                        };
+                yield return new SectionRegistration
+                             {
+                                 SelectExpression = elem.GetAttributeValue("select"),
+                                 NameExpression = elem.GetAttributeValue("name"),
+                                 AssetIdExpression = elem.GetAttributeValue("assetId"),
+                                 VersionExpression = elem.GetAttributeValue("version"),
+                                 ConditionExpression = elem.GetAttributeValueOrDefault("condition"),
+                                 Variables = this.ParseVariables(elem).ToArray(),
+                             };
             }
         }
 
         private IEnumerable<XPathVariable> ParseVariables(XElement element)
         {
-            return
-                element.Attributes()
-                       .Where(a => a.Name.NamespaceName == Namespaces.Variable)
-                       .Select(a => new ExpressionXPathVariable(a.Name.LocalName, a.Value));
+            return element.Attributes()
+                          .Where(a => a.Name.NamespaceName == Namespaces.Variable)
+                          .Select(a => new ExpressionXPathVariable(a.Name.LocalName, a.Value));
         }
 
         private IEnumerable<XPathVariable> ParseParams(IEnumerable<XElement> elements)
@@ -151,8 +144,8 @@ namespace LBi.LostDoc.Templating
             {
                 if (elem.Name.LocalName == "with-param")
                 {
-                    yield return new ExpressionXPathVariable(this.GetAttributeValue(elem, "name"),
-                                                             this.GetAttributeValue(elem, "select"));
+                    yield return new ExpressionXPathVariable(elem.GetAttributeValue("name"),
+                                                             elem.GetAttributeValue("select"));
                 }
                 else
                 {
@@ -177,7 +170,7 @@ namespace LBi.LostDoc.Templating
             {
                 XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                 XsltSettings settings = new XsltSettings(true, true);
-                XmlResolver resolver = new XmlFileProviderResolver(fileProvider);
+                XmlResolver resolver = new XmlFileProviderResolver(fileProvider, );
                 ret.Load(reader, settings, resolver);
             }
 
@@ -239,7 +232,7 @@ namespace LBi.LostDoc.Templating
                         if (EvalCondition(xpathContext, assetInputElement, assetRegistration.ConditionExpression))
                         {
                             this._fileResolver.Add(assetId, new Version(version), newUri);
-                            assetIdentifiers.Add(AssetIdentifier.Parse(assetId));
+                            assetIdentifiers.Add(new AssetIdentifier(assetId, version));
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}",
                                                                      assetId,
                                                                      version,
@@ -313,8 +306,6 @@ namespace LBi.LostDoc.Templating
             xpathContext.PopVariableScope(); // 1
         }
 
-
-
         private static IEnumerable<KeyValuePair<string, object>> ResolveXsltParams(IEnumerable<XPathVariable> xsltParams,
                                                                                    XNode contextNode,
                                                                                    XsltContext xpathContext)
@@ -351,7 +342,6 @@ namespace LBi.LostDoc.Templating
                 workingDoc = XDocument.Load(xmlReader, LoadOptions.SetLineInfo);
 
             // template inheritence
-            //XAttribute templateInheritsAttr = workingDoc.Root.Attribute("inherits");
             if (this._templateInfo.Inherits != null)
             {
 
@@ -386,13 +376,13 @@ namespace LBi.LostDoc.Templating
 
             foreach (XElement paramNode in paramNodes)
             {
-                string name = this.GetAttributeValue(paramNode, "name");
+                string name = paramNode.GetAttributeValue("name");
                 object argValue;
                 if (templateData.Arguments.TryGetValue(name, out argValue))
                     globalParams.Add(new ConstantXPathVariable(name, argValue));
                 else
                 {
-                    string expr = this.GetAttributeValueOrDefault(paramNode, "select");
+                    string expr = paramNode.GetAttributeValueOrDefault("select");
                     globalParams.Add(new ExpressionXPathVariable(name, expr));
                 }
             }
@@ -421,7 +411,7 @@ namespace LBi.LostDoc.Templating
             List<Index> indices = new List<Index>();
             foreach (XElement elem in workingDoc.Root.Elements())
             {
-                // we alread proessed the parameters
+                // we alread processed the parameters
                 if (elem.Name.LocalName == "parameter")
                     continue;
 
@@ -467,7 +457,7 @@ namespace LBi.LostDoc.Templating
 
         private Resource ParseResouceDefinition(IFileProvider provider, XElement elem)
         {
-            string source = this.GetAttributeValue(elem, "path");
+            string source = elem.GetAttributeValue("path");
 
             XAttribute outputAttr = elem.Attribute("output");
 
@@ -480,16 +470,16 @@ namespace LBi.LostDoc.Templating
             List<ResourceTransform> transforms = new List<ResourceTransform>();
             foreach (XElement transform in elem.Elements("transform"))
             {
-                string transformName = this.GetAttributeValue(transform, "name");
+                string transformName = transform.GetAttributeValue("name");
 
                 var transformParams = transform.Elements("with-param")
-                                               .Select(p => new ExpressionXPathVariable(this.GetAttributeValue(p, "name"),
-                                                                                        this.GetAttributeValue(p, "select")));
+                                               .Select(p => new ExpressionXPathVariable(p.GetAttributeValue("name"),
+                                                                                        p.GetAttributeValue("select")));
 
                 transforms.Add(new ResourceTransform(transformName, transformParams));
             }
 
-            var resource = new Resource(this.GetAttributeValueOrDefault(elem, "condition"),
+            var resource = new Resource(elem.GetAttributeValueOrDefault("condition"),
                                         this.ParseVariables(elem).ToArray(),
                                         provider,
                                         source,
@@ -505,10 +495,10 @@ namespace LBi.LostDoc.Templating
             XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
             while (metaNode != null)
             {
-                if (EvalCondition(customContext, metaNode, this.GetAttributeValueOrDefault(metaNode, "condition")))
+                if (EvalCondition(customContext, metaNode, metaNode.GetAttributeValueOrDefault("condition")))
                 {
                     XslCompiledTransform metaTransform = this.LoadStylesheet(provider,
-                                                                             this.GetAttributeValue(metaNode, "stylesheet"));
+                                                                             metaNode.GetAttributeValue("stylesheet"));
 
                     XsltArgumentList xsltArgList = new XsltArgumentList();
 
@@ -519,8 +509,8 @@ namespace LBi.LostDoc.Templating
 
                     foreach (XElement paramNode in metaParamNodes)
                     {
-                        string pName = this.GetAttributeValue(paramNode, "name");
-                        string pExpr = this.GetAttributeValue(paramNode, "select");
+                        string pName = paramNode.GetAttributeValue("name");
+                        string pExpr = paramNode.GetAttributeValue("select");
 
                         try
                         {
@@ -567,7 +557,7 @@ namespace LBi.LostDoc.Templating
 
 
                     TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
-                                                             this.GetAttributeValue(metaNode, "stylesheet"));
+                                                             metaNode.GetAttributeValue("stylesheet"));
 
                     TraceSources.TemplateSource.TraceData(TraceEventType.Verbose, 1, outputDoc.CreateNavigator());
 
@@ -587,9 +577,9 @@ namespace LBi.LostDoc.Templating
 
         protected virtual Index ParseIndexDefinition(XElement elem)
         {
-            return new Index(this.GetAttributeValue(elem, "name"),
-                             this.GetAttributeValue(elem, "match"),
-                             this.GetAttributeValue(elem, "key"));
+            return new Index(elem.GetAttributeValue("name"),
+                             elem.GetAttributeValue("match"),
+                             elem.GetAttributeValue("key"));
         }
 
         private static bool EvalCondition(CustomXsltContext customContext, XNode contextNode, string condition)
@@ -622,7 +612,7 @@ namespace LBi.LostDoc.Templating
         {
 
             var nameAttr = elem.Attribute("name");
-            var src = this.GetAttributeValue(elem, "stylesheet");
+            var src = elem.GetAttributeValue("stylesheet");
             string name;
             if (nameAttr != null)
             {
@@ -650,38 +640,18 @@ namespace LBi.LostDoc.Templating
                        {
                            Source = src,
                            Transform = transform,
-                           SelectExpression = this.GetAttributeValue(elem, "select"),
-                           InputExpression = this.GetAttributeValueOrDefault(elem, "input"),
-                           OutputExpression = this.GetAttributeValue(elem, "output"),
+                           SelectExpression = elem.GetAttributeValueOrDefault("select", "/"),
+                           InputExpression = elem.GetAttributeValueOrDefault("input"),
+                           OutputExpression = elem.GetAttributeValueOrDefault("output"),
                            XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
                            Variables = this.ParseVariables(elem).ToArray(),
                            Name = name,
                            Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
                            AssetRegistrations = this.ParseAssetRegistration(elem.Elements("register-asset")).ToArray(),
-                           ConditionExpression = GetAttributeValueOrDefault(elem, "condition")
+                           ConditionExpression = elem.GetAttributeValueOrDefault("condition")
                        };
 
             return ret;
-        }
-
-        private string GetAttributeValueOrDefault(XElement elem, string attName, string defaultValue = null)
-        {
-            var attr = elem.Attribute(attName);
-
-            if (attr == null)
-                return defaultValue;
-
-            return attr.Value;
-        }
-
-        private string GetAttributeValue(XElement elem, string attName)
-        {
-            var attr = elem.Attribute(attName);
-
-            if (attr == null)
-                throw TemplateException.MissingAttribute(this._templateSourcePath, elem, attName);
-
-            return attr.Value;
         }
 
         /// <summary>
@@ -762,6 +732,17 @@ namespace LBi.LostDoc.Templating
                 context.DocumentIndex.BuildIndexes();
             }
 
+            //List<Task<WorkUnitResult>> tasks = new List<Task<WorkUnitResult>>();
+
+            //foreach (UnitOfWork unitOfWork in work)
+            //{
+            //    Task<WorkUnitResult> task = new Task<WorkUnitResult>(uow => ((UnitOfWork) uow).Execute(context), unitOfWork);
+            //    tasks.Add(task);
+            //    this._dependencyProvider.Add(uow.);
+            //}
+            //    work.Select(uow => new Task<WorkUnitResult>(() => uow.Execute(context)));
+
+            //this._dependencyProvider.Add(); 
 
             int totalCount = work.Count;
             long lastProgress = Stopwatch.GetTimestamp();
@@ -794,7 +775,7 @@ namespace LBi.LostDoc.Templating
                              parallelOptions,
                              uow =>
                              {
-                                 results.Add(uow.Execute(context));
+                                 results.Add(uow.CreateTask(context));
                                  int c = Interlocked.Increment(ref processed);
                                  long lp = Interlocked.Read(ref lastProgress);
                                  if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 5.0)

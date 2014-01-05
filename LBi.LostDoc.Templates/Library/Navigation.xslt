@@ -28,7 +28,7 @@
   <xsl:template match="/bundle">
     <node text="Library" assetId="">
       <!-- target="ld:resolveAsset('*:*', '0.0.0.0')" assetId="{{*:*,0.0.0.0}} -->
-      
+
       <!-- assemblies -->
       <xsl:apply-templates select="assembly[@phase = '0']">
         <xsl:sort select="@name"/>
@@ -36,9 +36,9 @@
 
       <!-- global namespace -->
       <xsl:apply-templates select="assembly/namespace[@name = '' and @phase = '0']"/>
-      
+
       <!-- rest of namespaces -->
-      <xsl:apply-templates select="assembly/namespace[@name != '' and @phase = '0']">
+      <xsl:apply-templates select="assembly/namespace[@name != '' and @phase = '0']" mode="named-root-namespace">
         <xsl:sort select="@name"/>
       </xsl:apply-templates>
     </node>
@@ -50,17 +50,51 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="namespace">
+  <xsl:template match="namespace" mode="named-root-namespace">
     <xsl:if test="not(preceding::namespace[@name=current()/@name and @phase = '0'] | //namespace[starts-with(current()/@name, concat(@name, '.'))])">
       <node text="{@name}" assetId="{@assetId}">
         <!-- child namespaces -->
         <xsl:apply-templates select="/bundle/assembly/namespace[starts-with(@name, concat(current()/@name, '.')) and @phase = '0']">
           <xsl:sort select="@name"/>
+          <xsl:with-param name="parent" select="@name"/>
         </xsl:apply-templates>
       </node>
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="namespace">
+    <xsl:param name="parent" />
+    <xsl:if test="not(preceding::namespace[@name=current()/@name and @phase = '0'])">
+      <xsl:if test="not(contains(substring-after(@name, concat($parent, '.')), '.')) or not(//namespace[starts-with(current()/@name, concat(@name, '.')) and not(contains(substring-after(current()/@name, concat(@name, '.')), '.'))])">
+        <node text="{@name}" assetId="{@assetId}">
+          <!-- child namespaces -->
+          <xsl:apply-templates select="/bundle/assembly/namespace[starts-with(@name, concat(current()/@name, '.')) and @phase = '0']">
+            <xsl:sort select="@name"/>
+            <xsl:with-param name="parent" select="@name"/>
+          </xsl:apply-templates>
+
+          <xsl:apply-templates select="*"/>
+        </node>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="*[parent::namespace]">
+    <node text="{@name}" assetId="{@assetId}">
+      <!-- constructors -->
+      <xsl:apply-templates select="constructor"/>
+
+      <!-- other members -->
+      <xsl:apply-templates select="method | field | operator | event">
+        <xsl:sort select="@name"/>
+      </xsl:apply-templates>
+    </node>
+  </xsl:template>
+
+
+  <xsl:template match="method | field | constructor | operator | event">
+    <node text="{@name}" assetId="{@assetId}" />
+  </xsl:template>
 
   <xsl:template match="@* | node()" mode="copy">
     <xsl:copy>

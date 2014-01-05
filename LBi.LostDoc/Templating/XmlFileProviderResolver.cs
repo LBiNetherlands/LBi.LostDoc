@@ -24,14 +24,14 @@ namespace LBi.LostDoc.Templating
 {
     public class XmlFileProviderResolver : XmlResolver
     {
-        private readonly string _basePath;
         private readonly IFileProvider _fileProvider;
+        private readonly IDependencyProvider _dependencyProvider;
 
         // TODO investigate whether basePath can be deleted entirely
-        public XmlFileProviderResolver(IFileProvider fileProvider, string basePath = null)
+        public XmlFileProviderResolver(IFileProvider fileProvider, IDependencyProvider dependencyProvider)
         {
+            this._dependencyProvider = dependencyProvider;
             this._fileProvider = fileProvider;
-            this._basePath = basePath;
         }
 
         /// <summary>
@@ -76,6 +76,9 @@ namespace LBi.LostDoc.Templating
         {
             string uri = absoluteUri.ToString();
 
+            if (this._dependencyProvider.Exists(absoluteUri))
+                return this._dependencyProvider.GetDependency(absoluteUri);
+
             if (this._fileProvider.FileExists(uri))
                 return this._fileProvider.OpenFile(uri, FileMode.Open);
 
@@ -84,9 +87,6 @@ namespace LBi.LostDoc.Templating
 
         public override Uri ResolveUri(Uri baseUri, string relativeUri)
         {
-            if (this._basePath != null)
-                return new Uri(this._basePath + "/" + relativeUri, UriKind.Relative);
-
             return new Uri(relativeUri, UriKind.RelativeOrAbsolute);
         }
     }

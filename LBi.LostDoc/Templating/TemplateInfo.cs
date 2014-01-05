@@ -26,7 +26,6 @@ namespace LBi.LostDoc.Templating
 {
     public class TemplateInfo
     {
-        // TODO we can eliminate the TemplateResolver here once we remove it as a requirement for the Template class
         public TemplateInfo(IFileProvider source, string path, string name, TemplateParameterInfo[] parameters, TemplateInfo inheritedTemplate)
         {
             this.Source = source;
@@ -101,8 +100,8 @@ namespace LBi.LostDoc.Templating
                 foreach (XElement parameterElement in parameterElements)
                 {
                     string paramName = parameterElement.Attribute("name").Value;
-                    string defaultValue = ReadOptionalAttribute(parameterElement, "select");
-                    string description = ReadOptionalAttribute(parameterElement, "description");
+                    string defaultValue = parameterElement.GetAttributeValueOrDefault("select");
+                    string description = parameterElement.GetAttributeValueOrDefault("description");
 
                     // add or override inherited parameter default value
                     parameters[paramName] = new TemplateParameterInfo(paramName, description, defaultValue);
@@ -110,14 +109,6 @@ namespace LBi.LostDoc.Templating
             }
 
             return new TemplateInfo(source, specPath, name, parameters.Values.ToArray(), inheritedTemplate);
-        }
-
-        private static string ReadOptionalAttribute(XElement element, string attribute)
-        {
-            var xattr = element.Attribute(attribute);
-            if (xattr == null)
-                return null;
-            return xattr.Value;
         }
     }
 }

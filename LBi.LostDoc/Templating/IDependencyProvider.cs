@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 DigitasLBi Netherlands B.V.
+ * Copyright 2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@
  * limitations under the License. 
  */
 
-using System.Threading.Tasks;
+using System;
+using System.IO;
 
 namespace LBi.LostDoc.Templating
 {
-    public abstract class UnitOfWork
+    public interface IDependencyProvider
     {
-
-        public virtual Task<WorkUnitResult> CreateTask(ITemplatingContext context)
-        {
-            return new Task<WorkUnitResult>(() => this.Execute(context));
-        }
-
-        protected abstract WorkUnitResult Execute(ITemplatingContext context);
-
+        Stream GetDependency(Uri uri);
+        bool Exists(Uri uri);
     }
 }

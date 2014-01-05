@@ -255,6 +255,12 @@ namespace LBi.LostDoc.Reflection
                 }
             }
 
+            if (ret == null)
+            {
+                TraceSources.AssemblyLoader.TraceCritical("Failed to load assembly '{0}'", fullName);
+                throw new FileNotFoundException("Failed to load: " + fullName);
+            }
+
             this.RegisterAssembly(ret, direct: direct);
 
             return ret;

@@ -105,15 +105,18 @@
     <Compile Include="Templating\AssetSection.cs" />
     <Compile Include="Templating\ConstantXPathVariable.cs" />
     <Compile Include="Templating\DefaultUniqueUriFactory.cs" />
+    <Compile Include="Templating\DependencyProvider.cs" />
     <Compile Include="Templating\ExportTransformAttribute.cs" />
     <Compile Include="Templating\ExpressionXPathVariable.cs" />
     <Compile Include="Templating\FileProviders\DirectoryFileProvider.cs" />
     <Compile Include="Templating\AssetResolvers\FileResolver.cs" />
     <Compile Include="Templating\AssetResolvers\MsdnResolver.cs" />
     <Compile Include="Templating\FileProviders\HttpFileProvider.cs" />
+    <Compile Include="Templating\IDependencyProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
     <Compile Include="Templating\IUniqueUriFactory.cs" />
+    <Compile Include="Templating\MissingNodeException.cs" />
     <Compile Include="Templating\ParameterExport.cs" />
     <Compile Include="Templating\ResourceTransform.cs" />
     <Compile Include="Templating\ScopedFileProvider.cs" />
@@ -138,6 +141,7 @@
     <Compile Include="Templating\UnitOfWork.cs" />
     <Compile Include="Templating\UriExtensions.cs" />
     <Compile Include="Templating\WorkUnitResult.cs" />
+    <Compile Include="Templating\XDomExtensions.cs" />
     <Compile Include="Templating\XPathVariable.cs" />
     <Compile Include="Templating\XPath\XPathNavigatorIterator.cs" />
     <Compile Include="Templating\XPath\CustomXsltContext.cs" />

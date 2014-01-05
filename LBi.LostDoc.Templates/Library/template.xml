@@ -51,6 +51,8 @@
     <with-param name="value" select="concat('images/logo.', substring-after-last($LogoUrl, '.'))"/>
   </meta-template>
 
+  <apply-stylesheet stylesheet="EnrichNaming.xslt" />
+
   <apply-stylesheet name="Navigation"
                     select="/"
                     output="'Navigation.xml'"
@@ -62,7 +64,7 @@
                     output="'Navigation2.xml'"
                     stylesheet="Navigation.xslt"/>-->
 
-  <apply-stylesheet name="Library"
+  <!--<apply-stylesheet name="Library"
                     select="/bundle"
                     output="'Library.html'"
                     stylesheet="Library.xslt">
@@ -111,7 +113,6 @@
 
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
-
 
   <apply-stylesheet name="Enumerations"
                     select="/bundle/assembly/namespace//enum[@phase = '0']"
@@ -165,7 +166,6 @@
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
 
-
   <apply-stylesheet name="Remaining methods"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and namespace-uri(.) = '' and @phase = '0']/method[not(@declaredAs) and not(preceding-sibling::method/@name = @name) and not(following-sibling::method/@name = @name)]"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', coalesce(substring-after-last(@name, '.'), @name)), '`.&lt;&gt;', '-/()'),  '.html')"
@@ -211,7 +211,6 @@
 
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
-
 
   <apply-stylesheet name="Remaining properties"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface|self::enum) and namespace-uri(.) = '' and @phase = '0']/property[not(@declaredAs) and not(preceding-sibling::property/@name = @name) and not(following-sibling::property/@name = @name)]"
@@ -289,6 +288,6 @@
                     version="get-version(@assetId)"/>
     
     <with-param name="assetId" select="@assetId" />
-  </apply-stylesheet>
+  </apply-stylesheet>-->
 
 </template>

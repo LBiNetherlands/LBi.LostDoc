@@ -1,5 +1,5 @@
-/*
- * Copyright 2012-2014 DigitasLBi Netherlands B.V.
+﻿/*
+ * Copyright 2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,25 @@
  * limitations under the License. 
  */
 
-using System.Threading.Tasks;
+using System;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace LBi.LostDoc.Templating
 {
-    public abstract class UnitOfWork
+    public class MissingNodeException : Exception
     {
-
-        public virtual Task<WorkUnitResult> CreateTask(ITemplatingContext context)
+        public MissingNodeException(XNode parent, XmlNodeType missingNodeType, string name)
         {
-            return new Task<WorkUnitResult>(() => this.Execute(context));
+            this.Parent = parent;
+            this.Name = name;
+            this.Type = missingNodeType;
         }
 
-        protected abstract WorkUnitResult Execute(ITemplatingContext context);
+        public XmlNodeType Type { get; private set; }
 
+        public string Name { get; private set; }
+
+        public XNode Parent { get; private set; }
     }
 }

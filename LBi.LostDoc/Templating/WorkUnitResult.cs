@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,34 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
+using System.IO;
 
 namespace LBi.LostDoc.Templating
 {
     public class WorkUnitResult
     {
-        public UnitOfWork WorkUnit { get; set; }
+        public WorkUnitResult(UnitOfWork unitOfWork, long duration, IFileProvider fileProvider, string path)
+        {
+            this.WorkUnit = unitOfWork;
+            this.Duration = duration;
+            this.FileProvider = fileProvider;
+            this.Path = path;
+        }
+
+        public string Path { get; protected set; }
+
+        public IFileProvider FileProvider { get; protected set; }
+
+        public UnitOfWork WorkUnit { get; protected set; }
 
         /// <summary>
         ///   Micro seconds.
         /// </summary>
-        public long Duration { get; set; }
+        public long Duration { get; protected set; }
+
+        public virtual Stream GetStream()
+        {
+            return this.FileProvider.OpenFile(this.Path, FileMode.Open);
+        }
     }
 }
