@@ -170,7 +170,7 @@ namespace LBi.LostDoc.Templating
             {
                 XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                 XsltSettings settings = new XsltSettings(true, true);
-                XmlResolver resolver = new XmlFileProviderResolver(fileProvider, null);
+                XmlResolver resolver = new XmlFileProviderResolver(fileProvider);
                 ret.Load(reader, settings, resolver);
             }
 
@@ -593,7 +593,7 @@ namespace LBi.LostDoc.Templating
                              parallelOptions,
                              uow =>
                              {
-                                 results.Add(uow.CreateTask(context));
+                                 results.Add(uow.Execute(context));
                                  int c = Interlocked.Increment(ref processed);
                                  long lp = Interlocked.Read(ref lastProgress);
                                  if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 5.0)

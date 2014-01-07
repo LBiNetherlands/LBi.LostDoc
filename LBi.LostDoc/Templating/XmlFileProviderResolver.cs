@@ -25,12 +25,9 @@ namespace LBi.LostDoc.Templating
     public class XmlFileProviderResolver : XmlResolver
     {
         private readonly IFileProvider _fileProvider;
-        private readonly IDependencyProvider _dependencyProvider;
 
-        // TODO investigate whether basePath can be deleted entirely
-        public XmlFileProviderResolver(IFileProvider fileProvider, IDependencyProvider dependencyProvider)
+        public XmlFileProviderResolver(IFileProvider fileProvider)
         {
-            this._dependencyProvider = dependencyProvider;
             this._fileProvider = fileProvider;
         }
 
@@ -75,9 +72,6 @@ namespace LBi.LostDoc.Templating
         public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
         {
             string uri = absoluteUri.ToString();
-
-            if (this._dependencyProvider.Exists(absoluteUri))
-                return this._dependencyProvider.GetDependency(absoluteUri);
 
             if (this._fileProvider.FileExists(uri))
                 return this._fileProvider.OpenFile(uri, FileMode.Open);

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -28,23 +29,41 @@ namespace LBi.LostDoc.Templating
 {
     public class StylesheetApplication : UnitOfWork
     {
-        public XslCompiledTransform Transform { get; set; }
-        public IEnumerable<KeyValuePair<string, object>> XsltParams { get; set; }
-        public string SaveAs { get; set; }
-        public XNode InputNode { get; set; }
-        public AssetIdentifier[] AssetIdentifiers { get; set; }
-        public string StylesheetName { get; set; }
-        public List<AssetSection> Sections { get; set; }
-        public string Input { get; set; }
+        public StylesheetApplication(string outputPath,
+                                     XNode inputNode,
+                                     IEnumerable<KeyValuePair<string, object>> xsltParams,
+                                     IEnumerable<AssetIdentifier> assetIdentifiers,
+                                     string stylesheetName,
+                                     IEnumerable<AssetSection> sections,
+                                     string input,
+                                     XslCompiledTransform transform)
+            : base(outputPath)
+        {
+            this.InputNode = inputNode;
+            this.XsltParams = xsltParams.ToArray();
+            this.AssetIdentifiers = assetIdentifiers.ToArray();
+            this.StylesheetName = stylesheetName;
+            this.Sections = sections.ToArray();
+            this.Input = input;
+            this.Transform = transform;
+        }
 
-        protected virtual WorkUnitResult Execute(ITemplatingContext context)
+        public XslCompiledTransform Transform { get; protected set; }
+        public KeyValuePair<string, object>[] XsltParams { get; protected set; }
+        public XNode InputNode { get; protected set; }
+        public AssetIdentifier[] AssetIdentifiers { get; protected set; }
+        public string StylesheetName { get; protected set; }
+        public AssetSection[] Sections { get; protected set; }
+        public string Input { get; protected set; }
+
+        public override WorkUnitResult Execute(ITemplatingContext context)
         {
             Stopwatch localTimer = Stopwatch.StartNew();
 
-            Uri newUri = new Uri(this.SaveAs, UriKind.RelativeOrAbsolute);
+            Uri newUri = new Uri(this.Path, UriKind.RelativeOrAbsolute);
             FileMode mode = FileMode.CreateNew;
             bool exists;
-            if (!(exists = context.TemplateData.OutputFileProvider.FileExists(this.SaveAs)) || context.TemplateData.OverwriteExistingFiles)
+            if (!(exists = context.TemplateData.OutputFileProvider.FileExists(this.Path)) || context.TemplateData.OverwriteExistingFiles)
             {
                 if (exists)
                     mode = FileMode.Create;
@@ -60,16 +79,16 @@ namespace LBi.LostDoc.Templating
                 // and custom extensions
                 argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, newUri));
 
-                using (Stream stream = context.TemplateData.OutputFileProvider.OpenFile(this.SaveAs, mode))
+                using (Stream stream = context.TemplateData.OutputFileProvider.OpenFile(this.Path, mode))
                 using (TextWriter writer = new StreamWriter(stream, Encoding.UTF8))
                 {
                     if (exists)
                     {
-                        TraceSources.TemplateSource.TraceWarning("Replacing {0}", this.SaveAs);
+                        TraceSources.TemplateSource.TraceWarning("Replacing {0}", this.Path);
                     }
                     else
                     {
-                        TraceSources.TemplateSource.TraceVerbose("{0}", this.SaveAs);
+                        TraceSources.TemplateSource.TraceVerbose("{0}", this.Path);
                     }
                     long tickStart = localTimer.ElapsedTicks;
                     this.Transform.Transform(context.Document, argList, writer);
@@ -88,16 +107,9 @@ namespace LBi.LostDoc.Templating
 
             localTimer.Stop();
 
-            return new WorkUnitResult(this,
-                                      (long)
-                                      Math.Round(localTimer.ElapsedTicks / (double)Stopwatch.Frequency * 1000000),
-                                      context.OutputFileProvider,
-                                      this.SaveAs);
-        }
-
-        public override Task<WorkUnitResult> CreateTask(ITemplatingContext context)
-        {
-            return new Task<WorkUnitResult>(() => this.Execute(context));
+            return new WorkUnitResult(context.OutputFileProvider,
+                                      this,
+                                      (long)Math.Round(localTimer.ElapsedTicks / (double)Stopwatch.Frequency * 1000000));
         }
     }
 }

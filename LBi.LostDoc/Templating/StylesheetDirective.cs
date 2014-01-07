@@ -156,17 +156,14 @@ namespace LBi.LostDoc.Templating
 
                 context.XsltContext.PopVariableScope(); // 1
 
-                yield return new StylesheetApplication
-                {
-                    Input = input,
-                    StylesheetName = this.Name,
-                    AssetIdentifiers = assetIdentifiers.ToArray(), /* list of AssetIdentifiers */
-                    Sections = sections, /* list of AssetSection */
-                    SaveAs = newUri.ToString(),
-                    Transform = this.Transform,
-                    InputNode = inputNode,
-                    XsltParams = xsltParams
-                };
+                yield return new StylesheetApplication(saveAs,
+                                                       inputNode,
+                                                       xsltParams,
+                                                       assetIdentifiers.ToArray(),
+                                                       this.Name,
+                                                       sections,
+                                                       input,
+                                                       this.Transform);
             }
         }
     }

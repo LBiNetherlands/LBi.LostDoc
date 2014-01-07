@@ -188,11 +188,11 @@ namespace LBi.LostDoc.Repository
                                 saDict.Add(aid, result);
                         }
 
-                        var indexResults = saDict.Values.Where(sa => sa.SaveAs.EndsWith(".xml"));
+                        var indexResults = saDict.Values.Where(sa => sa.Path.EndsWith(".xml"));
 
                         foreach (var sa in indexResults)
                         {
-                            string absPath = Path.Combine(htmlDir.FullName, sa.SaveAs);
+                            string absPath = Path.Combine(htmlDir.FullName, sa.Path);
 
                             XDocument indexDoc = XDocument.Load(absPath);
 
@@ -224,7 +224,7 @@ namespace LBi.LostDoc.Repository
                                 Document doc = new Document();
                                 
                                 doc.Add(new Field("uri",
-                                                  new Uri(ssApplication.SaveAs, UriKind.Relative).ToString(),
+                                                  new Uri(ssApplication.Path, UriKind.Relative).ToString(),
                                                   Field.Store.YES,
                                                   Field.Index.NO));
 
@@ -326,7 +326,7 @@ namespace LBi.LostDoc.Repository
             StylesheetApplication ssWu = (StylesheetApplication)wu.WorkUnit;
             return new XElement("document",
                                 ssWu.AssetIdentifiers.Select(wual => new XElement("assetId", new XAttribute("assetId", wual))),
-                                new XAttribute("output", ssWu.SaveAs),
+                                new XAttribute("output", ssWu.Path),
                                 ssWu.Sections.Select(wuse => new XElement("section",
                                                                           new XAttribute("name", wuse.Name),
                                                                           new XAttribute("assetId", wuse.AssetIdentifier))),

@@ -20,15 +20,14 @@ namespace LBi.LostDoc.Templating
 {
     public class WorkUnitResult
     {
-        public WorkUnitResult(UnitOfWork unitOfWork, long duration, IFileProvider fileProvider, string path)
+        public WorkUnitResult(IFileProvider fileProvder, UnitOfWork unitOfWork, long duration)
         {
+            this.FileProvider = fileProvder;
             this.WorkUnit = unitOfWork;
             this.Duration = duration;
-            this.FileProvider = fileProvider;
-            this.Path = path;
         }
 
-        public string Path { get; protected set; }
+        public string Path { get { return this.WorkUnit.Path; } }
 
         public IFileProvider FileProvider { get; protected set; }
 

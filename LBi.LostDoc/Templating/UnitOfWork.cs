@@ -14,19 +14,16 @@
  * limitations under the License. 
  */
 
-using System.Threading.Tasks;
-
 namespace LBi.LostDoc.Templating
 {
     public abstract class UnitOfWork
     {
-
-        public virtual Task<WorkUnitResult> CreateTask(ITemplatingContext context)
+        protected UnitOfWork(string path)
         {
-            return new Task<WorkUnitResult>(() => this.Execute(context));
+            this.Path = path;
         }
 
-        protected abstract WorkUnitResult Execute(ITemplatingContext context);
-
+        public string Path { get; protected set; }
+        public abstract WorkUnitResult Execute(ITemplatingContext context);
     }
 }
