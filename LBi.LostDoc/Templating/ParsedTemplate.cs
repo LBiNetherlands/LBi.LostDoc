@@ -16,6 +16,7 @@
 
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace LBi.LostDoc.Templating
@@ -23,20 +24,20 @@ namespace LBi.LostDoc.Templating
     public class ParsedTemplate
     {
         /// <summary>
-        /// Contains all stylesheet definitions specified in the template.
+        /// Contains all StylesheetDirective definitions specified in the template.
         /// </summary>
-        public Stylesheet[] Stylesheets { get; set; }
+        public StylesheetDirective[] StylesheetsDirectives { get; set; }
 
         /// <summary>
         /// Contains all resource definitions specified in the template.
         /// </summary>
-        public Resource[] Resources { get; set; }
+        public ResourceDirective[] ResourceDirectives { get; set; }
 
         /// <summary>
         /// Contains the index definitions specified in the template.
         /// </summary>
-        public Index[] Indices { get; set; }
-        
+        public IndexDirective[] IndexDirectives { get; set; }
+
         /// <summary>
         /// Contains the processed source document, required for template inheritence.
         /// </summary>
@@ -51,5 +52,22 @@ namespace LBi.LostDoc.Templating
         /// Temporary files generated while templating, useful for debugging.
         /// </summary>
         public TempFileCollection TemporaryFiles { get; set; }
+
+        public IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context)
+        {
+            var ret = Enumerable.Empty<UnitOfWork>();
+
+            context.XsltContext.PushVariableScope(context.Document.Root, this.Parameters);
+
+            foreach (ResourceDirective resource in this.ResourceDirectives)
+                ret = ret.Concat(resource.DiscoverWork(context));
+
+            foreach (StylesheetDirective stylesheet in this.StylesheetsDirectives)
+                ret = ret.Concat(stylesheet.DiscoverWork(context));
+
+            context.XsltContext.PopVariableScope();
+
+            return ret;
+        }
     }
 }

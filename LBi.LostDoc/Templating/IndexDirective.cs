@@ -16,9 +16,9 @@
 
 namespace LBi.LostDoc.Templating
 {
-    public class Index
+    public class IndexDirective
     {
-        public Index(string name, string matchExpr, string keyExpr)
+        public IndexDirective(string name, string matchExpr, string keyExpr)
         {
             this.Name = name;
             this.MatchExpr = matchExpr;

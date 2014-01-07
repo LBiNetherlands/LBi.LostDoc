@@ -16,6 +16,9 @@
 
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
+using System.Xml.Xsl;
+using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
@@ -39,6 +42,32 @@ namespace LBi.LostDoc.Templating
                 throw new MissingNodeException(elem, XmlNodeType.Attribute, attName);
 
             return attr.Value;
+        }
+
+        public static bool EvaluateCondition(this XNode contextNode, string condition, XsltContext customContext)
+        {
+            bool shouldApply;
+            if (string.IsNullOrWhiteSpace(condition))
+                shouldApply = true;
+            else
+            {
+                object value = contextNode.XPathEvaluate(condition, customContext);
+                shouldApply = XPathServices.ResultToBool(value);
+            }
+            return shouldApply;
+        }
+
+        public static string EvaluateValue(this XNode contextNode, string valueOrExpression, XsltContext customContext)
+        {
+            // TODO this is quick and dirty
+            if (valueOrExpression.StartsWith("{") && valueOrExpression.EndsWith("}"))
+            {
+                string expression = valueOrExpression.Substring(1, valueOrExpression.Length - 2);
+                object value = contextNode.XPathEvaluate(expression, customContext);
+                return XPathServices.ResultToString(value);
+            }
+
+            return valueOrExpression;
         }
     }
 }
