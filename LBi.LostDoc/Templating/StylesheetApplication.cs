@@ -20,7 +20,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Xsl;
 using LBi.LostDoc.Diagnostics;
@@ -36,7 +36,8 @@ namespace LBi.LostDoc.Templating
                                      string stylesheetName,
                                      IEnumerable<AssetSection> sections,
                                      string input,
-                                     XslCompiledTransform transform)
+                                     XslCompiledTransform transform,
+                                     IFileProvider fileProvider)
             : base(outputPath)
         {
             this.InputNode = inputNode;
@@ -46,15 +47,24 @@ namespace LBi.LostDoc.Templating
             this.Sections = sections.ToArray();
             this.Input = input;
             this.Transform = transform;
+            this.FileProvider = fileProvider;
         }
 
         public XslCompiledTransform Transform { get; protected set; }
+
         public KeyValuePair<string, object>[] XsltParams { get; protected set; }
+
         public XNode InputNode { get; protected set; }
+
         public AssetIdentifier[] AssetIdentifiers { get; protected set; }
+
         public string StylesheetName { get; protected set; }
+
         public AssetSection[] Sections { get; protected set; }
+
         public string Input { get; protected set; }
+
+        public IFileProvider FileProvider { get; protected set; }
 
         public override WorkUnitResult Execute(ITemplatingContext context)
         {
@@ -80,7 +90,7 @@ namespace LBi.LostDoc.Templating
                 argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, newUri));
 
                 using (Stream stream = context.TemplateData.OutputFileProvider.OpenFile(this.Path, mode))
-                using (TextWriter writer = new StreamWriter(stream, Encoding.UTF8))
+                using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false }))
                 {
                     if (exists)
                     {
@@ -91,10 +101,15 @@ namespace LBi.LostDoc.Templating
                         TraceSources.TemplateSource.TraceVerbose("{0}", this.Path);
                     }
                     long tickStart = localTimer.ElapsedTicks;
-                    this.Transform.Transform(context.Document, argList, writer);
-                    TraceSources.TemplateSource.TraceVerbose("Transform applied in: {0:N0} ms",
-                                                             ((localTimer.ElapsedTicks - tickStart) /
-                                                              (double)Stopwatch.Frequency) * 1000);
+                    
+                    this.Transform.Transform(context.Document,
+                                             argList,
+                                             writer,
+                                             TODO FIX FIX FIX);
+
+                    double duration = ((localTimer.ElapsedTicks - tickStart) / (double)Stopwatch.Frequency) * 1000;
+
+                    TraceSources.TemplateSource.TraceVerbose("Transform applied in: {0:N0} ms", duration);
 
                     writer.Close();
                     stream.Close();

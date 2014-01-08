@@ -16,18 +16,14 @@
 
 using System;
 using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,9 +31,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
-using LBi.LostDoc.Composition;
 using LBi.LostDoc.Diagnostics;
-using LBi.LostDoc.Extensibility;
 using LBi.LostDoc.Templating.AssetResolvers;
 using LBi.LostDoc.Templating.FileProviders;
 using LBi.LostDoc.Templating.XPath;
@@ -178,10 +172,6 @@ namespace LBi.LostDoc.Templating
         }
 
         #endregion
-
-
-
-
 
         protected virtual ParsedTemplate PrepareTemplate(TemplateData templateData, Stack<IFileProvider> providers = null)
         {
@@ -511,8 +501,10 @@ namespace LBi.LostDoc.Templating
             ParsedTemplate tmpl = this.PrepareTemplate(templateData);
 
             // collect all work that has to be done
+            CustomXsltContext xsltContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
+            xsltContext.PushVariableScope(templateData.Document.Root, tmpl.Parameters);
             ITemplateContext templateContext = new TemplateContext(templateData.Document,
-                                                                   CreateCustomXsltContext(templateData.IgnoredVersionComponent),
+                                                                   xsltContext,
                                                                    this._uriFactory,
                                                                    this._fileResolver,
                                                                    this._container.Catalog);
@@ -550,14 +542,15 @@ namespace LBi.LostDoc.Templating
                 context.DocumentIndex.BuildIndexes();
             }
 
-            //List<Task<WorkUnitResult>> tasks = new List<Task<WorkUnitResult>>();
+            List<Task<WorkUnitResult>> tasks = new List<Task<WorkUnitResult>>();
 
-            //foreach (UnitOfWork unitOfWork in work)
-            //{
-            //    Task<WorkUnitResult> task = new Task<WorkUnitResult>(uow => ((UnitOfWork) uow).Execute(context), unitOfWork);
-            //    tasks.Add(task);
-            //    this._dependencyProvider.Add(uow.);
-            //}
+            // register all tasks in the dependency provider
+            foreach (UnitOfWork unitOfWork in work)
+            {
+                Task<WorkUnitResult> task = new Task<WorkUnitResult>(uow => ((UnitOfWork) uow).Execute(context), unitOfWork);
+                tasks.Add(task);
+                this._dependencyProvider.Add(new Uri(unitOfWork.Path, UriKind.RelativeOrAbsolute), task);
+            }
             //    work.Select(uow => new Task<WorkUnitResult>(() => uow.Execute(context)));
 
             //this._dependencyProvider.Add(); 

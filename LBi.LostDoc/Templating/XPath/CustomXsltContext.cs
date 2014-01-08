@@ -23,17 +23,10 @@ using System.Xml.Xsl;
 
 namespace LBi.LostDoc.Templating.XPath
 {
-    public class  ResolveEventArgs : EventArgs
-    {
-        public string Name { get; protected set; }
-        public object Value { get; protected set; }
-    }
-
-
     public class CustomXsltContext : System.Xml.Xsl.XsltContext
     {
-        protected Dictionary<string, IXsltContextFunction> Functions;
-        protected Stack<XPathVariableList> Variables;
+        protected readonly Dictionary<string, IXsltContextFunction> Functions;
+        protected readonly Stack<XPathVariableList> Variables;
 
         public CustomXsltContext()
         {
@@ -79,8 +72,7 @@ namespace LBi.LostDoc.Templating.XPath
             this.Functions[prefix + ":" + name] = function;
         }
 
-        public override IXsltContextFunction ResolveFunction(string prefix, string name,
-                                                             XPathResultType[] argTypes)
+        public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] argTypes)
         {
             IXsltContextFunction function;
 
