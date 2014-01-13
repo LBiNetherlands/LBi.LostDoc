@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Primitives;
+using System.Runtime.Caching;
 using System.Xml.Linq;
 using System.Xml.Xsl;
 using LBi.LostDoc.Templating.AssetResolvers;
@@ -29,18 +30,22 @@ namespace LBi.LostDoc.Templating
         private readonly IUniqueUriFactory _uniqueUriFactory;
         private readonly FileResolver _fileResolver;
 
-        public TemplateContext(XDocument document,
+        public TemplateContext(ObjectCache cache,
+                               XDocument document,
                                CustomXsltContext xsltContext,
                                IUniqueUriFactory uniqueUriFactory,
                                FileResolver fileResolver,
                                ComposablePartCatalog catalog)
         {
+            this.Cache = cache;
             this.XsltContext = xsltContext;
             this.Document = document;
             this._uniqueUriFactory = uniqueUriFactory;
             this._fileResolver = fileResolver;
             this.Catalog = catalog;
         }
+
+        public ObjectCache Cache { get; private set; }
 
         public ComposablePartCatalog Catalog { get; private set; }
 
@@ -61,7 +66,7 @@ namespace LBi.LostDoc.Templating
         
     }
 
-    public interface ITemplateContext
+    public interface ITemplateContext : IContextBase
     {
         CustomXsltContext XsltContext { get; }
 
@@ -70,8 +75,6 @@ namespace LBi.LostDoc.Templating
         void EnsureUniqueUri(ref Uri uri);
 
         void RegisterAssetUri(AssetIdentifier assetId, Uri uri);
-
-        ComposablePartCatalog Catalog { get; }
     }
 
     public interface ITemplateDirective<out TUnitOfWork> where TUnitOfWork : UnitOfWork

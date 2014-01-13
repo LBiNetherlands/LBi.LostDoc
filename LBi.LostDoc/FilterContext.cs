@@ -15,6 +15,7 @@
  */
 
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
 using System.Runtime.Caching;
 using LBi.LostDoc.Diagnostics;
@@ -25,9 +26,9 @@ namespace LBi.LostDoc
     {
         private IAssetFilter[] _filters;
 
-        public FilterContext(ObjectCache cache, CompositionContainer container, FilterState state, params IAssetFilter[] filters)
+        public FilterContext(ObjectCache cache, ComposablePartCatalog catalog, FilterState state, params IAssetFilter[] filters)
         {
-            this.Container = container;
+            this.Catalog = catalog;
             this.Cache = cache;
             this.State = state;
             this._filters = filters;
@@ -61,6 +62,6 @@ namespace LBi.LostDoc
 
         public ObjectCache Cache { get; private set; }
 
-        public CompositionContainer Container { get; private set; }
+        public ComposablePartCatalog Catalog { get; private set; }
     }
 }

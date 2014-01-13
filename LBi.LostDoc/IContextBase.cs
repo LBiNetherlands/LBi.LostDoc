@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License. 
  */
 
-using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.Runtime.Caching;
-using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc
 {
     public interface IContextBase
     {
         ObjectCache Cache { get; }
-        CompositionContainer Container { get; }
+        ComposablePartCatalog Catalog { get; }
     }
 }

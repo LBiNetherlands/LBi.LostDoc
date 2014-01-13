@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Xml.Linq;
@@ -26,9 +27,14 @@ namespace LBi.LostDoc.Templating
 {
     public class TemplatingContext : ITemplatingContext
     {
-        public TemplatingContext(ObjectCache cache, CompositionContainer container, IFileProvider outputFileProvider, TemplateData data, IEnumerable<IAssetUriResolver> resolvers, IFileProvider templateFileProvider)
+        public TemplatingContext(ObjectCache cache,
+                                 ComposablePartCatalog catalog,
+                                 IFileProvider outputFileProvider,
+                                 TemplateData data,
+                                 IEnumerable<IAssetUriResolver> resolvers,
+                                 IFileProvider templateFileProvider)
         {
-            this.Container = container;
+            this.Catalog = catalog;
             this.OutputFileProvider = outputFileProvider;
             this.TemplateData = data;
             this.AssetUriResolvers = resolvers.ToArray();
@@ -44,8 +50,6 @@ namespace LBi.LostDoc.Templating
 
         #region ITemplatingContext Members
 
-        public string BasePath { get; protected set; }
-
         public TemplateData TemplateData { get; protected set; }
         public XPathNavigatorIndex DocumentIndex { get; protected set; }
         public XPathNavigator Document { get; protected set; }
@@ -53,12 +57,13 @@ namespace LBi.LostDoc.Templating
         public IAssetUriResolver[] AssetUriResolvers { get; protected set; }
 
         public IFileProvider TemplateFileProvider { get; protected set; }
+
         public IFileProvider OutputFileProvider { get; private set; }
 
         #endregion
 
         public ObjectCache Cache { get; private set; }
 
-        public CompositionContainer Container { get; private set; }
+        public ComposablePartCatalog Catalog { get; private set; }
     }
 }

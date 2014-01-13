@@ -21,12 +21,10 @@ using LBi.LostDoc.Templating.XPath;
 namespace LBi.LostDoc.Templating
 {
     public interface ITemplatingContext : IContextBase
-    {
-        string BasePath { get; }
+    {        
         TemplateData TemplateData { get; }
         XPathNavigatorIndex DocumentIndex { get; }
         XPathNavigator Document { get; }
-
         IAssetUriResolver[] AssetUriResolvers { get; }
         IFileProvider TemplateFileProvider { get; }
         IFileProvider OutputFileProvider { get; }

@@ -108,7 +108,7 @@ namespace LBi.LostDoc
             // pass in assemblyLoader instead
             IAssetExplorer assetExplorer = new AssetExplorerCache(new ReflectionExplorer(assemblyLoader));
             IFilterContext filterContext = new FilterContext(this._cache,
-                                                             this._container,
+                                                             this._container.Catalog,
                                                              FilterState.Discovery,
                                                              this._filters.ToArray());
             // collect phase zero assets
@@ -119,7 +119,7 @@ namespace LBi.LostDoc
 
 
             IProcessingContext pctx = new ProcessingContext(this._cache,
-                                                            this._container,
+                                                            this._container.Catalog,
                                                             this._filters,
                                                             assemblyLoader,
                                                             ret.Root,
@@ -231,7 +231,7 @@ namespace LBi.LostDoc
 
             Asset asset = hierarchy.Value;
             IProcessingContext pctx = new ProcessingContext(this._cache,
-                                                            this._container,
+                                                            this._container.Catalog,
                                                             this._filters,
                                                             assemblyLoader,
                                                             parentNode,

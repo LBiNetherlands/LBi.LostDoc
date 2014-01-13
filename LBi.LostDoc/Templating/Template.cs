@@ -503,7 +503,8 @@ namespace LBi.LostDoc.Templating
             // collect all work that has to be done
             CustomXsltContext xsltContext = CreateCustomXsltContext(templateData.IgnoredVersionComponent);
             xsltContext.PushVariableScope(templateData.Document.Root, tmpl.Parameters);
-            ITemplateContext templateContext = new TemplateContext(templateData.Document,
+            ITemplateContext templateContext = new TemplateContext(this._cache,
+                                                                   templateData.Document,
                                                                    xsltContext,
                                                                    this._uriFactory,
                                                                    this._fileResolver,
@@ -518,7 +519,7 @@ namespace LBi.LostDoc.Templating
 
             // create context
             ITemplatingContext context = new TemplatingContext(this._cache,
-                                                               this._container,
+                                                               this._container.Catalog,
                                                                templateData.OutputFileProvider, // TODO fix this (this._basePath)
                                                                templateData,
                                                                this._resolvers,
