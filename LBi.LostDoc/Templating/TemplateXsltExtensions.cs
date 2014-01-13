@@ -88,7 +88,7 @@ namespace LBi.LostDoc.Templating
             {
                 aid = new AssetIdentifier(assetId, Version.Parse(version));
                 AssetIdentifier targetAid;
-                if (this._context.TemplateData.AssetRedirects.TryGet(aid, out targetAid))
+                if (this._context.Settings.AssetRedirects.TryGet(aid, out targetAid))
                 {
                     aid = targetAid;
                     TraceSources.AssetResolverSource.TraceVerbose("Redirected assetd {0} => {1}", aid, targetAid);
@@ -138,8 +138,8 @@ namespace LBi.LostDoc.Templating
         {
             AssetIdentifier qn = this.Parse(fqn);
 
-            if (this._context.TemplateData.IgnoredVersionComponent.HasValue)
-                return qn.Version.ToString((int)this._context.TemplateData.IgnoredVersionComponent.Value);
+            if (this._context.Settings.IgnoredVersionComponent.HasValue)
+                return qn.Version.ToString((int)this._context.Settings.IgnoredVersionComponent.Value);
 
             return qn.Version.ToString();
         }

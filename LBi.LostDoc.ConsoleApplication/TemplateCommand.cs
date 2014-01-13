@@ -99,7 +99,8 @@ namespace LBi.LostDoc.ConsoleApplication
                 var realProviders = lazyProviders.Select(lazy => lazy.Value);
                 TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
                 TemplateInfo templateInfo = templateResolver.Resolve(this.Template);
-                Template template = templateInfo.Load(container);
+                
+                Template templateParser = templateInfo.Load(container);
 
                 string outputDir = this.Output
                                    ?? (Directory.Exists(this.Path)
@@ -108,7 +109,7 @@ namespace LBi.LostDoc.ConsoleApplication
                 AssetRedirectCollection assetRedirects;
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
 
-                var templateData = new TemplateData(mergedDoc)
+                TemplateSettings settings = new TemplateSettings()
                                        {
                                            AssetRedirects = assetRedirects,
                                            OverwriteExistingFiles = this.Force.IsPresent,
@@ -117,7 +118,7 @@ namespace LBi.LostDoc.ConsoleApplication
                                            OutputFileProvider = new ScopedFileProvider(new DirectoryFileProvider(), outputDir)
                                        };
 
-                template.Generate(templateData);
+                templateParser.Generate(settings, mergedDoc);
             }
 
         }

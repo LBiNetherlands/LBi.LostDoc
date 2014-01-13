@@ -45,7 +45,7 @@ namespace LBi.LostDoc.Templating
             {
                 foreach (string directory in fileProvider.GetDirectories("."))
                 {
-                    string path = Path.Combine(directory, Template.TemplateDefinitionFileName);
+                    string path = Path.Combine(directory, TemplateParser.TemplateDefinitionFileName);
                     if (fileProvider.FileExists(path))
                         yield return TemplateInfo.Load(this, fileProvider, directory);
                 }
@@ -63,7 +63,7 @@ namespace LBi.LostDoc.Templating
 
         public bool TryResolve(string name, out TemplateInfo templateInfo)
         {
-            string path = Path.Combine(name, Template.TemplateDefinitionFileName);
+            string path = Path.Combine(name, TemplateParser.TemplateDefinitionFileName);
             IFileProvider fileProvider;
             bool ret = this.FileExists(path, out fileProvider);
             if (ret)

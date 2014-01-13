@@ -25,6 +25,21 @@ namespace LBi.LostDoc.Templating.XPath
 {
     public class CustomXsltContext : System.Xml.Xsl.XsltContext
     {
+        public static CustomXsltContext Create(VersionComponent? ignoredVersionComponent)
+        {
+            CustomXsltContext xpathContext = new CustomXsltContext();
+            xpathContext.RegisterFunction(string.Empty, "get-asset", new XsltContextAssetIdGetter());
+            xpathContext.RegisterFunction(string.Empty, "get-id", new XsltContextAssetIdGetter());
+            xpathContext.RegisterFunction(string.Empty, "get-version", new XsltContextAssetVersionGetter());
+            xpathContext.RegisterFunction(string.Empty, "substring-before-last", new XsltContextSubstringBeforeLastFunction());
+            xpathContext.RegisterFunction(string.Empty, "substring-after-last", new XsltContextSubstringAfterLastFunction());
+            xpathContext.RegisterFunction(string.Empty, "iif", new XsltContextTernaryOperator());
+            xpathContext.RegisterFunction(string.Empty, "get-significant-version", new XsltContextAssetVersionGetter(ignoredVersionComponent));
+            xpathContext.RegisterFunction(string.Empty, "coalesce", new XsltContextCoalesceFunction());
+            xpathContext.RegisterFunction(string.Empty, "join", new XsltContextJoinFunction());
+            return xpathContext;
+        }
+
         protected readonly Dictionary<string, IXsltContextFunction> Functions;
         protected readonly Stack<XPathVariableList> Variables;
 

@@ -122,7 +122,7 @@ namespace LBi.LostDoc.Repository
                 var mergedDoc = bundle.Merge(out assetRedirects);
 
                 // generate output
-                var templateData = new TemplateData(mergedDoc)
+                var templateData = new TemplateSettings()
                                        {
                                            AssetRedirects = assetRedirects,
                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
@@ -135,7 +135,7 @@ namespace LBi.LostDoc.Repository
                                        };
 
                 this.OnStateChanged(State.Templating);
-                templateOutput = this.Template.Generate(templateData);
+                templateOutput = this.Template.Generate(templateData, mergedDoc);
 
                 LostDoc.Diagnostics.TraceSources.TemplateSource.Listeners.Remove(traceListener);
                 LostDoc.Diagnostics.TraceSources.BundleSource.Listeners.Remove(traceListener);

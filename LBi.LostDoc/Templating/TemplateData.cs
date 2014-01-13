@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Linq;
 
 namespace LBi.LostDoc.Templating
 {
-    public class TemplateData
+    public class TemplateSettings
     {
-        public TemplateData(XDocument doc)
+        public TemplateSettings()
         {
-            this.Document = doc;
-       
             this.AssetRedirects = new AssetRedirectCollection();
             this.Arguments = new Dictionary<string, object>();
             this.Filter = null;
@@ -34,7 +31,6 @@ namespace LBi.LostDoc.Templating
             this.TemporaryFilesPath = Directory.GetCurrentDirectory();
         }
 
-        public XDocument Document { get; protected set; }
         public AssetRedirectCollection AssetRedirects { get; set; }
         public Func<UnitOfWork, bool> Filter { get; set; } 
         public VersionComponent? IgnoredVersionComponent { get; set; }

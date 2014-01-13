@@ -22,7 +22,7 @@ namespace LBi.LostDoc.Templating
 {
     public interface ITemplatingContext : IContextBase
     {        
-        TemplateData TemplateData { get; }
+        TemplateSettings Settings { get; }
         XPathNavigatorIndex DocumentIndex { get; }
         XPathNavigator Document { get; }
         IAssetUriResolver[] AssetUriResolvers { get; }

@@ -37,7 +37,7 @@ namespace LBi.LostDoc.Templating
                                      IEnumerable<AssetSection> sections,
                                      string input,
                                      XslCompiledTransform transform,
-                                     IFileProvider fileProvider)
+                                     XmlResolver xmlResolver)
             : base(outputPath)
         {
             this.InputNode = inputNode;
@@ -47,7 +47,7 @@ namespace LBi.LostDoc.Templating
             this.Sections = sections.ToArray();
             this.Input = input;
             this.Transform = transform;
-            this.FileProvider = fileProvider;
+            this.XmlResolver = xmlResolver;
         }
 
         public XslCompiledTransform Transform { get; protected set; }
@@ -64,7 +64,7 @@ namespace LBi.LostDoc.Templating
 
         public string Input { get; protected set; }
 
-        public IFileProvider FileProvider { get; protected set; }
+        public XmlResolver XmlResolver { get; protected set; }
 
         public override WorkUnitResult Execute(ITemplatingContext context)
         {
@@ -73,7 +73,7 @@ namespace LBi.LostDoc.Templating
             Uri newUri = new Uri(this.Path, UriKind.RelativeOrAbsolute);
             FileMode mode = FileMode.CreateNew;
             bool exists;
-            if (!(exists = context.TemplateData.OutputFileProvider.FileExists(this.Path)) || context.TemplateData.OverwriteExistingFiles)
+            if (!(exists = context.Settings.OutputFileProvider.FileExists(this.Path)) || context.Settings.OverwriteExistingFiles)
             {
                 if (exists)
                     mode = FileMode.Create;
@@ -89,7 +89,7 @@ namespace LBi.LostDoc.Templating
                 // and custom extensions
                 argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, newUri));
 
-                using (Stream stream = context.TemplateData.OutputFileProvider.OpenFile(this.Path, mode))
+                using (Stream stream = context.Settings.OutputFileProvider.OpenFile(this.Path, mode))
                 using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false }))
                 {
                     if (exists)
@@ -105,7 +105,7 @@ namespace LBi.LostDoc.Templating
                     this.Transform.Transform(context.Document,
                                              argList,
                                              writer,
-                                             TODO FIX FIX FIX);
+                                             new XmlFileProviderResolver(new StackedFileProvider(context.TemplateFileProvider)));
 
                     double duration = ((localTimer.ElapsedTicks - tickStart) / (double)Stopwatch.Frequency) * 1000;
 

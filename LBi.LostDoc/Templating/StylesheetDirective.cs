@@ -16,7 +16,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
@@ -28,7 +31,6 @@ namespace LBi.LostDoc.Templating
     public class StylesheetDirective : ITemplateDirective<StylesheetApplication>
     {
         public string ConditionExpression { get; set; }
-        public XslCompiledTransform Transform { get; set; }
         public string Name { get; set; }
         public string SelectExpression { get; set; }
         public string InputExpression { get; set; }
@@ -37,7 +39,30 @@ namespace LBi.LostDoc.Templating
         public XPathVariable[] Variables { get; set; }
         public SectionRegistration[] Sections { get; set; }
         public AssetRegistration[] AssetRegistrations { get; set; }
-        public string Source { get; set; }
+        public FileReference Stylesheet { get; set; }
+
+        protected virtual XslCompiledTransform LoadStylesheet(ObjectCache cache)
+        {
+            string cacheKey = "template://" + this.Stylesheet.Path;
+
+            XslCompiledTransform ret = cache.Get(cacheKey) as XslCompiledTransform;
+
+            if (ret == null)
+            {
+                ret = new XslCompiledTransform(true);
+                using (Stream str = this.Stylesheet.GetStream())
+                {
+                    XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
+                    XsltSettings settings = new XsltSettings(true, true);
+                    XmlResolver resolver = new XmlFileProviderResolver(this.Stylesheet.FileProvider);
+                    ret.Load(reader, settings, resolver);
+                }
+
+                cache.Add(cacheKey, ret, new CacheItemPolicy { Priority = CacheItemPriority.Default });
+            }
+
+            return ret;
+        }
 
         public virtual IEnumerable<StylesheetApplication> DiscoverWork(ITemplateContext context)
         {
@@ -54,7 +79,7 @@ namespace LBi.LostDoc.Templating
                 if (this.InputExpression != null)
                     input = XPathServices.ResultToString(inputNode.XPathEvaluate(this.InputExpression, context.XsltContext));
 
-                string saveAs = XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext));
+                string outputPath = XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext));
 
                 List<AssetIdentifier> assetIdentifiers = new List<AssetIdentifier>();
                 List<AssetSection> sections = new List<AssetSection>();
@@ -62,12 +87,12 @@ namespace LBi.LostDoc.Templating
                 // eval condition, shortcut and log instead of wrapping entire loop in if
                 if (!inputNode.EvaluateCondition(this.ConditionExpression, context.XsltContext))
                 {
-                    TraceSources.TemplateSource.TraceVerbose("Condition not met: {0}", saveAs);
+                    TraceSources.TemplateSource.TraceVerbose("Condition not met: {0}", outputPath);
                     context.XsltContext.PopVariableScope(); // 1
                     continue;
                 }
 
-                Uri newUri = new Uri(saveAs, UriKind.RelativeOrAbsolute);
+                Uri newUri = new Uri(outputPath, UriKind.RelativeOrAbsolute);
 
                 // ensure url is unique
                 context.EnsureUniqueUri(ref newUri);
@@ -156,14 +181,15 @@ namespace LBi.LostDoc.Templating
 
                 context.XsltContext.PopVariableScope(); // 1
 
-                yield return new StylesheetApplication(saveAs,
+                yield return new StylesheetApplication(outputPath,
                                                        inputNode,
                                                        xsltParams,
                                                        assetIdentifiers.ToArray(),
                                                        this.Name,
                                                        sections,
                                                        input,
-                                                       this.Transform);
+                                                       this.LoadStylesheet(context.Cache),
+                                                       null);
             }
         }
     }

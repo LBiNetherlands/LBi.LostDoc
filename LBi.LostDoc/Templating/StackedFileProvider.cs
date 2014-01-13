@@ -25,9 +25,14 @@ namespace LBi.LostDoc.Templating
     {
         private readonly IFileProvider[] _stack;
 
-        public StackedFileProvider(IEnumerable<IFileProvider> stack)
+        public StackedFileProvider(params IFileProvider[] stack)
         {
-            this._stack = stack.ToArray();
+            this._stack = stack;
+        }
+
+        public StackedFileProvider(IEnumerable<IFileProvider> stack)
+            : this(stack.ToArray())
+        {
         }
 
         public bool FileExists(string path)

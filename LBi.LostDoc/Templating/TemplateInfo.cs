@@ -44,7 +44,7 @@ namespace LBi.LostDoc.Templating
         // TODO see if we can't get rid of this CompositionContainer
         public Template Load(CompositionContainer container)
         {
-            Template ret = new Template(container);
+            TemplateParser ret = new TemplateParser(container);
             ret.Load(this);
             return ret;
         }
@@ -72,7 +72,7 @@ namespace LBi.LostDoc.Templating
         // TODO maybe move some (or all) of this to the TemplateResolver/Parser
         public static TemplateInfo Load(TemplateResolver resolver, IFileProvider source, string name)
         {
-            string specPath = System.IO.Path.Combine(name, Template.TemplateDefinitionFileName);
+            string specPath = System.IO.Path.Combine(name, TemplateParser.TemplateDefinitionFileName);
             if (!source.FileExists(specPath))
                 throw new FileNotFoundException("Couldn't find template specification: " + specPath + " from " + source.ToString(), specPath);
 

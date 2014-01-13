@@ -112,6 +112,7 @@
     <Compile Include="Templating\AssetResolvers\FileResolver.cs" />
     <Compile Include="Templating\AssetResolvers\MsdnResolver.cs" />
     <Compile Include="Templating\FileProviders\HttpFileProvider.cs" />
+    <Compile Include="Templating\FileReference.cs" />
     <Compile Include="Templating\IDependencyProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
@@ -122,7 +123,7 @@
     <Compile Include="Templating\ResourceTransform.cs" />
     <Compile Include="Templating\ScopedFileProvider.cs" />
     <Compile Include="Templating\IndexDirective.cs" />
-    <Compile Include="Templating\ParsedTemplate.cs" />
+    <Compile Include="Templating\Template.cs" />
     <Compile Include="Templating\ProgressArgs.cs" />
     <Compile Include="Templating\ResourceDirective.cs" />
     <Compile Include="Templating\ResourceDeployment.cs" />
@@ -148,7 +149,7 @@
     <Compile Include="Templating\XPath\CustomXsltContext.cs" />
     <Compile Include="Templating\IFileProvider.cs" />
     <Compile Include="Templating\ITemplatingContext.cs" />
-    <Compile Include="Templating\Template.cs" />
+    <Compile Include="Templating\TemplateParser.cs" />
     <Compile Include="Templating\TemplateXsltExtensions.cs" />
     <Compile Include="Templating\TemplatingContext.cs" />
     <Compile Include="Templating\IAssetUriResolver.cs" />
