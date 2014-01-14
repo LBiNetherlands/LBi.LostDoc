@@ -102,6 +102,10 @@
       <Project>{357e5ba0-0aa0-4c30-b7bb-eec8eaaa6d17}</Project>
       <Name>LBi.LostDoc.Templates</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LBi.LostDoc.Templating.Transforms.Less\LBi.LostDoc.Templating.Transforms.Less.csproj">
+      <Project>{d61cb417-8623-4d7e-b458-b7d1409f7f3d}</Project>
+      <Name>LBi.LostDoc.Templating.Transforms.Less</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
