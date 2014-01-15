@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc.Enrichers
 {
@@ -34,8 +35,7 @@ namespace LBi.LostDoc.Enrichers
             this._xslTransform = new XslCompiledTransform();
             using (
                 Stream resource =
-                    Assembly.GetExecutingAssembly().GetManifestResourceStream(
-                                                                              "LBi.LostDoc.Core.Enrichers.enrich-doc-comments.xslt")
+                    Assembly.GetExecutingAssembly().GetManifestResourceStream("LBi.LostDoc.Core.Enrichers.enrich-doc-comments.xslt")
                 )
             {
                 XmlReader reader = XmlReader.Create(resource);
@@ -45,15 +45,15 @@ namespace LBi.LostDoc.Enrichers
 
         #region IEnricher Members
 
-        public void EnrichType(IProcessingContext context, Type type)
+        public void EnrichType(IProcessingContext context, Asset typeAsset)
         {
         }
 
-        public void EnrichConstructor(IProcessingContext context, ConstructorInfo ctor)
+        public void EnrichConstructor(IProcessingContext context, Asset ctorAsset)
         {
         }
 
-        public void EnrichAssembly(IProcessingContext context, Assembly asm)
+        public void EnrichAssembly(IProcessingContext context, Asset assemblyAsset)
         {
         }
 
@@ -61,34 +61,34 @@ namespace LBi.LostDoc.Enrichers
         {
         }
 
-        public void EnrichMethod(IProcessingContext context, MethodInfo mInfo)
+        public void EnrichMethod(IProcessingContext context, Asset methodAsset)
         {
         }
 
-        public void EnrichField(IProcessingContext context, FieldInfo fieldInfo)
+        public void EnrichField(IProcessingContext context, Asset fieldAsset)
         {
         }
 
-        public void EnrichProperty(IProcessingContext context, PropertyInfo propertyInfo)
+        public void EnrichProperty(IProcessingContext context, Asset propertyAsset)
         {
         }
 
-        public void EnrichReturnValue(IProcessingContext context, MethodInfo methodInfo)
+        public void EnrichReturnValue(IProcessingContext context, Asset methodAsset)
         {
         }
 
-        public void EnrichParameter(IProcessingContext context, ParameterInfo item)
+        public void EnrichParameter(IProcessingContext context, Asset methodAsset, string parameterName)
         {
         }
 
-
-        public void EnrichTypeParameter(IProcessingContext context, Type typeParameter)
+        public void EnrichTypeParameter(IProcessingContext context, Asset typeOrMethodAsset, string name)
         {
         }
 
-        public void EnrichNamespace(IProcessingContext context, string ns)
+        public void EnrichNamespace(IProcessingContext context, Asset namespaceAsset)
         {
-            XElement element = this._doc.XPathSelectElement(string.Format("/doc/namespace[@name = '{0}']", ns));
+            NamespaceInfo nsInfo = (NamespaceInfo)namespaceAsset.Target;
+            XElement element = this._doc.XPathSelectElement(string.Format("/doc/namespace[@name = '{0}']", nsInfo.Name));
             if (element != null)
             {
                 element = this.EnrichXml(context, element);
@@ -97,10 +97,11 @@ namespace LBi.LostDoc.Enrichers
             }
         }
 
-
-        public void EnrichEvent(IProcessingContext context, EventInfo eventInfo)
+        public void EnrichEvent(IProcessingContext context, Asset eventAsset)
         {
         }
+
+
 
         #endregion
 

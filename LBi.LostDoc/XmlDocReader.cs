@@ -47,6 +47,11 @@ namespace LBi.LostDoc
             }
         }
 
+        public XElement GetDocComments(Asset asset)
+        {
+            return this.GetMemberElement(asset.Id.AssetId);
+        }
+
         public XElement GetDocComments(MethodInfo methodInfo)
         {
             string sig = Naming.GetAssetId(methodInfo);

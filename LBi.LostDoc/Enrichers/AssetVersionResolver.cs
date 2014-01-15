@@ -25,99 +25,101 @@ namespace LBi.LostDoc.Enrichers
 {
     internal class AssetVersionResolver
     {
-        private readonly Asset _assembly;
-        private readonly Dictionary<string, Asset[]>[] _accessibleAssets;
+        private readonly Asset _asset;
+        //private readonly Dictionary<string, Asset[]>[] _accessibleAssets;
         private readonly IProcessingContext _context;
 
-        public AssetVersionResolver(IProcessingContext context, Asset assembly)
+        public AssetVersionResolver(IProcessingContext context, Asset asset)
         {
             this._context = context;
-            this._assembly = assembly;
-            this._accessibleAssets = (Dictionary<string, Asset[]>[])context.Cache.Get(assembly.Id.ToString());
+            this._asset = asset;
+            //this._accessibleAssets = (Dictionary<string, Asset[]>[])context.Cache.Get(assembly.Id.ToString());
 
-            if (this._accessibleAssets == null)
-            {
-                TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheMiss, "Finding accessible assets for assembly: " + assembly.Id);
+            //if (this._accessibleAssets == null)
+            //{
+            //    TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheMiss, "Finding accessible assets for assembly: " + assembly.Id);
 
-                Stopwatch timer = Stopwatch.StartNew();
+            //    Stopwatch timer = Stopwatch.StartNew();
 
-                List<List<Asset>> phases = new List<List<Asset>>();
+            //    List<List<Asset>> phases = new List<List<Asset>>();
 
-                HashSet<Asset> processedAssemblies = new HashSet<Asset>();
+            //    HashSet<Asset> processedAssemblies = new HashSet<Asset>();
 
-                FindAccessibleAssets(processedAssemblies, phases, context.AssetExplorer, assembly, 0);
+            //    FindAccessibleAssets(processedAssemblies, phases, context.AssetExplorer, assembly, 0);
 
 
 
-                this._accessibleAssets = phases.Select(phase =>
-                                                       phase.GroupBy(ai => ai.Id.AssetId, StringComparer.Ordinal)
-                                                            .ToDictionary(g => g.Key,
-                                                                          g => g.ToArray(),
-                                                                          StringComparer.Ordinal))
-                                               .ToArray();
+            //    this._accessibleAssets = phases.Select(phase =>
+            //                                           phase.GroupBy(ai => ai.Id.AssetId, StringComparer.Ordinal)
+            //                                                .ToDictionary(g => g.Key,
+            //                                                              g => g.ToArray(),
+            //                                                              StringComparer.Ordinal))
+            //                                   .ToArray();
 
-                context.Cache.Add(assembly.Id.ToString(), this._accessibleAssets, new CacheItemPolicy());
+            //    context.Cache.Add(assembly.Id.ToString(), this._accessibleAssets, new CacheItemPolicy());
 
-                timer.Stop();
+            //    timer.Stop();
 
-                TraceSources.AssetResolverSource.TraceData(TraceEventType.Verbose,
-                                                           TraceEvents.CachePenalty,
-                                                           timer.ElapsedMilliseconds);
-            }
-            else
-            {
-                TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheHit, "Using cached accessible assets for assembly: " + assembly.Id);
-            }
+            //    TraceSources.AssetResolverSource.TraceData(TraceEventType.Verbose,
+            //                                               TraceEvents.CachePenalty,
+            //                                               timer.ElapsedMilliseconds);
+            //}
+            //else
+            //{
+            //    TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheHit, "Using cached accessible assets for assembly: " + assembly.Id);
+            //}
         }
 
-        private static void FindAccessibleAssets(HashSet<Asset> processedAssemblies, List<List<Asset>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
-        {
-            List<Asset> currentPhase;
+        //private static void FindAccessibleAssets(HashSet<Asset> processedAssemblies, List<List<Asset>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
+        //{
+        //    return;
 
-            if (assets.Count <= depth)
-                assets.Add(currentPhase = new List<Asset>());
-            else
-                currentPhase = assets[depth];
+        //    List<Asset> currentPhase;
 
-            currentPhase.AddRange(assetExplorer.Discover(assembly));
+        //    if (assets.Count <= depth)
+        //        assets.Add(currentPhase = new List<Asset>());
+        //    else
+        //        currentPhase = assets[depth];
 
-            foreach (var reference in assetExplorer.GetReferences(assembly))
-            {
-                if (processedAssemblies.Add(reference))
-                {
-                    FindAccessibleAssets(processedAssemblies, assets, assetExplorer, reference, depth + 1);
-                }
-            }
-        }
+        //    currentPhase.AddRange(assetExplorer.Discover(assembly));
+
+        //    foreach (var reference in assetExplorer.GetReferences(assembly))
+        //    {
+        //        if (processedAssemblies.Add(reference))
+        //        {
+        //            FindAccessibleAssets(processedAssemblies, assets, assetExplorer, reference, depth + 1);
+        //        }
+        //    }
+        //}
 
 
         public string getVersionedId(string assetId)
         {
-            Asset asset = null;
-            for (int depth = 0; depth < this._accessibleAssets.Length; depth++)
-            {
-                Asset[] matches;
-                if (!this._accessibleAssets[depth].TryGetValue(assetId, out matches))
-                    continue;
+            //Asset asset = null;
+            //for (int depth = 0; depth < this._accessibleAssets.Length; depth++)
+            //{
+            //    Asset[] matches;
+            //    if (!this._accessibleAssets[depth].TryGetValue(assetId, out matches))
+            //        continue;
 
-                if (matches.Length > 1)
-                {
-                    IGrouping<Version, Asset>[] groups = matches.GroupBy(ai => ai.Id.Version).ToArray();
-                    asset = groups.OrderByDescending(g => g.Count()).First().First();
+            //    if (matches.Length > 1)
+            //    {
+            //        IGrouping<Version, Asset>[] groups = matches.GroupBy(ai => ai.Id.Version).ToArray();
+            //        asset = groups.OrderByDescending(g => g.Count()).First().First();
 
-                    if (groups.Length > 1)
-                    {
-                        TraceSources.AssetResolverSource.TraceWarning("Asset {0} found in with several versions ({1}) using {2} from {3}",
-                                                                      assetId,
-                                                                      string.Join(", ", groups.Select(g => g.Key)),
-                                                                      asset.Id.Version,
-                                                                      this._context.AssetExplorer.GetRoot(asset).Id.ToString());
-                    }
+            //        if (groups.Length > 1)
+            //        {
+            //            TraceSources.AssetResolverSource.TraceWarning("Asset {0} found in with several versions ({1}) using {2} from {3}",
+            //                                                          assetId,
+            //                                                          string.Join(", ", groups.Select(g => g.Key)),
+            //                                                          asset.Id.Version,
+            //                                                          this._context.AssetExplorer.GetRoot(asset).Id.ToString());
+            //        }
                     
-                }
-                if (matches.Length > 0)
-                    asset = matches[0];
-            }
+            //    }
+            //    if (matches.Length > 0)
+            //        asset = matches[0];
+            //}
 
             if (asset != null)
             {

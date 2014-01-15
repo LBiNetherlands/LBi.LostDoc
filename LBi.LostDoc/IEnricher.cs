@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,55 +21,28 @@ namespace LBi.LostDoc
 {
     public interface IEnricher
     {
-        void EnrichType(IProcessingContext context, Type type);
+        void EnrichType(IProcessingContext context, Asset typeAsset);
 
-        void EnrichConstructor(IProcessingContext context, ConstructorInfo ctor);
+        void EnrichConstructor(IProcessingContext context, Asset ctorAsset);
 
-        void EnrichAssembly(IProcessingContext context, Assembly asm);
+        void EnrichAssembly(IProcessingContext context, Asset assemblyAsset);
 
         void RegisterNamespace(IProcessingContext context);
 
-        void EnrichMethod(IProcessingContext context, MethodInfo mInfo);
+        void EnrichMethod(IProcessingContext context, Asset methodAsset);
 
-        void EnrichField(IProcessingContext context, FieldInfo fieldInfo);
+        void EnrichField(IProcessingContext context, Asset fieldAsset);
 
-        void EnrichProperty(IProcessingContext context, PropertyInfo propertyInfo);
+        void EnrichProperty(IProcessingContext context, Asset propertyAsset);
 
-        void EnrichReturnValue(IProcessingContext context, MethodInfo methodInfo);
+        void EnrichReturnValue(IProcessingContext context, Asset methodAsset);
 
-        void EnrichParameter(IProcessingContext context, ParameterInfo item);
+        void EnrichParameter(IProcessingContext context, Asset methodAsset, string parameterName);
 
-        void EnrichTypeParameter(IProcessingContext context, Type typeParameter);
+        void EnrichTypeParameter(IProcessingContext context, Asset typeOrMethodAsset, string name);
 
-        void EnrichNamespace(IProcessingContext context, string ns);
+        void EnrichNamespace(IProcessingContext context, Asset namespaceAsset);
 
-        void EnrichEvent(IProcessingContext context, EventInfo eventInfo);
+        void EnrichEvent(IProcessingContext context, Asset eventAsset);
     }
-
-    //public interface IEnricher
-    //{
-    //    void EnrichType(IProcessingContext context, Asset typeAsset);
-
-    //    void EnrichConstructor(IProcessingContext context, Asset ctorAsset);
-
-    //    void EnrichAssembly(IProcessingContext context, Asset assemblyAsset);
-
-    //    void RegisterNamespace(IProcessingContext context);
-
-    //    void EnrichMethod(IProcessingContext context, Asset methodAsset);
-
-    //    void EnrichField(IProcessingContext context, Asset fieldAsset);
-
-    //    void EnrichProperty(IProcessingContext context, Asset propertyAsset);
-
-    //    void EnrichReturnValue(IProcessingContext context, Asset methodAsset);
-
-    //    void EnrichParameter(IProcessingContext context, Asset methodAsset, string parameterName);
-
-    //    void EnrichTypeParameter(IProcessingContext context, Asset typeOrMethodAsset, string name);
-
-    //    void EnrichNamespace(IProcessingContext context, Asset namespaceAsset);
-
-    //    void EnrichEvent(IProcessingContext context, Asset eventAsset);
-    //}
 }

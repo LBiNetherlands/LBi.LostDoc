@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,14 @@ namespace LBi.LostDoc.Enrichers
 
         #region IEnricher Members
 
-        public void EnrichType(IProcessingContext context, Type type)
+        public void EnrichType(IProcessingContext context, Asset typeAsset)
         {
-            XmlDocReader reader = this.GetDocReader(context, type.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(typeAsset));
             if (reader != null)
             {
-                XElement element = reader.GetDocComments(type);
+                XElement element = reader.GetDocComments(typeAsset);
                 if (element != null)
-                    this.RewriteXml(context, type.Assembly, element, "typeparam");
+                    this.RewriteXml(context, typeAsset, element, "typeparam");
             }
         }
 
@@ -213,9 +213,9 @@ namespace LBi.LostDoc.Enrichers
             return reader;
         }
 
-        private void RewriteXml(IProcessingContext context, Assembly assembly, XElement element, params string[] exclude)
+        private void RewriteXml(IProcessingContext context, Asset asset, XElement element, params string[] exclude)
         {
-            element = this.EnrichXml(context, assembly, element);
+            element = this.EnrichXml(context, asset, element);
             XNamespace ns = Namespaces.XmlDocComment;
             foreach (XElement elem in element.Elements())
             {
@@ -226,22 +226,22 @@ namespace LBi.LostDoc.Enrichers
             }
         }
 
-        private void RewriteXmlContent(IProcessingContext context, Assembly assembly, string container, XElement element)
+        private void RewriteXmlContent(IProcessingContext context, Asset asset, string container, XElement element)
         {
-            element = this.EnrichXml(context, assembly, element);
+            element = this.EnrichXml(context, asset, element);
             XNamespace ns = Namespaces.XmlDocComment;
             if (element.Nodes().Any())
                 context.Element.Add(new XElement(ns + container, element.Attributes(), element.Nodes()));
         }
 
-        private XElement EnrichXml(IProcessingContext context, Assembly assembly, XElement nodes)
+        private XElement EnrichXml(IProcessingContext context, Asset asset, XElement nodes)
         {
             XDocument ret = new XDocument();
 
             using (XmlWriter nodeWriter = ret.CreateWriter())
             {
                 XsltArgumentList argList = new XsltArgumentList();
-                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, ReflectionServices.GetAsset(assembly)));
+                argList.AddExtensionObject(Namespaces.Template, new AssetVersionResolver(context, asset));
 
                 this._xslTransform.Transform(nodes.CreateNavigator(), argList, nodeWriter);
                 nodeWriter.Close();
