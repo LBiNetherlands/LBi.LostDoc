@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,29 +57,34 @@ namespace LBi.LostDoc.Enrichers
             }
         }
 
-        public void EnrichConstructor(IProcessingContext context, ConstructorInfo ctor)
+        public void EnrichConstructor(IProcessingContext context, Asset ctorAsset)
         {
-            XmlDocReader reader = this.GetDocReader(context, ctor.DeclaringType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(ctorAsset));
             if (reader != null)
             {
-                XElement element = reader.GetDocComments(ctor);
+                XElement element = reader.GetDocComments(ctorAsset);
                 if (element != null)
-                    this.RewriteXml(context, ctor.ReflectedType.Assembly, element, "param", "typeparam");
+                    this.RewriteXml(context, ctorAsset, element, "param", "typeparam");
             }
         }
 
-        public void EnrichParameter(IProcessingContext context, ParameterInfo parameter)
+        public void EnrichParameter(IProcessingContext context, Asset methodAsset, string parameterName)
         {
-            XmlDocReader reader = this.GetDocReader(context, parameter.Member.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(methodAsset));
             if (reader != null)
             {
-                XElement element = reader.GetDocComments(parameter);
+                XElement element = reader.GetDocComments(methodAsset);
                 if (element != null)
-                    this.RewriteXmlContent(context, parameter.Member.ReflectedType.Assembly, "summary", element);
+                {
+                    element = element.XPathSelectElement(string.Format("param[@name='{0}']", parameterName));
+
+                    if (element != null)
+                        this.RewriteXmlContent(context, methodAsset, "summary", element);
+                }
             }
         }
 
-        public void EnrichAssembly(IProcessingContext context, Assembly asm)
+        public void EnrichAssembly(IProcessingContext context, Asset assemblyAsset)
         {
         }
 
@@ -89,91 +93,77 @@ namespace LBi.LostDoc.Enrichers
             context.Element.Add(new XAttribute(XNamespace.Xmlns + "xdc", Namespaces.XmlDocComment));
         }
 
-        public void EnrichMethod(IProcessingContext context, MethodInfo mInfo)
+        public void EnrichMethod(IProcessingContext context, Asset methodAsset)
         {
-            XElement element = this.GetMethodDocComments(mInfo, context);
-            if (element == null)
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(methodAsset));
+            if (reader != null)
             {
-                HashSet<MethodInfo> seen = new HashSet<MethodInfo>();
-                seen.Add(mInfo);
+                XElement element = reader.GetDocComments(methodAsset);
 
-                MethodInfo baseMethod = mInfo.GetBaseDefinition();
-                while (seen.Add(baseMethod))
+
+                if (element != null)
                 {
-                    element = this.GetMethodDocComments(baseMethod, context);
-                    if (element != null)
-                        break;
+                    this.RewriteXml(context,
+                                    methodAsset,
+                                    element,
+                                    "param",
+                                    "typeparam",
+                                    "filterpriority",
+                                    "returns");
                 }
-
-                if (element == null && !mInfo.DeclaringType.IsInterface)
-                    element = this.GetMethodDocComments(baseMethod, context);
-            }
-
-            if (element != null)
-            {
-                this.RewriteXml(context,
-                                mInfo.ReflectedType.Assembly,
-                                element,
-                                "param",
-                                "typeparam",
-                                "filterpriority",
-                                "returns");
             }
         }
 
-        public void EnrichField(IProcessingContext context, FieldInfo fieldInfo)
+        public void EnrichField(IProcessingContext context, Asset fieldAsset)
         {
-            XmlDocReader reader = this.GetDocReader(context, fieldInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(fieldAsset));
             if (reader != null)
             {
-                XElement element = reader.GetDocComments(fieldInfo);
+                XElement element = reader.GetDocComments(fieldAsset);
                 if (element != null)
-                    this.RewriteXml(context, fieldInfo.ReflectedType.Assembly, element);
+                    this.RewriteXml(context, fieldAsset, element);
             }
         }
 
-        public void EnrichProperty(IProcessingContext context, PropertyInfo propertyInfo)
+        public void EnrichProperty(IProcessingContext context, Asset propertyAsset)
         {
-            XmlDocReader reader = this.GetDocReader(context, propertyInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(propertyAsset));
             if (reader != null)
             {
-                XElement element = reader.GetDocComments(propertyInfo);
+                XElement element = reader.GetDocComments(propertyAsset);
                 if (element != null)
-                    this.RewriteXml(context, propertyInfo.ReflectedType.Assembly, element);
+                    this.RewriteXml(context, propertyAsset, element);
             }
         }
 
-        public void EnrichReturnValue(IProcessingContext context, MethodInfo methodInfo)
+        public void EnrichReturnValue(IProcessingContext context, Asset methodAsset)
         {
-            XmlDocReader reader = this.GetDocReader(context, methodInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(methodAsset));
             if (reader != null)
             {
-                XElement element = reader.GetDocCommentsReturnParameter(methodInfo.ReturnParameter);
+                XElement element = reader.GetDocComments(methodAsset);
                 if (element != null)
-                    this.RewriteXmlContent(context, methodInfo.ReflectedType.Assembly, "summary", element);
+                {
+                    element = element.XPathSelectElement("returns");
+
+                    if (element != null)
+                        this.RewriteXmlContent(context, methodAsset, "summary", element);
+                }
             }
         }
 
-        public void EnrichTypeParameter(IProcessingContext context, Type typeParameter)
-        {
-            if (typeParameter.DeclaringMethod != null)
-                this.EnrichTypeParameter(context, (MethodInfo)typeParameter.DeclaringMethod, typeParameter);
-            else
-                this.EnrichTypeParameter(context, typeParameter.DeclaringType, typeParameter);
-        }
-
-        public void EnrichNamespace(IProcessingContext context, string ns)
+        public void EnrichNamespace(IProcessingContext context, Asset namespaceAsset)
         {
         }
 
-        public void EnrichEvent(IProcessingContext context, EventInfo eventInfo)
+        public void EnrichEvent(IProcessingContext context, Asset eventAsset)
         {
-            XmlDocReader reader = this.GetDocReader(context, eventInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(eventAsset));
             if (reader != null)
             {
-                XElement element = reader.GetDocComments(eventInfo);
+                XElement element = reader.GetDocComments(eventAsset);
                 if (element != null)
-                    this.RewriteXml(context, eventInfo.ReflectedType.Assembly, element);
+                    this.RewriteXml(context, eventAsset, element);
             }
         }
 
@@ -250,33 +240,17 @@ namespace LBi.LostDoc.Enrichers
             return ret.Root;
         }
 
-        private XElement GetMethodDocComments(MethodInfo mInfo, IProcessingContext context)
+        public void EnrichTypeParameter(IProcessingContext context, Asset methodOrTypeaAsset, string parameterName)
         {
-            XmlDocReader reader = this.GetDocReader(context, mInfo.DeclaringType.Assembly);
-            if (reader != null)
-                return reader.GetDocComments(mInfo);
-            return null;
-        }
-
-        public void EnrichTypeParameter(IProcessingContext context, MethodInfo methodInfo, Type typeParameter)
-        {
-            XmlDocReader reader = this.GetDocReader(context, methodInfo.ReflectedType.Assembly);
+            XmlDocReader reader = this.GetDocReader(context, ReflectionServices.GetAssembly(methodOrTypeaAsset));
             if (reader != null)
             {
-                XElement element = reader.GetTypeParameterSummary(methodInfo, typeParameter);
+                XElement element = reader.GetDocComments(methodOrTypeaAsset);
                 if (element != null)
-                    this.RewriteXmlContent(context, methodInfo.ReflectedType.Assembly, "summary", element);
-            }
-        }
+                    element = element.XPathSelectElement(string.Format("typeparam[@name='{0}']", parameterName));
 
-        public void EnrichTypeParameter(IProcessingContext context, Type type, Type typeParameter)
-        {
-            XmlDocReader reader = this.GetDocReader(context, type.Assembly);
-            if (reader != null)
-            {
-                XElement element = reader.GetTypeParameterSummary(type, typeParameter);
                 if (element != null)
-                    this.RewriteXmlContent(context, typeParameter.Assembly, "summary", element);
+                    this.RewriteXmlContent(context, methodOrTypeaAsset, "summary", element);
             }
         }
 

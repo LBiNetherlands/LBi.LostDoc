@@ -121,12 +121,12 @@ namespace LBi.LostDoc.Enrichers
             //        asset = matches[0];
             //}
 
-            if (asset != null)
-            {
-                TraceSources.AssetResolverSource.TraceVerbose("Resolved {0} to version: {1}", assetId, asset.Id.Version);
-                this._context.AddReference(asset);
-                assetId = asset.Id.ToString();
-            }
+            //if (asset != null)
+            //{
+            //    TraceSources.AssetResolverSource.TraceVerbose("Resolved {0} to version: {1}", assetId, asset.Id.Version);
+            //    this._context.AddReference(asset);
+            //    assetId = asset.Id.ToString();
+            //}
 
             return assetId;
         }

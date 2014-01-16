@@ -33,7 +33,7 @@ namespace LBi.LostDoc.Reflection
                 case AssetType.Field:
                 case AssetType.Event:
                 case AssetType.Property:
-                    return ((MemberInfo)asset.Target).DeclaringType.Assembly;
+                    return ((MemberInfo)asset.Target).ReflectedType.Assembly;
                 case AssetType.Assembly:
                     return (Assembly)asset.Target;
                 default:

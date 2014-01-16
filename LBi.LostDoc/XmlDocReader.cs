@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc
@@ -52,74 +49,6 @@ namespace LBi.LostDoc
             return this.GetMemberElement(asset.Id.AssetId);
         }
 
-        public XElement GetDocComments(MethodInfo methodInfo)
-        {
-            string sig = Naming.GetAssetId(methodInfo);
-            return this.GetMemberElement(sig);
-        }
-
-        public XElement GetDocComments(Type type)
-        {
-            return this.GetMemberElement(Naming.GetAssetId(type));
-        }
-
-        public XElement GetDocComments(ConstructorInfo ctor)
-        {
-            string sig = Naming.GetAssetId(ctor);
-            return this.GetMemberElement(sig);
-        }
-
-        internal XElement GetDocComments(ParameterInfo parameter)
-        {
-            string sig;
-            if (parameter.Member is ConstructorInfo)
-                sig = Naming.GetAssetId((ConstructorInfo)parameter.Member);
-            else if (parameter.Member is PropertyInfo)
-                sig = Naming.GetAssetId((PropertyInfo)parameter.Member);
-            else
-                sig = Naming.GetAssetId((MethodInfo)parameter.Member);
-
-            XElement elem = this.GetMemberElement(sig);
-            if (elem != null)
-                return elem.XPathSelectElement(string.Format("param[@name='{0}']", parameter.Name));
-            return null;
-        }
-
-        internal XElement GetDocCommentsReturnParameter(ParameterInfo parameter)
-        {
-            string sig = Naming.GetAssetId((MethodInfo)parameter.Member);
-
-            XElement elem = this.GetMemberElement(sig);
-            if (elem != null)
-                return elem.XPathSelectElement("returns");
-            return null;
-        }
-
-        internal XElement GetDocComments(FieldInfo fieldInfo)
-        {
-            string sig = Naming.GetAssetId(fieldInfo);
-            return this.GetMemberElement(sig);
-        }
-
-        internal XElement GetTypeParameterSummary(Type type, Type typeParameter)
-        {
-            string sig = Naming.GetAssetId(type);
-
-            XElement elem = this.GetMemberElement(sig);
-            if (elem != null)
-                return elem.XPathSelectElement(string.Format("typeparam[@name='{0}']", typeParameter.Name));
-            return null;
-        }
-
-        internal XElement GetTypeParameterSummary(MethodInfo methodInfo, Type typeParameter)
-        {
-            string sig = Naming.GetAssetId(methodInfo);
-
-            XElement elem = this.GetMemberElement(sig);
-            if (elem != null)
-                return elem.XPathSelectElement(string.Format("typeparam[@name='{0}']", typeParameter.Name));
-            return null;
-        }
 
         private XElement GetMemberElement(string signature)
         {
@@ -128,18 +57,6 @@ namespace LBi.LostDoc
                 ret = null;
 
             return ret;
-        }
-
-        public XElement GetDocComments(PropertyInfo propertyInfo)
-        {
-            string sig = Naming.GetAssetId(propertyInfo);
-            return this.GetMemberElement(sig);
-        }
-
-        public XElement GetDocComments(EventInfo eventInfo)
-        {
-            string sig = Naming.GetAssetId(eventInfo);
-            return this.GetMemberElement(sig);
         }
     }
 }

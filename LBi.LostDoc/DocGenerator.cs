@@ -348,7 +348,7 @@ namespace LBi.LostDoc
             context.Element.Add(ret);
 
             foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichAssembly(context.Clone(ret), asm);
+                enricher.EnrichAssembly(context.Clone(ret), asset);
 
             return ret;
         }
@@ -364,7 +364,7 @@ namespace LBi.LostDoc
             context.Element.Add(ret);
 
             foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichNamespace(context.Clone(ret), nsInfo.Name);
+                enricher.EnrichNamespace(context.Clone(ret), asset);
 
             return ret;
         }
@@ -499,7 +499,7 @@ namespace LBi.LostDoc
 
 
             foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichType(context.Clone(ret), type);
+                enricher.EnrichType(context.Clone(ret), asset);
 
 
             context.Element.Add(ret);
@@ -537,7 +537,7 @@ namespace LBi.LostDoc
 
             // enrich typeparam
             foreach (IEnricher enricher in this.Enrichers)
-                enricher.EnrichTypeParameter(context.Clone(tpElem), tp);
+                enricher.EnrichTypeParameter(context.Clone(tpElem), ReflectionServices.GetAsset(mInfo), tp.Name);
         }
 
         private bool IsOperator(MethodInfo method)
@@ -679,7 +679,7 @@ namespace LBi.LostDoc
             }
 
             foreach (IEnricher item in this.Enrichers)
-                item.EnrichMethod(context.Clone(ret), mInfo);
+                item.EnrichMethod(context.Clone(ret), asset);
 
             ParameterInfo[] methodParams = mInfo.GetParameters();
             this.GenerateParameterElements(context.Clone(ret), methodParams);
@@ -691,7 +691,7 @@ namespace LBi.LostDoc
                 GenerateTypeRef(context.Clone(retElem), mInfo.ReturnType);
 
                 foreach (IEnricher item in this.Enrichers)
-                    item.EnrichReturnValue(context.Clone(retElem), mInfo);
+                    item.EnrichReturnValue(context.Clone(retElem), asset);
 
                 ret.Add(retElem);
             }
@@ -775,7 +775,7 @@ namespace LBi.LostDoc
                 GenerateTypeRef(context.Clone(pElem), pType);
 
                 foreach (IEnricher enricher in this.Enrichers)
-                    enricher.EnrichParameter(context.Clone(pElem), item);
+                    enricher.EnrichParameter(context.Clone(pElem), ReflectionServices.GetAsset(item.Member), item.Name);
 
                 context.Element.Add(pElem);
             }
@@ -842,7 +842,7 @@ namespace LBi.LostDoc
             context.Element.Add(ret);
 
             foreach (IEnricher item in this.Enrichers)
-                item.EnrichConstructor(context.Clone(ret), constructorInfo);
+                item.EnrichConstructor(context.Clone(ret), asset);
 
             ParameterInfo[] methodParams = constructorInfo.GetParameters();
             this.GenerateParameterElements(context.Clone(ret), methodParams);
@@ -885,7 +885,7 @@ namespace LBi.LostDoc
             context.Element.Add(ret);
 
             foreach (IEnricher item in this.Enrichers)
-                item.EnrichField(context.Clone(ret), fieldInfo);
+                item.EnrichField(context.Clone(ret), asset);
 
             return ret;
         }
@@ -938,7 +938,7 @@ namespace LBi.LostDoc
             this.GenerateImplementsElement(context.Clone(ret), eventInfo);
 
             foreach (IEnricher item in this.Enrichers)
-                item.EnrichEvent(context.Clone(ret), eventInfo);
+                item.EnrichEvent(context.Clone(ret), asset);
 
             return ret;
         }
@@ -1068,7 +1068,7 @@ namespace LBi.LostDoc
             this.GenerateImplementsElement(context.Clone(ret), propInfo);
 
             foreach (IEnricher item in this.Enrichers)
-                item.EnrichProperty(context.Clone(ret), propInfo);
+                item.EnrichProperty(context.Clone(ret), asset);
 
             return ret;
         }
