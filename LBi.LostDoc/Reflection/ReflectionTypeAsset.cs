@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 DigitasLBi Netherlands B.V.
+﻿/*
+ * Copyright 2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,23 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
+using System;
+using LBi.LostDoc.Primitives;
 
-namespace LBi.LostDoc
+namespace LBi.LostDoc.Reflection
 {
-    public interface IAssetExplorer
+    internal class ReflectionTypeAsset : TypeAsset
     {
-        IEnumerable<Asset> GetReferences(Asset asset);
+        public ReflectionTypeAsset(AssetIdentifier id, Type target) : base(id, target)
+        {
+            this.Target = target;
+        }
 
-        Asset GetParent(Asset asset);
+        public override string Name
+        {
+            get { return this.Target.Name; }
+        }
 
-        IEnumerable<Asset> GetChildren(Asset asset);
+        protected internal new Type Target { get; private set; }
     }
 }

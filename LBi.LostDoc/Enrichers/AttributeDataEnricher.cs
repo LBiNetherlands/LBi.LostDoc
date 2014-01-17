@@ -81,7 +81,7 @@ namespace LBi.LostDoc.Enrichers
 
         public void EnrichParameter(IProcessingContext context, Asset methodAsset, string parameterName)
         {
-            MethodInfo methodInfo = (MethodInfo)methodAsset.Target;
+            MethodBase methodInfo = (MethodBase)methodAsset.Target;
             ParameterInfo parameterInfo = methodInfo.GetParameters().Single(p => p.Name == parameterName);
             GenerateAttributeElements(context, parameterInfo.GetCustomAttributesData());
         }

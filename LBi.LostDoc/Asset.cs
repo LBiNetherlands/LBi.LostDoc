@@ -25,6 +25,7 @@ namespace LBi.LostDoc
             this.Id = id;
             this.Target = target;
         }
+        public virtual string Name { get { return null; } }
 
         public object Target { get; private set; }
 

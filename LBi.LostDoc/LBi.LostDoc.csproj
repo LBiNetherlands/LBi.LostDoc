@@ -90,12 +90,15 @@
     <Compile Include="Filters\SpecialNameMemberInfoFilter.cs" />
     <Compile Include="Namespaces.cs" />
     <Compile Include="Naming.cs" />
+    <Compile Include="Primitives\TypeAsset.cs" />
     <Compile Include="ProcessingContextExtensions.cs" />
     <Compile Include="Reflection\IAssemblyLoader.cs" />
     <Compile Include="Reflection\NamespaceInfo.cs" />
     <Compile Include="Reflection\ReflectionExplorer.cs" />
+    <Compile Include="Reflection\ReflectionExtensions.cs" />
     <Compile Include="Reflection\ReflectionOnlyAssemblyLoader.cs" />
     <Compile Include="Reflection\ReflectionServices.cs" />
+    <Compile Include="Reflection\ReflectionTypeAsset.cs" />
     <Compile Include="Service References\MsdnContentService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

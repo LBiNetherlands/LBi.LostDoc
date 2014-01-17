@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2013 DigitasLBi Netherlands B.V.
+ * Copyright 2013-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace LBi.LostDoc.Reflection
 {
@@ -31,12 +32,58 @@ namespace LBi.LostDoc.Reflection
             this._assemblyLoader = assemblyLoader;
         }
 
-        public IEnumerable<Asset> GetReferences(Asset assemblyAsset)
+        public IEnumerable<Asset> GetReferences(Asset asset)
         {
-            if (assemblyAsset.Type != AssetType.Assembly)
-                throw new ArgumentException("Asset must be of type Assembly", "assemblyAsset");
 
-            Assembly assembly = assemblyAsset.GetAssembly();
+            //switch (asset.Type)
+            //{
+            //    case AssetType.Namespace:
+            //        // nothing
+            //        yield break;
+
+            //    case AssetType.Type:
+            //        // base class & implemented interface types
+            //        Type type = (Type)asset.Target;
+            //        yield return ReflectionServices.GetAsset(type.BaseType);
+            //        foreach (var interfaceType in type.GetImplementedInterfaces())
+            //            yield return ReflectionServices.GetAsset(interfaceType);
+
+            //        if (type.IsGenericType)
+            //        {
+            //            foreach (Type typeArg in type.GetGenericArguments())
+            //            {
+            //                if (typeArg.IsGenericParameter)
+            //                    continue;
+
+            //                yield return 
+            //            }
+            //        } else if (type.IsG)
+                        
+
+            //        break;
+            //    case AssetType.Method:
+            //        // parameter & return types
+            //        MethodInfo method = (MethodInfo)asset.Target;
+            //        yield return ReflectionServices.GetAsset(method.ReturnType);
+
+            //        break;
+            //    case AssetType.Field:
+            //        // field type
+            //        break;
+            //    case AssetType.Event:
+            //        // parameter & return types
+            //        break;
+            //    case AssetType.Property:
+            //        // property type, indexer types
+            //        break;
+            //    case AssetType.Assembly:
+            //        // references
+            //        break;
+            //    default:
+            //        throw new ArgumentOutOfRangeException();
+            //}
+
+            Assembly assembly = asset.GetAssembly();
 
             AssemblyName[] references = assembly.GetReferencedAssemblies();
 
@@ -47,9 +94,9 @@ namespace LBi.LostDoc.Reflection
                 if (asm == null)
                     throw new FileNotFoundException("Assembly not found: " + reference.ToString());
 
-                Asset asset = ReflectionServices.GetAsset(asm);
+                Asset rasset = ReflectionServices.GetAsset(asm);
 
-                yield return asset;
+                yield return rasset;
             }
         }
 
