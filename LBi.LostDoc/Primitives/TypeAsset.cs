@@ -15,11 +15,7 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LBi.LostDoc.Primitives
 {
@@ -30,66 +26,9 @@ namespace LBi.LostDoc.Primitives
             Contract.Requires<ArgumentException>(id.Type == AssetType.Type, "Invalid AssetIdentifier for TypeAsset");
         }
 
-    }
-
-    public abstract class AssemblyAsset : Asset
-    {
-        protected AssemblyAsset(AssetIdentifier id, object target) : base(id, target)
+        public override void Visit(IVisitor visitor)
         {
-            Contract.Requires<ArgumentException>(id.Type == AssetType.Assembly, "Invalid AssetIdentifier for AssemblyAsset");
-
-        }
-    }
-
-    public abstract class NamespaceAsset : Asset
-    {
-        protected NamespaceAsset(AssetIdentifier id, object target) : base(id, target)
-        {
-            Contract.Requires<ArgumentException>(id.Type == AssetType.Namespace, "Invalid AssetIdentifier for NamespaceAsset");
-
-        }
-    }
-
-    public abstract class MemberAsset : Asset
-    {
-        protected MemberAsset(AssetIdentifier id, object target)
-            : base(id, target)
-        {
-        }
-    }
-
-    public abstract class MethodAsset : MemberAsset
-    {
-        protected MethodAsset(AssetIdentifier id, object target) : base(id, target)
-        {
-            Contract.Requires<ArgumentException>(id.Type == AssetType.Method, "Invalid AssetIdentifier for MethodAsset");
-        }
-    }
-
-    public abstract class PropertyAsset : MemberAsset
-    {
-        protected PropertyAsset(AssetIdentifier id, object target)
-            : base(id, target)
-        {
-            Contract.Requires<ArgumentException>(id.Type == AssetType.Property, "Invalid AssetIdentifier for PropertyAsset");
-        }
-    }
-
-    public abstract class EventAsset : MemberAsset
-    {
-        protected EventAsset(AssetIdentifier id, object target)
-            : base(id, target)
-        {
-            Contract.Requires<ArgumentException>(id.Type == AssetType.Event, "Invalid AssetIdentifier for EventAsset");
-        }
-    }
-
-    public abstract class OperatorAsset : MemberAsset
-    {
-        protected OperatorAsset(AssetIdentifier id, object target)
-            : base(id, target)
-        {
-            Contract.Requires<ArgumentException>(id.Type == AssetType.Method, "Invalid AssetIdentifier for OperatorAsset");
+            visitor.VisitType(this);
         }
     }
 }

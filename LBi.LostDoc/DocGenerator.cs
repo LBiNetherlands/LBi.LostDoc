@@ -28,6 +28,7 @@ using System.Xml.XPath;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Enrichers;
 using LBi.LostDoc.Filters;
+using LBi.LostDoc.Primitives;
 using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc
@@ -219,7 +220,13 @@ namespace LBi.LostDoc
             return assets;
         }
 
-        protected virtual void BuildHierarchy(XElement parentNode, LinkedListNode<Asset> hierarchy, HashSet<Asset> references, HashSet<Asset> emittedAssets, int phase, IAssetExplorer assetExplorer)
+        protected virtual void BuildHierarchy(XElement parentNode,
+                                              LinkedListNode<Asset> hierarchy,
+                                              HashSet<Asset> references,
+                                              HashSet<Asset> emittedAssets,
+                                              int phase,
+                                              IAssetExplorer assetExplorer,
+                                              AssetXmlWriter writer)
         {
             if (hierarchy == null)
                 return;
@@ -244,49 +251,53 @@ namespace LBi.LostDoc
             // add asset to list of generated assets
             emittedAssets.Add(asset);
 
-            // dispatch depending on type
-            switch (asset.Type)
-            {
-                case AssetType.Namespace:
-                    newElement = parentNode.XPathSelectElement(string.Format("namespace[@assetId = '{0}']", asset));
-                    if (newElement == null)
-                        newElement = this.GenerateNamespaceElement(pctx, asset);
-                    break;
-                case AssetType.Type:
-                    newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", asset));
-                    if (newElement == null)
-                        newElement = this.GenerateTypeElement(pctx, asset);
-                    break;
-                case AssetType.Method:
-                    newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", asset));
-                    if (newElement == null)
-                        newElement = this.GenerateMethodElement(pctx, asset);
-                    break;
-                case AssetType.Field:
-                    newElement = parentNode.XPathSelectElement(string.Format("field[@assetId = '{0}']", asset));
-                    if (newElement == null)
-                        newElement = this.GenerateFieldElement(pctx, asset);
-                    break;
-                case AssetType.Event:
-                    newElement = parentNode.XPathSelectElement(string.Format("event[@assetId = '{0}']", asset));
-                    if (newElement == null)
-                        newElement = this.GenerateEventElement(pctx, asset);
-                    break;
-                case AssetType.Property:
-                    newElement = parentNode.XPathSelectElement(string.Format("property[@assetId = '{0}']", asset));
-                    if (newElement == null)
-                        newElement = this.GeneratePropertyElement(pctx, asset);
-                    break;
-                case AssetType.Assembly:
-                    newElement = parentNode.XPathSelectElement(string.Format("assembly[@assetId = '{0}']", asset));
-                    if (newElement == null)
-                        newElement = this.GenerateAssemblyElement(pctx, asset);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            newElement = parentNode.XPathSelectElement("*[@assetId=" + asset.Id + "]");
+            if (newElement == null)
+                newElement = writer.Writer(pctx, asset);
 
-            this.BuildHierarchy(newElement, hierarchy.Next, references, emittedAssets, phase, assetExplorer);
+            //// dispatch depending on type
+            //switch (asset.Type)
+            //{
+            //    case AssetType.Namespace:
+            //        newElement = parentNode.XPathSelectElement(string.Format("namespace[@assetId = '{0}']", asset));
+            //        if (newElement == null)
+            //            newElement = this.GenerateNamespaceElement(pctx, asset);
+            //        break;
+            //    case AssetType.Type:
+            //        newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", asset));
+            //        if (newElement == null)
+            //            newElement = this.GenerateTypeElement(pctx, asset);
+            //        break;
+            //    case AssetType.Method:
+            //        newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", asset));
+            //        if (newElement == null)
+            //            newElement = this.GenerateMethodElement(pctx, asset);
+            //        break;
+            //    case AssetType.Field:
+            //        newElement = parentNode.XPathSelectElement(string.Format("field[@assetId = '{0}']", asset));
+            //        if (newElement == null)
+            //            newElement = this.GenerateFieldElement(pctx, asset);
+            //        break;
+            //    case AssetType.Event:
+            //        newElement = parentNode.XPathSelectElement(string.Format("event[@assetId = '{0}']", asset));
+            //        if (newElement == null)
+            //            newElement = this.GenerateEventElement(pctx, asset);
+            //        break;
+            //    case AssetType.Property:
+            //        newElement = parentNode.XPathSelectElement(string.Format("property[@assetId = '{0}']", asset));
+            //        if (newElement == null)
+            //            newElement = this.GeneratePropertyElement(pctx, asset);
+            //        break;
+            //    case AssetType.Assembly:
+            //        newElement = parentNode.XPathSelectElement(string.Format("assembly[@assetId = '{0}']", asset));
+            //        if (newElement == null)
+            //            newElement = writer.Writer(pctx, asset);
+            //        break;
+            //    default:
+            //        throw new ArgumentOutOfRangeException();
+            //}
+
+            this.BuildHierarchy(newElement, hierarchy.Next, references, emittedAssets, phase, assetExplorer, writer);
         }
 
 
@@ -1083,6 +1094,94 @@ namespace LBi.LostDoc
         ~DocGenerator()
         {
             this.Dispose(false);
+        }
+    }
+
+    public class AssetXmlWriter : IVisitor
+    {
+        private XElement _current;
+        private IProcessingContext _context;
+        private IEnricher[] _enrichers;
+
+        public AssetXmlWriter(IEnumerable<IEnricher> enrichers)
+        {
+            this._enrichers = enrichers.ToArray();
+        }
+
+
+        public XElement Writer(IProcessingContext context, Asset asset)
+        {
+            this._current = null;
+            this._context = context;
+
+            asset.Visit(this);
+            XElement ret = this._current;
+            
+            this._context = null;
+            this._current = null;
+
+            return ret;
+        }
+
+        void IVisitor.VisitAssembly(AssemblyAsset asset)
+        {
+            this._current = new XElement("assembly",
+                                         new XAttribute("name", asset.Name),
+                                         new XAttribute("filename", asset.Filename),
+                                         new XAttribute("assetId", asset.Id),
+                                         new XAttribute("phase", this._context.Phase));
+
+            IEnumerable<Asset> references = this._context.AssetExplorer.GetReferences(asset);
+
+            foreach (Asset reference in references)
+            {
+                this._current.Add( new XElement("references", new XAttribute("assembly", reference.Id)));
+            }
+
+            this._context.Element.Add(this._current);
+
+            foreach (IEnricher enricher in this._enrichers)
+                enricher.EnrichAssembly(this._context.Clone(this._current), asset);
+        }
+
+        void IVisitor.VisitNamespace(NamespaceAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IVisitor.VisitType(TypeAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IVisitor.VisitField(FieldAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IVisitor.VisitEvent(EventAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IVisitor.VisitProperty(PropertyAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IVisitor.VisitUnknown(Asset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IVisitor.VisitMethod(MethodAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IVisitor.VisitConstructor(ConstructorAsset asset)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 DigitasLBi Netherlands B.V.
+ * Copyright 2013-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,29 @@
  */
 
 using System;
+using LBi.LostDoc.Primitives;
 
 namespace LBi.LostDoc
 {
-    public class Asset : IEquatable<Asset>
+    public abstract class Asset : IEquatable<Asset> 
     {
-        public Asset(AssetIdentifier id, object target)
+        protected Asset(AssetIdentifier id, object target)
         {
             this.Id = id;
             this.Target = target;
         }
-        public virtual string Name { get { return null; } }
+        public abstract string Name { get { return null; } }
 
         public object Target { get; private set; }
 
         public AssetIdentifier Id { get; private set; }
 
         public AssetType Type { get { return this.Id.Type; } }
+
+        public virtual void Visit(IVisitor visitor)
+        {
+            visitor.VisitUnknown(this);
+        }
 
         public void Visit(IAssetVisitor visitor)
         {

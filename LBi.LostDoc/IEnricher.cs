@@ -14,35 +14,34 @@
  * limitations under the License. 
  */
 
-using System;
-using System.Reflection;
+using LBi.LostDoc.Primitives;
 
 namespace LBi.LostDoc
 {
     public interface IEnricher
     {
-        void EnrichType(IProcessingContext context, Asset typeAsset);
+        void EnrichType(IProcessingContext context, TypeAsset typeAsset);
 
-        void EnrichConstructor(IProcessingContext context, Asset ctorAsset);
+        void EnrichConstructor(IProcessingContext context, ConstructorAsset ctorAsset);
 
-        void EnrichAssembly(IProcessingContext context, Asset assemblyAsset);
+        void EnrichAssembly(IProcessingContext context, AssemblyAsset assemblyAsset);
 
         void RegisterNamespace(IProcessingContext context);
 
-        void EnrichMethod(IProcessingContext context, Asset methodAsset);
+        void EnrichMethod(IProcessingContext context, MethodAsset methodAsset);
 
-        void EnrichField(IProcessingContext context, Asset fieldAsset);
+        void EnrichField(IProcessingContext context, FieldAsset fieldAsset);
 
-        void EnrichProperty(IProcessingContext context, Asset propertyAsset);
+        void EnrichProperty(IProcessingContext context, PropertyAsset propertyAsset);
 
-        void EnrichReturnValue(IProcessingContext context, Asset methodAsset);
+        void EnrichReturnValue(IProcessingContext context, MethodAsset methodAsset);
 
-        void EnrichParameter(IProcessingContext context, Asset methodAsset, string parameterName);
+        void EnrichParameter(IProcessingContext context, Parameter parameter);
 
-        void EnrichTypeParameter(IProcessingContext context, Asset typeOrMethodAsset, string name);
+        void EnrichTypeParameter(IProcessingContext context, TypeParameter typeParameter);
 
-        void EnrichNamespace(IProcessingContext context, Asset namespaceAsset);
+        void EnrichNamespace(IProcessingContext context, NamespaceAsset namespaceAsset);
 
-        void EnrichEvent(IProcessingContext context, Asset eventAsset);
+        void EnrichEvent(IProcessingContext context, EventAsset eventAsset);
     }
 }
