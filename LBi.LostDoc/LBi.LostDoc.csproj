@@ -184,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Primitives\ObjectModel.cd" />
     <None Include="Service References\MsdnContentService\atoms.xsd">
       <SubType>Designer</SubType>
     </None>

@@ -246,56 +246,13 @@ namespace LBi.LostDoc
                                                             phase,
                                                             assetExplorer);
 
-            XElement newElement;
-
             // add asset to list of generated assets
             emittedAssets.Add(asset);
 
-            newElement = parentNode.XPathSelectElement("*[@assetId=" + asset.Id + "]");
+            // check if already exists, write otherwise
+            XElement newElement = parentNode.XPathSelectElement("*[@assetId=" + asset.Id + "]");
             if (newElement == null)
                 newElement = writer.Writer(pctx, asset);
-
-            //// dispatch depending on type
-            //switch (asset.Type)
-            //{
-            //    case AssetType.Namespace:
-            //        newElement = parentNode.XPathSelectElement(string.Format("namespace[@assetId = '{0}']", asset));
-            //        if (newElement == null)
-            //            newElement = this.GenerateNamespaceElement(pctx, asset);
-            //        break;
-            //    case AssetType.Type:
-            //        newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", asset));
-            //        if (newElement == null)
-            //            newElement = this.GenerateTypeElement(pctx, asset);
-            //        break;
-            //    case AssetType.Method:
-            //        newElement = parentNode.XPathSelectElement(string.Format("*[@assetId = '{0}']", asset));
-            //        if (newElement == null)
-            //            newElement = this.GenerateMethodElement(pctx, asset);
-            //        break;
-            //    case AssetType.Field:
-            //        newElement = parentNode.XPathSelectElement(string.Format("field[@assetId = '{0}']", asset));
-            //        if (newElement == null)
-            //            newElement = this.GenerateFieldElement(pctx, asset);
-            //        break;
-            //    case AssetType.Event:
-            //        newElement = parentNode.XPathSelectElement(string.Format("event[@assetId = '{0}']", asset));
-            //        if (newElement == null)
-            //            newElement = this.GenerateEventElement(pctx, asset);
-            //        break;
-            //    case AssetType.Property:
-            //        newElement = parentNode.XPathSelectElement(string.Format("property[@assetId = '{0}']", asset));
-            //        if (newElement == null)
-            //            newElement = this.GeneratePropertyElement(pctx, asset);
-            //        break;
-            //    case AssetType.Assembly:
-            //        newElement = parentNode.XPathSelectElement(string.Format("assembly[@assetId = '{0}']", asset));
-            //        if (newElement == null)
-            //            newElement = writer.Writer(pctx, asset);
-            //        break;
-            //    default:
-            //        throw new ArgumentOutOfRangeException();
-            //}
 
             this.BuildHierarchy(newElement, hierarchy.Next, references, emittedAssets, phase, assetExplorer, writer);
         }
@@ -339,46 +296,6 @@ namespace LBi.LostDoc
             }
         }
 
-        private XElement GenerateAssemblyElement(IProcessingContext context, Asset asset)
-        {
-            Assembly asm = (Assembly)asset.Target;
-
-            IEnumerable<XElement> references =
-                asm.GetReferencedAssemblies()
-                   .Select(an => new XElement("references",
-                                              new XAttribute("assembly",
-                                                             AssetIdentifier.FromAssembly(context.AssemblyLoader.Load(an.FullName)))));
-
-            XElement ret = new XElement("assembly",
-                                        new XAttribute("name", asm.GetName().Name),
-                                        new XAttribute("filename", asm.ManifestModule.Name),
-                                        new XAttribute("assetId", asset.Id),
-                                        new XAttribute("phase", context.Phase),
-                                        references);
-
-            context.Element.Add(ret);
-
-            foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichAssembly(context.Clone(ret), asset);
-
-            return ret;
-        }
-
-        private XElement GenerateNamespaceElement(IProcessingContext context, Asset asset)
-        {
-            NamespaceInfo nsInfo = (NamespaceInfo)asset.Target;
-            var ret = new XElement("namespace",
-                                   new XAttribute("name", nsInfo.Name),
-                                   new XAttribute("assetId", asset.Id),
-                                   new XAttribute("phase", context.Phase));
-
-            context.Element.Add(ret);
-
-            foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichNamespace(context.Clone(ret), asset);
-
-            return ret;
-        }
 
         private XElement GenerateTypeElement(IProcessingContext context, Asset asset)
         {
@@ -1123,19 +1040,24 @@ namespace LBi.LostDoc
             return ret;
         }
 
+        protected virtual IEnumerable<XAttribute> GetCommonAttributes()
+        {
+            yield return new XAttribute("phase", this._context.Phase);
+        }
+
         void IVisitor.VisitAssembly(AssemblyAsset asset)
         {
             this._current = new XElement("assembly",
                                          new XAttribute("name", asset.Name),
                                          new XAttribute("filename", asset.Filename),
                                          new XAttribute("assetId", asset.Id),
-                                         new XAttribute("phase", this._context.Phase));
+                                         this.GetCommonAttributes());
 
             IEnumerable<Asset> references = this._context.AssetExplorer.GetReferences(asset);
 
             foreach (Asset reference in references)
             {
-                this._current.Add( new XElement("references", new XAttribute("assembly", reference.Id)));
+                this._current.Add(new XElement("references", new XAttribute("assembly", reference.Id)));
             }
 
             this._context.Element.Add(this._current);
@@ -1146,12 +1068,146 @@ namespace LBi.LostDoc
 
         void IVisitor.VisitNamespace(NamespaceAsset asset)
         {
-            throw new NotImplementedException();
+            this._current = new XElement("namespace",
+                                         new XAttribute("name", asset.Name),
+                                         new XAttribute("assetId", asset.Id),
+                                         this.GetCommonAttributes());
+
+            this._context.Element.Add(this._current);
+
+            foreach (IEnricher enricher in this._enrichers)
+                enricher.EnrichNamespace(this._context.Clone(this._current), asset);
         }
 
         void IVisitor.VisitType(TypeAsset asset)
         {
-            throw new NotImplementedException();
+            string elemName;
+
+            if (asset.IsClass)
+                elemName = "class";
+            else if (asset.IsEnum)
+                elemName = "enum";
+            else if (asset.IsValueType)
+                elemName = "struct";
+            else if (asset.IsInterface)
+                elemName = "interface";
+            else
+                throw new ArgumentException("Unknown asset type: " + asset.Type.ToString(), "asset");
+
+            this._current = new XElement(elemName,
+                                         new XAttribute("name", asset.Name),
+                                         new XAttribute("assetId", asset.Id),
+                                         this.GetCommonAttributes());
+
+            if (asset.IsEnum)
+            {
+                Type underlyingType = type.GetEnumUnderlyingType();
+                AssetIdentifier aid = AssetIdentifier.FromType(underlyingType);
+                ret.Add(new XAttribute("underlyingType", aid));
+                context.AddReference(new Asset(aid, underlyingType));
+            }
+
+
+            if (!type.IsInterface && type.IsAbstract)
+                ret.Add(new XAttribute("isAbstract", XmlConvert.ToString(type.IsAbstract)));
+
+            if (!type.IsVisible || type.IsNested && type.IsNestedAssembly)
+                ret.Add(new XAttribute("isInternal", XmlConvert.ToString(true)));
+
+            if (type.IsPublic || type.IsNested && type.IsNestedPublic)
+                ret.Add(new XAttribute("isPublic", XmlConvert.ToString(true)));
+
+            if (type.IsNested && type.IsNestedPrivate)
+                ret.Add(new XAttribute("isPrivate", XmlConvert.ToString(true)));
+
+            if (type.IsNested && type.IsNestedFamily)
+                ret.Add(new XAttribute("isProtected", XmlConvert.ToString(true)));
+
+            if (type.IsNested && type.IsNestedFamANDAssem)
+                ret.Add(new XAttribute("isProtectedAndInternal", XmlConvert.ToString(true)));
+
+            if (type.IsNested && type.IsNestedFamORAssem)
+                ret.Add(new XAttribute("isProtectedOrInternal", XmlConvert.ToString(true)));
+
+            if (type.IsClass && type.IsSealed)
+                ret.Add(new XAttribute("isSealed", XmlConvert.ToString(true)));
+
+            if (type.BaseType != null)
+            {
+                AssetIdentifier baseAid = AssetIdentifier.FromType(type.BaseType);
+                Asset baseAsset = new Asset(baseAid, type.BaseType);
+                if (!context.IsFiltered(baseAsset))
+                {
+                    var inheritsElem = new XElement("inherits");
+                    ret.Add(inheritsElem);
+                    GenerateTypeRef(context.Clone(inheritsElem), type.BaseType);
+                }
+            }
+
+            if (type.ContainsGenericParameters)
+            {
+                Type[] typeParams = type.GetGenericArguments();
+                if (type.IsNested && type.DeclaringType.ContainsGenericParameters)
+                {
+                    Type[] inheritedTypeParams = type.DeclaringType.GetGenericArguments();
+
+                    Debug.Assert(typeParams.Length >= inheritedTypeParams.Length);
+
+                    for (int paramPos = 0; paramPos < inheritedTypeParams.Length; paramPos++)
+                    {
+                        Debug.Assert(typeParams[paramPos].Name == inheritedTypeParams[paramPos].Name);
+                        Debug.Assert(typeParams[paramPos].GenericParameterAttributes == inheritedTypeParams[paramPos].GenericParameterAttributes);
+                    }
+
+                    Type[] declaredTypeParams = new Type[typeParams.Length - inheritedTypeParams.Length];
+
+                    for (int paramPos = inheritedTypeParams.Length; paramPos < typeParams.Length; paramPos++)
+                    {
+                        declaredTypeParams[paramPos - inheritedTypeParams.Length] = typeParams[paramPos];
+                    }
+
+                    typeParams = declaredTypeParams;
+                }
+
+                foreach (Type tp in typeParams)
+                {
+                    this.GenerateTypeParamElement(context.Clone(ret), type, tp);
+                }
+            }
+
+            if (type.IsClass)
+            {
+                foreach (Type interfaceType in type.GetInterfaces())
+                {
+                    InterfaceMapping mapping = type.GetInterfaceMap(interfaceType);
+
+                    if (mapping.TargetMethods.Any(mi => mi.DeclaringType == type))
+                    {
+                        Type ifType = interfaceType.IsGenericType
+                                          ? interfaceType.GetGenericTypeDefinition()
+                                          : interfaceType;
+                        AssetIdentifier interfaceAssetId = AssetIdentifier.FromType(ifType);
+
+                        Asset interfaceAsset = new Asset(interfaceAssetId, ifType);
+
+                        if (!context.IsFiltered(interfaceAsset))
+                        {
+                            var implElement = new XElement("implements");
+                            ret.Add(implElement);
+                            GenerateTypeRef(context.Clone(implElement), interfaceType, "interface");
+                        }
+                    }
+                }
+            }
+
+
+            foreach (IEnricher enricher in this._enrichers)
+                enricher.EnrichType(context.Clone(ret), asset);
+
+
+            context.Element.Add(ret);
+
+            return ret;
         }
 
         void IVisitor.VisitField(FieldAsset asset)
