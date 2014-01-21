@@ -4,13 +4,16 @@
     {
         void VisitAssembly(AssemblyAsset asset);
         void VisitNamespace(NamespaceAsset asset);
-        void VisitType(TypeAsset asset);
         void VisitField(FieldAsset asset);
         void VisitEvent(EventAsset asset);
         void VisitProperty(PropertyAsset asset);
         void VisitUnknown(Asset asset);
         void VisitMethod(MethodAsset asset);
         void VisitConstructor(ConstructorAsset asset);
+        void VistEnum(EnumAsset asset);
+        void VistInterface(InterfaceAsset asset);
+        void VistReferenceType(ReferenceTypeAsset asset);
+        void VistValueType(ValueTypeAsset asset);
     }
 
     public interface IVisitor<out T>

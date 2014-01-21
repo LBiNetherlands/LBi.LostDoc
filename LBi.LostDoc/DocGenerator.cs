@@ -1033,25 +1033,25 @@ namespace LBi.LostDoc
 
             asset.Visit(this);
             XElement ret = this._current;
-            
+
             this._context = null;
             this._current = null;
 
             return ret;
         }
 
-        protected virtual IEnumerable<XAttribute> GetCommonAttributes()
+        protected virtual IEnumerable<XAttribute> GetCommonAttributes(Asset asset)
         {
+            yield return new XAttribute("name", asset.Name);
+            yield return new XAttribute("assetId", asset.Id);
             yield return new XAttribute("phase", this._context.Phase);
         }
 
         void IVisitor.VisitAssembly(AssemblyAsset asset)
         {
             this._current = new XElement("assembly",
-                                         new XAttribute("name", asset.Name),
                                          new XAttribute("filename", asset.Filename),
-                                         new XAttribute("assetId", asset.Id),
-                                         this.GetCommonAttributes());
+                                         this.GetCommonAttributes(asset));
 
             IEnumerable<Asset> references = this._context.AssetExplorer.GetReferences(asset);
 
@@ -1079,35 +1079,8 @@ namespace LBi.LostDoc
                 enricher.EnrichNamespace(this._context.Clone(this._current), asset);
         }
 
-        void IVisitor.VisitType(TypeAsset asset)
+        private void VisitType(TypeAsset asset)
         {
-            string elemName;
-
-            if (asset.IsClass)
-                elemName = "class";
-            else if (asset.IsEnum)
-                elemName = "enum";
-            else if (asset.IsValueType)
-                elemName = "struct";
-            else if (asset.IsInterface)
-                elemName = "interface";
-            else
-                throw new ArgumentException("Unknown asset type: " + asset.Type.ToString(), "asset");
-
-            this._current = new XElement(elemName,
-                                         new XAttribute("name", asset.Name),
-                                         new XAttribute("assetId", asset.Id),
-                                         this.GetCommonAttributes());
-
-            if (asset.IsEnum)
-            {
-                Type underlyingType = type.GetEnumUnderlyingType();
-                AssetIdentifier aid = AssetIdentifier.FromType(underlyingType);
-                ret.Add(new XAttribute("underlyingType", aid));
-                context.AddReference(new Asset(aid, underlyingType));
-            }
-
-
             if (!type.IsInterface && type.IsAbstract)
                 ret.Add(new XAttribute("isAbstract", XmlConvert.ToString(type.IsAbstract)));
 
@@ -1129,20 +1102,6 @@ namespace LBi.LostDoc
             if (type.IsNested && type.IsNestedFamORAssem)
                 ret.Add(new XAttribute("isProtectedOrInternal", XmlConvert.ToString(true)));
 
-            if (type.IsClass && type.IsSealed)
-                ret.Add(new XAttribute("isSealed", XmlConvert.ToString(true)));
-
-            if (type.BaseType != null)
-            {
-                AssetIdentifier baseAid = AssetIdentifier.FromType(type.BaseType);
-                Asset baseAsset = new Asset(baseAid, type.BaseType);
-                if (!context.IsFiltered(baseAsset))
-                {
-                    var inheritsElem = new XElement("inherits");
-                    ret.Add(inheritsElem);
-                    GenerateTypeRef(context.Clone(inheritsElem), type.BaseType);
-                }
-            }
 
             if (type.ContainsGenericParameters)
             {
@@ -1175,39 +1134,10 @@ namespace LBi.LostDoc
                 }
             }
 
-            if (type.IsClass)
-            {
-                foreach (Type interfaceType in type.GetInterfaces())
-                {
-                    InterfaceMapping mapping = type.GetInterfaceMap(interfaceType);
-
-                    if (mapping.TargetMethods.Any(mi => mi.DeclaringType == type))
-                    {
-                        Type ifType = interfaceType.IsGenericType
-                                          ? interfaceType.GetGenericTypeDefinition()
-                                          : interfaceType;
-                        AssetIdentifier interfaceAssetId = AssetIdentifier.FromType(ifType);
-
-                        Asset interfaceAsset = new Asset(interfaceAssetId, ifType);
-
-                        if (!context.IsFiltered(interfaceAsset))
-                        {
-                            var implElement = new XElement("implements");
-                            ret.Add(implElement);
-                            GenerateTypeRef(context.Clone(implElement), interfaceType, "interface");
-                        }
-                    }
-                }
-            }
-
-
             foreach (IEnricher enricher in this._enrichers)
-                enricher.EnrichType(context.Clone(ret), asset);
+                enricher.EnrichType(this._context.Clone(this._current), asset);
 
-
-            context.Element.Add(ret);
-
-            return ret;
+            this._context.Element.Add(this._current);
         }
 
         void IVisitor.VisitField(FieldAsset asset)
@@ -1236,6 +1166,57 @@ namespace LBi.LostDoc
         }
 
         void IVisitor.VisitConstructor(ConstructorAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void VistEnum(EnumAsset asset)
+        {
+            this._current = new XElement("enum",
+                                         this.GetCommonAttributes(asset));
+
+            ValueTypeAsset underlyingType = asset.UnderlyingType;
+
+            this._current.Add(new XAttribute("underlyingType", underlyingType.Id));
+            this._context.AddReference(underlyingType);
+
+            this.VisitType(asset);
+        }
+
+        public void VistInterface(InterfaceAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void VistReferenceType(ReferenceTypeAsset asset)
+        {
+            this._current = new XElement("class",
+                                         this.GetCommonAttributes(asset));
+
+            if (asset.IsSealed)
+                this._current.Add(new XAttribute("isSealed", XmlConvert.ToString(true)));
+
+            if (!this._context.IsFiltered(asset.BaseType))
+            {
+                var inheritsElem = new XElement("inherits");
+                this._current.Add(inheritsElem);
+                this.GenerateTypeRef(this._context.Clone(inheritsElem), asset.BaseType);
+            }
+
+            foreach (InterfaceAsset interfaceAsset in asset.DeclaredInterfaces)
+            {
+                if (!this._context.IsFiltered(interfaceAsset))
+                {
+                    var implElement = new XElement("implements");
+                    this._current.Add(implElement);
+                    this.GenerateTypeRef(this._context.Clone(implElement), interfaceAsset, "interface");
+                }
+            }
+
+            this.VisitType(asset);
+        }
+
+        public void VistValueType(ValueTypeAsset asset)
         {
             throw new NotImplementedException();
         }

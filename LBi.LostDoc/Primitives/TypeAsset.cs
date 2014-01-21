@@ -26,9 +26,32 @@ namespace LBi.LostDoc.Primitives
             Contract.Requires<ArgumentException>(id.Type == AssetType.Type, "Invalid AssetIdentifier for TypeAsset");
         }
 
+    }
+
+    public abstract class EnumAsset : TypeAsset
+    {
+        protected EnumAsset(AssetIdentifier id, object target) : base(id, target)
+        {
+        }
+
+        public abstract ValueTypeAsset UnderlyingType { get; }
+
         public override void Visit(IVisitor visitor)
         {
-            visitor.VisitType(this);
+            visitor.VistEnum(this);
+        }
+    }
+
+    public abstract class InterfaceAsset : TypeAsset
+    {
+        protected InterfaceAsset(AssetIdentifier id, object target)
+            : base(id, target)
+        {
+        }
+
+        public override void Visit(IVisitor visitor)
+        {
+            visitor.VistInterface(this);
         }
     }
 }

@@ -101,8 +101,10 @@
     <Compile Include="Primitives\OperatorAsset.cs" />
     <Compile Include="Primitives\Parameter.cs" />
     <Compile Include="Primitives\PropertyAsset.cs" />
+    <Compile Include="Primitives\ReferenceTypeAsset.cs" />
     <Compile Include="Primitives\TypeAsset.cs" />
     <Compile Include="Primitives\TypeParameter.cs" />
+    <Compile Include="Primitives\ValueTypeAsset.cs" />
     <Compile Include="ProcessingContextExtensions.cs" />
     <Compile Include="Reflection\IAssemblyLoader.cs" />
     <Compile Include="Reflection\NamespaceInfo.cs" />
