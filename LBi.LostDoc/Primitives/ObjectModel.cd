@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="LBi.LostDoc.Asset">
-    <Position X="10.25" Y="2" Width="1.5" />
+    <Position X="13.5" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAQEgAAAACQAAAAAAIAAAQAAAAAAAAA=</HashCode>
       <FileName>Asset.cs</FileName>
@@ -9,23 +9,23 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="LBi.LostDoc.Primitives.OperatorAsset">
-    <Position X="8" Y="7.75" Width="1.5" />
+    <Position X="14.75" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\OperatorAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.PropertyAsset">
-    <Position X="14.75" Y="7.75" Width="1.5" />
+    <Position X="21.5" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\PropertyAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.TypeAsset">
-    <Position X="5.75" Y="5.75" Width="1.5" />
+    <Position X="9" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\TypeAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -37,35 +37,35 @@
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.ConstructorAsset">
-    <Position X="17" Y="7.75" Width="1.5" />
+    <Position X="23.75" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\ConstructorAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.EventAsset">
-    <Position X="19.25" Y="7.75" Width="1.5" />
+    <Position X="26" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\EventAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.FieldAsset">
-    <Position X="10.25" Y="7.75" Width="1.5" />
+    <Position X="17" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\FieldAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.MemberAsset">
-    <Position X="13.75" Y="5.75" Width="1.5" />
+    <Position X="20.25" Y="5.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\MemberAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.MethodAsset">
-    <Position X="12.5" Y="7.75" Width="1.5" />
+    <Position X="19.25" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\MethodAsset.cs</FileName>
@@ -76,6 +76,34 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\NamespaceAsset.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LBi.LostDoc.Primitives.EnumAsset">
+    <Position X="10.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Primitives\TypeAsset.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LBi.LostDoc.Primitives.InterfaceAsset">
+    <Position X="12.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Primitives\TypeAsset.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LBi.LostDoc.Primitives.ValueTypeAsset">
+    <Position X="5.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Primitives\ValueTypeAsset.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LBi.LostDoc.Primitives.ReferenceTypeAsset">
+    <Position X="8" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAQAAAAAAAAAAAAAgAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Primitives\ReferenceTypeAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
