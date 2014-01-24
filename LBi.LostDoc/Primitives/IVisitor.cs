@@ -14,6 +14,8 @@
         void VistInterface(InterfaceAsset asset);
         void VistReferenceType(ReferenceTypeAsset asset);
         void VistValueType(ValueTypeAsset asset);
+        void VisitOperator(OperatorAsset asset);
+        void VisitDelegate(DelegateAsset asset);
     }
 
     public interface IVisitor<out T>

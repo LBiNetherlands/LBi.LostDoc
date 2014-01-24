@@ -11,6 +11,8 @@ namespace LBi.LostDoc.Primitives
             Contract.Requires<ArgumentException>(id.Type == AssetType.Field, "Invalid AssetIdentifier for FieldAsset");
         }
 
+        public abstract TypeAsset FieldType { get; }
+
         public override void Visit(IVisitor visitor)
         {
             visitor.VisitField(this);

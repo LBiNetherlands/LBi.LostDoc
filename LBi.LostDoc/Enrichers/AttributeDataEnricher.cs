@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
+using LBi.LostDoc.Primitives;
 using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc.Enrichers
@@ -33,19 +34,19 @@ namespace LBi.LostDoc.Enrichers
 
         #region IEnricher Members
 
-        public void EnrichType(IProcessingContext context, Asset typeAsset)
+        public void EnrichType(IProcessingContext context, TypeAsset typeAsset)
         {
             Type type = (Type)typeAsset.Target;
             GenerateAttributeElements(context, type.GetCustomAttributesData());
         }
 
-        public void EnrichConstructor(IProcessingContext context, Asset ctorAsset)
+        public void EnrichConstructor(IProcessingContext context, ConstructorAsset ctorAsset)
         {
             ConstructorInfo ctor = (ConstructorInfo)ctorAsset.Target;
             GenerateAttributeElements(context, ctor.GetCustomAttributesData());
         }
 
-        public void EnrichAssembly(IProcessingContext context, Asset assemblyAsset)
+        public void EnrichAssembly(IProcessingContext context, AssemblyAsset assemblyAsset)
         {
             Assembly asm = (Assembly)assemblyAsset.Target;
             GenerateAttributeElements(context, asm.GetCustomAttributesData());
@@ -55,60 +56,60 @@ namespace LBi.LostDoc.Enrichers
         {
         }
 
-        public void EnrichMethod(IProcessingContext context, Asset methodAsset)
+        public void EnrichMethod(IProcessingContext context, MethodAsset methodAsset)
         {
             MethodInfo mInfo = (MethodInfo)methodAsset.Target;
             GenerateAttributeElements(context, mInfo.GetCustomAttributesData());
         }
 
-        public void EnrichField(IProcessingContext context, Asset fieldAsset)
+        public void EnrichField(IProcessingContext context, FieldAsset fieldAsset)
         {
             FieldInfo fieldInfo = (FieldInfo)fieldAsset.Target;
             GenerateAttributeElements(context, fieldInfo.GetCustomAttributesData());
         }
 
-        public void EnrichProperty(IProcessingContext context, Asset propertyAsset)
+        public void EnrichProperty(IProcessingContext context, PropertyAsset propertyAsset)
         {
             PropertyInfo propertyInfo = (PropertyInfo)propertyAsset.Target;
             GenerateAttributeElements(context, propertyInfo.GetCustomAttributesData());
         }
 
-        public void EnrichReturnValue(IProcessingContext context, Asset methodAsset)
+        public void EnrichReturnValue(IProcessingContext context, MethodAsset methodAsset)
         {
             MethodInfo methodInfo = (MethodInfo)methodAsset.Target;
             GenerateAttributeElements(context, CustomAttributeData.GetCustomAttributes(methodInfo.ReturnParameter));
         }
 
-        public void EnrichParameter(IProcessingContext context, Asset methodAsset, string parameterName)
+        public void EnrichParameter(IProcessingContext context, Parameter parameter)
         {
-            MethodBase methodInfo = (MethodBase)methodAsset.Target;
-            ParameterInfo parameterInfo = methodInfo.GetParameters().Single(p => p.Name == parameterName);
-            GenerateAttributeElements(context, parameterInfo.GetCustomAttributesData());
+            //MethodBase methodInfo = null;//(MethodBase)methodAsset.Target;
+            //ParameterInfo parameterInfo = methodInfo.GetParameters().Single(p => p.Name == parameter.ToString());
+            //GenerateAttributeElements(context, parameterInfo.GetCustomAttributesData());
         }
 
-        public void EnrichTypeParameter(IProcessingContext context, Asset typeOrMethodAsset, string name)
+        public void EnrichTypeParameter(IProcessingContext context, TypeParameter typeParameter)
         {
-            Type typeParameter;
+            //Type typeParameter;
 
-            MethodInfo methodInfo = typeOrMethodAsset.Target as MethodInfo;
-            if (methodInfo != null)
-            {
-                typeParameter = methodInfo.GetGenericArguments().Single(t => t.Name == name);
-            }
-            else
-            {
-                Type type = (Type)typeOrMethodAsset.Target;
-                typeParameter = type.GetGenericArguments().Single(t => t.Name == name);
-            }
-            GenerateAttributeElements(context, typeParameter.GetCustomAttributesData());
+            //MethodInfo methodInfo = typeOrMethodAsset.Target as MethodInfo;
+            //if (methodInfo != null)
+            //{
+            //    typeParameter = methodInfo.GetGenericArguments().Single(t => t.Name == name);
+            //}
+            //else
+            //{
+            //    Type type = (Type)typeOrMethodAsset.Target;
+            //    typeParameter = type.GetGenericArguments().Single(t => t.Name == name);
+            //}
+            //GenerateAttributeElements(context, typeParameter.GetCustomAttributesData());
         }
 
         // namespaces don't have attributes
-        public void EnrichNamespace(IProcessingContext context, Asset namespaceAsset)
+        public void EnrichNamespace(IProcessingContext context, NamespaceAsset namespaceAsset)
         {
         }
 
-        public void EnrichEvent(IProcessingContext context, Asset eventAsset)
+        public void EnrichEvent(IProcessingContext context, EventAsset eventAsset)
         {
             EventInfo eventInfo = (EventInfo)eventAsset.Target;
             GenerateAttributeElements(context, eventInfo.GetCustomAttributesData());

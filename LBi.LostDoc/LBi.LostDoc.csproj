@@ -92,8 +92,14 @@
     <Compile Include="Naming.cs" />
     <Compile Include="Primitives\AssemblyAsset.cs" />
     <Compile Include="Primitives\ConstructorAsset.cs" />
+    <Compile Include="Primitives\DelegateAsset.cs" />
+    <Compile Include="Primitives\EnumAsset.cs" />
     <Compile Include="Primitives\EventAsset.cs" />
     <Compile Include="Primitives\FieldAsset.cs" />
+    <Compile Include="Primitives\IGenericType.cs" />
+    <Compile Include="Primitives\IImplementsInterfaces.cs" />
+    <Compile Include="Primitives\INestedAsset.cs" />
+    <Compile Include="Primitives\InterfaceAsset.cs" />
     <Compile Include="Primitives\IVisitor.cs" />
     <Compile Include="Primitives\MemberAsset.cs" />
     <Compile Include="Primitives\MethodAsset.cs" />

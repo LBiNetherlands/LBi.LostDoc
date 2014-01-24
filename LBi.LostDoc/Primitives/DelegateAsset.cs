@@ -2,14 +2,16 @@
 
 namespace LBi.LostDoc.Primitives
 {
-    public abstract class ValueTypeAsset : TypeAsset, IImplementsInterfaces, IGenericType
+    public abstract class DelegateAsset : TypeAsset, IGenericType
     {
-        protected ValueTypeAsset(AssetIdentifier id, object target)
+        protected DelegateAsset(AssetIdentifier id, object target)
             : base(id, target)
         {
         }
 
-        public abstract IEnumerable<InterfaceAsset> DeclaredInterfaces { get; }
+        public abstract TypeAsset Returns { get; }
+
+        public abstract IEnumerable<Parameter> Parameters { get; }
 
         public abstract bool ContainsTypeParameters { get; }
 
@@ -17,7 +19,8 @@ namespace LBi.LostDoc.Primitives
 
         public override void Visit(IVisitor visitor)
         {
-            visitor.VistValueType(this);
+            visitor.VisitDelegate(this);
         }
+
     }
 }

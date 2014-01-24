@@ -19,39 +19,14 @@ using System.Diagnostics.Contracts;
 
 namespace LBi.LostDoc.Primitives
 {
-    public abstract class TypeAsset : Asset
+    public abstract class TypeAsset : Asset, INestedAsset<Asset>
     {
-        protected TypeAsset(AssetIdentifier id, object target) : base(id, target)
+        protected TypeAsset(AssetIdentifier id, object target)
+            : base(id, target)
         {
             Contract.Requires<ArgumentException>(id.Type == AssetType.Type, "Invalid AssetIdentifier for TypeAsset");
         }
 
-    }
-
-    public abstract class EnumAsset : TypeAsset
-    {
-        protected EnumAsset(AssetIdentifier id, object target) : base(id, target)
-        {
-        }
-
-        public abstract ValueTypeAsset UnderlyingType { get; }
-
-        public override void Visit(IVisitor visitor)
-        {
-            visitor.VistEnum(this);
-        }
-    }
-
-    public abstract class InterfaceAsset : TypeAsset
-    {
-        protected InterfaceAsset(AssetIdentifier id, object target)
-            : base(id, target)
-        {
-        }
-
-        public override void Visit(IVisitor visitor)
-        {
-            visitor.VistInterface(this);
-        }
+        public abstract Asset DeclaringAsset { get; }
     }
 }

@@ -1069,9 +1069,7 @@ namespace LBi.LostDoc
         void IVisitor.VisitNamespace(NamespaceAsset asset)
         {
             this._current = new XElement("namespace",
-                                         new XAttribute("name", asset.Name),
-                                         new XAttribute("assetId", asset.Id),
-                                         this.GetCommonAttributes());
+                                         this.GetCommonAttributes(asset));
 
             this._context.Element.Add(this._current);
 
@@ -1152,7 +1150,127 @@ namespace LBi.LostDoc
 
         void IVisitor.VisitProperty(PropertyAsset asset)
         {
-            throw new NotImplementedException();
+            this._current = new XElement("property",
+                                         this.GetCommonAttributes(asset));
+
+            this.GenerateTypeRef(this._context.Clone(this._current), asset.PropertyType);
+
+            this.GenerateParameterElements(this._context.Clone(this._current), asset.Parameters);
+
+            MethodAsset setMethod = asset.SetMethod;
+            MethodAsset getMethod = asset.GetMethod;
+
+            if ((setMethod ?? getMethod).IsAbstract)
+                this._current.Add(new XAttribute("isAbstract", XmlConvert.ToString(true)));
+
+            if ((setMethod ?? getMethod).IsVirtual)
+                this._current.Add(new XAttribute("isVirtual", XmlConvert.ToString(true)));
+
+
+            const int C_PUBLIC = 10;
+            const int C_INTERNAL_OR_PROTECTED = 8;
+            const int C_INTERNAL = 6;
+            const int C_PROTECTED = 4;
+            const int C_INTERNAL_AND_PROTECTED = 2;
+            const int C_PRIVATE = 0;
+
+            int leastRestrictiveAccessModifier;
+
+            if (setMethod != null && setMethod.IsPublic || getMethod != null && getMethod.IsPublic)
+            {
+                this._current.Add(new XAttribute("isPublic", XmlConvert.ToString(true)));
+                leastRestrictiveAccessModifier = C_PUBLIC;
+            }
+            else if (setMethod != null && setMethod.IsFamilyOrAssembly ||
+                     getMethod != null && getMethod.IsFamilyOrAssembly)
+            {
+                this._current.Add(new XAttribute("isInternalOrProtected", XmlConvert.ToString(true)));
+                leastRestrictiveAccessModifier = C_INTERNAL_OR_PROTECTED;
+            }
+            else if (setMethod != null && setMethod.IsAssembly || getMethod != null && getMethod.IsAssembly)
+            {
+                this._current.Add(new XAttribute("isInternal", XmlConvert.ToString(true)));
+                leastRestrictiveAccessModifier = C_INTERNAL;
+            }
+            else if (setMethod != null && setMethod.IsFamily || getMethod != null && getMethod.IsFamily)
+            {
+                this._current.Add(new XAttribute("isProtected", XmlConvert.ToString(true)));
+                leastRestrictiveAccessModifier = C_PROTECTED;
+            }
+            else if (setMethod != null && setMethod.IsFamilyAndAssembly ||
+                     getMethod != null && getMethod.IsFamilyAndAssembly)
+            {
+                this._current.Add(new XAttribute("isInternalAndProtected", XmlConvert.ToString(true)));
+                leastRestrictiveAccessModifier = C_INTERNAL_AND_PROTECTED;
+            }
+            else if (setMethod != null && setMethod.IsPrivate || getMethod != null && getMethod.IsPrivate)
+            {
+                this._current.Add(new XAttribute("isPrivate", XmlConvert.ToString(true)));
+                leastRestrictiveAccessModifier = C_PRIVATE;
+            }
+            else
+            {
+                throw new InvalidOperationException("What the hell happened here?");
+            }
+
+            if (setMethod != null)
+            {
+                var setElem = new XElement("set");
+
+                if (leastRestrictiveAccessModifier > C_INTERNAL_OR_PROTECTED && setMethod.IsFamilyOrAssembly)
+                    setElem.Add(new XAttribute("isInternalOrProtected",
+                                               XmlConvert.ToString(setMethod.IsFamilyOrAssembly)));
+
+                if (leastRestrictiveAccessModifier > C_INTERNAL && setMethod.IsAssembly)
+                    setElem.Add(new XAttribute("isInternal", XmlConvert.ToString(setMethod.IsAssembly)));
+
+                if (leastRestrictiveAccessModifier > C_PROTECTED && setMethod.IsFamily)
+                    setElem.Add(new XAttribute("isProtected", XmlConvert.ToString(setMethod.IsFamily)));
+
+                if (leastRestrictiveAccessModifier > C_INTERNAL_AND_PROTECTED && setMethod.IsFamilyAndAssembly)
+                    setElem.Add(new XAttribute("isInternalAndProtected",
+                                               XmlConvert.ToString(setMethod.IsFamilyAndAssembly)));
+
+                if (leastRestrictiveAccessModifier > C_PRIVATE && setMethod.IsPrivate)
+                    setElem.Add(new XAttribute("isPrivate", XmlConvert.ToString(setMethod.IsPrivate)));
+
+                ret.Add(setElem);
+            }
+
+            if (getMethod != null)
+            {
+                var getElem = new XElement("get");
+                if (leastRestrictiveAccessModifier > C_INTERNAL_OR_PROTECTED && getMethod.IsFamilyOrAssembly)
+                    getElem.Add(new XAttribute("isInternalOrProtected",
+                                               XmlConvert.ToString(getMethod.IsFamilyOrAssembly)));
+
+                if (leastRestrictiveAccessModifier > C_INTERNAL && getMethod.IsAssembly)
+                    getElem.Add(new XAttribute("isInternal", XmlConvert.ToString(getMethod.IsAssembly)));
+
+                if (leastRestrictiveAccessModifier > C_PROTECTED && getMethod.IsFamily)
+                    getElem.Add(new XAttribute("isProtected", XmlConvert.ToString(getMethod.IsFamily)));
+
+                if (leastRestrictiveAccessModifier > C_INTERNAL_AND_PROTECTED && getMethod.IsFamilyAndAssembly)
+                    getElem.Add(new XAttribute("isInternalAndProtected",
+                                               XmlConvert.ToString(getMethod.IsFamilyAndAssembly)));
+
+                if (leastRestrictiveAccessModifier > C_PRIVATE && getMethod.IsPrivate)
+                    getElem.Add(new XAttribute("isPrivate", XmlConvert.ToString(getMethod.IsPrivate)));
+
+                ret.Add(getElem);
+            }
+
+
+            if (asset.IsSpecialName)
+                ret.Add(new XAttribute("isSpecialName", XmlConvert.ToString(asset.IsSpecialName)));
+
+            this._context.Element.Add(ret);
+
+            this.GenerateImplementsElement(this._context.Clone(ret), asset);
+
+            foreach (IEnricher item in this._enrichers)
+                item.EnrichProperty(this._context.Clone(ret), asset);
+
         }
 
         void IVisitor.VisitUnknown(Asset asset)
@@ -1185,7 +1303,20 @@ namespace LBi.LostDoc
 
         public void VistInterface(InterfaceAsset asset)
         {
-            throw new NotImplementedException();
+            this._current = new XElement("enum",
+                              this.GetCommonAttributes(asset));
+
+            foreach (InterfaceAsset interfaceAsset in asset.DeclaredInterfaces)
+            {
+                if (!this._context.IsFiltered(interfaceAsset))
+                {
+                    var implElement = new XElement("implements");
+                    this._current.Add(implElement);
+                    this.GenerateTypeRef(this._context.Clone(implElement), interfaceAsset, "interface");
+                }
+            }
+
+            this.VisitType(asset);
         }
 
         public void VistReferenceType(ReferenceTypeAsset asset)
@@ -1217,6 +1348,29 @@ namespace LBi.LostDoc
         }
 
         public void VistValueType(ValueTypeAsset asset)
+        {
+            this._current = new XElement("struct",
+                                         this.GetCommonAttributes(asset));
+
+            foreach (InterfaceAsset interfaceAsset in asset.DeclaredInterfaces)
+            {
+                if (!this._context.IsFiltered(interfaceAsset))
+                {
+                    var implElement = new XElement("implements");
+                    this._current.Add(implElement);
+                    this.GenerateTypeRef(this._context.Clone(implElement), interfaceAsset, "interface");
+                }
+            }
+
+            this.VisitType(asset);
+        }
+
+        public void VisitOperator(OperatorAsset asset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void VisitDelegate(DelegateAsset asset)
         {
             throw new NotImplementedException();
         }

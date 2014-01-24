@@ -1,9 +1,15 @@
 ﻿param($ldPath = $(throw "ldpath required"));
 
-
-
 [string]$script:verbose = "";
 $choices = @(
+    (New-Object -TypeName PSObject @{
+                                        C = "Extract C:\temp\Output\LBi.EPiServer7.Common.dll"; 
+                                        A = @("Extract -IncludeBclDocComments -Path C:\temp\Output\LBi.EPiServer7.Common.dll -Output .\tmp\")
+                                    }),
+    (New-Object -TypeName PSObject @{
+                                        C = "Extract NodaTime from c:\temp\noda"; 
+                                        A = @((Get-ChildItem -Path c:\temp\noda\*.dll -Recurse).FullName | %{ "Extract -IncludeBclDocComments -Path {0} -Output .\tmp\" -f $_ })
+                                    }),
     (New-Object -TypeName PSObject @{
                                         C = "Extract System.Web.*.dll from Web.Host bin folder"; 
                                         A = @((Get-ChildItem -Path ..\..\..\LBi.LostDoc.Repository.Web.Host\bin\System.Web.*.dll).FullName | %{ "Extract -IncludeBclDocComments -Path {0} -Output .\tmp\" -f $_ })
@@ -37,7 +43,7 @@ $choices = @(
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Template"; 
-                                        A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html")
+                                        A = @("Template -Path .\Tmp -Template Library -Force -Output .\Html -IgnoreVersionComponent Patch")
                                     }),
     (New-Object -TypeName PSObject @{
                                         C = "Template with Custom logo"; 

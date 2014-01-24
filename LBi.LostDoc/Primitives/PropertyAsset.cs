@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Reflection;
 
 namespace LBi.LostDoc.Primitives
 {
@@ -15,5 +17,15 @@ namespace LBi.LostDoc.Primitives
         {
             visitor.VisitProperty(this);
         }
+
+        public abstract TypeAsset PropertyType { get; }
+
+        public abstract bool IsSpecialName { get; }
+
+        public abstract IEnumerable<Parameter> Parameters { get; }
+        
+        public abstract MethodAsset SetMethod { get; }
+
+        public abstract MethodAsset GetMethod { get; }
     }
 }

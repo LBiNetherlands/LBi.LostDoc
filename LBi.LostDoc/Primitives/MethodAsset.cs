@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace LBi.LostDoc.Primitives
@@ -14,5 +15,25 @@ namespace LBi.LostDoc.Primitives
         {
             visitor.VisitMethod(this);
         }
+
+        public abstract TypeAsset Returns { get; }
+
+        public abstract IEnumerable<Parameter> Parameters { get; }
+        
+        public abstract bool IsAbstract { get; }
+
+        public abstract bool IsVirtual { get; }
+
+        public abstract bool IsPublic { get; }
+
+        public abstract bool IsPrivate { get;  }
+
+        public abstract bool IsAssembly { get; }
+
+        public abstract bool IsFamilyAndAssembly { get; }
+
+        public abstract bool IsFamilyOrAssembly { get; }
+        
+        public abstract bool IsFamily { get; }
     }
 }

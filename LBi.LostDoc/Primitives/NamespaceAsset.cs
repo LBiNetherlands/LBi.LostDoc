@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 
 namespace LBi.LostDoc.Primitives
 {
-    public abstract class NamespaceAsset : Asset
+    public abstract class NamespaceAsset : Asset, INestedAsset<Asset>
     {
         protected NamespaceAsset(AssetIdentifier id, object target) : base(id, target)
         {
@@ -15,5 +15,7 @@ namespace LBi.LostDoc.Primitives
         {
             visitor.VisitNamespace(this);
         }
+
+        public Asset DeclaringAsset { get; private set; }
     }
 }

@@ -10,5 +10,10 @@ namespace LBi.LostDoc.Primitives
         {
             Contract.Requires<ArgumentException>(id.Type == AssetType.Method, "Invalid AssetIdentifier for OperatorAsset");
         }
+
+        public override void Visit(IVisitor visitor)
+        {
+            visitor.VisitOperator(this);
+        }
     }
 }

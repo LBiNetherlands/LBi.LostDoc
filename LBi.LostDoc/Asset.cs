@@ -19,14 +19,15 @@ using LBi.LostDoc.Primitives;
 
 namespace LBi.LostDoc
 {
-    public abstract class Asset : IEquatable<Asset> 
+    public abstract class Asset : IEquatable<Asset>
     {
         protected Asset(AssetIdentifier id, object target)
         {
             this.Id = id;
             this.Target = target;
         }
-        public abstract string Name { get { return null; } }
+        
+        public abstract string Name { get; }
 
         public object Target { get; private set; }
 
