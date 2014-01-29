@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="LBi.LostDoc.Asset">
-    <Position X="27.5" Y="1.75" Width="2.75" />
+    <Position X="33.5" Y="1.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAQEgAAAACQAAAAAAIAAAQAAAAAAAAA=</HashCode>
       <FileName>Asset.cs</FileName>
@@ -9,57 +9,49 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="LBi.LostDoc.Primitives.OperatorAsset">
-    <Position X="5.25" Y="9.75" Width="3.25" />
+    <Position X="12.75" Y="10" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\OperatorAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.PropertyAsset">
-    <Position X="17" Y="9.75" Width="3.25" />
+    <Position X="24.5" Y="10" Width="3.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAIACAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAiAAAQAAAAAAAAAAAAAAAAAAIACIAAAAAA=</HashCode>
       <FileName>Primitives\PropertyAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="LBi.LostDoc.Primitives.TypeAsset">
-    <Position X="40" Y="6.25" Width="3" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Primitives\TypeAsset.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
   <Class Name="LBi.LostDoc.Primitives.AssemblyAsset">
-    <Position X="25.5" Y="6.5" Width="3.25" />
+    <Position X="40" Y="5.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\AssemblyAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.ConstructorAsset">
-    <Position X="21" Y="9.75" Width="3.5" />
+    <Position X="28.5" Y="10" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\ConstructorAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.EventAsset">
-    <Position X="25.25" Y="9.75" Width="3" />
+    <Position X="32.75" Y="10" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\EventAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.FieldAsset">
-    <Position X="9.25" Y="9.75" Width="3" />
+    <Position X="16.75" Y="10" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAABAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\FieldAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.MemberAsset">
-    <Position X="15.25" Y="6.5" Width="3.25" />
+    <Position X="22.75" Y="7.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\MemberAsset.cs</FileName>
@@ -67,14 +59,14 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="LBi.LostDoc.Primitives.MethodAsset">
-    <Position X="13" Y="9.75" Width="3.25" />
+    <Position X="20.5" Y="10" Width="3.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAIgAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAIQBAAAAQAAAAAAAAAECAAAAAAAMoAACAAAAA=</HashCode>
       <FileName>Primitives\MethodAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.NamespaceAsset">
-    <Position X="29.5" Y="6.5" Width="3.5" />
+    <Position X="44" Y="5.5" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\NamespaceAsset.cs</FileName>
@@ -82,14 +74,14 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="LBi.LostDoc.Primitives.EnumAsset">
-    <Position X="40" Y="9.75" Width="3" />
+    <Position X="38" Y="15.25" Width="3" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\EnumAsset.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LBi.LostDoc.Primitives.InterfaceAsset">
-    <Position X="43.75" Y="9.75" Width="4.5" />
+    <Position X="41.75" Y="15.25" Width="4.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAgAAEAgAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\InterfaceAsset.cs</FileName>
@@ -97,7 +89,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="LBi.LostDoc.Primitives.ValueTypeAsset">
-    <Position X="30" Y="9.75" Width="4.25" />
+    <Position X="24.25" Y="15.25" Width="4.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAgAAEAgAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\ValueTypeAsset.cs</FileName>
@@ -105,7 +97,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="LBi.LostDoc.Primitives.ReferenceTypeAsset">
-    <Position X="35" Y="9.75" Width="4.25" />
+    <Position X="29.25" Y="15.25" Width="4.25" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAQAAAAAAAAgAAEAgAAIAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\ReferenceTypeAsset.cs</FileName>
@@ -113,29 +105,44 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="LBi.LostDoc.Primitives.DelegateAsset">
-    <Position X="49" Y="9.75" Width="4.25" />
+    <Position X="47" Y="15.25" Width="4.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAgAAEAAAAAAIgAAAAAAAA=</HashCode>
       <FileName>Primitives\DelegateAsset.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Interface Name="LBi.LostDoc.Primitives.IGenericType">
-    <Position X="33.75" Y="1.5" Width="4.25" />
+  <Class Name="LBi.LostDoc.Primitives.ArrayAsset">
+    <Position X="34.25" Y="15.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAABBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Primitives\ArrayAsset.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LBi.LostDoc.Primitives.TypeAsset">
+    <Position X="36.25" Y="12.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Primitives\TypeAsset.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="LBi.LostDoc.Primitives.IGenericType" Collapsed="true">
+    <Position X="65.25" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAEAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\IGenericType.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="LBi.LostDoc.Primitives.IImplementsInterfaces">
-    <Position X="38.75" Y="1.5" Width="3.75" />
+  <Interface Name="LBi.LostDoc.Primitives.IImplementsInterfaces" Collapsed="true">
+    <Position X="67" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\IImplementsInterfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="LBi.LostDoc.Primitives.INestedAsset&lt;T&gt;">
-    <Position X="43.25" Y="1.5" Width="2" />
+  <Interface Name="LBi.LostDoc.Primitives.INestedAsset&lt;T&gt;" Collapsed="true">
+    <Position X="65.25" Y="2.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\INestedAsset.cs</FileName>
