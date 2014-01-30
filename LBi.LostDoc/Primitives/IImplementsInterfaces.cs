@@ -4,6 +4,6 @@ namespace LBi.LostDoc.Primitives
 {
     public interface IImplementsInterfaces
     {
-        IEnumerable<InterfaceAsset> DeclaredInterfaces { get; }
+        IEnumerable<IInterface> DeclaredInterfaces { get; }
     }
 }

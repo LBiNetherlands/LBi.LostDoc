@@ -25,5 +25,7 @@ namespace LBi.LostDoc
         Asset GetParent(Asset asset);
 
         IEnumerable<Asset> GetChildren(Asset asset);
+
+        // TODO Add GetAttributes(IAsset asset)
     }
 }

@@ -35,14 +35,14 @@ namespace LBi.LostDoc
             return ret;
         }
 
-        protected virtual IEnumerable<XAttribute> GetCommonAttributes(Asset asset)
+        protected virtual IEnumerable<XAttribute> GetCommonAttributes(IAsset asset)
         {
             yield return new XAttribute("name", asset.Name);
             yield return new XAttribute("assetId", asset.Id);
             yield return new XAttribute("phase", this._context.Phase);
         }
 
-        void IVisitor.VisitAssembly(AssemblyAsset asset)
+        void IVisitor.VisitAssembly(IAssembly asset)
         {
             this._current = new XElement("assembly",
                                          new XAttribute("filename", asset.Filename),
@@ -61,7 +61,7 @@ namespace LBi.LostDoc
                 enricher.EnrichAssembly(this._context.Clone(this._current), asset);
         }
 
-        void IVisitor.VisitNamespace(NamespaceAsset asset)
+        void IVisitor.VisitNamespace(INamespace asset)
         {
             this._current = new XElement("namespace",
                                          this.GetCommonAttributes(asset));
@@ -72,7 +72,7 @@ namespace LBi.LostDoc
                 enricher.EnrichNamespace(this._context.Clone(this._current), asset);
         }
 
-        private void VisitType(TypeAsset asset)
+        private void VisitType(IType asset)
         {
             if (!type.IsInterface && type.IsAbstract)
                 ret.Add(new XAttribute("isAbstract", XmlConvert.ToString(type.IsAbstract)));
@@ -129,28 +129,22 @@ namespace LBi.LostDoc
 
             foreach (IEnricher enricher in this._enrichers)
                 enricher.EnrichType(this._context.Clone(this._current), asset);
-
-            this._context.Element.Add(this._current);
         }
 
-        void IVisitor.VisitField(FieldAsset asset)
+        void IVisitor.VisitField(IField asset)
         {
             throw new NotImplementedException();
         }
 
-        void IVisitor.VisitEvent(EventAsset asset)
+        void IVisitor.VisitEvent(IEvent asset)
         {
-            EventInfo eventInfo = (EventInfo)asset.Target;
-            XElement ret = new XElement("event",
-                                        new XAttribute("name", eventInfo.Name),
-                                        new XAttribute("assetId", asset.Id),
-                                        new XAttribute("phase", context.Phase));
+            this._current = new XElement("event",
+                                         this.GetCommonAttributes(asset));
 
+            GenerateTypeRef(this._context.Clone(this._current), asset.EventHandlerType);
 
-            GenerateTypeRef(context.Clone(ret), eventInfo.EventHandlerType);
-
-            MethodInfo addMethod = eventInfo.GetAddMethod(true);
-            MethodInfo removeMethod = eventInfo.GetRemoveMethod(true);
+            IMethod addMethod = asset.AddMethod;
+            IMethod removeMethod = asset.RemoveMethod;
             if (addMethod != null)
             {
                 var addElem = new XElement("add");
@@ -163,7 +157,7 @@ namespace LBi.LostDoc
                 if (addMethod.IsFamily)
                     addElem.Add(new XAttribute("isProtected", XmlConvert.ToString(addMethod.IsFamily)));
 
-                ret.Add(addElem);
+                this._current.Add(addElem);
             }
 
             if (removeMethod != null)
@@ -178,28 +172,26 @@ namespace LBi.LostDoc
                 if (removeMethod.IsFamily)
                     removeElem.Add(new XAttribute("isProtected", XmlConvert.ToString(removeMethod.IsFamily)));
 
-                ret.Add(removeElem);
+                this._current.Add(removeElem);
             }
 
-            this._current.Add(ret);
-
-            this.GenerateImplementsElement(this._context.Clone(this._current), eventInfo);
+            this.GenerateImplementsElement(this._context.Clone(this._current), asset);
 
             foreach (IEnricher item in this._enrichers)
                 item.EnrichEvent(this._context.Clone(this._current), asset);
         }
 
-        void IVisitor.VisitProperty(PropertyAsset asset)
+        void IVisitor.VisitProperty(IProperty asset)
         {
             this._current = new XElement("property",
                                          this.GetCommonAttributes(asset));
 
-            this.GenerateTypeRef(this._context.Clone(this._current), asset.PropertyType);
+            this.GenerateTypeRef(this._context.Clone(this._current), asset.Returns);
 
             this.GenerateParameterElements(this._context.Clone(this._current), asset.Parameters);
 
-            MethodAsset setMethod = asset.SetMethod;
-            MethodAsset getMethod = asset.GetMethod;
+            IMethod setMethod = asset.SetMethod;
+            IMethod getMethod = asset.GetMethod;
 
             if ((setMethod ?? getMethod).IsAbstract)
                 this._current.Add(new XAttribute("isAbstract", XmlConvert.ToString(true)));
@@ -275,7 +267,7 @@ namespace LBi.LostDoc
                 if (leastRestrictiveAccessModifier > C_PRIVATE && setMethod.IsPrivate)
                     setElem.Add(new XAttribute("isPrivate", XmlConvert.ToString(setMethod.IsPrivate)));
 
-                ret.Add(setElem);
+                this._current.Add(setElem);
             }
 
             if (getMethod != null)
@@ -298,43 +290,41 @@ namespace LBi.LostDoc
                 if (leastRestrictiveAccessModifier > C_PRIVATE && getMethod.IsPrivate)
                     getElem.Add(new XAttribute("isPrivate", XmlConvert.ToString(getMethod.IsPrivate)));
 
-                ret.Add(getElem);
+                this._current.Add(getElem);
             }
 
 
             if (asset.IsSpecialName)
-                ret.Add(new XAttribute("isSpecialName", XmlConvert.ToString(asset.IsSpecialName)));
+                this._current.Add(new XAttribute("isSpecialName", XmlConvert.ToString(asset.IsSpecialName)));
 
-            this._context.Element.Add(ret);
-
-            this.GenerateImplementsElement(this._context.Clone(ret), asset);
+            this.GenerateImplementsElement(this._context.Clone(this._current), asset);
 
             foreach (IEnricher item in this._enrichers)
                 item.EnrichProperty(this._context.Clone(ret), asset);
 
         }
 
-        void IVisitor.VisitUnknown(Asset asset)
+        void IVisitor.VisitUnknown(IAsset asset)
         {
             throw new NotImplementedException();
         }
 
-        void IVisitor.VisitMethod(MethodAsset asset)
+        void IVisitor.VisitMethod(IMethod asset)
         {
             throw new NotImplementedException();
         }
 
-        void IVisitor.VisitConstructor(ConstructorAsset asset)
+        void IVisitor.VisitConstructor(IConstructor asset)
         {
             throw new NotImplementedException();
         }
 
-        public void VistEnum(EnumAsset asset)
+        public void VistEnum(IEnum asset)
         {
             this._current = new XElement("enum",
                                          this.GetCommonAttributes(asset));
 
-            ValueTypeAsset underlyingType = asset.UnderlyingType;
+            IValueType underlyingType = asset.UnderlyingType;
 
             this._current.Add(new XAttribute("underlyingType", underlyingType.Id));
             this._context.AddReference(underlyingType);
@@ -342,12 +332,12 @@ namespace LBi.LostDoc
             this.VisitType(asset);
         }
 
-        public void VistInterface(InterfaceAsset asset)
+        public void VistInterface(IInterface asset)
         {
             this._current = new XElement("enum",
                                          this.GetCommonAttributes(asset));
 
-            foreach (InterfaceAsset interfaceAsset in asset.DeclaredInterfaces)
+            foreach (IInterface interfaceAsset in asset.DeclaredInterfaces)
             {
                 if (!this._context.IsFiltered(interfaceAsset))
                 {
@@ -360,7 +350,7 @@ namespace LBi.LostDoc
             this.VisitType(asset);
         }
 
-        public void VistReferenceType(ReferenceTypeAsset asset)
+        public void VistReferenceType(IReferenceType asset)
         {
             this._current = new XElement("class",
                                          this.GetCommonAttributes(asset));
@@ -375,7 +365,7 @@ namespace LBi.LostDoc
                 this.GenerateTypeRef(this._context.Clone(inheritsElem), asset.BaseType);
             }
 
-            foreach (InterfaceAsset interfaceAsset in asset.DeclaredInterfaces)
+            foreach (IInterface interfaceAsset in asset.DeclaredInterfaces)
             {
                 if (!this._context.IsFiltered(interfaceAsset))
                 {
@@ -388,12 +378,12 @@ namespace LBi.LostDoc
             this.VisitType(asset);
         }
 
-        public void VistValueType(ValueTypeAsset asset)
+        public void VistValueType(IValueType asset)
         {
             this._current = new XElement("struct",
                                          this.GetCommonAttributes(asset));
 
-            foreach (InterfaceAsset interfaceAsset in asset.DeclaredInterfaces)
+            foreach (IInterface interfaceAsset in asset.DeclaredInterfaces)
             {
                 if (!this._context.IsFiltered(interfaceAsset))
                 {
@@ -406,12 +396,12 @@ namespace LBi.LostDoc
             this.VisitType(asset);
         }
 
-        public void VisitOperator(OperatorAsset asset)
+        public void VisitOperator(IOperator asset)
         {
             throw new NotImplementedException();
         }
 
-        public void VisitDelegate(DelegateAsset asset)
+        public void VisitDelegate(IDelegate asset)
         {
             throw new NotImplementedException();
         }
@@ -473,9 +463,9 @@ namespace LBi.LostDoc
             }
         }
 
-        private void GenerateParameterElements(IProcessingContext context, ParameterInfo[] methodParams)
+        private void GenerateParameterElements(IProcessingContext context, IEnumerable<Parameter> methodParams)
         {
-            foreach (ParameterInfo item in methodParams)
+            foreach (Parameter item in methodParams)
             {
                 XElement pElem = new XElement("param", new XAttribute("name", item.Name));
 
@@ -493,8 +483,8 @@ namespace LBi.LostDoc
 
                 GenerateTypeRef(context.Clone(pElem), pType);
 
-                foreach (IEnricher enricher in this.Enrichers)
-                    enricher.EnrichParameter(context.Clone(pElem), ReflectionServices.GetAsset(item.Member), item.Name);
+                foreach (IEnricher enricher in this._enrichers)
+                    enricher.EnrichParameter(context.Clone(pElem), item);
 
                 context.Element.Add(pElem);
             }
@@ -539,10 +529,10 @@ namespace LBi.LostDoc
             }
         }
 
-        public static void GenerateTypeRef(IProcessingContext context, TypeAsset type, string attrName = null)
+        public void GenerateTypeRef(IProcessingContext context, IType type, string attrName = null)
         {
             // TODO rethink how we generate the typerefs, probably ensure we always output a root element rather than just the attribute for param/type
-            if (pType.IsArray)
+            if (type.PrimitiveType == Primitive.Array)
             {
                 // TODO arrayOf is the only capitalized element
                 var arrayElem = new XElement("arrayOf", new XAttribute("rank", pType.GetArrayRank()));

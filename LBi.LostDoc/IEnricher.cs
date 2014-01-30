@@ -20,28 +20,28 @@ namespace LBi.LostDoc
 {
     public interface IEnricher
     {
-        void EnrichType(IProcessingContext context, TypeAsset typeAsset);
+        void EnrichType(IProcessingContext context, IType typeAsset);
 
-        void EnrichConstructor(IProcessingContext context, ConstructorAsset ctorAsset);
+        void EnrichConstructor(IProcessingContext context, IConstructor ctorAsset);
 
-        void EnrichAssembly(IProcessingContext context, AssemblyAsset assemblyAsset);
+        void EnrichAssembly(IProcessingContext context, IAssembly assemblyAsset);
 
         void RegisterNamespace(IProcessingContext context);
 
-        void EnrichMethod(IProcessingContext context, MethodAsset methodAsset);
+        void EnrichMethod(IProcessingContext context, IMethod methodAsset);
 
-        void EnrichField(IProcessingContext context, FieldAsset fieldAsset);
+        void EnrichField(IProcessingContext context, IField fieldAsset);
 
-        void EnrichProperty(IProcessingContext context, PropertyAsset propertyAsset);
+        void EnrichProperty(IProcessingContext context, IProperty propertyAsset);
 
-        void EnrichReturnValue(IProcessingContext context, MethodAsset methodAsset);
+        void EnrichReturnValue(IProcessingContext context, IMethod methodAsset);
 
         void EnrichParameter(IProcessingContext context, Parameter parameter);
 
         void EnrichTypeParameter(IProcessingContext context, TypeParameter typeParameter);
 
-        void EnrichNamespace(IProcessingContext context, NamespaceAsset namespaceAsset);
+        void EnrichNamespace(IProcessingContext context, INamespace namespaceAsset);
 
-        void EnrichEvent(IProcessingContext context, EventAsset eventAsset);
+        void EnrichEvent(IProcessingContext context, IEvent eventAsset);
     }
 }

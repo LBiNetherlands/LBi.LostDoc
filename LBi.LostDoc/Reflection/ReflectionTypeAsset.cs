@@ -19,7 +19,7 @@ using LBi.LostDoc.Primitives;
 
 namespace LBi.LostDoc.Reflection
 {
-    internal class ReflectionTypeAsset : TypeAsset
+    internal class ReflectionTypeAsset : IType
     {
         public ReflectionTypeAsset(AssetIdentifier id, Type target) : base(id, target)
         {

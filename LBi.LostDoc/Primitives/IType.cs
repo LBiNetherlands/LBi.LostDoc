@@ -14,19 +14,9 @@
  * limitations under the License. 
  */
 
-using System;
-using System.Diagnostics.Contracts;
-
 namespace LBi.LostDoc.Primitives
 {
-    public abstract class TypeAsset : Asset, INestedAsset<Asset>
+    public interface IType : IAsset
     {
-        protected TypeAsset(AssetIdentifier id, object target)
-            : base(id, target)
-        {
-            Contract.Requires<ArgumentException>(id.Type == AssetType.Type, "Invalid AssetIdentifier for TypeAsset");
-        }
-
-        public abstract Asset DeclaringAsset { get; }
     }
 }

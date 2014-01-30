@@ -20,7 +20,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
-namespace LBi.LostDoc
+namespace LBi.LostDoc.Primitives
 {
     public class AssetIdentifier : IEquatable<AssetIdentifier>, IComparable<AssetIdentifier>
     {

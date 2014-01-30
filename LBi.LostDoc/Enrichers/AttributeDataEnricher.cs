@@ -34,7 +34,7 @@ namespace LBi.LostDoc.Enrichers
 
         #region IEnricher Members
 
-        public void EnrichType(IProcessingContext context, TypeAsset typeAsset)
+        public void EnrichType(IProcessingContext context, IType typeAsset)
         {
             Type type = (Type)typeAsset.Target;
             GenerateAttributeElements(context, type.GetCustomAttributesData());

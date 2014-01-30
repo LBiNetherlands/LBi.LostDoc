@@ -2,32 +2,19 @@
 {
     public interface IVisitor
     {
-        void VisitAssembly(AssemblyAsset asset);
-        void VisitNamespace(NamespaceAsset asset);
-        void VisitField(FieldAsset asset);
-        void VisitEvent(EventAsset asset);
-        void VisitProperty(PropertyAsset asset);
-        void VisitUnknown(Asset asset);
-        void VisitMethod(MethodAsset asset);
-        void VisitConstructor(ConstructorAsset asset);
-        void VistEnum(EnumAsset asset);
-        void VistInterface(InterfaceAsset asset);
-        void VistReferenceType(ReferenceTypeAsset asset);
-        void VistValueType(ValueTypeAsset asset);
-        void VisitOperator(OperatorAsset asset);
-        void VisitDelegate(DelegateAsset asset);
-    }
-
-    public interface IVisitor<out T>
-    {
-        T VisitAssembly(AssemblyAsset asset);
-        T VisitNamespace(NamespaceAsset asset);
-        T VisitType(TypeAsset asset);
-        T VisitField(FieldAsset asset);
-        T VisitEvent(EventAsset asset);
-        T VisitProperty(PropertyAsset asset);
-        T VisitUnknown(Asset asset);
-        T VisitMethod(MethodAsset asset);
-        T VisitConstructor(ConstructorAsset asset);
+        void VisitAssembly(IAssembly asset);
+        void VisitNamespace(INamespace asset);
+        void VisitField(IField asset);
+        void VisitEvent(IEvent asset);
+        void VisitProperty(IProperty asset);
+        void VisitUnknown(IAsset asset);
+        void VisitMethod(IMethod asset);
+        void VisitConstructor(IConstructor asset);
+        void VistEnum(IEnum asset);
+        void VistInterface(IInterface asset);
+        void VistReferenceType(IReferenceType asset);
+        void VistValueType(IValueType asset);
+        void VisitOperator(IOperator asset);
+        void VisitDelegate(IDelegate asset);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace LBi.LostDoc.Primitives
 {
-    public class TypeParameter
+    public interface ITypeParameter
     {
     }
 }

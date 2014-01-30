@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.Xml.Linq;
+using LBi.LostDoc.Primitives;
 using LBi.LostDoc.Reflection;
 
 namespace LBi.LostDoc
@@ -25,11 +26,17 @@ namespace LBi.LostDoc
         IAssetExplorer AssetExplorer { get; }
 
         IAssemblyLoader AssemblyLoader { get; }
+        
         XElement Element { get; }
+        
         IEnumerable<Asset> References { get; }
+        
         int Phase { get; }
-        bool AddReference(Asset asset);
+        
+        bool AddReference(IAsset asset);
+
         IProcessingContext Clone(XElement newElement);
-        bool IsFiltered(Asset asset);
+        
+        bool IsFiltered(IAsset asset);
     }
 }
