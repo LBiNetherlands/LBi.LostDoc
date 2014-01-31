@@ -90,6 +90,18 @@
   <ItemGroup>
     <EmbeddedResource Include="Library\images\lostdoc.svg" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\js\lostdoc.search.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\js\lib\lunr.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\js\lib\knockout.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\less\search.less" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist $(ProjectDir)..\AddInPackages mkdir $(ProjectDir)..\AddInPackages

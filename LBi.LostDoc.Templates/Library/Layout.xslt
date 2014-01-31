@@ -65,6 +65,10 @@
 
           <div class="right-col-outer">
             <div class="right-col-inner">
+              <form class="search-box">
+                <input type="search" class="search-input" placeholder="search" />
+                <button class="search-button"></button>
+              </form>
               <xsl:call-template name="section-main-before"/>
               <main class="main-content detachable">
                 <xsl:call-template name="section-main-first"/>
@@ -77,8 +81,10 @@
 
         </div>
         <script src="{ld:relative('js/lib/zepto.js')}" >&#160;</script>
+        <script src="{ld:relative('js/lib/knockout.js')}" >&#160;</script>
         <script src="{ld:relative('js/lostdoc.settings.js')}" >&#160;</script>
         <script src="{ld:relative('js/lostdoc.layout.js')}" >&#160;</script>
+        <script src="{ld:relative('js/lostdoc.search.js')}" >&#160;</script>
         <script src="{ld:relative('js/lostdoc.js')}" >&#160;</script>
         <xsl:call-template name="section-body-last"/>
       </body>

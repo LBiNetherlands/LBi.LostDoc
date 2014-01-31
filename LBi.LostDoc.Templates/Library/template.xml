@@ -31,8 +31,10 @@
   </include-resource>
 
   <include-resource path="js\lib\zepto.js" output="js\lib\zepto.js"/>
+  <include-resource path="js\lib\knockout.js" output="js\lib\knockout.js"/>
   <include-resource path="js\lostdoc.settings.js" output="js\lostdoc.settings.js"/>
   <include-resource path="js\lostdoc.layout.js" output="js\lostdoc.layout.js"/>
+  <include-resource path="js\lostdoc.search.js" output="js\lostdoc.search.js"/>
   <include-resource path="js\lostdoc.js" output="js\lostdoc.js"/>
 
   <include-resource path="{$LogoUrl}"
