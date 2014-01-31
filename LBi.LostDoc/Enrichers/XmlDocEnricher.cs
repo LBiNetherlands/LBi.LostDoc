@@ -112,7 +112,7 @@ namespace LBi.LostDoc.Enrichers
             if (element != null)
             {
                 this.RewriteXml(context,
-                                mInfo.ReflectedType.Assembly,
+                                mInfo.DeclaringType.Assembly,
                                 element,
                                 "param",
                                 "typeparam",

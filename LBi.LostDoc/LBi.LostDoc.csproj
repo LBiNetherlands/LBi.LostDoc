@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Asset.cs" />
-    <Compile Include="AssetExplorerCache.cs" />
     <Compile Include="AssetIdentifier.cs" />
     <Compile Include="AssetServices.cs" />
     <Compile Include="AssetType.cs" />

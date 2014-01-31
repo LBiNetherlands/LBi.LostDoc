@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,36 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.Caching;
 using LBi.LostDoc.Diagnostics;
 
 namespace LBi.LostDoc.Enrichers
 {
     internal class AssetVersionResolver
     {
+        private class AssetPrefixFilter : IAssetFilter
+        {
+            private readonly string _assetPrefix;
+
+            public AssetPrefixFilter(string asset)
+            {
+                this._assetPrefix = asset.Substring(asset.IndexOf(':') + 1);
+            }
+
+            public bool Filter(IFilterContext context, Asset asset)
+            {
+                if (asset.Type == AssetType.Type)
+                {
+                    bool filtered = !_assetPrefix.StartsWith(asset.Id.AssetId.Substring(asset.Id.AssetId.IndexOf(':') + 1));
+                    return filtered;
+                }
+                else if (asset.Type == AssetType.Namespace)
+                {
+                    
+                }
+
+                return false;
+            }
+        }
         private readonly Asset _assembly;
         private readonly Dictionary<string, Asset[]>[] _accessibleAssets;
         private readonly IProcessingContext _context;
@@ -33,90 +55,38 @@ namespace LBi.LostDoc.Enrichers
         {
             this._context = context;
             this._assembly = assembly;
-            this._accessibleAssets = (Dictionary<string, Asset[]>[])context.Cache.Get(assembly.Id.ToString());
-
-            if (this._accessibleAssets == null)
-            {
-                TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheMiss, "Finding accessible assets for assembly: " + assembly.Id);
-
-                Stopwatch timer = Stopwatch.StartNew();
-
-                List<List<Asset>> phases = new List<List<Asset>>();
-
-                HashSet<Asset> processedAssemblies = new HashSet<Asset>();
-
-                FindAccessibleAssets(processedAssemblies, phases, context.AssetExplorer, assembly, 0);
-
-
-
-                this._accessibleAssets = phases.Select(phase =>
-                                                       phase.GroupBy(ai => ai.Id.AssetId, StringComparer.Ordinal)
-                                                            .ToDictionary(g => g.Key,
-                                                                          g => g.ToArray(),
-                                                                          StringComparer.Ordinal))
-                                               .ToArray();
-
-                context.Cache.Add(assembly.Id.ToString(), this._accessibleAssets, new CacheItemPolicy());
-
-                timer.Stop();
-
-                TraceSources.AssetResolverSource.TraceData(TraceEventType.Verbose,
-                                                           TraceEvents.CachePenalty,
-                                                           timer.ElapsedMilliseconds);
-            }
-            else
-            {
-                TraceSources.AssetResolverSource.TraceVerbose(TraceEvents.CacheHit, "Using cached accessible assets for assembly: " + assembly.Id);
-            }
         }
-
-        private static void FindAccessibleAssets(HashSet<Asset> processedAssemblies, List<List<Asset>> assets, IAssetExplorer assetExplorer, Asset assembly, int depth)
-        {
-            List<Asset> currentPhase;
-
-            if (assets.Count <= depth)
-                assets.Add(currentPhase = new List<Asset>());
-            else
-                currentPhase = assets[depth];
-
-            currentPhase.AddRange(assetExplorer.Discover(assembly));
-
-            foreach (var reference in assetExplorer.GetReferences(assembly))
-            {
-                if (processedAssemblies.Add(reference))
-                {
-                    FindAccessibleAssets(processedAssemblies, assets, assetExplorer, reference, depth + 1);
-                }
-            }
-        }
-
 
         public string getVersionedId(string assetId)
         {
             Asset asset = null;
-            for (int depth = 0; depth < this._accessibleAssets.Length; depth++)
+
+            FilterContext filterContext = new FilterContext(this._context.Cache, null, FilterState.Discovery, new AssetPrefixFilter(assetId));
+
+            foreach (Asset a in this._context.AssetExplorer.Discover(this._assembly, filterContext))
             {
-                Asset[] matches;
-                if (!this._accessibleAssets[depth].TryGetValue(assetId, out matches))
-                    continue;
-
-                if (matches.Length > 1)
+                if (StringComparer.Ordinal.Equals(a.Id.AssetId, assetId))
                 {
-                    IGrouping<Version, Asset>[] groups = matches.GroupBy(ai => ai.Id.Version).ToArray();
-                    asset = groups.OrderByDescending(g => g.Count()).First().First();
-
-                    if (groups.Length > 1)
-                    {
-                        TraceSources.AssetResolverSource.TraceWarning("Asset {0} found in with several versions ({1}) using {2} from {3}",
-                                                                      assetId,
-                                                                      string.Join(", ", groups.Select(g => g.Key)),
-                                                                      asset.Id.Version,
-                                                                      this._context.AssetExplorer.GetRoot(asset).Id.ToString());
-                    }
-                    
+                    asset = a;
+                    break;
                 }
-                if (matches.Length > 0)
-                    asset = matches[0];
+            }
+
+            if (asset == null)
+            {
+                foreach (var asm in this._context.AssetExplorer.GetReferences(this._assembly))
+                {
+                    Debug.WriteLine(asm.ToString());
+
+                    foreach (Asset a in this._context.AssetExplorer.Discover(asm, filterContext))
+                    {
+                        if (StringComparer.Ordinal.Equals(a.Id.AssetId, assetId))
+                        {
+                            asset = a;
+                            break;
+                        }
+                    }
+                }
             }
 
             if (asset != null)
@@ -124,6 +94,10 @@ namespace LBi.LostDoc.Enrichers
                 TraceSources.AssetResolverSource.TraceVerbose("Resolved {0} to version: {1}", assetId, asset.Id.Version);
                 this._context.AddReference(asset);
                 assetId = asset.Id.ToString();
+            }
+            else
+            {
+                TraceSources.AssetResolverSource.TraceWarning("Failed to resolve {0}", assetId);
             }
 
             return assetId;
