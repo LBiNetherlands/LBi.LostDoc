@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   
-  Copyright 2012-2013 DigitasLBi Netherlands B.V.
+  Copyright 2012-2014 DigitasLBi Netherlands B.V.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -46,6 +46,8 @@
     </transform>-->
   </include-resource>
 
+  <include-resource path="images\search.svg" output="images\search.svg" />
+  
   <!-- inject [with-param/@name='logoUri'] element in all 'apply-stylesheet' directives found. -->
   <!-- TODO look into how GlobalParameter.xslt handles it's 'value' -->
   <meta-template stylesheet="GlobalParameter.xslt">
