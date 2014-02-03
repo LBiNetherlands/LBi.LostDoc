@@ -111,6 +111,7 @@
     <Compile Include="Templating\FileProviders\HttpFileProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
+    <Compile Include="Templating\Metadata.cs" />
     <Compile Include="Templating\ParameterExport.cs" />
     <Compile Include="Templating\ResourceTransform.cs" />
     <Compile Include="Templating\ScopedFileProvider.cs" />
@@ -233,9 +234,7 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Templating\Transformers\Less\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

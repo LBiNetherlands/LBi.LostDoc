@@ -47,7 +47,7 @@
   </include-resource>
 
   <include-resource path="images\search.svg" output="images\search.svg" />
-  
+
   <!-- inject [with-param/@name='logoUri'] element in all 'apply-stylesheet' directives found. -->
   <!-- TODO look into how GlobalParameter.xslt handles it's 'value' -->
   <meta-template stylesheet="GlobalParameter.xslt">
@@ -57,10 +57,11 @@
 
   <apply-stylesheet name="Library" select="/bundle" assetId="'*:*'" version="'0.0.0.0'" output="'Library.html'"
                     stylesheet="Library.xslt">
+
   </apply-stylesheet>
 
-  <apply-stylesheet name="Assembly summary" 
-                    select="/bundle/assembly[@phase = '0']" 
+  <apply-stylesheet name="Assembly summary"
+                    select="/bundle/assembly[@phase = '0']"
                     assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(@filename, '/', get-significant-version(@assetId), '.html')"
@@ -86,15 +87,17 @@
 
   <apply-stylesheet name="Types"
                     select="/bundle/assembly/namespace//*[(self::class|self::struct|self::interface) and @phase = '0']"
-                    assetId="get-id(@assetId)" 
+                    assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', @name), '`.&lt;&gt;', '-/()'), '.html')"
                     stylesheet="Type.xslt">
+
     <with-param name="assetId" select="@assetId" />
+
   </apply-stylesheet>
 
 
-  <apply-stylesheet name="Enumerations" 
+  <apply-stylesheet name="Enumerations"
                     select="/bundle/assembly/namespace//enum[@phase = '0']"
                     assetId="get-id(@assetId)"
                     version="get-version(@assetId)"
@@ -182,6 +185,8 @@
                     output="concat(ancestor::assembly/@filename, '/', get-significant-version(@assetId), '/', translate(concat(join((ancestor::*[ancestor::assembly])/@name, '/'), '/', coalesce(substring-after-last(@name, '.'), @name)), '`.&lt;&gt;', '-/()'),  '.html')"
                     stylesheet="Member.xslt">
     <with-param name="assetId" select="@assetId" />
+
+    <metadata name="index" stylesheet="index.xslt" />
   </apply-stylesheet>
 
   <apply-stylesheet name="Operators overload disambiguation"

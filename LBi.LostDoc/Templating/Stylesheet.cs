@@ -32,5 +32,6 @@ namespace LBi.LostDoc.Templating
         public SectionRegistration[] Sections { get; set; }
         public AliasRegistration[] AssetAliases { get; set; }
         public string Source { get; set; }
+        public Metadata[] Metadata { get; set; }
     }
 }

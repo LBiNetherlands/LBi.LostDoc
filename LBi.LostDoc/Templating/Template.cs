@@ -651,8 +651,29 @@ namespace LBi.LostDoc.Templating
                            Name = name,
                            Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
                            AssetAliases = this.ParseAliasRegistration(elem.Elements("register-alias")).ToArray(),
+                           Metadata = this.ParseMetadataRegistration(provider, elem.Elements("metadata")).ToArray(),
                            ConditionExpression = GetAttributeValueOrDefault(elem, "condition")
                        };
+        }
+
+        private IEnumerable<Metadata> ParseMetadataRegistration(IFileProvider provider, IEnumerable<XElement> metadataElements)
+        {
+            foreach (XElement elem in metadataElements)
+            {
+                string name = this.GetAttributeValue(elem, "name");
+                XPathVariable[] variables = this.ParseVariables(elem).ToArray();
+                string selectExpression = this.GetAttributeValueOrDefault(elem, "select");
+                string conditionExpr = this.GetAttributeValueOrDefault(elem, "select");
+                XPathVariable[] xsltParams = this.ParseParams(elem.Elements("with-param")).ToArray();
+                XslCompiledTransform transform = this.LoadStylesheet(provider, this.GetAttributeValue(elem, "stylesheet"));
+
+                yield return new Metadata(name,
+                                          variables,
+                                          selectExpression,
+                                          conditionExpr,
+                                          xsltParams,
+                                          transform);
+            }
         }
 
         private string GetAttributeValueOrDefault(XElement elem, string attName, string defaultValue = null)
