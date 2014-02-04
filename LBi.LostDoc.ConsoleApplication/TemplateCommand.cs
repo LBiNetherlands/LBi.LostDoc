@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition.Hosting;
@@ -22,10 +21,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Xml.Linq;
 using LBi.Cli.Arguments;
-using LBi.LostDoc.Composition;
 using LBi.LostDoc.ConsoleApplication.Extensibility;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Extensibility;
@@ -109,6 +106,7 @@ namespace LBi.LostDoc.ConsoleApplication
 
                 // resolve template name to TemplateInfo
                 TemplateResolver templateResolver = new TemplateResolver(templateProviders.ToArray());
+                
                 TemplateInfo templateInfo = templateResolver.Resolve(this.Template);
 
                 // parse and pre-process template
@@ -128,7 +126,6 @@ namespace LBi.LostDoc.ConsoleApplication
                                             IgnoredVersionComponent = this.IgnoreVersionComponent,
                                             Arguments = this.Arguments,
                                             OutputFileProvider = new ScopedFileProvider(new DirectoryFileProvider(), outputDir),
-
                                         };
 
                 // execute template

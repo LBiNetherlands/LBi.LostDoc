@@ -51,100 +51,86 @@ namespace LBi.LostDoc.Templating
             this._basePath = Path.GetDirectoryName(templateInfo.Path);
         }
 
-        protected virtual IFileProvider GetScopedFileProvider()
-        {
-            return new ScopedFileProvider(this._templateInfo.Source, this._basePath);
-        }
-
 
         #region Preprocessing
 
         protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc,
-                                                        CustomXsltContext customContext,
                                                         IFileProvider templateProvider,
                                                         IFileProvider tempFileProvider)
         {
+            CustomXsltContext xsltContext = CustomXsltContext.Create(null);
+
             // check for meta-template directives and expand
             int metaCount = 0;
             XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
             while (metaNode != null)
             {
-                if (metaNode.EvaluateCondition(metaNode.GetAttributeValueOrDefault("condition"), customContext))
+                XslCompiledTransform metaTransform = new XslCompiledTransform(true);
+                using (Stream str = templateProvider.OpenFile(metaNode.GetAttributeValue("stylesheet"), FileMode.Open))
                 {
-                    XslCompiledTransform metaTransform = new XslCompiledTransform(true);
-                    using (
-                        Stream str = templateProvider.OpenFile(metaNode.GetAttributeValue("stylesheet"), FileMode.Open))
-                    {
-                        XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
-                        XsltSettings settings = new XsltSettings(true, true);
-                        XmlResolver resolver = new XmlFileProviderResolver(templateProvider);
-                        metaTransform.Load(reader, settings, resolver);
-                    }
-
-                    XsltArgumentList xsltArgList = new XsltArgumentList();
-
-                    // TODO this is a quick fix/hack
-                    xsltArgList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(null, null));
-
-                    var metaParamNodes = metaNode.Elements("with-param");
-
-                    foreach (XElement paramNode in metaParamNodes)
-                    {
-                        string pName = paramNode.GetAttributeValue("name");
-                        string pExpr = paramNode.GetAttributeValue("select");
-
-                        try
-                        {
-                            xsltArgList.AddParam(pName,
-                                                 string.Empty,
-                                                 workingDoc.XPathEvaluate(pExpr, customContext));
-                        }
-                        catch (XPathException ex)
-                        {
-                            throw new TemplateException(this._templateSourcePath,
-                                                        paramNode.Attribute("select"),
-                                                        string.Format("Unable to process XPath expression: '{0}'", pExpr),
-                                                        ex);
-                        }
-                    }
-
-                    // this isn't very nice, but I can't figure out another way to get LineInfo included in the transformed document
-                    XDocument outputDoc;
-                    using (MemoryStream tempStream = new MemoryStream())
-                    using (
-                        XmlWriter outputWriter = XmlWriter.Create(tempStream, new XmlWriterSettings { Indent = true }))
-                    {
-
-                        metaTransform.Transform(workingDoc.CreateNavigator(),
-                                                xsltArgList,
-                                                outputWriter,
-                                                new XmlFileProviderResolver(templateProvider));
-
-                        outputWriter.Close();
-
-                        // rewind stream
-                        tempStream.Seek(0, SeekOrigin.Begin);
-                        outputDoc = XDocument.Load(tempStream, LoadOptions.SetLineInfo);
-
-                        // create and register temp file
-                        // TODO this is a bit hacky, maybe add Template.Name {get;} instead of this._basePath (which could be anything)
-                        string filename = this._basePath + ".meta." +
-                                          (++metaCount).ToString(CultureInfo.InvariantCulture);
-                        this.SaveTempFile(tempFileProvider, outputDoc, filename);
-                    }
-
-                    TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
-                                                             metaNode.GetAttributeValue("stylesheet"));
-
-                    TraceSources.TemplateSource.TraceData(TraceEventType.Verbose, 1, outputDoc.CreateNavigator());
-
-                    workingDoc = outputDoc;
+                    XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
+                    XsltSettings settings = new XsltSettings(true, true);
+                    XmlResolver resolver = new XmlFileProviderResolver(templateProvider);
+                    metaTransform.Load(reader, settings, resolver);
                 }
-                else
+
+                XsltArgumentList xsltArgList = new XsltArgumentList();
+
+                // TODO this is a quick fix/hack
+                xsltArgList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(null, null));
+
+                var metaParamNodes = metaNode.Elements("with-param");
+
+                foreach (XElement paramNode in metaParamNodes)
                 {
-                    // didn't process, so remove it
-                    metaNode.Remove();
+                    string pName = paramNode.GetAttributeValue("name");
+                    string pExpr = paramNode.GetAttributeValue("select");
+
+                    try
+                    {
+                        xsltArgList.AddParam(pName,
+                                             string.Empty,
+                                             workingDoc.XPathEvaluate(pExpr, xsltContext));
+                    }
+                    catch (XPathException ex)
+                    {
+                        throw new TemplateException(this._templateSourcePath,
+                                                    paramNode.Attribute("select"),
+                                                    string.Format("Unable to process XPath expression: '{0}'", pExpr),
+                                                    ex);
+                    }
                 }
+
+                // this isn't very nice, but I can't figure out another way to get LineInfo included in the transformed document
+                XDocument outputDoc;
+                using (MemoryStream tempStream = new MemoryStream())
+                using (XmlWriter outputWriter = XmlWriter.Create(tempStream, new XmlWriterSettings { Indent = true }))
+                {
+
+                    metaTransform.Transform(workingDoc.CreateNavigator(),
+                                            xsltArgList,
+                                            outputWriter,
+                                            new XmlFileProviderResolver(templateProvider));
+
+                    outputWriter.Close();
+
+                    // rewind stream
+                    tempStream.Seek(0, SeekOrigin.Begin);
+                    outputDoc = XDocument.Load(tempStream, LoadOptions.SetLineInfo);
+
+                    // create and register temp file
+                    // TODO this is a bit hacky, maybe add Template.Name {get;} instead of this._basePath (which could be anything)
+                    string filename = this._basePath + ".meta." +
+                                      (++metaCount).ToString(CultureInfo.InvariantCulture);
+                    this.SaveTempFile(tempFileProvider, outputDoc, filename);
+                }
+
+                TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
+                                                         metaNode.GetAttributeValue("stylesheet"));
+
+                TraceSources.TemplateSource.TraceData(TraceEventType.Verbose, 1, outputDoc.CreateNavigator());
+
+                workingDoc = outputDoc;
 
                 // select next template
                 metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
@@ -153,7 +139,6 @@ namespace LBi.LostDoc.Templating
         }
 
         protected virtual XDocument PreProcess(TemplateInfo templateInfo,
-                                               Dictionary<string, object> arguments,
                                                Stack<IFileProvider> providerStack,
                                                IFileProvider tempFileProvider)
         {
@@ -168,7 +153,6 @@ namespace LBi.LostDoc.Templating
                 int depth = providerStack.Count + 1;
 
                 XDocument inheritedSource = this.PreProcess(templateInfo.Inherits,
-                                                            arguments,
                                                             providerStack,
                                                             tempFileProvider);
 
@@ -183,14 +167,7 @@ namespace LBi.LostDoc.Templating
             // push template provider onto provider stack
             providerStack.Push(new ScopedFileProvider(templateInfo.Source, Path.GetDirectoryName(templateInfo.Path)));
 
-            CustomXsltContext xsltContext = CustomXsltContext.Create(null);
-
-            xsltContext.PushVariableScope(templateDefinition, this.GetGlobalParameters(templateInfo, arguments));
-
-            xsltContext.PushVariableScope(templateDefinition, arguments.Select(argument => new ConstantXPathVariable(argument.Key, argument.Value)));
-
             return this.ApplyMetaTransforms(templateDefinition,
-                                            xsltContext,
                                             new StackedFileProvider(providerStack),
                                             tempFileProvider);
         }
@@ -199,13 +176,13 @@ namespace LBi.LostDoc.Templating
 
         #region Parsing
 
-        public virtual Template ParseTemplate(Dictionary<string, object> arguments, IFileProvider tempFileProvider = null)
+        public virtual Template ParseTemplate(IFileProvider tempFileProvider = null)
         {
             Stack<IFileProvider> providers = new Stack<IFileProvider>();
             providers.Push(new HttpFileProvider());
             providers.Push(new DirectoryFileProvider());
 
-            XDocument workingDoc = this.PreProcess(this._templateInfo, arguments, providers, tempFileProvider);
+            XDocument workingDoc = this.PreProcess(this._templateInfo, providers, tempFileProvider);
 
             // save real template definition as temp file
             // TODO this doesn't make that much sense without the tempFileProvider being stashed away as well
@@ -243,6 +220,7 @@ namespace LBi.LostDoc.Templating
             return new Template
                    {
                        TemplateFileProvider = provider,
+                       // TODO figure out what to do with Parameters here
                        Parameters = this.GetGlobalParameters(this._templateInfo, arguments).ToArray(),
                        ResourceDirectives = resources.ToArray(),
                        StylesheetsDirectives = stylesheets.ToArray(),
