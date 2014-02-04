@@ -83,8 +83,7 @@ namespace LBi.LostDoc.Templating
                 foreach (KeyValuePair<string, object> kvp in this.XsltParams)
                     argList.AddParam(kvp.Key, string.Empty, kvp.Value);
 
-                argList.XsltMessageEncountered +=
-                    (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
+                argList.XsltMessageEncountered += (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
 
                 // and custom extensions
                 argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, newUri));
@@ -93,13 +92,10 @@ namespace LBi.LostDoc.Templating
                 using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false }))
                 {
                     if (exists)
-                    {
                         TraceSources.TemplateSource.TraceWarning("Replacing {0}", this.Path);
-                    }
                     else
-                    {
                         TraceSources.TemplateSource.TraceVerbose("{0}", this.Path);
-                    }
+
                     long tickStart = localTimer.ElapsedTicks;
                     
                     this.Transform.Transform(context.Document,

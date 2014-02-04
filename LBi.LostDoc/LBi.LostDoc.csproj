@@ -112,6 +112,8 @@
     <Compile Include="Templating\AssetResolvers\FileResolver.cs" />
     <Compile Include="Templating\AssetResolvers\MsdnResolver.cs" />
     <Compile Include="Templating\FileProviders\HttpFileProvider.cs" />
+    <Compile Include="Templating\FileProviders\NullFileProvider.cs" />
+    <Compile Include="Templating\FileProviders\TemporaryFileProvider.cs" />
     <Compile Include="Templating\FileReference.cs" />
     <Compile Include="Templating\IDependencyProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
@@ -132,7 +134,7 @@
     <Compile Include="Templating\StackedFileProvider.cs" />
     <Compile Include="Templating\StylesheetDirective.cs" />
     <Compile Include="Templating\StylesheetApplication.cs" />
-    <Compile Include="Templating\TemplateData.cs" />
+    <Compile Include="Templating\TemplateSettings.cs" />
     <Compile Include="Templating\TemplateException.cs" />
     <Compile Include="Templating\TemplateInfo.cs" />
     <Compile Include="Templating\TemplateOutput.cs" />

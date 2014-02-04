@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,14 @@ namespace LBi.LostDoc.Templating
 {
     public class ProgressArgs : EventArgs
     {
-        public ProgressArgs(int percent)
+        public ProgressArgs(string action, int? percent)
         {
+            this.Action = action;
             this.Percent = percent;
         }
-        public int Percent { get; protected set; }
+
+        public string Action { get; protected set; }
+
+        public int? Percent { get; protected set; }
     }
 }

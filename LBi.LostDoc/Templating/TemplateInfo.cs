@@ -41,12 +41,11 @@ namespace LBi.LostDoc.Templating
         public TemplateParameterInfo[] Parameters { get; protected set; }
         public TemplateInfo Inherits { get; protected set; }
 
-        // TODO see if we can't get rid of this CompositionContainer
-        public Template Load(CompositionContainer container)
+        public Template Load()
         {
-            TemplateParser ret = new TemplateParser(container);
+            TemplateParser ret = new TemplateParser();
             ret.Load(this);
-            return ret;
+            return ret.ParseTemplate()
         }
 
         public IEnumerable<string> GetFiles()

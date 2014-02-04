@@ -156,6 +156,13 @@ namespace LBi.LostDoc.Templating.XPath
         #endregion
 
 
+        public void PushVariableScope(XNode scope, IEnumerable<XPathVariable> variables)
+        {
+            var list = new XPathVariableList(this.Variables.Count == 0 ? null : this.Variables.Peek(), scope, this);
+            list.AddRange(variables);
+            this.Variables.Push(list);
+        }
+
         public void PushVariableScope(XNode scope, params XPathVariable[] variables)
         {
             var list = new XPathVariableList(this.Variables.Count == 0 ? null : this.Variables.Peek(), scope, this);

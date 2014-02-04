@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,15 @@
  * limitations under the License. 
  */
 
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 namespace LBi.LostDoc.Templating
 {
     public class TemplateOutput
     {
-        public TemplateOutput(WorkUnitResult[] result, TempFileCollection tempFiles)
+        public TemplateOutput(WorkUnitResult[] result)
         {
             this.Results = result;
-            this.TemporaryFiles = tempFiles;
         }
 
-        public TempFileCollection TemporaryFiles { get; protected set; }
         public WorkUnitResult[] Results { get; protected set; }
     }
 }

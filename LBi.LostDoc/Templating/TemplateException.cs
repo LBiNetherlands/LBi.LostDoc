@@ -19,6 +19,7 @@ using System.Xml;
 
 namespace LBi.LostDoc.Templating
 {
+    // TODO we need to add the IFileProvider where the template.xml can be located here!
     public class TemplateException : Exception
     {
         public static TemplateException MissingAttribute(string filename, IXmlLineInfo lineInfo, string attributeName)

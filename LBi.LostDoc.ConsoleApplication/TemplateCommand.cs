@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition.Hosting;
@@ -96,29 +97,42 @@ namespace LBi.LostDoc.ConsoleApplication
                 }
 
                 var lazyProviders = container.GetExports<IFileProvider>(ContractNames.TemplateProvider);
-                var realProviders = lazyProviders.Select(lazy => lazy.Value);
-                TemplateResolver templateResolver = new TemplateResolver(realProviders.ToArray());
-                TemplateInfo templateInfo = templateResolver.Resolve(this.Template);
-                
-                Template templateParser = templateInfo.Load(container);
+                var templateProviders = lazyProviders.Select(lazy => lazy.Value);
 
                 string outputDir = this.Output
                                    ?? (Directory.Exists(this.Path)
                                            ? this.Path
                                            : System.IO.Path.GetDirectoryName(this.Path));
+
+
+                TemporaryFileProvider tempFileProvider = new TemporaryFileProvider();
+
+                // resolve template name to TemplateInfo
+                TemplateResolver templateResolver = new TemplateResolver(templateProviders.ToArray());
+                TemplateInfo templateInfo = templateResolver.Resolve(this.Template);
+
+                // parse and pre-process template
+                TemplateParser templateParser = new TemplateParser();
+                templateParser.Load(templateInfo);
+
+                Template template = templateParser.ParseTemplate(this.Arguments, tempFileProvider);
+                
                 AssetRedirectCollection assetRedirects;
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
 
-                TemplateSettings settings = new TemplateSettings()
-                                       {
-                                           AssetRedirects = assetRedirects,
-                                           OverwriteExistingFiles = this.Force.IsPresent,
-                                           IgnoredVersionComponent = this.IgnoreVersionComponent,
-                                           Arguments = this.Arguments,
-                                           OutputFileProvider = new ScopedFileProvider(new DirectoryFileProvider(), outputDir)
-                                       };
+                // create settings object
+                TemplateSettings settings = new TemplateSettings
+                                        {
+                                            AssetRedirects = assetRedirects,
+                                            OverwriteExistingFiles = this.Force.IsPresent,
+                                            IgnoredVersionComponent = this.IgnoreVersionComponent,
+                                            Arguments = this.Arguments,
+                                            OutputFileProvider = new ScopedFileProvider(new DirectoryFileProvider(), outputDir),
 
-                templateParser.Generate(settings, mergedDoc);
+                                        };
+
+                // execute template
+                template.Generate(settings, mergedDoc);
             }
 
         }

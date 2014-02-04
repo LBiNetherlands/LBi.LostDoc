@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,44 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Templating.AssetResolvers;
 using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
     public class Template
     {
+        private readonly FileResolver _fileResolver;
+        private readonly List<IAssetUriResolver> _resolvers;
+        private readonly IUniqueUriFactory _uriFactory;
+        private readonly ComposablePartCatalog _catalog;
+        private readonly DependencyProvider _dependencyProvider;
+        private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly ObjectCache _cache;
+
+        public Template()
+        {
+            this._fileResolver = new FileResolver();
+            this._resolvers = new List<IAssetUriResolver>();
+            this._resolvers.Add(this._fileResolver);
+            this._resolvers.Add(new MsdnResolver());
+            this._uriFactory = new DefaultUniqueUriFactory();
+            this._cancellationTokenSource = new CancellationTokenSource();
+            this._dependencyProvider = new DependencyProvider(this._cancellationTokenSource.Token);
+            this._cache = new MemoryCache("TemplateCache");
+        }
+
+        public IFileProvider TemplateFileProvider { get; set; }
+
         /// <summary>
         /// Contains all StylesheetDirective definitions specified in the template.
         /// </summary>
@@ -47,41 +72,40 @@ namespace LBi.LostDoc.Templating
         public IndexDirective[] IndexDirectives { get; set; }
 
         /// <summary>
-        /// Contains the processed source document, required for template inheritence.
-        /// </summary>
-        public XDocument Source { get; set; }
-
-        /// <summary>
         /// Set of parameters
         /// </summary>
         public XPathVariable[] Parameters { get; set; }
 
-        /// <summary>
-        /// Temporary files generated while templating, useful for debugging.
-        /// </summary>
-        public TempFileCollection TemporaryFiles { get; set; }
-
-        // TODO implement this
         public event EventHandler<ProgressArgs> Progress;
 
-        protected virtual void OnProgress(int percent)
+        protected virtual void OnProgress(string action, int? percent = null)
         {
             EventHandler<ProgressArgs> handler = this.Progress;
             if (handler != null)
-                handler(this, new ProgressArgs(percent));
+                handler(this, new ProgressArgs(action, percent));
         }
 
-        public virtual IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context)
+        protected virtual IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context)
         {
             var ret = Enumerable.Empty<UnitOfWork>();
 
             context.XsltContext.PushVariableScope(context.Document.Root, this.Parameters);
 
-            foreach (ResourceDirective resource in this.ResourceDirectives)
-                ret = ret.Concat(resource.DiscoverWork(context));
+            this.OnProgress("Processing resource directives", 0);
+            for (int i = 0; i < this.ResourceDirectives.Length; i++)
+            {
+                ret = ret.Concat(this.ResourceDirectives[i].DiscoverWork(context));
+                this.OnProgress("Processing resource directives", (int)Math.Round(100.0 * ((1.0 + i) / this.ResourceDirectives.Length)));
+            }
+            this.OnProgress("Processing resource directives", 100);
 
-            foreach (StylesheetDirective stylesheet in this.StylesheetsDirectives)
-                ret = ret.Concat(stylesheet.DiscoverWork(context));
+            this.OnProgress("Processing stylesheet directives", 0);
+            for (int i = 0; i < this.StylesheetsDirectives.Length; i++)
+            {
+                ret = ret.Concat(this.StylesheetsDirectives[i].DiscoverWork(context));
+                this.OnProgress("Processing stylesheet directives", (int)Math.Round(100.0 * ((1.0 + i) / this.StylesheetsDirectives.Length)));
+            }
+            this.OnProgress("Processing stylesheet directives", 100);
 
             context.XsltContext.PopVariableScope();
 
@@ -92,7 +116,7 @@ namespace LBi.LostDoc.Templating
         /// Applies the loaded templates to <paramref name="settings"/>.
         /// </summary>
         /// <param name="settings">
-        /// Instance of <see cref="TemplateData"/> containing the various input data needed. 
+        /// Instance of <see cref="TemplateSettings"/> containing the various input data needed. 
         /// </param>
         public virtual TemplateOutput Generate(TemplateSettings settings, XDocument inputDocument)
         {
@@ -101,35 +125,32 @@ namespace LBi.LostDoc.Templating
             this._uriFactory.Clear();
             this._fileResolver.Clear();
 
-            //ParsedTemplate tmpl = this.PrepareTemplate(settings);
-
             // collect all work that has to be done
-            CustomXsltContext xsltContext = CreateCustomXsltContext(settings.IgnoredVersionComponent);
+            CustomXsltContext xsltContext = CustomXsltContext.Create(settings.IgnoredVersionComponent);
             xsltContext.PushVariableScope(inputDocument.Root, this.Parameters);
             ITemplateContext templateContext = new TemplateContext(this._cache,
                                                                    inputDocument,
                                                                    xsltContext,
                                                                    this._uriFactory,
                                                                    this._fileResolver,
-                                                                   this._container.Catalog);
+                                                                   this._catalog);
 
             UnitOfWork[] work = this.DiscoverWork(templateContext).ToArray();
 
-            // TODO this isn't true (total number of work-units include resource deployments)
-            TraceSources.TemplateSource.TraceInformation("Generating {0:N0} documents from {1:N0} stylesheets.",
+            TraceSources.TemplateSource.TraceInformation("processing {0:N0} work units from {1:N0} directives.",
                                                          work.Length,
-                                                         this.StylesheetsDirectives.Length);
+                                                         this.ResourceDirectives.Length + this.StylesheetsDirectives.Length);
 
             ConcurrentBag<WorkUnitResult> results = new ConcurrentBag<WorkUnitResult>();
 
             // create context
             ITemplatingContext context = new TemplatingContext(this._cache,
-                                                               this._container.Catalog,
-                                                               settings.OutputFileProvider, // TODO fix this (this._basePath)
+                                                               this._catalog,
+                                                               settings.OutputFileProvider,
                                                                settings,
                                                                inputDocument,
                                                                this._resolvers,
-                                                               this._templateInfo.Source);
+                                                               this.TemplateFileProvider);
 
 
             // fill indices
@@ -158,9 +179,6 @@ namespace LBi.LostDoc.Templating
                 tasks.Add(task);
                 this._dependencyProvider.Add(new Uri(unitOfWork.Path, UriKind.RelativeOrAbsolute), task);
             }
-            //    work.Select(uow => new Task<WorkUnitResult>(() => uow.Execute(context)));
-
-            //this._dependencyProvider.Add(); 
 
             int totalCount = work.Length;
             long lastProgress = Stopwatch.GetTimestamp();
@@ -365,7 +383,7 @@ namespace LBi.LostDoc.Templating
             TraceSources.TemplateSource.TraceInformation("Statistics generated in {0:N1} seconds",
                                                          statsTimer.Elapsed.TotalSeconds);
 
-            return new TemplateOutput(results.ToArray(), this.TemporaryFiles);
+            return new TemplateOutput(results.ToArray());
         }
     }
 }

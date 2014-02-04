@@ -15,66 +15,38 @@
  */
 
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Caching;
-using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 using LBi.LostDoc.Diagnostics;
-using LBi.LostDoc.Templating.AssetResolvers;
 using LBi.LostDoc.Templating.FileProviders;
 using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
-
-    // TODO figure out how to untangle this mess of a class, extract parsing to TemplateParser
     // TODO fix error handling, a bad template.xml file will just throw random exceptions, xml schema validation?
     public class TemplateParser
     {
         public const string TemplateDefinitionFileName = "template.xml";
 
-        //private readonly ObjectCache _cache;
-        private readonly CompositionContainer _container;
-        private readonly FileResolver _fileResolver;
-        private readonly List<IAssetUriResolver> _resolvers;
-        private readonly IUniqueUriFactory _uriFactory;
         private string _basePath;
-        private XDocument _templateDefinition;
         private string _templateSourcePath;
         private TemplateInfo _templateInfo;
-        private readonly DependencyProvider _dependencyProvider;
-        private CancellationTokenSource _cancellationTokenSource;
 
-        public TemplateParser(CompositionContainer container)
+        public TemplateParser()
         {
-            this._cache = new MemoryCache("TemplateCache");
-            this._fileResolver = new FileResolver();
-            this._resolvers = new List<IAssetUriResolver>();
-            this._resolvers.Add(this._fileResolver);
-            this._resolvers.Add(new MsdnResolver());
-            this._uriFactory = new DefaultUniqueUriFactory();
-            this._container = container;
-            this._cancellationTokenSource = new CancellationTokenSource();
-            this._dependencyProvider = new DependencyProvider(this._cancellationTokenSource.Token);
         }
-
-        #region LoadFrom Template
 
         public virtual void Load(TemplateInfo templateInfo)
         {
             this._templateInfo = templateInfo;
             this._templateSourcePath = null;
-            using (Stream str = this._templateInfo.Source.OpenFile(templateInfo.Path, FileMode.Open))
-                _templateDefinition = XDocument.Load(str, LoadOptions.SetLineInfo);
 
             this._basePath = Path.GetDirectoryName(templateInfo.Path);
         }
@@ -84,7 +56,201 @@ namespace LBi.LostDoc.Templating
             return new ScopedFileProvider(this._templateInfo.Source, this._basePath);
         }
 
-        private IEnumerable<AssetRegistration> ParseAssetRegistration(IEnumerable<XElement> elements)
+
+        #region Preprocessing
+
+        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc,
+                                                        CustomXsltContext customContext,
+                                                        IFileProvider templateProvider,
+                                                        IFileProvider tempFileProvider)
+        {
+            // check for meta-template directives and expand
+            int metaCount = 0;
+            XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
+            while (metaNode != null)
+            {
+                if (metaNode.EvaluateCondition(metaNode.GetAttributeValueOrDefault("condition"), customContext))
+                {
+                    XslCompiledTransform metaTransform = new XslCompiledTransform(true);
+                    using (
+                        Stream str = templateProvider.OpenFile(metaNode.GetAttributeValue("stylesheet"), FileMode.Open))
+                    {
+                        XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
+                        XsltSettings settings = new XsltSettings(true, true);
+                        XmlResolver resolver = new XmlFileProviderResolver(templateProvider);
+                        metaTransform.Load(reader, settings, resolver);
+                    }
+
+                    XsltArgumentList xsltArgList = new XsltArgumentList();
+
+                    // TODO this is a quick fix/hack
+                    xsltArgList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(null, null));
+
+                    var metaParamNodes = metaNode.Elements("with-param");
+
+                    foreach (XElement paramNode in metaParamNodes)
+                    {
+                        string pName = paramNode.GetAttributeValue("name");
+                        string pExpr = paramNode.GetAttributeValue("select");
+
+                        try
+                        {
+                            xsltArgList.AddParam(pName,
+                                                 string.Empty,
+                                                 workingDoc.XPathEvaluate(pExpr, customContext));
+                        }
+                        catch (XPathException ex)
+                        {
+                            throw new TemplateException(this._templateSourcePath,
+                                                        paramNode.Attribute("select"),
+                                                        string.Format("Unable to process XPath expression: '{0}'", pExpr),
+                                                        ex);
+                        }
+                    }
+
+                    // this isn't very nice, but I can't figure out another way to get LineInfo included in the transformed document
+                    XDocument outputDoc;
+                    using (MemoryStream tempStream = new MemoryStream())
+                    using (
+                        XmlWriter outputWriter = XmlWriter.Create(tempStream, new XmlWriterSettings { Indent = true }))
+                    {
+
+                        metaTransform.Transform(workingDoc.CreateNavigator(),
+                                                xsltArgList,
+                                                outputWriter,
+                                                new XmlFileProviderResolver(templateProvider));
+
+                        outputWriter.Close();
+
+                        // rewind stream
+                        tempStream.Seek(0, SeekOrigin.Begin);
+                        outputDoc = XDocument.Load(tempStream, LoadOptions.SetLineInfo);
+
+                        // create and register temp file
+                        // TODO this is a bit hacky, maybe add Template.Name {get;} instead of this._basePath (which could be anything)
+                        string filename = this._basePath + ".meta." +
+                                          (++metaCount).ToString(CultureInfo.InvariantCulture);
+                        this.SaveTempFile(tempFileProvider, outputDoc, filename);
+                    }
+
+                    TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
+                                                             metaNode.GetAttributeValue("stylesheet"));
+
+                    TraceSources.TemplateSource.TraceData(TraceEventType.Verbose, 1, outputDoc.CreateNavigator());
+
+                    workingDoc = outputDoc;
+                }
+                else
+                {
+                    // didn't process, so remove it
+                    metaNode.Remove();
+                }
+
+                // select next template
+                metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
+            }
+            return workingDoc;
+        }
+
+        protected virtual XDocument PreProcess(TemplateInfo templateInfo,
+                                               Dictionary<string, object> arguments,
+                                               Stack<IFileProvider> providerStack,
+                                               IFileProvider tempFileProvider)
+        {
+            XDocument templateDefinition;
+
+            using (Stream str = this._templateInfo.Source.OpenFile(templateInfo.Path, FileMode.Open))
+                templateDefinition = XDocument.Load(str, LoadOptions.SetLineInfo);
+
+            // template inheritence
+            if (templateInfo.Inherits != null)
+            {
+                int depth = providerStack.Count + 1;
+
+                XDocument inheritedSource = this.PreProcess(templateInfo.Inherits,
+                                                            arguments,
+                                                            providerStack,
+                                                            tempFileProvider);
+
+                // a little hacky but it should work with the Reverse()/AddFirst()
+                foreach (XElement elem in inheritedSource.Root.Elements().Reverse())
+                    templateDefinition.Root.AddFirst(new XElement(elem));
+
+                // create and register temp file
+                this.SaveTempFile(tempFileProvider, templateDefinition, "inherited." + depth + '.' + templateInfo.Name);
+            }
+
+            // push template provider onto provider stack
+            providerStack.Push(new ScopedFileProvider(templateInfo.Source, Path.GetDirectoryName(templateInfo.Path)));
+
+            CustomXsltContext xsltContext = CustomXsltContext.Create(null);
+
+            xsltContext.PushVariableScope(templateDefinition, this.GetGlobalParameters(templateInfo, arguments));
+
+            xsltContext.PushVariableScope(templateDefinition, arguments.Select(argument => new ConstantXPathVariable(argument.Key, argument.Value)));
+
+            return this.ApplyMetaTransforms(templateDefinition,
+                                            xsltContext,
+                                            new StackedFileProvider(providerStack),
+                                            tempFileProvider);
+        }
+
+        #endregion
+
+        #region Parsing
+
+        public virtual Template ParseTemplate(Dictionary<string, object> arguments, IFileProvider tempFileProvider = null)
+        {
+            Stack<IFileProvider> providers = new Stack<IFileProvider>();
+            providers.Push(new HttpFileProvider());
+            providers.Push(new DirectoryFileProvider());
+
+            XDocument workingDoc = this.PreProcess(this._templateInfo, arguments, providers, tempFileProvider);
+
+            // save real template definition as temp file
+            // TODO this doesn't make that much sense without the tempFileProvider being stashed away as well
+            this._templateSourcePath = this.SaveTempFile(tempFileProvider, workingDoc, "final");
+
+            // create stacked provider
+            IFileProvider provider = new StackedFileProvider(providers);
+
+            // loading template
+            List<StylesheetDirective> stylesheets = new List<StylesheetDirective>();
+            List<ResourceDirective> resources = new List<ResourceDirective>();
+            List<IndexDirective> indices = new List<IndexDirective>();
+            foreach (XElement elem in workingDoc.Root.Elements())
+            {
+                // we alread processed the parameters
+                if (elem.Name.LocalName == "parameter")
+                    continue;
+
+                switch (elem.Name.LocalName)
+                {
+                    case "apply-stylesheet":
+                        stylesheets.Add(this.ParseStylesheet(provider, elem));
+                        break;
+                    case "index":
+                        indices.Add(this.ParseIndexDefinition(elem));
+                        break;
+                    case "include-resource":
+                        resources.Add(this.ParseResouceDefinition(provider, elem));
+                        break;
+                    default:
+                        throw new Exception("Unknown element: " + elem.Name.LocalName);
+                }
+            }
+
+            return new Template
+                   {
+                       TemplateFileProvider = provider,
+                       Parameters = this.GetGlobalParameters(this._templateInfo, arguments).ToArray(),
+                       ResourceDirectives = resources.ToArray(),
+                       StylesheetsDirectives = stylesheets.ToArray(),
+                       IndexDirectives = indices.ToArray(),
+                   };
+        }
+
+        protected virtual IEnumerable<AssetRegistration> ParseAssetRegistration(IEnumerable<XElement> elements)
         {
             foreach (XElement elem in elements)
             {
@@ -98,7 +264,7 @@ namespace LBi.LostDoc.Templating
             }
         }
 
-        private IEnumerable<SectionRegistration> ParseSectionRegistration(IEnumerable<XElement> elements)
+        protected virtual IEnumerable<SectionRegistration> ParseSectionRegistration(IEnumerable<XElement> elements)
         {
             foreach (XElement elem in elements)
             {
@@ -114,14 +280,14 @@ namespace LBi.LostDoc.Templating
             }
         }
 
-        private IEnumerable<XPathVariable> ParseVariables(XElement element)
+        protected virtual IEnumerable<XPathVariable> ParseVariables(XElement element)
         {
             return element.Attributes()
                           .Where(a => a.Name.NamespaceName == Namespaces.Variable)
                           .Select(a => new ExpressionXPathVariable(a.Name.LocalName, a.Value));
         }
 
-        private IEnumerable<XPathVariable> ParseParams(IEnumerable<XElement> elements)
+        protected virtual IEnumerable<XPathVariable> ParseParams(IEnumerable<XElement> elements)
         {
             foreach (XElement elem in elements)
             {
@@ -137,152 +303,48 @@ namespace LBi.LostDoc.Templating
             }
         }
 
-
-
-
-        #endregion
-
-        public virtual Template PrepareTemplate(TemplateSettings settings)
+        protected virtual IndexDirective ParseIndexDefinition(XElement elem)
         {
-            Stack<IFileProvider> providers = new Stack<IFileProvider>();
-            providers.Push(new HttpFileProvider());
-            providers.Push(new DirectoryFileProvider());
-           
-            return this.PrepareTemplate(settings, providers);
+            return new IndexDirective(elem.GetAttributeValue("name"),
+                                      elem.GetAttributeValue("match"),
+                                      elem.GetAttributeValue("key"));
         }
 
-        protected virtual Template PrepareTemplate(TemplateSettings xsettings, Stack<IFileProvider> providers)
+        protected virtual StylesheetDirective ParseStylesheet(IFileProvider provider, XElement elem)
         {
-            // set up temp file container
-            TempFileCollection tempFiles = new TempFileCollection(settings.TemporaryFilesPath,
-                                                                  settings.KeepTemporaryFiles);
 
-            if (!Directory.Exists(tempFiles.TempDir))
-                Directory.CreateDirectory(tempFiles.TempDir);
-
-            // clone orig doc
-            XDocument workingDoc;
-
-            // this is required to preserve the line information 
-            using (var xmlReader = this._templateDefinition.CreateReader())
-                workingDoc = XDocument.Load(xmlReader, LoadOptions.SetLineInfo);
-
-            // template inheritence
-            if (this._templateInfo.Inherits != null)
+            var nameAttr = elem.Attribute("name");
+            var src = elem.GetAttributeValue("stylesheet");
+            string name;
+            if (nameAttr != null)
             {
-
-                int depth = providers.Count + 1;
-                TemplateParser inheritedTemplateParser = _templateInfo.Inherits.Load(this._container);
-                Template template = inheritedTemplateParser.PrepareTemplate(settings, providers);
-
-                providers.Push(inheritedTemplateParser.GetScopedFileProvider());
-
-                // a little hacky but it should work with the Reverse()/AddFirst()
-                foreach (XElement elem in template.Source.Root.Elements().Reverse())
-                {
-                    workingDoc.Root.AddFirst(new XElement(elem));
-                }
-
-                // create and register temp file (this can be overriden later if there are meta-template directives
-                // in the template
-                this._templateSourcePath = this.SaveTempFile(tempFiles, workingDoc, "inherited." + depth + '.' + _templateInfo.Name);
+                name = nameAttr.Value;
+                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0} ({1})", name, src);
+            }
+            else
+            {
+                name = Path.GetFileNameWithoutExtension(src);
+                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0}", name);
             }
 
-            // add our file provider to the top of the stack
-            providers.Push(this.GetScopedFileProvider());
-
-            // create stacked provider
-            IFileProvider provider = new StackedFileProvider(providers);
-
-            // start by loading any parameters as they are needed for meta-template evaluation
-            CustomXsltContext customContext = CustomXsltContext.Create(settings.IgnoredVersionComponent);
-
-            XElement[] paramNodes = workingDoc.Root.Elements("parameter").ToArray();
-            List<XPathVariable> globalParams = new List<XPathVariable>();
-
-            foreach (XElement paramNode in paramNodes)
+            var ret = new StylesheetDirective
             {
-                string name = paramNode.GetAttributeValue("name");
-                object argValue;
-                if (settings.Arguments.TryGetValue(name, out argValue))
-                    globalParams.Add(new ConstantXPathVariable(name, argValue));
-                else
-                {
-                    string expr = paramNode.GetAttributeValueOrDefault("select");
-                    globalParams.Add(new ExpressionXPathVariable(name, expr));
-                }
-            }
+                Stylesheet = new FileReference(0, provider, src),
+                SelectExpression = elem.GetAttributeValueOrDefault("select", "/"),
+                InputExpression = elem.GetAttributeValueOrDefault("input"),
+                OutputExpression = elem.GetAttributeValueOrDefault("output"),
+                XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
+                Variables = this.ParseVariables(elem).ToArray(),
+                Name = name,
+                Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
+                AssetRegistrations = this.ParseAssetRegistration(elem.Elements("register-asset")).ToArray(),
+                ConditionExpression = elem.GetAttributeValueOrDefault("condition"),
+            };
 
-            customContext.PushVariableScope(workingDoc, globalParams.ToArray());
-
-            var arguments = settings.Arguments
-                                        .Select(argument => new ConstantXPathVariable(argument.Key, argument.Value))
-                                        .ToArray();
-
-            customContext.PushVariableScope(workingDoc, arguments);
-
-            // expand any meta-template directives
-            workingDoc = ApplyMetaTransforms(workingDoc, customContext, provider, tempFiles);
-
-            // there was neither inheretance, nor any meta-template directives
-            if (this._templateSourcePath == null)
-            {
-                // save current template to disk
-                this._templateSourcePath = this.SaveTempFile(tempFiles, workingDoc);
-            }
-
-            // loading template
-            List<StylesheetDirective> stylesheets = new List<StylesheetDirective>();
-            List<ResourceDirective> resources = new List<ResourceDirective>();
-            List<IndexDirective> indices = new List<IndexDirective>();
-            foreach (XElement elem in workingDoc.Root.Elements())
-            {
-                // we alread processed the parameters
-                if (elem.Name.LocalName == "parameter")
-                    continue;
-
-                if (elem.Name.LocalName == "apply-stylesheet")
-                {
-                    stylesheets.Add(this.ParseStylesheet(provider, elem));
-                }
-                else if (elem.Name.LocalName == "index")
-                {
-                    indices.Add(this.ParseIndexDefinition(elem));
-                }
-                else if (elem.Name.LocalName == "include-resource")
-                {
-                    resources.Add(ParseResouceDefinition(provider, elem));
-                }
-                else
-                {
-                    throw new Exception("Unknown element: " + elem.Name.LocalName);
-                }
-            }
-
-            return new Template
-                       {
-                           Parameters = globalParams.ToArray(),
-                           Source = workingDoc,
-                           ResourceDirectives = resources.ToArray(),
-                           StylesheetsDirectives = stylesheets.ToArray(),
-                           IndexDirectives = indices.ToArray(),
-                           TemporaryFiles = tempFiles,
-                           // add provider here?!
-                       };
+            return ret;
         }
 
-        private string SaveTempFile(TempFileCollection tempFiles, XDocument workingDoc, string suffix = null)
-        {
-            var tempFileName = Path.Combine(tempFiles.TempDir,
-                                            Path.GetDirectoryName(this._basePath)
-                                            + TemplateDefinitionFileName
-                                            + (suffix != null ? "." + suffix : ""));
-            workingDoc.Save(tempFileName, SaveOptions.OmitDuplicateNamespaces);
-            tempFiles.AddFile(tempFileName, tempFiles.KeepFiles);
-            return tempFileName;
-        }
-
-        private ResourceDirective ParseResouceDefinition(IFileProvider provider, XElement elem)
+        protected virtual ResourceDirective ParseResouceDefinition(IFileProvider provider, XElement elem)
         {
             string source = elem.GetAttributeValue("path");
 
@@ -315,140 +377,34 @@ namespace LBi.LostDoc.Templating
             return resource;
         }
 
-        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc, CustomXsltContext customContext, IFileProvider provider, TempFileCollection tempFiles)
+        #endregion
+
+        protected virtual List<XPathVariable> GetGlobalParameters(TemplateInfo templateInfo, Dictionary<string, object> arguments)
         {
-            // check for meta-template directives and expand
-            int metaCount = 0;
-            XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
-            while (metaNode != null)
+            List<XPathVariable> globalParams = new List<XPathVariable>();
+            foreach (var parameterInfo in templateInfo.Parameters)
             {
-                if (metaNode.EvaluateCondition(metaNode.GetAttributeValueOrDefault("condition"), customContext))
-                {
-                    XslCompiledTransform metaTransform = new XslCompiledTransform(true);
-                    using (Stream str = provider.OpenFile(metaNode.GetAttributeValue("stylesheet"), FileMode.Open))
-                    {
-                        XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
-                        XsltSettings settings = new XsltSettings(true, true);
-                        XmlResolver resolver = new XmlFileProviderResolver(provider);
-                        metaTransform.Load(reader, settings, resolver);
-                    }
-
-                    XsltArgumentList xsltArgList = new XsltArgumentList();
-
-                    // TODO this is a quick fix/hack
-                    xsltArgList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(null, null));
-
-                    var metaParamNodes = metaNode.Elements("with-param");
-
-                    foreach (XElement paramNode in metaParamNodes)
-                    {
-                        string pName = paramNode.GetAttributeValue("name");
-                        string pExpr = paramNode.GetAttributeValue("select");
-
-                        try
-                        {
-                            xsltArgList.AddParam(pName,
-                                                 string.Empty,
-                                                 workingDoc.XPathEvaluate(pExpr, customContext));
-                        }
-                        catch (XPathException ex)
-                        {
-                            throw new TemplateException(this._templateSourcePath,
-                                                        paramNode.Attribute("select"),
-                                                        string.Format(
-                                                            "Unable to process XPath expression: '{0}'",
-                                                            pExpr),
-                                                        ex);
-                        }
-                    }
-
-
-
-                    // this isn't very nice, but I can't figure out another way to get LineInfo included in the transformed document
-                    XDocument outputDoc;
-                    using (MemoryStream tempStream = new MemoryStream())
-                    using (XmlWriter outputWriter = XmlWriter.Create(tempStream, new XmlWriterSettings { Indent = true }))
-                    {
-
-                        metaTransform.Transform(workingDoc.CreateNavigator(),
-                                                xsltArgList,
-                                                outputWriter,
-                                                new XmlFileProviderResolver(provider));
-
-                        outputWriter.Close();
-
-                        // rewind stream
-                        tempStream.Seek(0, SeekOrigin.Begin);
-                        outputDoc = XDocument.Load(tempStream, LoadOptions.SetLineInfo);
-
-                        // create and register temp file
-                        // this will override the value set in PrepareTemplate in case of template inhertence
-                        // TODO this is a bit hacky, maybe add Template.Name {get;} instead of this._basePath (which could be anything)
-                        string filename = this._basePath + ".meta." + (++metaCount).ToString(CultureInfo.InvariantCulture);
-                        this._templateSourcePath = this.SaveTempFile(tempFiles, outputDoc, filename);
-                    }
-
-
-                    TraceSources.TemplateSource.TraceVerbose("Template after transformation by {0}",
-                                                             metaNode.GetAttributeValue("stylesheet"));
-
-                    TraceSources.TemplateSource.TraceData(TraceEventType.Verbose, 1, outputDoc.CreateNavigator());
-
-                    workingDoc = outputDoc;
-                }
+                object argValue;
+                if (arguments.TryGetValue(parameterInfo.Name, out argValue))
+                    globalParams.Add(new ConstantXPathVariable(parameterInfo.Name, argValue));
                 else
-                {
-                    // didn't process, so remove it
-                    metaNode.Remove();
-                }
-
-                // select next template
-                metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
+                    globalParams.Add(new ExpressionXPathVariable(parameterInfo.Name, parameterInfo.DefaultExpression));
             }
-            return workingDoc;
+            return globalParams;
         }
 
-        protected virtual IndexDirective ParseIndexDefinition(XElement elem)
+        private string SaveTempFile(IFileProvider tempFiles, XDocument workingDoc, string suffix = null)
         {
-            return new IndexDirective(elem.GetAttributeValue("name"),
-                                      elem.GetAttributeValue("match"),
-                                      elem.GetAttributeValue("key"));
+            string tempFileName = TemplateDefinitionFileName + (suffix != null ? "." + suffix : "");
+
+            using (var stream = tempFiles.OpenFile(tempFileName, FileMode.Create))
+                workingDoc.Save(stream, SaveOptions.OmitDuplicateNamespaces);
+
+            return tempFileName;
         }
 
 
 
-        private StylesheetDirective ParseStylesheet(IFileProvider provider, XElement elem)
-        {
 
-            var nameAttr = elem.Attribute("name");
-            var src = elem.GetAttributeValue("stylesheet");
-            string name;
-            if (nameAttr != null)
-            {
-                name = nameAttr.Value;
-                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0} ({1})", name, src);
-            }
-            else
-            {
-                name = Path.GetFileNameWithoutExtension(src);
-                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0}", name);
-            }
-
-            var ret = new StylesheetDirective
-                       {
-                           Stylesheet = new FileReference(0, provider, src),
-                           SelectExpression = elem.GetAttributeValueOrDefault("select", "/"),
-                           InputExpression = elem.GetAttributeValueOrDefault("input"),
-                           OutputExpression = elem.GetAttributeValueOrDefault("output"),
-                           XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
-                           Variables = this.ParseVariables(elem).ToArray(),
-                           Name = name,
-                           Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
-                           AssetRegistrations = this.ParseAssetRegistration(elem.Elements("register-asset")).ToArray(),
-                           ConditionExpression = elem.GetAttributeValueOrDefault("condition"),
-                       };
-
-            return ret;
-        }
     }
 }
