@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+using System;
 using System.IO;
 
 namespace LBi.LostDoc.Templating
@@ -27,7 +28,7 @@ namespace LBi.LostDoc.Templating
             this.Duration = duration;
         }
 
-        public string Path { get { return this.WorkUnit.Path; } }
+        public Uri Path { get { return this.WorkUnit.Path; } }
 
         public IFileProvider FileProvider { get; protected set; }
 
@@ -40,7 +41,7 @@ namespace LBi.LostDoc.Templating
 
         public virtual Stream GetStream()
         {
-            return this.FileProvider.OpenFile(this.Path, FileMode.Open);
+            return this.FileProvider.OpenFile(this.Path.ToString(), FileMode.Open);
         }
     }
 }

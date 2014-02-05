@@ -57,8 +57,8 @@ namespace LBi.LostDoc.Templating
 
             if (context.Document.Root.EvaluateCondition(this.ConditionExpression, context.XsltContext))
             {
-                string expandedSource = context.Document.Root.EvaluateValue(this.Source, context.XsltContext);
-                string expandedOutput = context.Document.Root.EvaluateValue(this.Output, context.XsltContext);
+                Uri expandedSource = new Uri(context.Document.Root.EvaluateValue(this.Source, context.XsltContext), UriKind.RelativeOrAbsolute);
+                Uri expandedOutput = new Uri(context.Document.Root.EvaluateValue(this.Output, context.XsltContext), UriKind.RelativeOrAbsolute);
 
                 List<IResourceTransform> transforms = new List<IResourceTransform>();
 
@@ -66,7 +66,7 @@ namespace LBi.LostDoc.Templating
                 {
                     using (CompositionContainer localContainer = new CompositionContainer(context.Catalog))
                     {
-                        string dirName = Path.GetDirectoryName(expandedSource);
+                        string dirName = Path.GetDirectoryName(expandedSource.ToString());
                         CompositionBatch batch = new CompositionBatch();
                         var exportMetadata = new Dictionary<string, object>();
 

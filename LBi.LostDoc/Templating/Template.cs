@@ -165,7 +165,7 @@ namespace LBi.LostDoc.Templating
             {
                 Task<WorkUnitResult> task = new Task<WorkUnitResult>(uow => ((UnitOfWork)uow).Execute(context), unitOfWork);
                 tasks.Add(task);
-                dependencyProvider.Add(new Uri(unitOfWork.Path, UriKind.RelativeOrAbsolute), task);
+                dependencyProvider.Add(unitOfWork.Path, task);
             }
 
             int totalCount = work.Length;

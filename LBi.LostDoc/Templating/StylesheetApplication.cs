@@ -29,13 +29,13 @@ namespace LBi.LostDoc.Templating
 {
     public class StylesheetApplication : UnitOfWork
     {
-        public StylesheetApplication(string outputPath,
+        public StylesheetApplication(Uri outputPath,
                                      XNode inputNode,
                                      IEnumerable<KeyValuePair<string, object>> xsltParams,
                                      IEnumerable<AssetIdentifier> assetIdentifiers,
                                      string stylesheetName,
                                      IEnumerable<AssetSection> sections,
-                                     string input,
+                                     Uri input,
                                      XslCompiledTransform transform,
                                      XmlResolver xmlResolver)
             : base(outputPath)
@@ -62,7 +62,7 @@ namespace LBi.LostDoc.Templating
 
         public AssetSection[] Sections { get; protected set; }
 
-        public string Input { get; protected set; }
+        public Uri Input { get; protected set; }
 
         public XmlResolver XmlResolver { get; protected set; }
 
@@ -70,10 +70,9 @@ namespace LBi.LostDoc.Templating
         {
             Stopwatch localTimer = Stopwatch.StartNew();
 
-            Uri newUri = new Uri(this.Path, UriKind.RelativeOrAbsolute);
             FileMode mode = FileMode.CreateNew;
             bool exists;
-            if (!(exists = context.Settings.OutputFileProvider.FileExists(this.Path)) || context.Settings.OverwriteExistingFiles)
+            if (!(exists = context.Settings.OutputFileProvider.FileExists(this.Path.ToString())) || context.Settings.OverwriteExistingFiles)
             {
                 if (exists)
                     mode = FileMode.Create;
@@ -86,9 +85,9 @@ namespace LBi.LostDoc.Templating
                 argList.XsltMessageEncountered += (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
 
                 // and custom extensions
-                argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, newUri));
+                argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, this.Path));
 
-                using (Stream stream = context.Settings.OutputFileProvider.OpenFile(this.Path, mode))
+                using (Stream stream = context.Settings.OutputFileProvider.OpenFile(this.Path.ToString(), mode))
                 using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false }))
                 {
                     if (exists)
@@ -113,7 +112,7 @@ namespace LBi.LostDoc.Templating
             }
             else
             {
-                TraceSources.TemplateSource.TraceWarning("Skipping {0}", newUri);
+                TraceSources.TemplateSource.TraceWarning("Skipping {0}", this.Path);
             }
 
             localTimer.Stop();

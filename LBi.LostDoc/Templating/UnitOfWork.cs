@@ -14,16 +14,18 @@
  * limitations under the License. 
  */
 
+using System;
+
 namespace LBi.LostDoc.Templating
 {
     public abstract class UnitOfWork
     {
-        protected UnitOfWork(string path)
+        protected UnitOfWork(Uri path)
         {
             this.Path = path;
         }
 
-        public string Path { get; protected set; }
+        public Uri Path { get; protected set; }
         public abstract WorkUnitResult Execute(ITemplatingContext context);
     }
 }

@@ -24,8 +24,8 @@ namespace LBi.LostDoc.Templating
 {
     public class ResourceDeployment : UnitOfWork
     {
-        public ResourceDeployment(IFileProvider fileProvider, string path, string destination, IResourceTransform[] transforms)
-            : base(path)
+        public ResourceDeployment(IFileProvider fileProvider, Uri path, Uri destination, IResourceTransform[] transforms)
+            : base(destination)
         {
             this.FileProvider = fileProvider;
             this.ResourcePath = path;
@@ -35,31 +35,25 @@ namespace LBi.LostDoc.Templating
 
         public IResourceTransform[] Transforms { get; protected set; }
 
-        public string Destination { get; protected set; }
+        public Uri Destination { get; protected set; }
 
         public IFileProvider FileProvider { get; protected set; }
 
-        public string ResourcePath { get; protected set; }
+        public Uri ResourcePath { get; protected set; }
 
         public override WorkUnitResult Execute(ITemplatingContext context)
         {
             Stopwatch localTimer = new Stopwatch();
 
             // copy resources to output dir
-            string target = this.Destination ?? this.ResourcePath;
-
-            if (this.Destination != null)
-            {
-                TraceSources.TemplateSource.TraceInformation("Copying resource: {0} => {1}",
-                                                             this.ResourcePath,
-                                                             this.Destination);
-            }
-            else
-                TraceSources.TemplateSource.TraceInformation("Copying resource: {0}", this.ResourcePath);
+            TraceSources.TemplateSource.TraceInformation("Copying resource: {0} => {1}",
+                                                         this.ResourcePath,
+                                                         this.Destination);
 
 
-            using (Stream streamSrc = this.FileProvider.OpenFile(this.ResourcePath, FileMode.Open))
-            using (Stream streamDest = context.OutputFileProvider.OpenFile(target, FileMode.Create))
+
+            using (Stream streamSrc = this.FileProvider.OpenFile(this.ResourcePath.ToString(), FileMode.Open))
+            using (Stream streamDest = context.OutputFileProvider.OpenFile(this.Destination.ToString(), FileMode.Create))
             {
                 Stream outStream = streamSrc;
                 for (int i = 0; i < this.Transforms.Length; i++)

@@ -75,11 +75,11 @@ namespace LBi.LostDoc.Templating
             {
                 context.XsltContext.PushVariableScope(inputNode, this.Variables); // 1
 
-                string input = null;
+                Uri inputUri = null;
                 if (this.InputExpression != null)
-                    input = XPathServices.ResultToString(inputNode.XPathEvaluate(this.InputExpression, context.XsltContext));
+                    inputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.InputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
 
-                string outputPath = XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext));
+                Uri outputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
 
                 List<AssetIdentifier> assetIdentifiers = new List<AssetIdentifier>();
                 List<AssetSection> sections = new List<AssetSection>();
@@ -87,15 +87,13 @@ namespace LBi.LostDoc.Templating
                 // eval condition, shortcut and log instead of wrapping entire loop in if
                 if (!inputNode.EvaluateCondition(this.ConditionExpression, context.XsltContext))
                 {
-                    TraceSources.TemplateSource.TraceVerbose("Condition not met: {0}", outputPath);
+                    TraceSources.TemplateSource.TraceVerbose("Condition not met: {0}", outputUri);
                     context.XsltContext.PopVariableScope(); // 1
                     continue;
                 }
 
-                Uri newUri = new Uri(outputPath, UriKind.RelativeOrAbsolute);
-
                 // ensure url is unique
-                context.EnsureUniqueUri(ref newUri);
+                context.EnsureUniqueUri(ref outputUri);
 
                 // asset identifiers
                 foreach (AssetRegistration assetRegistration in this.AssetRegistrations)
@@ -114,12 +112,12 @@ namespace LBi.LostDoc.Templating
                         {
                             
                             AssetIdentifier assetIdentifier = new AssetIdentifier(assetId, version);
-                            context.RegisterAssetUri(assetIdentifier, newUri);
+                            context.RegisterAssetUri(assetIdentifier, outputUri);
                             assetIdentifiers.Add(assetIdentifier);
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1} => {2}",
                                                                      assetId,
                                                                      version,
-                                                                     newUri.ToString());
+                                                                     outputUri.ToString());
                         }
                         else
                         {
@@ -147,7 +145,7 @@ namespace LBi.LostDoc.Templating
                         // eval condition
                         if (sectionInputElement.EvaluateCondition(section.ConditionExpression, context.XsltContext))
                         {
-                            Uri sectionUri = new Uri(newUri + "#" + sectionName, UriKind.Relative);
+                            Uri sectionUri = new Uri(outputUri + "#" + sectionName, UriKind.Relative);
                             AssetIdentifier assetIdentifier = new AssetIdentifier(sectionAssetId, sectionVersion);
                             context.RegisterAssetUri(assetIdentifier, sectionUri);
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1}, (Section: {2}) => {3}",
@@ -181,13 +179,13 @@ namespace LBi.LostDoc.Templating
 
                 context.XsltContext.PopVariableScope(); // 1
 
-                yield return new StylesheetApplication(outputPath,
+                yield return new StylesheetApplication(outputUri,
                                                        inputNode,
                                                        xsltParams,
                                                        assetIdentifiers.ToArray(),
                                                        this.Name,
                                                        sections,
-                                                       input,
+                                                       inputUri,
                                                        this.LoadStylesheet(context.Cache),
                                                        null);
             }
