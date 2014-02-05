@@ -32,8 +32,6 @@ namespace LBi.LostDoc.Templating
             this.AssetRedirects = new AssetRedirectCollection();
             this.Arguments = new Dictionary<string, object>();
             this.Filter = null;
-            this.KeepTemporaryFiles = true;
-            this.TemporaryFilesPath = Directory.GetCurrentDirectory();
             this.UriFactory = new DefaultUniqueUriFactory();
             this.Cache = new MemoryCache("LostDoc");
             this.FileResolver = new FileResolver(caseSensitiveFs: false);
@@ -49,8 +47,6 @@ namespace LBi.LostDoc.Templating
         public Dictionary<string, object> Arguments { get; set; }
         public IFileProvider OutputFileProvider { get; set; }
         public bool OverwriteExistingFiles { get; set; }
-        public bool KeepTemporaryFiles { get; set; }
-        public string TemporaryFilesPath { get; set; }
         public IUniqueUriFactory UriFactory { get; set; }
         public ObjectCache Cache { get; set; }
         public IFileResolver FileResolver { get; set; }
