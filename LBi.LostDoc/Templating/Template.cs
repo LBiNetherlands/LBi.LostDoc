@@ -144,6 +144,7 @@ namespace LBi.LostDoc.Templating
             // fill indices
             using (TraceSources.TemplateSource.TraceActivity("Indexing input document"))
             {
+                this.OnProgress("Indexing input");
                 var customXsltContext = CustomXsltContext.Create(settings.IgnoredVersionComponent);
                 foreach (var index in this.IndexDirectives)
                 {
