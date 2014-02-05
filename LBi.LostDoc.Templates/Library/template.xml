@@ -47,8 +47,8 @@
   <!-- inject [with-param/@name='logoUri'] element in all 'apply-stylesheet' directives found. -->
   <!-- TODO look into how GlobalParameter.xslt handles it's 'value' -->
   <meta-template stylesheet="GlobalParameter.xslt">
-    <with-param name="name" select="'logoUri'"/>
-    <with-param name="value" select="concat('images/logo.', substring-after-last($LogoUrl, '.'))"/>
+    <with-param name="name" value="logoUri"/>
+    <with-param name="value" value="concat('images/logo.', substring-after-last($LogoUrl, '.'))"/>
   </meta-template>
 
   <apply-stylesheet stylesheet="EnrichNaming.xslt" />

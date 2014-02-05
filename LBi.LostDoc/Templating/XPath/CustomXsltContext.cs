@@ -92,21 +92,17 @@ namespace LBi.LostDoc.Templating.XPath
             IXsltContextFunction function;
 
             if (this.Functions.TryGetValue(prefix + ":" + name, out function))
-            {
                 return function;
-            }
 
             return null;
         }
 
         public override IXsltContextVariable ResolveVariable(string prefix, string name)
         {
-            IXsltContextVariable ret = this.Variables.Peek().Resolve(name);
+            if (this.Variables.Count == 0)
+                return null;
 
-            if (ret == null)
-                throw new XsltException("Invalid variable: " + name);
-
-            return ret;
+            return this.Variables.Peek().Resolve(name);
         }
 
         internal static string GetValue(object v)

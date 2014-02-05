@@ -32,7 +32,7 @@ namespace LBi.LostDoc.Templating.FileProviders
             do
             {
                 tempDirectory = Path.Combine(Path.GetTempPath(), "LostDoc_" + Path.GetRandomFileName());
-            } while (!Directory.Exists(tempDirectory));
+            } while (Directory.Exists(tempDirectory));
 
             TraceSources.TemplateSource.TraceVerbose("Creating temporary directory: {0}", tempDirectory);
 

@@ -72,21 +72,21 @@ namespace LBi.LostDoc.Templating
                 foreach (XElement paramNode in metaParamNodes)
                 {
                     string pName = paramNode.GetAttributeValue("name");
-                    string pExpr = paramNode.GetAttributeValue("select");
+                    string pExpr = paramNode.GetAttributeValue("value");
 
-                    //try
-                    //{
-                    xsltArgList.AddParam(pName,
-                                         string.Empty,
-                                         workingDoc.XPathEvaluate(pExpr, xsltContext));
-                    //}
-                    //catch (XPathException ex)
-                    //{
-                    //    throw new TemplateException(this._templateSourcePath,
-                    //                                paramNode.Attribute("select"),
-                    //                                string.Format("Unable to process XPath expression: '{0}'", pExpr),
-                    //                                ex);
-                    //}
+                    try
+                    {
+                        xsltArgList.AddParam(pName,
+                                             string.Empty,
+                                             workingDoc.EvaluateValue(pExpr, xsltContext));
+                    }
+                    catch (XPathException ex)
+                    {
+                        throw new TemplateException(new FileReference(0, templateInfo.Source, templateInfo.Path),
+                                                    paramNode.Attribute("select"),
+                                                    string.Format("Unable to process XPath expression: '{0}'. {1}", pExpr, ex.Message),
+                                                    ex);
+                    }
                 }
 
                 // this isn't very nice, but I can't figure out another way to get LineInfo included in the transformed document
@@ -173,7 +173,7 @@ namespace LBi.LostDoc.Templating
             XDocument workingDoc = this.PreProcess(templateInfo, providers, tempFileProvider);
 
             // save real template definition as temp file
-            string tempFilename =  this.SaveTempFile(tempFileProvider, workingDoc, "final");
+            string tempFilename = this.SaveTempFile(tempFileProvider, workingDoc, "final");
             FileReference templateSource = new FileReference(0, tempFileProvider, tempFilename);
 
             // create stacked provider
