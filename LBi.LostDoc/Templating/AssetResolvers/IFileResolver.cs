@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 DigitasLBi Netherlands B.V.
+ * Copyright 2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@
  * limitations under the License. 
  */
 
-using System.ComponentModel.Composition.Hosting;
+using System;
+using System.Collections.Generic;
 
-namespace LBi.LostDoc.ConsoleApplication.Extensibility
+namespace LBi.LostDoc.Templating.AssetResolvers
 {
-    public interface ICommand
+    public interface IFileResolver : IAssetUriResolver, IEnumerable<KeyValuePair<AssetIdentifier, Uri>>, IEqualityComparer<Uri>
     {
-        // TODO add CancellationToken here
-        void Invoke(CompositionContainer container);
+        void Add(string assetId, Version version, Uri uri);
+
+        void Clear();
     }
 }

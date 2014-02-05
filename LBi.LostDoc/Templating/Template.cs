@@ -15,44 +15,37 @@
  */
 
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Caching;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using LBi.LostDoc.Diagnostics;
-using LBi.LostDoc.Templating.AssetResolvers;
 using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
     public class Template
     {
-        private readonly FileResolver _fileResolver;
-        private readonly List<IAssetUriResolver> _resolvers;
-        private readonly IUniqueUriFactory _uriFactory;
-        private readonly ComposablePartCatalog _catalog;
-        private readonly DependencyProvider _dependencyProvider;
-        private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly ObjectCache _cache;
-
-        public Template()
+        public Template(FileReference templateSource,
+                        IFileProvider templateFileProvider,
+                        IEnumerable<TemplateParameterInfo> parameters,
+                        IEnumerable<ResourceDirective> resourceDirectives,
+                        IEnumerable<StylesheetDirective> stylesheetsDirectives,
+                        IEnumerable<IndexDirective> indexDirectives)
         {
-            this._fileResolver = new FileResolver();
-            this._resolvers = new List<IAssetUriResolver>();
-            this._resolvers.Add(this._fileResolver);
-            this._resolvers.Add(new MsdnResolver());
-            this._uriFactory = new DefaultUniqueUriFactory();
-            this._cancellationTokenSource = new CancellationTokenSource();
-            this._dependencyProvider = new DependencyProvider(this._cancellationTokenSource.Token);
-            this._cache = new MemoryCache("TemplateCache");
+            this.Source = templateSource;
+            this.TemplateFileProvider = templateFileProvider;
+            this.Parameters = parameters.ToArray();
+            this.ResourceDirectives = resourceDirectives.ToArray();
+            this.StylesheetsDirectives = stylesheetsDirectives.ToArray();
+            this.IndexDirectives = indexDirectives.ToArray();
         }
+
+        public FileReference Source { get; private set; }
 
         public IFileProvider TemplateFileProvider { get; set; }
 
@@ -74,7 +67,7 @@ namespace LBi.LostDoc.Templating
         /// <summary>
         /// Set of parameters
         /// </summary>
-        public XPathVariable[] Parameters { get; set; }
+        public TemplateParameterInfo[] Parameters { get; set; }
 
         public event EventHandler<ProgressArgs> Progress;
 
@@ -89,25 +82,15 @@ namespace LBi.LostDoc.Templating
         {
             var ret = Enumerable.Empty<UnitOfWork>();
 
-            context.XsltContext.PushVariableScope(context.Document.Root, this.Parameters);
-
             this.OnProgress("Processing resource directives", 0);
             for (int i = 0; i < this.ResourceDirectives.Length; i++)
-            {
                 ret = ret.Concat(this.ResourceDirectives[i].DiscoverWork(context));
-                this.OnProgress("Processing resource directives", (int)Math.Round(100.0 * ((1.0 + i) / this.ResourceDirectives.Length)));
-            }
             this.OnProgress("Processing resource directives", 100);
 
             this.OnProgress("Processing stylesheet directives", 0);
             for (int i = 0; i < this.StylesheetsDirectives.Length; i++)
-            {
                 ret = ret.Concat(this.StylesheetsDirectives[i].DiscoverWork(context));
-                this.OnProgress("Processing stylesheet directives", (int)Math.Round(100.0 * ((1.0 + i) / this.StylesheetsDirectives.Length)));
-            }
             this.OnProgress("Processing stylesheet directives", 100);
-
-            context.XsltContext.PopVariableScope();
 
             return ret;
         }
@@ -115,25 +98,30 @@ namespace LBi.LostDoc.Templating
         /// <summary>
         /// Applies the loaded templates to <paramref name="settings"/>.
         /// </summary>
+        /// <param name="inputDocument"></param>
         /// <param name="settings">
-        /// Instance of <see cref="TemplateSettings"/> containing the various input data needed. 
+        ///     Instance of <see cref="TemplateSettings"/> containing the various input data needed. 
         /// </param>
-        public virtual TemplateOutput Generate(TemplateSettings settings, XDocument inputDocument)
+        public virtual TemplateOutput Generate(XDocument inputDocument, TemplateSettings settings)
         {
             Stopwatch timer = Stopwatch.StartNew();
 
-            this._uriFactory.Clear();
-            this._fileResolver.Clear();
+            DependencyProvider dependencyProvider = new DependencyProvider(settings.CancellationToken);
+            List<IAssetUriResolver> assetUriResolvers = new List<IAssetUriResolver>();
+            assetUriResolvers.Add(settings.FileResolver);
+            if (settings.UriResolvers != null)
+                assetUriResolvers.AddRange(settings.UriResolvers);
 
             // collect all work that has to be done
             CustomXsltContext xsltContext = CustomXsltContext.Create(settings.IgnoredVersionComponent);
-            xsltContext.PushVariableScope(inputDocument.Root, this.Parameters);
-            ITemplateContext templateContext = new TemplateContext(this._cache,
+            xsltContext.PushVariableScope(inputDocument.Root, this.GetGlobalParameters(this.Parameters, settings.Arguments));
+
+            ITemplateContext templateContext = new TemplateContext(settings.Cache,
                                                                    inputDocument,
                                                                    xsltContext,
-                                                                   this._uriFactory,
-                                                                   this._fileResolver,
-                                                                   this._catalog);
+                                                                   settings.UriFactory,
+                                                                   settings.FileResolver,
+                                                                   settings.Catalog);
 
             UnitOfWork[] work = this.DiscoverWork(templateContext).ToArray();
 
@@ -144,12 +132,12 @@ namespace LBi.LostDoc.Templating
             ConcurrentBag<WorkUnitResult> results = new ConcurrentBag<WorkUnitResult>();
 
             // create context
-            ITemplatingContext context = new TemplatingContext(this._cache,
-                                                               this._catalog,
+            ITemplatingContext context = new TemplatingContext(settings.Cache,
+                                                               settings.Catalog,
                                                                settings.OutputFileProvider,
                                                                settings,
                                                                inputDocument,
-                                                               this._resolvers,
+                                                               assetUriResolvers,
                                                                this.TemplateFileProvider);
 
 
@@ -177,7 +165,7 @@ namespace LBi.LostDoc.Templating
             {
                 Task<WorkUnitResult> task = new Task<WorkUnitResult>(uow => ((UnitOfWork)uow).Execute(context), unitOfWork);
                 tasks.Add(task);
-                this._dependencyProvider.Add(new Uri(unitOfWork.Path, UriKind.RelativeOrAbsolute), task);
+                dependencyProvider.Add(new Uri(unitOfWork.Path, UriKind.RelativeOrAbsolute), task);
             }
 
             int totalCount = work.Length;
@@ -185,9 +173,10 @@ namespace LBi.LostDoc.Templating
             int processed = 0;
             // process all units of work
             ParallelOptions parallelOptions = new ParallelOptions
-            {
-                //MaxDegreeOfParallelism = 1
-            };
+                                              {
+                                                  //MaxDegreeOfParallelism = 1
+                                                  CancellationToken = settings.CancellationToken
+                                              };
 
 
             IEnumerable<UnitOfWork> unitsOfWork = work;
@@ -195,15 +184,15 @@ namespace LBi.LostDoc.Templating
             {
                 unitsOfWork = unitsOfWork
                     .Where(uow =>
-                    {
-                        if (settings.Filter(uow))
-                            return true;
+                           {
+                               if (settings.Filter(uow))
+                                   return true;
 
-                        TraceSources.TemplateSource.TraceInformation("Filtered unit of work: [{0}] {1}",
-                                                                     uow.GetType().Name,
-                                                                     uow.ToString());
-                        return false;
-                    });
+                               TraceSources.TemplateSource.TraceVerbose("Filtered unit of work: [{0}] {1}",
+                                                                        uow.GetType().Name,
+                                                                        uow.ToString());
+                               return false;
+                           });
             }
 
 
@@ -220,11 +209,12 @@ namespace LBi.LostDoc.Templating
                                                                      Stopwatch.GetTimestamp(),
                                                                      lp) == lp)
                                      {
-                                         TraceSources.TemplateSource.TraceInformation(
-                                             "Progress: {0:P1} ({1:N0}/{2:N0})",
-                                             c / (double)totalCount,
-                                             c,
-                                             totalCount);
+                                         double percent = c / (double)totalCount;
+                                         this.OnProgress("Generating", (int)Math.Round(percent));
+                                         TraceSources.TemplateSource.TraceInformation("Progress: {0:P1} ({1:N0}/{2:N0})",
+                                                                                      percent,
+                                                                                      c,
+                                                                                      totalCount);
                                      }
                                  }
                              });
@@ -232,6 +222,7 @@ namespace LBi.LostDoc.Templating
             // stop timing
             timer.Stop();
 
+            this.OnProgress("Generating", 100);
 
             Stopwatch statsTimer = new Stopwatch();
             // prepare stats
@@ -384,6 +375,20 @@ namespace LBi.LostDoc.Templating
                                                          statsTimer.Elapsed.TotalSeconds);
 
             return new TemplateOutput(results.ToArray());
+        }
+
+        protected virtual List<XPathVariable> GetGlobalParameters(IEnumerable<TemplateParameterInfo> parameters, Dictionary<string, object> arguments)
+        {
+            List<XPathVariable> globalParams = new List<XPathVariable>();
+            foreach (var parameterInfo in parameters)
+            {
+                object argValue;
+                if (arguments.TryGetValue(parameterInfo.Name, out argValue))
+                    globalParams.Add(new ConstantXPathVariable(parameterInfo.Name, argValue));
+                else
+                    globalParams.Add(new ExpressionXPathVariable(parameterInfo.Name, parameterInfo.DefaultExpression));
+            }
+            return globalParams;
         }
     }
 }

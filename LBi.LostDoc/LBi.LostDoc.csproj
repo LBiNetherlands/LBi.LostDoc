@@ -102,6 +102,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Templating\AssetRegistration.cs" />
+    <Compile Include="Templating\AssetResolvers\IFileResolver.cs" />
     <Compile Include="Templating\AssetSection.cs" />
     <Compile Include="Templating\ConstantXPathVariable.cs" />
     <Compile Include="Templating\DefaultUniqueUriFactory.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Templating\IDependencyProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
+    <Compile Include="Templating\ITemplateContext.cs" />
     <Compile Include="Templating\ITemplateDirective.cs" />
     <Compile Include="Templating\IUniqueUriFactory.cs" />
     <Compile Include="Templating\MissingNodeException.cs" />
@@ -134,6 +136,7 @@
     <Compile Include="Templating\StackedFileProvider.cs" />
     <Compile Include="Templating\StylesheetDirective.cs" />
     <Compile Include="Templating\StylesheetApplication.cs" />
+    <Compile Include="Templating\TemplateContext.cs" />
     <Compile Include="Templating\TemplateSettings.cs" />
     <Compile Include="Templating\TemplateException.cs" />
     <Compile Include="Templating\TemplateInfo.cs" />

@@ -35,26 +35,14 @@ namespace LBi.LostDoc.Templating
     {
         public const string TemplateDefinitionFileName = "template.xml";
 
-        private string _basePath;
-        private string _templateSourcePath;
-        private TemplateInfo _templateInfo;
-
         public TemplateParser()
         {
         }
 
-        public virtual void Load(TemplateInfo templateInfo)
-        {
-            this._templateInfo = templateInfo;
-            this._templateSourcePath = null;
-
-            this._basePath = Path.GetDirectoryName(templateInfo.Path);
-        }
-
-
         #region Preprocessing
 
-        protected virtual XDocument ApplyMetaTransforms(XDocument workingDoc,
+        protected virtual XDocument ApplyMetaTransforms(TemplateInfo templateInfo,
+                                                        XDocument workingDoc,
                                                         IFileProvider templateProvider,
                                                         IFileProvider tempFileProvider)
         {
@@ -86,19 +74,19 @@ namespace LBi.LostDoc.Templating
                     string pName = paramNode.GetAttributeValue("name");
                     string pExpr = paramNode.GetAttributeValue("select");
 
-                    try
-                    {
-                        xsltArgList.AddParam(pName,
-                                             string.Empty,
-                                             workingDoc.XPathEvaluate(pExpr, xsltContext));
-                    }
-                    catch (XPathException ex)
-                    {
-                        throw new TemplateException(this._templateSourcePath,
-                                                    paramNode.Attribute("select"),
-                                                    string.Format("Unable to process XPath expression: '{0}'", pExpr),
-                                                    ex);
-                    }
+                    //try
+                    //{
+                    xsltArgList.AddParam(pName,
+                                         string.Empty,
+                                         workingDoc.XPathEvaluate(pExpr, xsltContext));
+                    //}
+                    //catch (XPathException ex)
+                    //{
+                    //    throw new TemplateException(this._templateSourcePath,
+                    //                                paramNode.Attribute("select"),
+                    //                                string.Format("Unable to process XPath expression: '{0}'", pExpr),
+                    //                                ex);
+                    //}
                 }
 
                 // this isn't very nice, but I can't figure out another way to get LineInfo included in the transformed document
@@ -119,8 +107,7 @@ namespace LBi.LostDoc.Templating
                     outputDoc = XDocument.Load(tempStream, LoadOptions.SetLineInfo);
 
                     // create and register temp file
-                    // TODO this is a bit hacky, maybe add Template.Name {get;} instead of this._basePath (which could be anything)
-                    string filename = this._basePath + ".meta." +
+                    string filename = templateInfo.Name + ".meta." +
                                       (++metaCount).ToString(CultureInfo.InvariantCulture);
                     this.SaveTempFile(tempFileProvider, outputDoc, filename);
                 }
@@ -144,7 +131,7 @@ namespace LBi.LostDoc.Templating
         {
             XDocument templateDefinition;
 
-            using (Stream str = this._templateInfo.Source.OpenFile(templateInfo.Path, FileMode.Open))
+            using (Stream str = templateInfo.Source.OpenFile(templateInfo.Path, FileMode.Open))
                 templateDefinition = XDocument.Load(str, LoadOptions.SetLineInfo);
 
             // template inheritence
@@ -167,7 +154,8 @@ namespace LBi.LostDoc.Templating
             // push template provider onto provider stack
             providerStack.Push(new ScopedFileProvider(templateInfo.Source, Path.GetDirectoryName(templateInfo.Path)));
 
-            return this.ApplyMetaTransforms(templateDefinition,
+            return this.ApplyMetaTransforms(templateInfo,
+                                            templateDefinition,
                                             new StackedFileProvider(providerStack),
                                             tempFileProvider);
         }
@@ -176,17 +164,17 @@ namespace LBi.LostDoc.Templating
 
         #region Parsing
 
-        public virtual Template ParseTemplate(IFileProvider tempFileProvider = null)
+        public virtual Template ParseTemplate(TemplateInfo templateInfo, IFileProvider tempFileProvider)
         {
             Stack<IFileProvider> providers = new Stack<IFileProvider>();
             providers.Push(new HttpFileProvider());
             providers.Push(new DirectoryFileProvider());
 
-            XDocument workingDoc = this.PreProcess(this._templateInfo, providers, tempFileProvider);
+            XDocument workingDoc = this.PreProcess(templateInfo, providers, tempFileProvider);
 
             // save real template definition as temp file
-            // TODO this doesn't make that much sense without the tempFileProvider being stashed away as well
-            this._templateSourcePath = this.SaveTempFile(tempFileProvider, workingDoc, "final");
+            string tempFilename =  this.SaveTempFile(tempFileProvider, workingDoc, "final");
+            FileReference templateSource = new FileReference(0, tempFileProvider, tempFilename);
 
             // create stacked provider
             IFileProvider provider = new StackedFileProvider(providers);
@@ -217,15 +205,7 @@ namespace LBi.LostDoc.Templating
                 }
             }
 
-            return new Template
-                   {
-                       TemplateFileProvider = provider,
-                       // TODO figure out what to do with Parameters here
-                       Parameters = this.GetGlobalParameters(this._templateInfo, arguments).ToArray(),
-                       ResourceDirectives = resources.ToArray(),
-                       StylesheetsDirectives = stylesheets.ToArray(),
-                       IndexDirectives = indices.ToArray(),
-                   };
+            return new Template(templateSource, provider, templateInfo.Parameters, resources, stylesheets, indices);
         }
 
         protected virtual IEnumerable<AssetRegistration> ParseAssetRegistration(IEnumerable<XElement> elements)
@@ -357,20 +337,6 @@ namespace LBi.LostDoc.Templating
 
         #endregion
 
-        protected virtual List<XPathVariable> GetGlobalParameters(TemplateInfo templateInfo, Dictionary<string, object> arguments)
-        {
-            List<XPathVariable> globalParams = new List<XPathVariable>();
-            foreach (var parameterInfo in templateInfo.Parameters)
-            {
-                object argValue;
-                if (arguments.TryGetValue(parameterInfo.Name, out argValue))
-                    globalParams.Add(new ConstantXPathVariable(parameterInfo.Name, argValue));
-                else
-                    globalParams.Add(new ExpressionXPathVariable(parameterInfo.Name, parameterInfo.DefaultExpression));
-            }
-            return globalParams;
-        }
-
         private string SaveTempFile(IFileProvider tempFiles, XDocument workingDoc, string suffix = null)
         {
             string tempFileName = TemplateDefinitionFileName + (suffix != null ? "." + suffix : "");
@@ -380,9 +346,5 @@ namespace LBi.LostDoc.Templating
 
             return tempFileName;
         }
-
-
-
-
     }
 }

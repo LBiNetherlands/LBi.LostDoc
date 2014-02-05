@@ -14,69 +14,10 @@
  * limitations under the License. 
  */
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition.Primitives;
-using System.Runtime.Caching;
-using System.Xml.Linq;
-using System.Xml.Xsl;
-using LBi.LostDoc.Templating.AssetResolvers;
-using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
-    public class TemplateContext : ITemplateContext
-    {
-        private readonly IUniqueUriFactory _uniqueUriFactory;
-        private readonly FileResolver _fileResolver;
-
-        public TemplateContext(ObjectCache cache,
-                               XDocument document,
-                               CustomXsltContext xsltContext,
-                               IUniqueUriFactory uniqueUriFactory,
-                               FileResolver fileResolver,
-                               ComposablePartCatalog catalog)
-        {
-            this.Cache = cache;
-            this.XsltContext = xsltContext;
-            this.Document = document;
-            this._uniqueUriFactory = uniqueUriFactory;
-            this._fileResolver = fileResolver;
-            this.Catalog = catalog;
-        }
-
-        public ObjectCache Cache { get; private set; }
-
-        public ComposablePartCatalog Catalog { get; private set; }
-
-        public XDocument Document { get; private set; }
-
-        public CustomXsltContext XsltContext { get; private set; }
-        
-        public void EnsureUniqueUri(ref Uri uri)
-        {
-            this._uniqueUriFactory.EnsureUnique(ref uri);
-        }
-
-        public void RegisterAssetUri(AssetIdentifier assetId, Uri uri)
-        {
-            this._fileResolver.Add(assetId.AssetId, assetId.Version, uri);
-        }
-
-        
-    }
-
-    public interface ITemplateContext : IContextBase
-    {
-        CustomXsltContext XsltContext { get; }
-
-        XDocument Document { get; }
-
-        void EnsureUniqueUri(ref Uri uri);
-
-        void RegisterAssetUri(AssetIdentifier assetId, Uri uri);
-    }
-
     public interface ITemplateDirective<out TUnitOfWork> where TUnitOfWork : UnitOfWork
     {
         IEnumerable<TUnitOfWork> DiscoverWork(ITemplateContext context);

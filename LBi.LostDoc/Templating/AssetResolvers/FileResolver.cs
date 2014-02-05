@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ using System.Linq;
 
 namespace LBi.LostDoc.Templating.AssetResolvers
 {
-    public class FileResolver : IAssetUriResolver, IEnumerable<KeyValuePair<AssetIdentifier, Uri>>, IEqualityComparer<Uri>
+    public class FileResolver : IFileResolver
     {
         private readonly Dictionary<string, Dictionary<Version, Uri>> _lookupCache;
         private readonly StringComparer _comparer;

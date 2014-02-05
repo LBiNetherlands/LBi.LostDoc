@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2013 DigitasLBi Netherlands B.V.
+ * Copyright 2013-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using LBi.LostDoc.Templating.FileProviders;
 
 namespace LBi.LostDoc.Templating
 {
@@ -41,11 +41,10 @@ namespace LBi.LostDoc.Templating
         public TemplateParameterInfo[] Parameters { get; protected set; }
         public TemplateInfo Inherits { get; protected set; }
 
-        public Template Load()
+        public Template Load(IFileProvider tempFileProvider = null)
         {
             TemplateParser ret = new TemplateParser();
-            ret.Load(this);
-            return ret.ParseTemplate()
+            return ret.ParseTemplate(this, tempFileProvider ?? NullFileProvider.Instance);
         }
 
         public IEnumerable<string> GetFiles()

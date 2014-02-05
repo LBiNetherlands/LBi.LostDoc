@@ -109,11 +109,8 @@ namespace LBi.LostDoc.ConsoleApplication
                 
                 TemplateInfo templateInfo = templateResolver.Resolve(this.Template);
 
-                // parse and pre-process template
-                TemplateParser templateParser = new TemplateParser();
-                templateParser.Load(templateInfo);
-
-                Template template = templateParser.ParseTemplate(this.Arguments, tempFileProvider);
+                // load template
+                Template template = templateInfo.Load();
                 
                 AssetRedirectCollection assetRedirects;
                 XDocument mergedDoc = bundle.Merge(out assetRedirects);
@@ -129,7 +126,7 @@ namespace LBi.LostDoc.ConsoleApplication
                                         };
 
                 // execute template
-                template.Generate(settings, mergedDoc);
+                template.Generate(mergedDoc, settings);
             }
 
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 DigitasLBi Netherlands B.V.
+ * Copyright 2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,20 @@
  * limitations under the License. 
  */
 
-using System.ComponentModel.Composition.Hosting;
+using System;
+using System.Xml.Linq;
+using LBi.LostDoc.Templating.XPath;
 
-namespace LBi.LostDoc.ConsoleApplication.Extensibility
+namespace LBi.LostDoc.Templating
 {
-    public interface ICommand
+    public interface ITemplateContext : IContextBase
     {
-        // TODO add CancellationToken here
-        void Invoke(CompositionContainer container);
+        CustomXsltContext XsltContext { get; }
+
+        XDocument Document { get; }
+
+        void EnsureUniqueUri(ref Uri uri);
+
+        void RegisterAssetUri(AssetIdentifier assetId, Uri uri);
     }
 }

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2013 DigitasLBi Netherlands B.V.
+ * Copyright 2013-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,24 @@ using System.Xml;
 
 namespace LBi.LostDoc.Templating
 {
-    // TODO we need to add the IFileProvider where the template.xml can be located here!
     public class TemplateException : Exception
     {
-        public static TemplateException MissingAttribute(string filename, IXmlLineInfo lineInfo, string attributeName)
+        public static TemplateException MissingAttribute(FileReference templateSource, IXmlLineInfo lineInfo, string attributeName)
         {
-            return new TemplateException(filename, lineInfo, string.Format("Missing required attribute '{0}'", attributeName));
+            return new TemplateException(templateSource, lineInfo, string.Format("Missing required attribute '{0}'", attributeName));
         }
 
 
-        public TemplateException(string filename, IXmlLineInfo lineInfo, string message)
-            : this(filename, lineInfo, message, null)
+        public TemplateException(FileReference templateSource, IXmlLineInfo lineInfo, string message)
+            : this(templateSource, lineInfo, message, null)
         {
         }
 
-        public TemplateException(string filename, IXmlLineInfo lineInfo, string message, Exception innerException)
+        public TemplateException(FileReference templateSource, IXmlLineInfo lineInfo, string message, Exception innerException)
             : base(WrapMessage(lineInfo, message, innerException), innerException)
         {
             this.LineInfo = lineInfo;
-            this.Path = filename;
+            this.Template = templateSource;
         }
 
         private static string WrapMessage(IXmlLineInfo lineInfo, string message, Exception innerException)
@@ -50,6 +49,6 @@ namespace LBi.LostDoc.Templating
         }
 
         public IXmlLineInfo LineInfo { get; protected set; }
-        public string Path { get; protected set; }
+        public FileReference Template { get; protected set; }
     }
 }

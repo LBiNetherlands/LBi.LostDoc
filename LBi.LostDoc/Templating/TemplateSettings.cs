@@ -16,7 +16,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.IO;
+using System.Runtime.Caching;
+using System.Threading;
+using LBi.LostDoc.Templating.AssetResolvers;
 
 namespace LBi.LostDoc.Templating
 {
@@ -29,6 +34,13 @@ namespace LBi.LostDoc.Templating
             this.Filter = null;
             this.KeepTemporaryFiles = true;
             this.TemporaryFilesPath = Directory.GetCurrentDirectory();
+            this.UriFactory = new DefaultUniqueUriFactory();
+            this.Cache = new MemoryCache("LostDoc");
+            this.FileResolver = new FileResolver(caseSensitiveFs: false);
+            this.Catalog = new ApplicationCatalog();
+            this.UriResolvers = new List<IAssetUriResolver>();
+            this.UriResolvers.Add(new MsdnResolver());
+            this.CancellationToken = CancellationToken.None;
         }
 
         public AssetRedirectCollection AssetRedirects { get; set; }
@@ -39,5 +51,11 @@ namespace LBi.LostDoc.Templating
         public bool OverwriteExistingFiles { get; set; }
         public bool KeepTemporaryFiles { get; set; }
         public string TemporaryFilesPath { get; set; }
+        public IUniqueUriFactory UriFactory { get; set; }
+        public ObjectCache Cache { get; set; }
+        public IFileResolver FileResolver { get; set; }
+        public ComposablePartCatalog Catalog { get; set; }
+        public List<IAssetUriResolver> UriResolvers { get; set; }
+        public CancellationToken CancellationToken { get; set; }
     }
 }
