@@ -39,7 +39,7 @@
   <xsl:template match="meta-template[@stylesheet='GlobalParameter.xslt' and position() = 1]">
     <xsl:apply-templates select="/template/apply-stylesheet" mode="inject">
       <xsl:with-param name="name" select="$name"/>
-      <xsl:with-param name="value" select="with-param[@name='value']/@select"/>
+      <xsl:with-param name="value" select="with-param[@name='value']/@value"/>
     </xsl:apply-templates>
   </xsl:template>
 
