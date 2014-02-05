@@ -29,13 +29,15 @@ namespace LBi.LostDoc.Templating
 {
     public class ResourceDirective : ITemplateDirective<ResourceDeployment>
     {
-        public ResourceDirective(string conditional,
+        public ResourceDirective(int order,
+                                 string conditional,
                                  XPathVariable[] variables,
                                  IFileProvider fileProvider,
                                  string source,
                                  string output,
                                  ResourceTransform[] transformers)
         {
+            this.Order = order;
             this.ConditionExpression = conditional;
             this.FileProvider = fileProvider;
             this.Source = source;
@@ -44,6 +46,7 @@ namespace LBi.LostDoc.Templating
             this.Transforms = transformers;
         }
 
+        public int Order { get; private set; }
         public IFileProvider FileProvider { get; private set; }
         public string ConditionExpression { get; private set; }
         public string Source { get; private set; }
@@ -108,7 +111,8 @@ namespace LBi.LostDoc.Templating
 
                 yield return new ResourceDeployment(this.FileProvider,
                                                     expandedSource,
-                                                    expandedOutput, // TODO this needs a 'writable' file provider
+                                                    expandedOutput,
+                                                    this.Order,
                                                     transforms.ToArray());
             }
             context.XsltContext.PopVariableScope();

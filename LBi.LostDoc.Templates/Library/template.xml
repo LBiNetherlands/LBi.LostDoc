@@ -55,16 +55,10 @@
 
   <apply-stylesheet name="Navigation"
                     select="/"
-                    output="'Navigation.xml'"
+                    output="'temp://navigation.xml'"
                     stylesheet="Navigation.xslt"/>
 
-  <!-- <apply-stylesheet name="Navigation"
-                    input="'Navigation.xml'"
-                    select="/"
-                    output="'Navigation2.xml'"
-                    stylesheet="Navigation.xslt"/>-->
-
-  <!--<apply-stylesheet name="Library"
+  <apply-stylesheet name="Library"
                     select="/bundle"
                     output="'Library.html'"
                     stylesheet="Library.xslt">
@@ -74,7 +68,7 @@
 
     <with-param name="assetId" select="@assetId" />
   </apply-stylesheet>
-
+<!--
   <apply-stylesheet name="Assembly summary"
                     select="/bundle/assembly[@phase = '0']"
                     output="concat(@filename, '/', get-significant-version(@assetId), '.html')"

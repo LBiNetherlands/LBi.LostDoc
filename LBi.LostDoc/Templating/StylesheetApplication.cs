@@ -29,7 +29,8 @@ namespace LBi.LostDoc.Templating
 {
     public class StylesheetApplication : UnitOfWork
     {
-        public StylesheetApplication(Uri outputPath,
+        public StylesheetApplication(int order,
+                                     Uri outputPath,
                                      XNode inputNode,
                                      IEnumerable<KeyValuePair<string, object>> xsltParams,
                                      IEnumerable<AssetIdentifier> assetIdentifiers,
@@ -38,7 +39,7 @@ namespace LBi.LostDoc.Templating
                                      Uri input,
                                      XslCompiledTransform transform,
                                      XmlResolver xmlResolver)
-            : base(outputPath)
+            : base(outputPath, order)
         {
             this.InputNode = inputNode;
             this.XsltParams = xsltParams.ToArray();
@@ -96,7 +97,7 @@ namespace LBi.LostDoc.Templating
                         TraceSources.TemplateSource.TraceVerbose("{0}", this.Path);
 
                     long tickStart = localTimer.ElapsedTicks;
-                    
+
                     this.Transform.Transform(context.Document,
                                              argList,
                                              writer,

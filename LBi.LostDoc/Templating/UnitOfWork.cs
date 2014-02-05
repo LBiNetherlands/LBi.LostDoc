@@ -20,12 +20,15 @@ namespace LBi.LostDoc.Templating
 {
     public abstract class UnitOfWork
     {
-        protected UnitOfWork(Uri path)
+        protected UnitOfWork(Uri path, int order)
         {
             this.Path = path;
+            this.Order = order;
         }
 
+        public int Order { get; protected set; }
         public Uri Path { get; protected set; }
+
         public abstract WorkUnitResult Execute(ITemplatingContext context);
     }
 }

@@ -24,8 +24,8 @@ namespace LBi.LostDoc.Templating
 {
     public class ResourceDeployment : UnitOfWork
     {
-        public ResourceDeployment(IFileProvider fileProvider, Uri path, Uri destination, IResourceTransform[] transforms)
-            : base(destination)
+        public ResourceDeployment(IFileProvider fileProvider, Uri path, Uri destination, int order, IResourceTransform[] transforms)
+            : base(destination, order)
         {
             this.FileProvider = fileProvider;
             this.ResourcePath = path;

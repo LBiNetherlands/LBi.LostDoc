@@ -183,6 +183,8 @@ namespace LBi.LostDoc.Templating
             List<StylesheetDirective> stylesheets = new List<StylesheetDirective>();
             List<ResourceDirective> resources = new List<ResourceDirective>();
             List<IndexDirective> indices = new List<IndexDirective>();
+
+            int order = 0;
             foreach (XElement elem in workingDoc.Root.Elements())
             {
                 // we alread processed the parameters
@@ -192,17 +194,18 @@ namespace LBi.LostDoc.Templating
                 switch (elem.Name.LocalName)
                 {
                     case "apply-stylesheet":
-                        stylesheets.Add(this.ParseStylesheet(provider, elem));
+                        stylesheets.Add(this.ParseStylesheet(provider, elem, order));
                         break;
                     case "index":
                         indices.Add(this.ParseIndexDefinition(elem));
                         break;
                     case "include-resource":
-                        resources.Add(this.ParseResouceDefinition(provider, elem));
+                        resources.Add(this.ParseResouceDefinition(provider, elem, order));
                         break;
                     default:
                         throw new Exception("Unknown element: " + elem.Name.LocalName);
                 }
+                order++;
             }
 
             return new Template(templateSource, provider, templateInfo.Parameters, resources, stylesheets, indices);
@@ -268,7 +271,7 @@ namespace LBi.LostDoc.Templating
                                       elem.GetAttributeValue("key"));
         }
 
-        protected virtual StylesheetDirective ParseStylesheet(IFileProvider provider, XElement elem)
+        protected virtual StylesheetDirective ParseStylesheet(IFileProvider provider, XElement elem, int order)
         {
 
             var nameAttr = elem.Attribute("name");
@@ -285,24 +288,25 @@ namespace LBi.LostDoc.Templating
                 TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0}", name);
             }
 
-            var ret = new StylesheetDirective
-            {
-                Stylesheet = new FileReference(0, provider, src),
-                SelectExpression = elem.GetAttributeValueOrDefault("select", "/"),
-                InputExpression = elem.GetAttributeValueOrDefault("input"),
-                OutputExpression = elem.GetAttributeValueOrDefault("output"),
-                XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
-                Variables = this.ParseVariables(elem).ToArray(),
-                Name = name,
-                Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
-                AssetRegistrations = this.ParseAssetRegistration(elem.Elements("register-asset")).ToArray(),
-                ConditionExpression = elem.GetAttributeValueOrDefault("condition"),
-            };
+            // TODO move this to ctor
+            var ret = new StylesheetDirective(order)
+                      {
+                          Stylesheet = new FileReference(0, provider, src),
+                          SelectExpression = elem.GetAttributeValueOrDefault("select", "/"),
+                          InputExpression = elem.GetAttributeValueOrDefault("input"),
+                          OutputExpression = elem.GetAttributeValueOrDefault("output"),
+                          XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
+                          Variables = this.ParseVariables(elem).ToArray(),
+                          Name = name,
+                          Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
+                          AssetRegistrations = this.ParseAssetRegistration(elem.Elements("register-asset")).ToArray(),
+                          ConditionExpression = elem.GetAttributeValueOrDefault("condition"),
+                      };
 
             return ret;
         }
 
-        protected virtual ResourceDirective ParseResouceDefinition(IFileProvider provider, XElement elem)
+        protected virtual ResourceDirective ParseResouceDefinition(IFileProvider provider, XElement elem, int order)
         {
             string source = elem.GetAttributeValue("path");
 
@@ -326,12 +330,13 @@ namespace LBi.LostDoc.Templating
                 transforms.Add(new ResourceTransform(transformName, transformParams));
             }
 
-            var resource = new ResourceDirective(elem.GetAttributeValueOrDefault("condition"),
-                                        this.ParseVariables(elem).ToArray(),
-                                        provider,
-                                        source,
-                                        output,
-                                        transforms.ToArray());
+            var resource = new ResourceDirective(order,
+                                                 elem.GetAttributeValueOrDefault("condition"),
+                                                 this.ParseVariables(elem).ToArray(),
+                                                 provider,
+                                                 source,
+                                                 output,
+                                                 transforms.ToArray());
             return resource;
         }
 

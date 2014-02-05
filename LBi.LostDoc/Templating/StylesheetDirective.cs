@@ -28,8 +28,23 @@ using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
+    //public static class StorageSchemas
+    //{
+    //    public static readonly string Template = "template";
+    //    public static readonly string Temporary = "temp";
+    //    public static readonly string Output = "output";
+    //}
+
+
     public class StylesheetDirective : ITemplateDirective<StylesheetApplication>
     {
+        public StylesheetDirective(int order)
+        {
+            this.Order = order;
+        }
+
+        public int Order { get; private set; }
+
         public string ConditionExpression { get; set; }
         public string Name { get; set; }
         public string SelectExpression { get; set; }
@@ -79,7 +94,9 @@ namespace LBi.LostDoc.Templating
                 if (this.InputExpression != null)
                     inputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.InputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
 
-                Uri outputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
+                Uri outputUri = null;
+                if (this.OutputExpression != null)
+                    outputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
 
                 List<AssetIdentifier> assetIdentifiers = new List<AssetIdentifier>();
                 List<AssetSection> sections = new List<AssetSection>();
@@ -179,7 +196,8 @@ namespace LBi.LostDoc.Templating
 
                 context.XsltContext.PopVariableScope(); // 1
 
-                yield return new StylesheetApplication(outputUri,
+                yield return new StylesheetApplication(this.Order,
+                                                       outputUri,
                                                        inputNode,
                                                        xsltParams,
                                                        assetIdentifiers.ToArray(),
