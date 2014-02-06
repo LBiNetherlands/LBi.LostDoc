@@ -24,6 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Templating.IO;
 using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
@@ -164,7 +165,8 @@ namespace LBi.LostDoc.Templating
             // register all tasks in the dependency provider
             foreach (UnitOfWork unitOfWork in work)
             {
-                Task<WorkUnitResult> task = new Task<WorkUnitResult>(uow => ((UnitOfWork)uow).Execute(context), unitOfWork);
+                Func<object, WorkUnitResult> func = uow => ((UnitOfWork)uow).Execute(context);
+                Task<WorkUnitResult> task = new Task<WorkUnitResult>(func, unitOfWork);
                 tasks.Add(task);
                 dependencyProvider.Add(unitOfWork.Path, task);
             }

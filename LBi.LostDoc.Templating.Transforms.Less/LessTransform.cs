@@ -20,6 +20,7 @@ using System.IO;
 using System.Text;
 using dotless.Core.configuration;
 using LBi.LostDoc.Extensibility;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating.Transforms.Less
 {

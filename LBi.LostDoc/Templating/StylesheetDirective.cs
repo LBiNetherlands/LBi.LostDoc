@@ -28,14 +28,6 @@ using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
-    //public static class StorageSchemas
-    //{
-    //    public static readonly string Template = "template";
-    //    public static readonly string Temporary = "temp";
-    //    public static readonly string Output = "output";
-    //}
-
-
     public class StylesheetDirective : ITemplateDirective<StylesheetApplication>
     {
         public StylesheetDirective(int order)

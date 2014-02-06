@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace LBi.LostDoc.Templating
+namespace LBi.LostDoc.Templating.IO
 {
     public class StackedFileProvider : IFileProvider
     {
@@ -31,7 +31,7 @@ namespace LBi.LostDoc.Templating
         }
 
         public StackedFileProvider(IEnumerable<IFileProvider> stack)
-            : this(stack.ToArray())
+            : this(new[] { stack.ToArray() })
         {
         }
 

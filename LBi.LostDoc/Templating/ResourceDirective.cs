@@ -24,6 +24,7 @@ using System.IO;
 using System.Linq;
 using LBi.LostDoc.Composition;
 using LBi.LostDoc.Extensibility;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {

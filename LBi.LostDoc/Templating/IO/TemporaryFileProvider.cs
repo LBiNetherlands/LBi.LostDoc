@@ -17,7 +17,7 @@
 using System.IO;
 using LBi.LostDoc.Diagnostics;
 
-namespace LBi.LostDoc.Templating.FileProviders
+namespace LBi.LostDoc.Templating.IO
 {
     public class TemporaryFileProvider : ScopedFileProvider
     {

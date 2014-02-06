@@ -17,6 +17,7 @@
 
 using System.IO;
 using dotless.Core.Input;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating.Transforms.Less
 {

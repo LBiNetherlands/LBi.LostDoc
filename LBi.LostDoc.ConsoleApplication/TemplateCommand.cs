@@ -27,7 +27,7 @@ using LBi.LostDoc.ConsoleApplication.Extensibility;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Extensibility;
 using LBi.LostDoc.Templating;
-using LBi.LostDoc.Templating.FileProviders;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.ConsoleApplication
 {

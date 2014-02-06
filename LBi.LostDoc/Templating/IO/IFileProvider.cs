@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2013 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,18 @@
  * limitations under the License. 
  */
 
-using System.Xml.Linq;
-using System.Xml.XPath;
-using LBi.LostDoc.Templating.IO;
-using LBi.LostDoc.Templating.XPath;
+using System.Collections.Generic;
+using System.IO;
 
-namespace LBi.LostDoc.Templating
+namespace LBi.LostDoc.Templating.IO
 {
-    public interface ITemplatingContext : IContextBase
-    {        
-        TemplateSettings Settings { get; }
-        XPathNavigatorIndex DocumentIndex { get; }
-        XPathNavigator Document { get; }
-        IAssetUriResolver[] AssetUriResolvers { get; }
-        IFileProvider TemplateFileProvider { get; }
-        IFileProvider OutputFileProvider { get; }
+    public interface IFileProvider
+    {
+        bool FileExists(string path);
+        Stream OpenFile(string path, FileMode mode);
+        bool SupportsDiscovery { get; }
+        IEnumerable<string> GetDirectories(string path);
+        IEnumerable<string> GetFiles(string path);
     }
+
 }

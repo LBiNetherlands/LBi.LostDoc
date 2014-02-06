@@ -24,6 +24,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Xsl;
 using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {

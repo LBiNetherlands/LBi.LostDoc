@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License. 
  */
 
-using System.Collections.Generic;
-using System.IO;
-
 namespace LBi.LostDoc.Templating
 {
-    public interface IFileProvider
+    public static class StorageSchemas
     {
-        bool FileExists(string path);
-        Stream OpenFile(string path, FileMode mode);
-        bool SupportsDiscovery { get; }
-        IEnumerable<string> GetDirectories(string path);
-        IEnumerable<string> GetFiles(string path);
+        public static readonly string Template = "template";
+        public static readonly string Temporary = "temp";
+        public static readonly string Output = "output";
     }
-
 }

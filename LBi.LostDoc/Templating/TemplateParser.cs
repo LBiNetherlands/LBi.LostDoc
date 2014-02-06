@@ -25,7 +25,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 using LBi.LostDoc.Diagnostics;
-using LBi.LostDoc.Templating.FileProviders;
+using LBi.LostDoc.Templating.IO;
 using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating

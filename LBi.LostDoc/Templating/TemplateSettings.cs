@@ -22,6 +22,7 @@ using System.IO;
 using System.Runtime.Caching;
 using System.Threading;
 using LBi.LostDoc.Templating.AssetResolvers;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {

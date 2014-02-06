@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace LBi.LostDoc.Templating.FileProviders
+namespace LBi.LostDoc.Templating.IO
 {
     public class NullFileProvider : IFileProvider
     {

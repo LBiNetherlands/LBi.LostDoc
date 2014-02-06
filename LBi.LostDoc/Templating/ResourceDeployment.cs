@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using LBi.LostDoc.Diagnostics;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {

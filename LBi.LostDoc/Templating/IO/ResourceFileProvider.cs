@@ -20,7 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace LBi.LostDoc.Templating.FileProviders
+namespace LBi.LostDoc.Templating.IO
 {
     public class ResourceFileProvider : IFileProvider
     {

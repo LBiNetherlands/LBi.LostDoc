@@ -18,11 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 
-namespace LBi.LostDoc.Templating.FileProviders
+namespace LBi.LostDoc.Templating.IO
 {
     public class HttpFileProvider : IFileProvider
     {
