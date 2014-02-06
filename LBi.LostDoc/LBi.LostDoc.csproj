@@ -119,6 +119,7 @@
     <Compile Include="Templating\IO\NullFileProvider.cs" />
     <Compile Include="Templating\IO\ResourceFileProvider.cs" />
     <Compile Include="Templating\IO\StackedFileProvider.cs" />
+    <Compile Include="Templating\IO\StorageResolver.cs" />
     <Compile Include="Templating\IO\TemporaryFileProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />

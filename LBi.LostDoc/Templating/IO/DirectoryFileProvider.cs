@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -22,26 +21,6 @@ using LBi.LostDoc.Extensibility;
 
 namespace LBi.LostDoc.Templating.IO
 {
-    public class StorageResolver
-    {
-        private readonly Dictionary<string, IFileProvider> _providers;
-
-        public StorageResolver()
-        {
-            this._providers = new Dictionary<string, IFileProvider>(StringComparer.Ordinal);
-        }
-
-        public void Add(string uriScheme, IFileProvider fileProvider)
-        {
-            this._providers.Add(uriScheme, fileProvider);
-        }
-
-        public FileReference Resolve(Uri uri)
-        {
-            return new FileReference(0, this._providers[uri.Scheme], uri.Authority + uri.PathAndQuery);
-        }
-    }
-
     [Export(ContractNames.TemplateProvider, typeof(IFileProvider))]
     public class DirectoryFileProvider : IFileProvider
     {

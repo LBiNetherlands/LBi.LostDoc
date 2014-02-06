@@ -107,6 +107,16 @@ namespace LBi.LostDoc.Templating
         {
             Stopwatch timer = Stopwatch.StartNew();
 
+            // TODO file, http, https, ftp, etc shouldn't be hardcoded but configured
+            StorageResolver storageResolver = new StorageResolver();
+            storageResolver.Add(StorageSchemas.Temporary, new TemporaryFileProvider(), stripScheme: true);
+            storageResolver.Add(StorageSchemas.Output, settings.OutputFileProvider, stripScheme: true);
+            storageResolver.Add(StorageSchemas.Template, this.TemplateFileProvider, stripScheme: true);
+            storageResolver.Add("file", new DirectoryFileProvider(), stripScheme: true);
+            storageResolver.Add("http", new HttpFileProvider(), stripScheme: false);
+            storageResolver.Add("https", new HttpFileProvider(), stripScheme: false);
+
+
             DependencyProvider dependencyProvider = new DependencyProvider(settings.CancellationToken);
             List<IAssetUriResolver> assetUriResolvers = new List<IAssetUriResolver>();
             assetUriResolvers.Add(settings.FileResolver);
