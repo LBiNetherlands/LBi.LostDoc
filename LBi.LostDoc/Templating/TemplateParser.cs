@@ -53,12 +53,16 @@ namespace LBi.LostDoc.Templating
             XElement metaNode = workingDoc.Root.Elements("meta-template").FirstOrDefault();
             while (metaNode != null)
             {
+                StorageResolver storage = new StorageResolver();
+                storage.Add(StorageSchemas.Template, templateProvider, true);
+                XmlResolver resolver = new XmlFileProviderResolver(storage, StorageSchemas.Template);
+
                 XslCompiledTransform metaTransform = new XslCompiledTransform(true);
                 using (Stream str = templateProvider.OpenFile(metaNode.GetAttributeValue("stylesheet"), FileMode.Open))
                 {
                     XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                     XsltSettings settings = new XsltSettings(true, true);
-                    XmlResolver resolver = new XmlFileProviderResolver(templateProvider);
+
                     metaTransform.Load(reader, settings, resolver);
                 }
 
@@ -98,7 +102,7 @@ namespace LBi.LostDoc.Templating
                     metaTransform.Transform(workingDoc.CreateNavigator(),
                                             xsltArgList,
                                             outputWriter,
-                                            new XmlFileProviderResolver(templateProvider));
+                                            resolver);
 
                     outputWriter.Close();
 
@@ -273,31 +277,16 @@ namespace LBi.LostDoc.Templating
 
         protected virtual StylesheetDirective ParseStylesheet(IFileProvider provider, XElement elem, int order)
         {
-
-            var nameAttr = elem.Attribute("name");
-            var src = elem.GetAttributeValue("stylesheet");
-            string name;
-            if (nameAttr != null)
-            {
-                name = nameAttr.Value;
-                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0} ({1})", name, src);
-            }
-            else
-            {
-                name = Path.GetFileNameWithoutExtension(src);
-                TraceSources.TemplateSource.TraceInformation("Loading stylesheet: {0}", name);
-            }
-
             // TODO move this to ctor
             var ret = new StylesheetDirective(order)
                       {
-                          Stylesheet = new FileReference(0, provider, src),
+                          StylesheetExpression = elem.GetAttributeValue("stylesheet"),
                           SelectExpression = elem.GetAttributeValueOrDefault("select", "/"),
                           InputExpression = elem.GetAttributeValueOrDefault("input"),
                           OutputExpression = elem.GetAttributeValueOrDefault("output"),
                           XsltParams = this.ParseParams(elem.Elements("with-param")).ToArray(),
                           Variables = this.ParseVariables(elem).ToArray(),
-                          Name = name,
+                          Name = elem.GetAttributeValueOrDefault("name"),
                           Sections = this.ParseSectionRegistration(elem.Elements("register-section")).ToArray(),
                           AssetRegistrations = this.ParseAssetRegistration(elem.Elements("register-asset")).ToArray(),
                           ConditionExpression = elem.GetAttributeValueOrDefault("condition"),
@@ -308,15 +297,8 @@ namespace LBi.LostDoc.Templating
 
         protected virtual ResourceDirective ParseResouceDefinition(IFileProvider provider, XElement elem, int order)
         {
-            string source = elem.GetAttributeValue("path");
-
-            XAttribute outputAttr = elem.Attribute("output");
-
-            string output;
-            if (outputAttr != null)
-                output = outputAttr.Value;
-            else
-                output = '\'' + Path.GetFileName(source) + '\'';
+            string inputExpression = elem.GetAttributeValue("path");
+            string outputExpression = elem.GetAttributeValueOrDefault("output", inputExpression);
 
             List<ResourceTransform> transforms = new List<ResourceTransform>();
             foreach (XElement transform in elem.Elements("transform"))
@@ -333,9 +315,8 @@ namespace LBi.LostDoc.Templating
             var resource = new ResourceDirective(order,
                                                  elem.GetAttributeValueOrDefault("condition"),
                                                  this.ParseVariables(elem).ToArray(),
-                                                 provider,
-                                                 source,
-                                                 output,
+                                                 inputExpression,
+                                                 outputExpression,
                                                  transforms.ToArray());
             return resource;
         }

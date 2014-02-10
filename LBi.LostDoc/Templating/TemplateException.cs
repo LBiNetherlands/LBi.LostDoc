@@ -16,6 +16,7 @@
 
 using System;
 using System.Xml;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {

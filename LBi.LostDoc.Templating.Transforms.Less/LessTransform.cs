@@ -48,6 +48,7 @@ namespace LBi.LostDoc.Templating.Transforms.Less
                                                                  MinifyOutput = false,
                                                                  LessSource = new LessFileReader(this.FileProvider)
                                                              });
+
                 return new MemoryStream(Encoding.UTF8.GetBytes(lessDoc)) { Position = 0 };
             }
         }

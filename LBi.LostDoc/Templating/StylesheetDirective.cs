@@ -46,30 +46,7 @@ namespace LBi.LostDoc.Templating
         public XPathVariable[] Variables { get; set; }
         public SectionRegistration[] Sections { get; set; }
         public AssetRegistration[] AssetRegistrations { get; set; }
-        public FileReference Stylesheet { get; set; }
-
-        protected virtual XslCompiledTransform LoadStylesheet(ObjectCache cache)
-        {
-            string cacheKey = "template://" + this.Stylesheet.Path;
-
-            XslCompiledTransform ret = cache.Get(cacheKey) as XslCompiledTransform;
-
-            if (ret == null)
-            {
-                ret = new XslCompiledTransform(true);
-                using (Stream str = this.Stylesheet.GetStream())
-                {
-                    XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
-                    XsltSettings settings = new XsltSettings(true, true);
-                    XmlResolver resolver = new XmlFileProviderResolver(this.Stylesheet.FileProvider);
-                    ret.Load(reader, settings, resolver);
-                }
-
-                cache.Add(cacheKey, ret, new CacheItemPolicy { Priority = CacheItemPriority.Default });
-            }
-
-            return ret;
-        }
+        public string StylesheetExpression { get; set; }
 
         public virtual IEnumerable<StylesheetApplication> DiscoverWork(ITemplateContext context)
         {
@@ -82,14 +59,24 @@ namespace LBi.LostDoc.Templating
             {
                 context.XsltContext.PushVariableScope(inputNode, this.Variables); // 1
 
+                Uri stylesheetUri = new Uri(context.Document.Root.EvaluateValue(this.StylesheetExpression, context.XsltContext), UriKind.RelativeOrAbsolute);
+
+                // set default storage scheme if none specified
+                if (!stylesheetUri.IsAbsoluteUri)
+                    stylesheetUri = stylesheetUri.AddScheme(StorageSchemas.Template);
+
                 Uri inputUri = null;
-                if (this.InputExpression != null)
+                if (this.InputExpression != null) { 
                     inputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.InputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
-
+                    if (!inputUri.IsAbsoluteUri)
+                        inputUri = inputUri.AddScheme(StorageSchemas.Template);
+                }
                 Uri outputUri = null;
-                if (this.OutputExpression != null)
+                if (this.OutputExpression != null) { 
                     outputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
-
+                    if (!outputUri.IsAbsoluteUri)
+                        outputUri = outputUri.AddScheme(StorageSchemas.Output);
+                }
                 List<AssetIdentifier> assetIdentifiers = new List<AssetIdentifier>();
                 List<AssetSection> sections = new List<AssetSection>();
 
@@ -189,15 +176,10 @@ namespace LBi.LostDoc.Templating
                 context.XsltContext.PopVariableScope(); // 1
 
                 yield return new StylesheetApplication(this.Order,
-                                                       outputUri,
-                                                       inputNode,
-                                                       xsltParams,
-                                                       assetIdentifiers.ToArray(),
                                                        this.Name,
-                                                       sections,
+                                                       stylesheetUri,
                                                        inputUri,
-                                                       this.LoadStylesheet(context.Cache),
-                                                       null);
+                                                       outputUri, inputNode, xsltParams, assetIdentifiers.ToArray(), sections, null);
             }
         }
     }

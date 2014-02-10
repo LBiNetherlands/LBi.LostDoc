@@ -15,9 +15,7 @@
  */
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,31 +25,35 @@ namespace LBi.LostDoc.Templating
 {
     public class DependencyProvider : IDependencyProvider, IFileProvider
     {
-        private readonly ConcurrentDictionary<Uri, Task<WorkUnitResult>> _tasks;
+        XXXXXX // WIP SortedList isn't what we want
+        private readonly Dictionary<Uri, SortedList<int, Task<WorkUnitResult>>> _tasks;
         private readonly CancellationToken _cancellationToken;
 
         public DependencyProvider(CancellationToken cancellationToken)
         {
-            this._tasks = new ConcurrentDictionary<Uri, Task<WorkUnitResult>>();
+            this._tasks = new Dictionary<Uri, SortedList<int, Task<WorkUnitResult>>>();
             this._cancellationToken = cancellationToken;
         }
 
 
-        public void Add(Uri uri, Task<WorkUnitResult> task)
+        public void Add(Uri uri, int order, Task<WorkUnitResult> task)
         {
-            if (!this._tasks.TryAdd(uri, task))
-                throw new DuplicateNameException("Uri already added: " + uri.ToString());
-        }
+            SortedList<int, Task<WorkUnitResult>> versionList;
+            if (!this._tasks.TryGetValue(uri, out versionList))
+                this._tasks.Add(uri, versionList = new SortedList<int, Task<WorkUnitResult>>());
+            versionList.Add(order, task);
+        } 
 
-        public Stream GetDependency(Uri uri)
+        public Stream GetDependency(Uri uri, int order)
         {
-            Task<WorkUnitResult> task;
-            if (this._tasks.TryGetValue(uri, out task))
+            SortedList<int, Task<WorkUnitResult>> versionList;
+            if (this._tasks.TryGetValue(uri, out versionList))
             {
-                if (!task.IsCompleted)
-                    task.Wait(this._cancellationToken);
 
-                return task.Result.GetStream();
+                if (!versionList.IsCompleted)
+                    versionList.Wait(this._cancellationToken);
+
+                return versionList.Result.GetStream();
             }
             
             throw new KeyNotFoundException("Uri doesn't exist: " + uri.ToString());

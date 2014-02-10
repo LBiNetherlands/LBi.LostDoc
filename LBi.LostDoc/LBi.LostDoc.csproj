@@ -111,9 +111,9 @@
     <Compile Include="Templating\ExpressionXPathVariable.cs" />
     <Compile Include="Templating\AssetResolvers\FileResolver.cs" />
     <Compile Include="Templating\AssetResolvers\MsdnResolver.cs" />
-    <Compile Include="Templating\FileReference.cs" />
     <Compile Include="Templating\IDependencyProvider.cs" />
     <Compile Include="Templating\IO\DirectoryFileProvider.cs" />
+    <Compile Include="Templating\IO\FileReference.cs" />
     <Compile Include="Templating\IO\HttpFileProvider.cs" />
     <Compile Include="Templating\IO\IFileProvider.cs" />
     <Compile Include="Templating\IO\NullFileProvider.cs" />
@@ -121,6 +121,7 @@
     <Compile Include="Templating\IO\StackedFileProvider.cs" />
     <Compile Include="Templating\IO\StorageResolver.cs" />
     <Compile Include="Templating\IO\TemporaryFileProvider.cs" />
+    <Compile Include="Templating\IO\VersionedFileProvider.cs" />
     <Compile Include="Templating\IResourceTransform.cs" />
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
     <Compile Include="Templating\ITemplateContext.cs" />

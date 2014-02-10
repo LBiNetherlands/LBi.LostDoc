@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Xml;
@@ -25,11 +24,13 @@ namespace LBi.LostDoc.Templating
 {
     public class XmlFileProviderResolver : XmlResolver
     {
-        private readonly IFileProvider _fileProvider;
+        private readonly StorageResolver _storageResolver;
+        private readonly string _defaultScheme;
 
-        public XmlFileProviderResolver(IFileProvider fileProvider)
+        public XmlFileProviderResolver(StorageResolver storageResolver, string defaultScheme)
         {
-            this._fileProvider = fileProvider;
+            this._storageResolver = storageResolver;
+            this._defaultScheme = defaultScheme;
         }
 
         /// <summary>
@@ -72,17 +73,21 @@ namespace LBi.LostDoc.Templating
         /// </exception>
         public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
         {
-            string uri = absoluteUri.ToString();
+            FileReference fileRef = this._storageResolver.Resolve(absoluteUri);
 
-            if (this._fileProvider.FileExists(uri))
-                return this._fileProvider.OpenFile(uri, FileMode.Open);
+            if (fileRef.Exists)
+                return fileRef.GetStream(FileMode.Open);
 
-            throw new FileNotFoundException("File not found: " + uri, uri);
+            throw new FileNotFoundException(string.Format("File not found: {0} ({1})", absoluteUri, fileRef.Path), fileRef.Path);
         }
 
         public override Uri ResolveUri(Uri baseUri, string relativeUri)
         {
-            return new Uri(relativeUri, UriKind.RelativeOrAbsolute);
+            var uri = new Uri(relativeUri, UriKind.RelativeOrAbsolute);
+            if (!uri.IsAbsoluteUri)
+                uri = uri.AddScheme(this._defaultScheme);
+            
+            return uri;
         }
     }
 }

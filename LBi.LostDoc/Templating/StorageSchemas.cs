@@ -14,12 +14,25 @@
  * limitations under the License. 
  */
 
+using System;
+
 namespace LBi.LostDoc.Templating
 {
     public static class StorageSchemas
     {
+        /// <summary>
+        /// template://
+        /// </summary>
         public static readonly string Template = "template";
+
+        /// <summary>
+        /// temp://
+        /// </summary>
         public static readonly string Temporary = "temp";
+
+        /// <summary>
+        /// output://
+        /// </summary>
         public static readonly string Output = "output";
     }
 }

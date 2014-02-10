@@ -30,18 +30,16 @@ namespace LBi.LostDoc.Templating
     {
         public TemplatingContext(ObjectCache cache,
                                  ComposablePartCatalog catalog,
-                                 IFileProvider outputFileProvider,
                                  TemplateSettings settings,
                                  XDocument document,
                                  IEnumerable<IAssetUriResolver> resolvers,
-                                 IFileProvider templateFileProvider)
+                                 StorageResolver storageResolver)
         {
             this.Catalog = catalog;
-            this.OutputFileProvider = outputFileProvider;
             this.Settings = settings;
             this.AssetUriResolvers = resolvers.ToArray();
-            this.TemplateFileProvider = templateFileProvider;
             this.Cache = cache;
+            this.Storage = storageResolver;
 
             XPathDocument xpathDoc;
             using (var reader = document.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
@@ -49,6 +47,7 @@ namespace LBi.LostDoc.Templating
             this.Document = xpathDoc.CreateNavigator();
             this.DocumentIndex = new XPathNavigatorIndex(this.Document.Clone());
         }
+
 
         #region ITemplatingContext Members
 
@@ -60,9 +59,7 @@ namespace LBi.LostDoc.Templating
 
         public IAssetUriResolver[] AssetUriResolvers { get; protected set; }
 
-        public IFileProvider TemplateFileProvider { get; protected set; }
-
-        public IFileProvider OutputFileProvider { get; private set; }
+        public StorageResolver Storage { get; protected set; }
 
         #endregion
 

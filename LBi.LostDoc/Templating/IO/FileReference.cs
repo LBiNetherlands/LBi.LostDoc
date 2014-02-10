@@ -15,12 +15,12 @@
  */
 
 using System.IO;
-using LBi.LostDoc.Templating.IO;
 
-namespace LBi.LostDoc.Templating
+namespace LBi.LostDoc.Templating.IO
 {
     public class FileReference
     {
+        // TODO do we really need order?
         public FileReference(int order, IFileProvider fileProvider, string path)
         {
             this.Order = order;
@@ -33,6 +33,8 @@ namespace LBi.LostDoc.Templating
         public IFileProvider FileProvider { get; protected set; }
 
         public int Order { get; protected set; }
+
+        public bool Exists { get { return this.FileProvider.FileExists(this.Path); } }
 
         public virtual Stream GetStream(FileMode fileMode = FileMode.Open)
         {

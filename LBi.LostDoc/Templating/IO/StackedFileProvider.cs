@@ -31,7 +31,7 @@ namespace LBi.LostDoc.Templating.IO
         }
 
         public StackedFileProvider(IEnumerable<IFileProvider> stack)
-            : this(new[] { stack.ToArray() })
+            : this( stack.ToArray() )
         {
         }
 

@@ -25,22 +25,16 @@ namespace LBi.LostDoc.Templating
 {
     public class ResourceDeployment : UnitOfWork
     {
-        public ResourceDeployment(IFileProvider fileProvider, Uri path, Uri destination, int order, IResourceTransform[] transforms)
-            : base(destination, order)
+        public ResourceDeployment(Uri input, Uri output, int order, IResourceTransform[] transforms)
+            : base(output, order)
         {
-            this.FileProvider = fileProvider;
-            this.ResourcePath = path;
-            this.Destination = destination;
+            this.Input = input;
             this.Transforms = transforms;
         }
 
         public IResourceTransform[] Transforms { get; protected set; }
 
-        public Uri Destination { get; protected set; }
-
-        public IFileProvider FileProvider { get; protected set; }
-
-        public Uri ResourcePath { get; protected set; }
+        public Uri Input { get; protected set; }
 
         public override WorkUnitResult Execute(ITemplatingContext context)
         {
@@ -48,20 +42,21 @@ namespace LBi.LostDoc.Templating
 
             // copy resources to output dir
             TraceSources.TemplateSource.TraceInformation("Copying resource: {0} => {1}",
-                                                         this.ResourcePath,
-                                                         this.Destination);
+                                                         this.Input,
+                                                         this.Output);
 
+            var inputFileRef = context.Storage.Resolve(this.Input);
+            var outputFileRef = context.Storage.Resolve(this.Output);
 
-
-            using (Stream streamSrc = this.FileProvider.OpenFile(this.ResourcePath.ToString(), FileMode.Open))
-            using (Stream streamDest = context.OutputFileProvider.OpenFile(this.Destination.ToString(), FileMode.Create))
+            using (Stream streamSrc = inputFileRef.GetStream(FileMode.Open))
+            using (Stream streamDest = outputFileRef.GetStream(FileMode.Create))
             {
                 Stream outStream = streamSrc;
                 for (int i = 0; i < this.Transforms.Length; i++)
                 {
                     TraceSources.TemplateSource.TraceInformation("Applying '{0}' to resource: {1}",
                                                                  this.Transforms[i].GetType().Name,
-                                                                 this.ResourcePath);
+                                                                 this.Input);
                     Stream oldStream = outStream;
                     outStream = this.Transforms[i].Transform(outStream);
                     oldStream.Dispose();
@@ -71,7 +66,7 @@ namespace LBi.LostDoc.Templating
                 outStream.Dispose();
             }
 
-            return new WorkUnitResult(context.OutputFileProvider,
+            return new WorkUnitResult(outputFileRef.FileProvider,
                                       this,
                                       (long)Math.Round(((double) localTimer.ElapsedTicks/Stopwatch.Frequency)*1, 000, 000));
         }

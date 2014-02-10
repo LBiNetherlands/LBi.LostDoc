@@ -19,6 +19,7 @@ using System.ComponentModel.Composition.Primitives;
 using System.Runtime.Caching;
 using System.Xml.Linq;
 using LBi.LostDoc.Templating.AssetResolvers;
+using LBi.LostDoc.Templating.IO;
 using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
@@ -33,13 +34,15 @@ namespace LBi.LostDoc.Templating
                                CustomXsltContext xsltContext,
                                IUniqueUriFactory uniqueUriFactory,
                                IFileResolver fileResolver,
-                               ComposablePartCatalog catalog)
+                               ComposablePartCatalog catalog,
+                               IFileProvider templateFileProvider)
         {
             this.Cache = cache;
             this.XsltContext = xsltContext;
             this.Document = document;
             this._uniqueUriFactory = uniqueUriFactory;
             this._fileResolver = fileResolver;
+            this.TemplateFileProvider = templateFileProvider;
             this.Catalog = catalog;
         }
 
@@ -49,6 +52,7 @@ namespace LBi.LostDoc.Templating
 
         public XDocument Document { get; private set; }
 
+        public IFileProvider TemplateFileProvider { get; private set; }
         public CustomXsltContext XsltContext { get; private set; }
         
         public void EnsureUniqueUri(ref Uri uri)

@@ -22,6 +22,7 @@ using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using LBi.LostDoc.Composition;
 using LBi.LostDoc.Extensibility;
 using LBi.LostDoc.Templating.IO;
@@ -33,25 +34,22 @@ namespace LBi.LostDoc.Templating
         public ResourceDirective(int order,
                                  string conditional,
                                  XPathVariable[] variables,
-                                 IFileProvider fileProvider,
-                                 string source,
-                                 string output,
+                                 string inputExpression,
+                                 string outputExpression,
                                  ResourceTransform[] transformers)
         {
             this.Order = order;
             this.ConditionExpression = conditional;
-            this.FileProvider = fileProvider;
-            this.Source = source;
-            this.Output = output;
+            this.InputExpression = inputExpression;
+            this.OutputExpression = outputExpression;
             this.Variables = variables;
             this.Transforms = transformers;
         }
 
         public int Order { get; private set; }
-        public IFileProvider FileProvider { get; private set; }
         public string ConditionExpression { get; private set; }
-        public string Source { get; private set; }
-        public string Output { get; private set; }
+        public string InputExpression { get; private set; }
+        public string OutputExpression { get; private set; }
         public XPathVariable[] Variables { get; private set; }
         public ResourceTransform[] Transforms { get; private set; }
 
@@ -61,17 +59,23 @@ namespace LBi.LostDoc.Templating
 
             if (context.Document.Root.EvaluateCondition(this.ConditionExpression, context.XsltContext))
             {
-                Uri expandedSource = new Uri(context.Document.Root.EvaluateValue(this.Source, context.XsltContext), UriKind.RelativeOrAbsolute);
-                Uri expandedOutput = new Uri(context.Document.Root.EvaluateValue(this.Output, context.XsltContext), UriKind.RelativeOrAbsolute);
+                Uri expandedInput = new Uri(context.Document.Root.EvaluateValue(this.InputExpression, context.XsltContext), UriKind.RelativeOrAbsolute);
+                Uri expandedOutput = new Uri(context.Document.Root.EvaluateValue(this.OutputExpression, context.XsltContext), UriKind.RelativeOrAbsolute);
+
+                // set default storage scheme if none specified
+                if (!expandedInput.IsAbsoluteUri)
+                    expandedInput = expandedInput.AddScheme(StorageSchemas.Template);
+
+                if (!expandedOutput.IsAbsoluteUri)
+                    expandedOutput = expandedOutput.AddScheme(StorageSchemas.Output);
 
                 List<IResourceTransform> transforms = new List<IResourceTransform>();
 
+                // TODO XXXXX THIS HAS TO BE DEFERRED TO EXEUCTION TIME
                 foreach (var resourceTransform in this.Transforms)
                 {
                     using (CompositionContainer localContainer = new CompositionContainer(context.Catalog))
                     {
-                        string dirName = Path.GetDirectoryName(expandedSource.ToString());
-                        CompositionBatch batch = new CompositionBatch();
                         var exportMetadata = new Dictionary<string, object>();
 
                         exportMetadata.Add(CompositionConstants.ExportTypeIdentityMetadataName,
@@ -80,9 +84,11 @@ namespace LBi.LostDoc.Templating
                         exportMetadata.Add(CompositionConstants.PartCreationPolicyMetadataName,
                                            CreationPolicy.Shared);
 
+                        CompositionBatch batch = new CompositionBatch();
+                        string dirName = Path.GetDirectoryName(expandedInput.ToString());
                         batch.AddExport(new Export(ContractNames.ResourceFileProvider,
                                                    exportMetadata,
-                                                   () => new ScopedFileProvider(this.FileProvider, dirName)));
+                                                   () => new ScopedFileProvider(context.TemplateFileProvider, dirName)));
 
                         // TODO export resourceTransform.Parameters into localContainer using CompositionBatch
 
@@ -110,8 +116,7 @@ namespace LBi.LostDoc.Templating
                     }
                 }
 
-                yield return new ResourceDeployment(this.FileProvider,
-                                                    expandedSource,
+                yield return new ResourceDeployment(expandedInput,
                                                     expandedOutput,
                                                     this.Order,
                                                     transforms.ToArray());

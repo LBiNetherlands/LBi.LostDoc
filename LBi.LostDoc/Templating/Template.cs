@@ -107,11 +107,11 @@ namespace LBi.LostDoc.Templating
         {
             Stopwatch timer = Stopwatch.StartNew();
 
-            // TODO file, http, https, ftp, etc shouldn't be hardcoded but configured
             StorageResolver storageResolver = new StorageResolver();
             storageResolver.Add(StorageSchemas.Temporary, new TemporaryFileProvider(), stripScheme: true);
             storageResolver.Add(StorageSchemas.Output, settings.OutputFileProvider, stripScheme: true);
             storageResolver.Add(StorageSchemas.Template, this.TemplateFileProvider, stripScheme: true);
+            // TODO file, http, https, ftp, etc shouldn't be hardcoded
             storageResolver.Add("file", new DirectoryFileProvider(), stripScheme: true);
             storageResolver.Add("http", new HttpFileProvider(), stripScheme: false);
             storageResolver.Add("https", new HttpFileProvider(), stripScheme: false);
@@ -132,7 +132,8 @@ namespace LBi.LostDoc.Templating
                                                                    xsltContext,
                                                                    settings.UriFactory,
                                                                    settings.FileResolver,
-                                                                   settings.Catalog);
+                                                                   settings.Catalog,
+                                                                   this.TemplateFileProvider);
 
             UnitOfWork[] work = this.DiscoverWork(templateContext).ToArray();
 
@@ -145,12 +146,10 @@ namespace LBi.LostDoc.Templating
             // create context
             ITemplatingContext context = new TemplatingContext(settings.Cache,
                                                                settings.Catalog,
-                                                               settings.OutputFileProvider,
                                                                settings,
                                                                inputDocument,
                                                                assetUriResolvers,
-                                                               this.TemplateFileProvider);
-
+                                                               storageResolver);
 
             // fill indices
             using (TraceSources.TemplateSource.TraceActivity("Indexing input document"))
@@ -178,7 +177,7 @@ namespace LBi.LostDoc.Templating
                 Func<object, WorkUnitResult> func = uow => ((UnitOfWork)uow).Execute(context);
                 Task<WorkUnitResult> task = new Task<WorkUnitResult>(func, unitOfWork);
                 tasks.Add(task);
-                dependencyProvider.Add(unitOfWork.Path, task);
+                dependencyProvider.Add(unitOfWork.Output, unitOfWork.Order, task);
             }
 
             int totalCount = work.Length;
@@ -375,7 +374,7 @@ namespace LBi.LostDoc.Templating
             foreach (var statGroup in resourceStats)
             {
                 TraceSources.TemplateSource.TraceInformation("Deployed resource '{0}' in {1:N0} ms",
-                                                             ((ResourceDeployment)statGroup.WorkUnit).ResourcePath,
+                                                             ((ResourceDeployment)statGroup.WorkUnit).Input,
                                                              statGroup.Duration);
             }
 

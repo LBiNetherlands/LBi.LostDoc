@@ -16,12 +16,15 @@
 
 using System;
 using System.Xml.Linq;
+using LBi.LostDoc.Templating.IO;
 using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
     public interface ITemplateContext : IContextBase
     {
+        IFileProvider TemplateFileProvider { get; }
+
         CustomXsltContext XsltContext { get; }
 
         XDocument Document { get; }

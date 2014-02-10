@@ -5,6 +5,13 @@ namespace LBi.LostDoc.Templating
 {
     public static class UriExtensions
     {
+        public static Uri AddScheme(this Uri current, string uriScheme)
+        {
+            if (current.IsAbsoluteUri)
+                throw new ArgumentException("Uri must be relative", "current");
+            return new Uri(uriScheme + Uri.SchemeDelimiter + current.OriginalString.Replace('\\', '/'));
+        }
+
         public static Uri GetRelativeUri(this Uri current, Uri target)
         {
             string targetStr = target.ToString();

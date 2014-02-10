@@ -29,7 +29,7 @@ namespace LBi.LostDoc.Templating
             this.Duration = duration;
         }
 
-        public Uri Path { get { return this.WorkUnit.Path; } }
+        public Uri Path { get { return this.WorkUnit.Output; } }
 
         public IFileProvider FileProvider { get; protected set; }
 
