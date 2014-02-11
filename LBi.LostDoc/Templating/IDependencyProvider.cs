@@ -21,7 +21,6 @@ namespace LBi.LostDoc.Templating
 {
     public interface IDependencyProvider
     {
-        Stream GetDependency(Uri uri);
-        bool Exists(Uri uri);
+        bool TryGetDependency(Uri uri, int order, out Stream stream);
     }
 }

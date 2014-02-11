@@ -19,77 +19,56 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {
-    public class DependencyProvider : IDependencyProvider, IFileProvider
+    public class DependencyProvider : IDependencyProvider
     {
-        XXXXXX // WIP SortedList isn't what we want
-        private readonly Dictionary<Uri, SortedList<int, Task<WorkUnitResult>>> _tasks;
+        private readonly Dictionary<Uri, List<Tuple<int, Task<WorkUnitResult>>>> _tasks;
         private readonly CancellationToken _cancellationToken;
 
         public DependencyProvider(CancellationToken cancellationToken)
         {
-            this._tasks = new Dictionary<Uri, SortedList<int, Task<WorkUnitResult>>>();
+            this._tasks = new Dictionary<Uri, List<Tuple<int, Task<WorkUnitResult>>>>();
             this._cancellationToken = cancellationToken;
         }
 
 
         public void Add(Uri uri, int order, Task<WorkUnitResult> task)
         {
-            SortedList<int, Task<WorkUnitResult>> versionList;
+            List<Tuple<int, Task<WorkUnitResult>>> versionList;
             if (!this._tasks.TryGetValue(uri, out versionList))
-                this._tasks.Add(uri, versionList = new SortedList<int, Task<WorkUnitResult>>());
-            versionList.Add(order, task);
+                this._tasks.Add(uri, versionList = new List<Tuple<int, Task<WorkUnitResult>>>());
+
+            versionList.Add(Tuple.Create(order, task));
         } 
 
-        public Stream GetDependency(Uri uri, int order)
+    
+
+        public bool TryGetDependency(Uri uri, int order, out Stream stream)
         {
-            SortedList<int, Task<WorkUnitResult>> versionList;
+            List<Tuple<int, Task<WorkUnitResult>>> versionList;
             if (this._tasks.TryGetValue(uri, out versionList))
             {
+                int index;
 
-                if (!versionList.IsCompleted)
-                    versionList.Wait(this._cancellationToken);
+                for (index = 0; index < versionList.Count && versionList[index].Item1 < order; index++);
 
-                return versionList.Result.GetStream();
+                if (index < versionList.Count)
+                {
+                    Task<WorkUnitResult> task = versionList[index].Item2;
+                    if (!task.IsCompleted)
+                        task.Wait(this._cancellationToken);
+
+                    stream = task.Result.GetStream();
+                }
+                else
+                    stream = null;
             }
-            
-            throw new KeyNotFoundException("Uri doesn't exist: " + uri.ToString());
-        }
+            else
+                stream = null;
 
-        public bool Exists(Uri uri)
-        {
-            return this._tasks.ContainsKey(uri);
-        }
-
-        bool IFileProvider.FileExists(string path)
-        {
-            return this.Exists(new Uri(path, UriKind.RelativeOrAbsolute));
-        }
-
-        Stream IFileProvider.OpenFile(string path, FileMode mode)
-        {
-            if (mode != FileMode.Open)
-                throw new NotSupportedException();
-
-            return this.GetDependency(new Uri(path, UriKind.RelativeOrAbsolute));
-        }
-
-        bool IFileProvider.SupportsDiscovery
-        {
-            get { return false; }
-        }
-
-        IEnumerable<string> IFileProvider.GetDirectories(string path)
-        {
-            throw new NotSupportedException();
-        }
-
-        IEnumerable<string> IFileProvider.GetFiles(string path)
-        {
-            throw new NotSupportedException();
+            return stream != null;
         }
     }
 }

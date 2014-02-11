@@ -149,7 +149,8 @@ namespace LBi.LostDoc.Templating
                                                                settings,
                                                                inputDocument,
                                                                assetUriResolvers,
-                                                               storageResolver);
+                                                               storageResolver,
+                                                               dependencyProvider);
 
             // fill indices
             using (TraceSources.TemplateSource.TraceActivity("Indexing input document"))
@@ -169,14 +170,14 @@ namespace LBi.LostDoc.Templating
                 context.DocumentIndex.BuildIndexes();
             }
 
-            List<Task<WorkUnitResult>> tasks = new List<Task<WorkUnitResult>>();
+            //List<Task<WorkUnitResult>> tasks = new List<Task<WorkUnitResult>>();
 
             // register all tasks in the dependency provider
             foreach (UnitOfWork unitOfWork in work)
             {
                 Func<object, WorkUnitResult> func = uow => ((UnitOfWork)uow).Execute(context);
                 Task<WorkUnitResult> task = new Task<WorkUnitResult>(func, unitOfWork);
-                tasks.Add(task);
+                //tasks.Add(task);
                 dependencyProvider.Add(unitOfWork.Output, unitOfWork.Order, task);
             }
 

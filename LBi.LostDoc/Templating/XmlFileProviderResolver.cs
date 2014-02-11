@@ -26,11 +26,20 @@ namespace LBi.LostDoc.Templating
     {
         private readonly StorageResolver _storageResolver;
         private readonly string _defaultScheme;
+        private readonly IDependencyProvider _dependencyProvider;
+        private readonly int _order;
 
-        public XmlFileProviderResolver(StorageResolver storageResolver, string defaultScheme)
+        public XmlFileProviderResolver(string defaultScheme, StorageResolver storageResolver)
         {
             this._storageResolver = storageResolver;
             this._defaultScheme = defaultScheme;
+        }
+
+        public XmlFileProviderResolver(string defaultScheme, StorageResolver storageResolver, IDependencyProvider dependencyProvider, int order)
+            : this(defaultScheme, storageResolver)
+        {
+            this._dependencyProvider = dependencyProvider;
+            this._order = order;
         }
 
         /// <summary>
@@ -73,6 +82,13 @@ namespace LBi.LostDoc.Templating
         /// </exception>
         public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
         {
+            Stream ret;
+            if (this._dependencyProvider != null &&
+                this._dependencyProvider.TryGetDependency(absoluteUri, this._order, out ret))
+            {
+                return ret;
+            }
+
             FileReference fileRef = this._storageResolver.Resolve(absoluteUri);
 
             if (fileRef.Exists)
@@ -86,7 +102,7 @@ namespace LBi.LostDoc.Templating
             var uri = new Uri(relativeUri, UriKind.RelativeOrAbsolute);
             if (!uri.IsAbsoluteUri)
                 uri = uri.AddScheme(this._defaultScheme);
-            
+
             return uri;
         }
     }

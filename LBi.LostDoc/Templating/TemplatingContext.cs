@@ -33,13 +33,15 @@ namespace LBi.LostDoc.Templating
                                  TemplateSettings settings,
                                  XDocument document,
                                  IEnumerable<IAssetUriResolver> resolvers,
-                                 StorageResolver storageResolver)
+                                 StorageResolver storageResolver,
+                                 IDependencyProvider dependencyProvider)
         {
             this.Catalog = catalog;
             this.Settings = settings;
             this.AssetUriResolvers = resolvers.ToArray();
             this.Cache = cache;
             this.Storage = storageResolver;
+            this.DependencyProvider = dependencyProvider;
 
             XPathDocument xpathDoc;
             using (var reader = document.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
@@ -60,6 +62,8 @@ namespace LBi.LostDoc.Templating
         public IAssetUriResolver[] AssetUriResolvers { get; protected set; }
 
         public StorageResolver Storage { get; protected set; }
+
+        public IDependencyProvider DependencyProvider { get; protected set; }
 
         #endregion
 

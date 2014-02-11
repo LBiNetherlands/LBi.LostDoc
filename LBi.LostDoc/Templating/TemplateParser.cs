@@ -55,7 +55,7 @@ namespace LBi.LostDoc.Templating
             {
                 StorageResolver storage = new StorageResolver();
                 storage.Add(StorageSchemas.Template, templateProvider, true);
-                XmlResolver resolver = new XmlFileProviderResolver(storage, StorageSchemas.Template);
+                XmlResolver resolver = new XmlFileProviderResolver(StorageSchemas.Template, storage);
 
                 XslCompiledTransform metaTransform = new XslCompiledTransform(true);
                 using (Stream str = templateProvider.OpenFile(metaNode.GetAttributeValue("stylesheet"), FileMode.Open))
