@@ -18,6 +18,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -170,67 +172,96 @@ namespace LBi.LostDoc.Templating
                 context.DocumentIndex.BuildIndexes();
             }
 
-            //List<Task<WorkUnitResult>> tasks = new List<Task<WorkUnitResult>>();
+            List<Task<WorkUnitResult>> tasks = new List<Task<WorkUnitResult>>();
 
             // register all tasks in the dependency provider
             foreach (UnitOfWork unitOfWork in work)
             {
-                Func<object, WorkUnitResult> func = uow => ((UnitOfWork)uow).Execute(context);
+                Func<object, WorkUnitResult> func =
+                    uow =>
+                    {
+                        WorkUnitResult ret;
+                        var ctx = context;
+                        var unit = (UnitOfWork) uow;
+                        FileReference outputRef;
+                        if (ctx.DependencyProvider.IsFinal(unit.Output, unit.Order))
+                            outputRef = ctx.Storage.Resolve(unit.Output);
+                        else
+                        {
+                            int delimiterPosition = unit.Output.OriginalString.IndexOf(Uri.SchemeDelimiter);
+                            string path = unit.Output.OriginalString.Substring(delimiterPosition);
+                            string uriSuffix = '/' + unit.Order.ToString(CultureInfo.InvariantCulture);
+                            Uri tempOutput = new Uri(StorageSchemas.Temporary + path + uriSuffix);
+                            outputRef = ctx.Storage.Resolve(tempOutput);
+                        }
+
+                        using (Stream outputStream = outputRef.GetStream(FileMode.Create))
+                        {
+                            var ticks = Stopwatch.GetTimestamp();
+                            unit.Execute(context, outputStream);
+                            ticks = Stopwatch.GetTimestamp() - ticks;
+                            return new WorkUnitResult(outputRef.FileProvider,
+                                                      unit,
+                                                      (long) Math.Round(ticks/(double) Stopwatch.Frequency*1000000));
+                        }
+                    };
                 Task<WorkUnitResult> task = new Task<WorkUnitResult>(func, unitOfWork);
                 //tasks.Add(task);
                 dependencyProvider.Add(unitOfWork.Output, unitOfWork.Order, task);
             }
 
-            int totalCount = work.Length;
-            long lastProgress = Stopwatch.GetTimestamp();
-            int processed = 0;
-            // process all units of work
-            ParallelOptions parallelOptions = new ParallelOptions
-                                              {
-                                                  //MaxDegreeOfParallelism = 1
-                                                  CancellationToken = settings.CancellationToken
-                                              };
+       
+      
+            //int totalCount = work.Length;
+            //long lastProgress = Stopwatch.GetTimestamp();
+            //int processed = 0;
+            //// process all units of work
+            //ParallelOptions parallelOptions = new ParallelOptions
+            //                                  {
+            //                                      //MaxDegreeOfParallelism = 1
+            //                                      CancellationToken = settings.CancellationToken
+            //                                  };
 
 
-            IEnumerable<UnitOfWork> unitsOfWork = work;
-            if (settings.Filter != null)
-            {
-                unitsOfWork = unitsOfWork
-                    .Where(uow =>
-                           {
-                               if (settings.Filter(uow))
-                                   return true;
+            //IEnumerable<UnitOfWork> unitsOfWork = work;
+            //if (settings.Filter != null)
+            //{
+            //    unitsOfWork = unitsOfWork
+            //        .Where(uow =>
+            //               {
+            //                   if (settings.Filter(uow))
+            //                       return true;
 
-                               TraceSources.TemplateSource.TraceVerbose("Filtered unit of work: [{0}] {1}",
-                                                                        uow.GetType().Name,
-                                                                        uow.ToString());
-                               return false;
-                           });
-            }
+            //                   TraceSources.TemplateSource.TraceVerbose("Filtered unit of work: [{0}] {1}",
+            //                                                            uow.GetType().Name,
+            //                                                            uow.ToString());
+            //                   return false;
+            //               });
+            //}
 
 
-            Parallel.ForEach(unitsOfWork,
-                             parallelOptions,
-                             uow =>
-                             {
-                                 results.Add(uow.Execute(context));
-                                 int c = Interlocked.Increment(ref processed);
-                                 long lp = Interlocked.Read(ref lastProgress);
-                                 if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 5.0)
-                                 {
-                                     if (Interlocked.CompareExchange(ref lastProgress,
-                                                                     Stopwatch.GetTimestamp(),
-                                                                     lp) == lp)
-                                     {
-                                         double percent = c / (double)totalCount;
-                                         this.OnProgress("Generating", (int)Math.Round(percent));
-                                         TraceSources.TemplateSource.TraceInformation("Progress: {0:P1} ({1:N0}/{2:N0})",
-                                                                                      percent,
-                                                                                      c,
-                                                                                      totalCount);
-                                     }
-                                 }
-                             });
+            //Parallel.ForEach(unitsOfWork,
+            //                 parallelOptions,
+            //                 uow =>
+            //                 {
+            //                     results.Add(uow.Execute(context));
+            //                     int c = Interlocked.Increment(ref processed);
+            //                     long lp = Interlocked.Read(ref lastProgress);
+            //                     if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 5.0)
+            //                     {
+            //                         if (Interlocked.CompareExchange(ref lastProgress,
+            //                                                         Stopwatch.GetTimestamp(),
+            //                                                         lp) == lp)
+            //                         {
+            //                             double percent = c / (double)totalCount;
+            //                             this.OnProgress("Generating", (int)Math.Round(percent));
+            //                             TraceSources.TemplateSource.TraceInformation("Progress: {0:P1} ({1:N0}/{2:N0})",
+            //                                                                          percent,
+            //                                                                          c,
+            //                                                                          totalCount);
+            //                         }
+            //                     }
+            //                 });
 
             // stop timing
             timer.Stop();

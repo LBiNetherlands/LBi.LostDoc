@@ -15,11 +15,8 @@
  */
 
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using LBi.LostDoc.Diagnostics;
-using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {
@@ -36,39 +33,29 @@ namespace LBi.LostDoc.Templating
 
         public Uri Input { get; protected set; }
 
-        public override WorkUnitResult Execute(ITemplatingContext context)
+        public override void Execute(ITemplatingContext context, Stream outputStream)
         {
-            Stopwatch localTimer = new Stopwatch();
-
             // copy resources to output dir
             TraceSources.TemplateSource.TraceInformation("Copying resource: {0} => {1}",
                                                          this.Input,
                                                          this.Output);
 
             var inputFileRef = context.Storage.Resolve(this.Input);
-            var outputFileRef = context.Storage.Resolve(this.Output);
 
-            using (Stream streamSrc = inputFileRef.GetStream(FileMode.Open))
-            using (Stream streamDest = outputFileRef.GetStream(FileMode.Create))
+            Stream streamSrc = inputFileRef.GetStream(FileMode.Open);
+            Stream outStream = streamSrc;
+            for (int i = 0; i < this.Transforms.Length; i++)
             {
-                Stream outStream = streamSrc;
-                for (int i = 0; i < this.Transforms.Length; i++)
-                {
-                    TraceSources.TemplateSource.TraceInformation("Applying '{0}' to resource: {1}",
-                                                                 this.Transforms[i].GetType().Name,
-                                                                 this.Input);
-                    Stream oldStream = outStream;
-                    outStream = this.Transforms[i].Transform(outStream);
-                    oldStream.Dispose();
-                }
-                outStream.CopyTo(streamDest);
-                streamDest.Close();
-                outStream.Dispose();
+                TraceSources.TemplateSource.TraceInformation("Applying '{0}' to resource: {1}",
+                                                             this.Transforms[i].GetType().Name,
+                                                             this.Input);
+                Stream oldStream = outStream;
+                outStream = this.Transforms[i].Transform(outStream);
+                oldStream.Dispose();
             }
-
-            return new WorkUnitResult(outputFileRef.FileProvider,
-                                      this,
-                                      (long)Math.Round(((double) localTimer.ElapsedTicks/Stopwatch.Frequency)*1, 000, 000));
+            outStream.CopyTo(outputStream);
+            outputStream.Close();
+            outStream.Dispose();
         }
     }
 }

@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.IO;
 
 namespace LBi.LostDoc.Templating
 {
@@ -29,6 +30,6 @@ namespace LBi.LostDoc.Templating
         public int Order { get; protected set; }
         public Uri Output { get; protected set; }
 
-        public abstract WorkUnitResult Execute(ITemplatingContext context);
+        public abstract void Execute(ITemplatingContext context, Stream output);
     }
 }

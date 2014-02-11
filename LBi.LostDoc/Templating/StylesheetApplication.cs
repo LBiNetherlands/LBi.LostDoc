@@ -69,63 +69,36 @@ namespace LBi.LostDoc.Templating
 
         public XmlResolver XmlResolver { get; protected set; }
 
-        public override WorkUnitResult Execute(ITemplatingContext context)
+        public override void Execute(ITemplatingContext context, Stream outputStream)
         {
-            Stopwatch localTimer = Stopwatch.StartNew();
+            // register xslt params
+            XsltArgumentList argList = new XsltArgumentList();
+            foreach (KeyValuePair<string, object> kvp in this.XsltParams)
+                argList.AddParam(kvp.Key, string.Empty, kvp.Value);
 
-            FileReference outputFileRef = context.Storage.Resolve(this.Output);
-            FileMode mode = FileMode.CreateNew;
-            bool exists;
-            if (!(exists = outputFileRef.Exists) || context.Settings.OverwriteExistingFiles)
+            argList.XsltMessageEncountered += (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
+
+            // and custom extensions
+            argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, this.Output));
+
+            using (XmlWriter writer = XmlWriter.Create(outputStream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false }))
             {
-                if (exists)
-                    mode = FileMode.Create;
+                long tickStart = Stopwatch.GetTimestamp();
 
-                // register xslt params
-                XsltArgumentList argList = new XsltArgumentList();
-                foreach (KeyValuePair<string, object> kvp in this.XsltParams)
-                    argList.AddParam(kvp.Key, string.Empty, kvp.Value);
+                var transform = this.LoadStylesheet(context);
 
-                argList.XsltMessageEncountered += (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
+                transform.Transform(context.Document,
+                                    argList,
+                                    writer,
+                                    new XmlFileProviderResolver(StorageSchemas.Temporary, context.Storage, context.DependencyProvider, this.Order));
 
-                // and custom extensions
-                argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, this.Output));
+                double duration = ((Stopwatch.GetTimestamp() - tickStart)/(double) Stopwatch.Frequency)*1000;
 
-                using (Stream stream = outputFileRef.GetStream(mode))
-                using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false }))
-                {
-                    if (exists)
-                        TraceSources.TemplateSource.TraceWarning("Replacing {0}", this.Output);
-                    else
-                        TraceSources.TemplateSource.TraceVerbose("{0}", this.Output);
+                TraceSources.TemplateSource.TraceVerbose("{0} ({1:N0} ms)", this.Output, duration);
 
-                    long tickStart = localTimer.ElapsedTicks;
-
-                    var transform = this.LoadStylesheet(context);
-
-                    transform.Transform(context.Document,
-                                        argList,
-                                        writer,
-                                        new XmlFileProviderResolver(StorageSchemas.Temporary, context.Storage, context.DependencyProvider, this.Order));
-
-                    double duration = ((localTimer.ElapsedTicks - tickStart) / (double)Stopwatch.Frequency) * 1000;
-
-                    TraceSources.TemplateSource.TraceVerbose("Transform applied in: {0:N0} ms", duration);
-
-                    writer.Close();
-                    stream.Close();
-                }
+                writer.Close();
+                outputStream.Close();
             }
-            else
-            {
-                TraceSources.TemplateSource.TraceWarning("Skipping {0}", this.Output);
-            }
-
-            localTimer.Stop();
-
-            return new WorkUnitResult(outputFileRef.FileProvider,
-                                      this,
-                                      (long)Math.Round(localTimer.ElapsedTicks / (double)Stopwatch.Frequency * 1000000));
         }
 
         protected virtual XslCompiledTransform LoadStylesheet(ITemplatingContext context)
@@ -140,7 +113,7 @@ namespace LBi.LostDoc.Templating
                 {
                     XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                     XsltSettings settings = new XsltSettings(true, true);
-                    XmlResolver resolver = new XmlFileProviderResolver(StorageSchemas.Template, context.Storage);
+                    XmlResolver resolver = new XmlFileProviderResolver(StorageSchemas.Template, context.Storage, context.DependencyProvider, this.Order);
                     ret.Load(reader, settings, resolver);
                 }
 

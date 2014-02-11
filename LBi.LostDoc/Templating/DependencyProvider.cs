@@ -41,9 +41,7 @@ namespace LBi.LostDoc.Templating
                 this._tasks.Add(uri, versionList = new List<Tuple<int, Task<WorkUnitResult>>>());
 
             versionList.Add(Tuple.Create(order, task));
-        } 
-
-    
+        }
 
         public bool TryGetDependency(Uri uri, int order, out Stream stream)
         {
@@ -69,6 +67,15 @@ namespace LBi.LostDoc.Templating
                 stream = null;
 
             return stream != null;
+        }
+
+        public bool IsFinal(Uri uri, int order)
+        {
+            List<Tuple<int, Task<WorkUnitResult>>> versionList;
+            if (this._tasks.TryGetValue(uri, out versionList))
+                return order >= versionList[versionList.Count - 1].Item1;
+
+            throw new KeyNotFoundException(uri.ToString());
         }
     }
 }
