@@ -200,7 +200,7 @@ namespace LBi.LostDoc.Templating
                             var ticks = Stopwatch.GetTimestamp();
                             unit.Execute(context, outputStream);
                             ticks = Stopwatch.GetTimestamp() - ticks;
-                            return new WorkUnitResult(outputRef.FileProvider,
+                            return new WorkUnitResult(outputRef,
                                                       unit,
                                                       (long) Math.Round(ticks/(double) Stopwatch.Frequency*1000000));
                         }

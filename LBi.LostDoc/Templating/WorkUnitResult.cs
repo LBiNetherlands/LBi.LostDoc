@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-using System;
 using System.IO;
 using LBi.LostDoc.Templating.IO;
 
@@ -22,16 +21,14 @@ namespace LBi.LostDoc.Templating
 {
     public class WorkUnitResult
     {
-        public WorkUnitResult(IFileProvider fileProvder, UnitOfWork unitOfWork, long duration)
+        public WorkUnitResult(FileReference fileReference, UnitOfWork unitOfWork, long duration)
         {
-            this.FileProvider = fileProvder;
+            this.FileReference = fileReference;
             this.WorkUnit = unitOfWork;
             this.Duration = duration;
         }
 
-        public Uri Path { get { return this.WorkUnit.Output; } }
-
-        public IFileProvider FileProvider { get; protected set; }
+        public FileReference FileReference { get; protected set; }
 
         public UnitOfWork WorkUnit { get; protected set; }
 
@@ -42,7 +39,7 @@ namespace LBi.LostDoc.Templating
 
         public virtual Stream GetStream()
         {
-            return this.FileProvider.OpenFile(this.Path.ToString(), FileMode.Open);
+            return this.FileReference.GetStream(FileMode.Open);
         }
     }
 }
