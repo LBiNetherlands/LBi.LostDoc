@@ -90,7 +90,7 @@ namespace LBi.LostDoc.Templating
                 transform.Transform(context.Document,
                                     argList,
                                     writer,
-                                    new XmlFileProviderResolver(StorageSchemas.Temporary, context.Storage, context.DependencyProvider, this.Order));
+                                    new XmlFileProviderResolver(Storage.UriSchemeTemporary, context.Storage, context.DependencyProvider, this.Order));
 
                 double duration = ((Stopwatch.GetTimestamp() - tickStart)/(double) Stopwatch.Frequency)*1000;
 
@@ -113,7 +113,7 @@ namespace LBi.LostDoc.Templating
                 {
                     XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                     XsltSettings settings = new XsltSettings(true, true);
-                    XmlResolver resolver = new XmlFileProviderResolver(StorageSchemas.Template, context.Storage, context.DependencyProvider, this.Order);
+                    XmlResolver resolver = new XmlFileProviderResolver(Storage.UriSchemeTemplate, context.Storage, context.DependencyProvider, this.Order);
                     ret.Load(reader, settings, resolver);
                 }
 

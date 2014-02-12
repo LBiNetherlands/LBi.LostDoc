@@ -18,21 +18,21 @@ using System;
 
 namespace LBi.LostDoc.Templating
 {
-    public static class StorageSchemas
+    public static class Storage
     {
         /// <summary>
         /// template://
         /// </summary>
-        public static readonly string Template = "template";
+        public static readonly string UriSchemeTemplate = "template";
 
         /// <summary>
         /// temp://
         /// </summary>
-        public static readonly string Temporary = "temp";
+        public static readonly string UriSchemeTemporary = "temp";
 
         /// <summary>
         /// output://
         /// </summary>
-        public static readonly string Output = "output";
+        public static readonly string UriSchemeOutput = "output";
     }
 }

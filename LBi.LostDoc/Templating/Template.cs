@@ -108,11 +108,11 @@ namespace LBi.LostDoc.Templating
         public virtual TemplateOutput Generate(XDocument inputDocument, TemplateSettings settings)
         {
             Stopwatch timer = Stopwatch.StartNew();
-
+            
             StorageResolver storageResolver = new StorageResolver();
-            storageResolver.Add(StorageSchemas.Temporary, new TemporaryFileProvider(), stripScheme: true);
-            storageResolver.Add(StorageSchemas.Output, settings.OutputFileProvider, stripScheme: true);
-            storageResolver.Add(StorageSchemas.Template, this.TemplateFileProvider, stripScheme: true);
+            storageResolver.Add(Storage.UriSchemeTemporary, new TemporaryFileProvider(), stripScheme: true);
+            storageResolver.Add(Storage.UriSchemeOutput, settings.OutputFileProvider, stripScheme: true);
+            storageResolver.Add(Storage.UriSchemeTemplate, this.TemplateFileProvider, stripScheme: true);
             // TODO file, http, https, ftp, etc shouldn't be hardcoded
             storageResolver.Add("file", new DirectoryFileProvider(), stripScheme: true);
             storageResolver.Add("http", new HttpFileProvider(), stripScheme: false);
@@ -187,7 +187,7 @@ namespace LBi.LostDoc.Templating
                             // redirect intermediary output files to the temp:// provider
                             string path = unit.Output.OriginalString.Substring(unit.Output.Scheme.Length);
                             string uriSuffix = '.' + unit.Order.ToString(CultureInfo.InvariantCulture);
-                            Uri tempOutput = new Uri(StorageSchemas.Temporary + path + uriSuffix);
+                            Uri tempOutput = new Uri(Storage.UriSchemeTemporary + path + uriSuffix);
                             outputRef = ctx.Storage.Resolve(tempOutput);
                         }
 

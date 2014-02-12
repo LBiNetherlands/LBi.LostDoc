@@ -62,19 +62,19 @@ namespace LBi.LostDoc.Templating
 
                 // set default storage scheme if none specified
                 if (!stylesheetUri.IsAbsoluteUri)
-                    stylesheetUri = stylesheetUri.AddScheme(StorageSchemas.Template);
+                    stylesheetUri = stylesheetUri.AddScheme(Storage.UriSchemeTemplate);
 
                 Uri inputUri = null;
                 if (this.InputExpression != null) { 
                     inputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.InputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
                     if (!inputUri.IsAbsoluteUri)
-                        inputUri = inputUri.AddScheme(StorageSchemas.Template);
+                        inputUri = inputUri.AddScheme(Storage.UriSchemeTemplate);
                 }
                 Uri outputUri = null;
                 if (this.OutputExpression != null) { 
                     outputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
                     if (!outputUri.IsAbsoluteUri)
-                        outputUri = outputUri.AddScheme(StorageSchemas.Output);
+                        outputUri = outputUri.AddScheme(Storage.UriSchemeOutput);
                 }
                 List<AssetIdentifier> assetIdentifiers = new List<AssetIdentifier>();
                 List<AssetSection> sections = new List<AssetSection>();

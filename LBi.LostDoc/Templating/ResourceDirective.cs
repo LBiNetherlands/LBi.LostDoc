@@ -64,10 +64,10 @@ namespace LBi.LostDoc.Templating
 
                 // set default storage scheme if none specified
                 if (!expandedInput.IsAbsoluteUri)
-                    expandedInput = expandedInput.AddScheme(StorageSchemas.Template);
+                    expandedInput = expandedInput.AddScheme(Storage.UriSchemeTemplate);
 
                 if (!expandedOutput.IsAbsoluteUri)
-                    expandedOutput = expandedOutput.AddScheme(StorageSchemas.Output);
+                    expandedOutput = expandedOutput.AddScheme(Storage.UriSchemeOutput);
 
                 List<IResourceTransform> transforms = new List<IResourceTransform>();
 

@@ -165,7 +165,7 @@
     <Compile Include="Templating\ResourceTransform.cs" />
     <Compile Include="Templating\ScopedFileProvider.cs" />
     <Compile Include="Templating\IndexDirective.cs" />
-    <Compile Include="Templating\StorageSchemas.cs" />
+    <Compile Include="Templating\Storage.cs" />
     <Compile Include="Templating\Template.cs" />
     <Compile Include="Templating\ProgressArgs.cs" />
     <Compile Include="Templating\ResourceDirective.cs" />
