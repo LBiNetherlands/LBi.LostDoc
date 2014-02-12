@@ -46,7 +46,11 @@ namespace LBi.LostDoc.Templating.IO
                 Directory.CreateDirectory(dir);
             }
 
-            return File.Open(path, mode);
+            FileAccess access = create ? FileAccess.Write : FileAccess.Read;
+
+            FileShare share = create ? FileShare.None : FileShare.Read;
+
+            return File.Open(path, mode, access, share);
         }
 
         public bool SupportsDiscovery
