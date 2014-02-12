@@ -51,7 +51,8 @@ namespace LBi.LostDoc.Templating.IO
 
         public bool FileExists(string path)
         {
-            return this._asm.GetManifestResourceInfo(this.ConvertPath(path)) != null;
+            string name = this.ConvertPath(path);
+            return this._asm.GetManifestResourceNames().Any(n => StringComparer.OrdinalIgnoreCase.Equals(n, name));
         }
 
         public Stream OpenFile(string path, FileMode mode)
@@ -59,7 +60,13 @@ namespace LBi.LostDoc.Templating.IO
             if (mode != FileMode.Open)
                 throw new ArgumentOutOfRangeException("mode", "Only FileMode.Open is supported.");
 
-            var ret = this._asm.GetManifestResourceStream(this.ConvertPath(path.TrimStart('/')));
+            string name = this.ConvertPath(path.TrimStart('/'));
+
+            var realName = this._asm.GetManifestResourceNames().SingleOrDefault(n => StringComparer.OrdinalIgnoreCase.Equals(n, name));
+            if (realName == null)
+                throw new FileNotFoundException(string.Format("Resource not found: {0} (Was: {1})", this.ConvertPath(path), path), path);
+
+            var ret = this._asm.GetManifestResourceStream(realName);
             if (ret == null)
                 throw new FileNotFoundException(string.Format("Resource not found: {0} (Was: {1})", this.ConvertPath(path), path), path);
             return ret;
