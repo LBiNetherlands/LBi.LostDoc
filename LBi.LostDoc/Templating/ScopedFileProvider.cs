@@ -16,12 +16,15 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {
     public class ScopedFileProvider : IFileProvider
     {
+        private static readonly char[] DirectorySeperatorChars = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+
         public ScopedFileProvider(IFileProvider fileProvider, string basePath)
         {
             this.FileProvider = fileProvider;
@@ -49,12 +52,18 @@ namespace LBi.LostDoc.Templating
 
         public IEnumerable<string> GetDirectories(string path)
         {
-            return this.FileProvider.GetDirectories(Path.Combine(this.BasePath, path));
+            string fullPath = Path.Combine(this.BasePath, path);
+            return this.FileProvider
+                       .GetDirectories(fullPath)
+                       .Select(p => p.Substring(fullPath.Length).TrimStart(DirectorySeperatorChars));
         }
 
         public IEnumerable<string> GetFiles(string path)
         {
-            return this.FileProvider.GetFiles(Path.Combine(this.BasePath, path));
+            string fullPath = Path.Combine(this.BasePath, path);
+            return this.FileProvider
+                       .GetFiles(fullPath)
+                       .Select(p => p.Substring(fullPath.Length).TrimStart(DirectorySeperatorChars));
         }
     }
 }
