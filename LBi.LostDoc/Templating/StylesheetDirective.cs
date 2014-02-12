@@ -50,8 +50,7 @@ namespace LBi.LostDoc.Templating
 
         public virtual IEnumerable<StylesheetApplication> DiscoverWork(ITemplateContext context)
         {
-            TraceSources.TemplateSource.TraceInformation("Processing stylesheet instructions: {0}",
-                                                         (object)this.Name);
+            TraceSources.TemplateSource.TraceInformation("Processing stylesheet instructions: {0}", (object)this.Name);
 
             IEnumerable<XNode> inputNodes = XPathServices.ToNodeSequence(context.Document.XPathEvaluate(this.SelectExpression, context.XsltContext));
 
@@ -88,8 +87,9 @@ namespace LBi.LostDoc.Templating
                     continue;
                 }
 
-                // ensure url is unique
-                context.EnsureUniqueUri(ref outputUri);
+                // TODO can we get rid of this?
+                //// ensure url is unique
+                //context.EnsureUniqueUri(ref outputUri);
 
                 // asset identifiers
                 foreach (AssetRegistration assetRegistration in this.AssetRegistrations)
@@ -179,7 +179,12 @@ namespace LBi.LostDoc.Templating
                                                        this.Name,
                                                        stylesheetUri,
                                                        inputUri,
-                                                       outputUri, inputNode, xsltParams, assetIdentifiers.ToArray(), sections, null);
+                                                       outputUri,
+                                                       inputNode,
+                                                       xsltParams,
+                                                       assetIdentifiers.ToArray(),
+                                                       sections,
+                                                       null);
             }
         }
     }
