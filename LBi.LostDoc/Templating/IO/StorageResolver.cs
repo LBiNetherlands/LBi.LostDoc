@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace LBi.LostDoc.Templating.IO
 {
@@ -30,16 +31,22 @@ namespace LBi.LostDoc.Templating.IO
 
         public void Add(string uriScheme, IFileProvider fileProvider, bool stripScheme)
         {
+            Contract.Requires<ArgumentNullException>(uriScheme != null, "uriScheme cannot be null");
+            Contract.Requires<ArgumentNullException>(fileProvider != null, "fileProvider cannot be null");
+
             this._providers.Add(uriScheme, Tuple.Create(fileProvider, stripScheme));
         }
 
         public FileReference Resolve(Uri uri)
         {
             var provider = this._providers[uri.Scheme];
+            string path;
             if (provider.Item2)
-                return new FileReference(0, provider.Item1, uri.Authority + uri.PathAndQuery);
+                path = uri.OriginalString.Substring(uri.Scheme.Length + Uri.SchemeDelimiter.Length);
             else
-                return new FileReference(0, provider.Item1, uri.ToString());
+                path = uri.ToString();
+
+            return new FileReference(provider.Item1, path.TrimEnd('/'));
         }
     }
 }

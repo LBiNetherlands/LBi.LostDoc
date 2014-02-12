@@ -86,7 +86,7 @@ namespace LBi.LostDoc.Templating
                     }
                     catch (XPathException ex)
                     {
-                        throw new TemplateException(new FileReference(0, templateInfo.Source, templateInfo.Path),
+                        throw new TemplateException(new FileReference(templateInfo.Source, templateInfo.Path),
                                                     paramNode.Attribute("select"),
                                                     string.Format("Unable to process XPath expression: '{0}'. {1}", pExpr, ex.Message),
                                                     ex);
@@ -178,7 +178,7 @@ namespace LBi.LostDoc.Templating
 
             // save real template definition as temp file
             string tempFilename = this.SaveTempFile(tempFileProvider, workingDoc, "final");
-            FileReference templateSource = new FileReference(0, tempFileProvider, tempFilename);
+            FileReference templateSource = new FileReference(tempFileProvider, tempFilename);
 
             // create stacked provider
             IFileProvider provider = new StackedFileProvider(providers);

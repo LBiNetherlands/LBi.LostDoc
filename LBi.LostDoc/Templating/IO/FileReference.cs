@@ -20,10 +20,8 @@ namespace LBi.LostDoc.Templating.IO
 {
     public class FileReference
     {
-        // TODO do we really need order?
-        public FileReference(int order, IFileProvider fileProvider, string path)
+        public FileReference(IFileProvider fileProvider, string path)
         {
-            this.Order = order;
             this.FileProvider = fileProvider;
             this.Path = path;
         }
@@ -31,8 +29,6 @@ namespace LBi.LostDoc.Templating.IO
         public string Path { get; protected set; }
 
         public IFileProvider FileProvider { get; protected set; }
-
-        public int Order { get; protected set; }
 
         public bool Exists { get { return this.FileProvider.FileExists(this.Path); } }
 
