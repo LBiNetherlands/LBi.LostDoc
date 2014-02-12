@@ -90,6 +90,24 @@
     <EmbeddedResource Include="Templating\MultipleVersionsOfTempFile\Echo.xslt" />
     <EmbeddedResource Include="Templating\MultipleVersionsOfTempFile\IncludeEcho.xslt" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\EnrichInputDocument\Enrich.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\EnrichInputDocument\template.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\EnrichInputDocument\Copy.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templating\AlternateInput\Static.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\AlternateInput\Copy.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\AlternateInput\template.xml" />
+  </ItemGroup>
   <!--  manual edit, the build server needs to reference a dll rather than a project -->
   <Choose>
     <When Condition=" '$(AlternateReferenceLocation)' != '' ">

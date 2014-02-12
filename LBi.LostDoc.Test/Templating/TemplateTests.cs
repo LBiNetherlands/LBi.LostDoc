@@ -13,15 +13,7 @@ namespace LBi.LostDoc.Test.Templating
         [Fact]
         public void MultipleVersionsOfTempFile()
         {
-            IFileProvider templateProvider = new ResourceFileProvider("LBi.LostDoc.Test.Templating", Assembly.GetExecutingAssembly());
-
-            TemplateInfo tInfo = new TemplateInfo(templateProvider,
-                                                  "MultipleVersionsOfTempFile/template.xml",
-                                                  "MultipleVersionsOfTempFile",
-                                                  new TemplateParameterInfo[0],
-                                                  null);
-
-            Template template = tInfo.Load();
+            var template = LoadTemplate("MultipleVersionsOfTempFile");
 
             TemporaryFileProvider tempFiles = new TemporaryFileProvider();
             TemplateOutput output = template.Generate(new XDocument(),
@@ -51,6 +43,66 @@ namespace LBi.LostDoc.Test.Templating
             }
 
             tempFiles.Delete();
+        }
+
+        [Fact]
+        public void EnrichInputDocument()
+        {
+            var template = LoadTemplate("EnrichInputDocument");
+
+            TemporaryFileProvider tempFiles = new TemporaryFileProvider();
+            TemplateOutput output = template.Generate(new XDocument(),
+                                                      new TemplateSettings
+                                                      {
+                                                          OutputFileProvider = tempFiles,
+                                                      });
+
+            Assert.Equal(1, tempFiles.GetFiles("").Count());
+            Assert.Contains("out.xml", tempFiles.GetFiles(""));
+
+            using (var file = tempFiles.OpenFile("out.xml", FileMode.Open))
+            {
+                Assert.Equal("data", XDocument.Load(file).Root.Name);
+            }
+
+            tempFiles.Delete();
+        }
+
+        [Fact]
+        public void AlternateInput()
+        {
+            var template = LoadTemplate("AlternateInput");
+
+            TemporaryFileProvider tempFiles = new TemporaryFileProvider();
+            TemplateOutput output = template.Generate(new XDocument(new XElement("input")),
+                                                      new TemplateSettings
+                                                      {
+                                                          OutputFileProvider = tempFiles,
+                                                      });
+
+            Assert.Equal(1, tempFiles.GetFiles("").Count());
+            Assert.Contains("out.xml", tempFiles.GetFiles(""));
+
+            using (var file = tempFiles.OpenFile("out.xml", FileMode.Open))
+            {
+                Assert.Equal("example", XDocument.Load(file).Root.Name);
+            }
+
+            tempFiles.Delete();
+        }
+        private static Template LoadTemplate(string name)
+        {
+            IFileProvider templateProvider = new ResourceFileProvider("LBi.LostDoc.Test.Templating",
+                                                                      Assembly.GetExecutingAssembly());
+
+            TemplateInfo tInfo = new TemplateInfo(templateProvider,
+                                                  name + "/template.xml",
+                                                  name,
+                                                  new TemplateParameterInfo[0],
+                                                  null);
+
+            Template template = tInfo.Load();
+            return template;
         }
     }
 }
