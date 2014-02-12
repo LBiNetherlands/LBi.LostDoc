@@ -63,6 +63,7 @@
     <Compile Include="NamingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflection\ReflectionExplorerTests.cs" />
+    <Compile Include="Templating\TemplateTests.cs" />
     <Compile Include="UriTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +82,13 @@
       <Project>{B36E13C7-AD0C-4AC8-B687-88F08A4932C4}</Project>
       <Name>Company.Project.Library</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\MultipleVersionsOfTempFile\template.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\MultipleVersionsOfTempFile\Echo.xslt" />
+    <EmbeddedResource Include="Templating\MultipleVersionsOfTempFile\IncludeEcho.xslt" />
   </ItemGroup>
   <!--  manual edit, the build server needs to reference a dll rather than a project -->
   <Choose>
