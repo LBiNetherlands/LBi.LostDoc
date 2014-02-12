@@ -1,6 +1,7 @@
 /* BSD License
 
-Copyright (c) 2005, XMLMVP Project
+ * Copyright (c) 2005, XMLMVP Project
+ * Copyright (c) 2014, DigitasLBi Netherlands B.V.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 
@@ -55,12 +56,13 @@ namespace LBi.LostDoc.Templating.XPath
     /// <para>Contributors: Daniel Cazzulino, <a href="http://clariusconsulting.net/kzu">blog</a></para>
     /// <para>See <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnxmlnet/html/XMLindexing.asp">"XML Indexing Part 1: XML IDs, XSLT Keys and Index"</a> article for more info.</para>
     /// </remarks>    
+    // TODO clean this up a bit, the IndexManager isn't very nice
     public class XPathNavigatorIndex
     {
         #region Fields & Ctor
 
-        private XPathNavigator nav;
-        private IndexManager manager;
+        private readonly XPathNavigator _nav;
+        private readonly IndexManager _manager;
 
         /// <summary>
         /// Creates Index over specified XPathNavigator.
@@ -68,8 +70,8 @@ namespace LBi.LostDoc.Templating.XPath
         /// <param name="navigator">Core XPathNavigator</param>
         public XPathNavigatorIndex(XPathNavigator navigator)
         {
-            this.nav = navigator;
-            manager = new IndexManager();
+            this._nav = navigator;
+            this._manager = new IndexManager();
         }
 
         #endregion Fields & Ctor
@@ -80,7 +82,7 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         public void BuildIndexes()
         {
-            manager.BuildIndexes();
+            this._manager.BuildIndexes();
         }
 
         /// <summary>
@@ -93,34 +95,32 @@ namespace LBi.LostDoc.Templating.XPath
         /// the value of the key for each matching node</param>
         public virtual void AddKey(string keyName, string match, string use)
         {
-            KeyDef key = new KeyDef(nav, match, use);
-            manager.AddKey(nav, keyName, key);
+            KeyDef key = new KeyDef(this._nav, match, use);
+            this._manager.AddKey(this._nav, keyName, key);
         }
 
         public virtual void AddKey(string keyName, string match, string use, XsltContext customXsltContext)
         {
-            KeyDef key = new KeyDef(nav, match, use, customXsltContext);
-            manager.AddKey(nav, keyName, key);
+            KeyDef key = new KeyDef(this._nav, match, use, customXsltContext);
+            this._manager.AddKey(this._nav, keyName, key);
         }
 
         public XPathNodeIterator Get(string keyName, object value)
         {
-            return this.manager.GetNodes(keyName, value);
+            return this._manager.GetNodes(keyName, value);
         }
 
 
         #region KeyDef
-
         /// <summary>
         /// Compilable key definition.
         /// </summary>
         private class KeyDef
         {
-            private readonly string match;
-            private string use;
-            private XPathExpression matchExpr, useExpr;
-            private XPathNavigator nav;
-            private XsltContext context;
+            private XPathExpression _matchExpr;
+            private XPathExpression _useExpr;
+            private readonly XPathNavigator _nav;
+            private readonly XsltContext _context;
 
             /// <summary>
             /// Creates a key definition with specified 'match' and 'use' expressions.
@@ -133,29 +133,23 @@ namespace LBi.LostDoc.Templating.XPath
             /// <param name="customContext">Optional <see cref="XsltContext"/> implemenation.</param>
             public KeyDef(XPathNavigator nav, string match, string use, XsltContext customContext = null)
             {
-                this.nav = nav;
-                this.match = match;
-                this.use = use;
-                this.context = customContext;
+                this._nav = nav;
+                this.Match = match;
+                this.Use = use;
+                this._context = customContext;
             }
 
             /// <summary>
             /// XPath pattern, defining the nodes to 
             /// which this key is applicable.
             /// </summary>
-            public string Match
-            {
-                get { return match; }
-            }
+            public string Match { get; private set; }
 
             /// <summary>
             /// XPath expression expression used to 
             /// determine the value of the key for each matching node.
             /// </summary>
-            public string Use
-            {
-                get { return use; }
-            }
+            public string Use { get; private set; }
 
             /// <summary>
             /// Compiled XPath pattern, defining the nodes to 
@@ -165,13 +159,13 @@ namespace LBi.LostDoc.Templating.XPath
             {
                 get
                 {
-                    if (matchExpr == null)
+                    if (this._matchExpr == null)
                     {
-                        matchExpr = nav.Compile(match);
-                        if (this.context != null)
-                            matchExpr.SetContext(this.context);
+                        this._matchExpr = this._nav.Compile(this.Match);
+                        if (this._context != null)
+                            this._matchExpr.SetContext(this._context);
                     }
-                    return matchExpr;
+                    return this._matchExpr;
                 }
             }
 
@@ -183,13 +177,13 @@ namespace LBi.LostDoc.Templating.XPath
             {
                 get
                 {
-                    if (useExpr == null)
+                    if (this._useExpr == null)
                     {
-                        useExpr = nav.Compile(use);
-                        if (this.context != null)
-                            useExpr.SetContext(this.context);
+                        this._useExpr = this._nav.Compile(this.Use);
+                        if (this._context != null)
+                            this._useExpr.SetContext(this._context);
                     }
-                    return useExpr;
+                    return this._useExpr;
                 }
             }
         }
@@ -203,16 +197,16 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         private class Index
         {
-            private List<KeyDef> keys;
-            private IDictionary<string, List<XPathNavigator>> index;
+            private readonly List<KeyDef> _keys;
+            private readonly IDictionary<string, List<XPathNavigator>> _index;
 
             /// <summary>
             /// Creates index over specified XPathNavigator.
             /// </summary>
             public Index()
             {
-                keys = new List<KeyDef>();
-                index = new Dictionary<string, List<XPathNavigator>>();
+                this._keys = new List<KeyDef>();
+                this._index = new Dictionary<string, List<XPathNavigator>>();
             }
 
             /// <summary>
@@ -221,7 +215,7 @@ namespace LBi.LostDoc.Templating.XPath
             /// <param name="key">Key definition</param>
             public void AddKey(KeyDef key)
             {
-                keys.Add(key);
+                this._keys.Add(key);
             }
 
             /// <summary>
@@ -245,7 +239,7 @@ namespace LBi.LostDoc.Templating.XPath
                     while (nodes.MoveNext())
                     {
 
-                        if (index.TryGetValue(nodes.Current.Value, out tmpIndexedNodes))
+                        if (this._index.TryGetValue(nodes.Current.Value, out tmpIndexedNodes))
                         {
                             if (indexedNodes == null)
                                 indexedNodes = new List<XPathNavigator>();
@@ -255,7 +249,7 @@ namespace LBi.LostDoc.Templating.XPath
                 }
                 else
                 {
-                    index.TryGetValue(keyValue.ToString(), out indexedNodes);
+                    this._index.TryGetValue(keyValue.ToString(), out indexedNodes);
                 }
                 if (indexedNodes == null)
                     indexedNodes = new List<XPathNavigator>(0);
@@ -270,7 +264,7 @@ namespace LBi.LostDoc.Templating.XPath
             /// <param name="node">Node to match</param>
             public void MatchNode(XPathNavigator node)
             {
-                foreach (KeyDef keyDef in keys)
+                foreach (KeyDef keyDef in this._keys)
                 {
                     if (node.Matches(keyDef.MatchExpr))
                     {
@@ -304,10 +298,10 @@ namespace LBi.LostDoc.Templating.XPath
             {
                 //Get slot
                 List<XPathNavigator> indexedNodes;
-                if (!index.TryGetValue(key, out indexedNodes))
+                if (!this._index.TryGetValue(key, out indexedNodes))
                 {
                     indexedNodes = new List<XPathNavigator>();
-                    index.Add(key, indexedNodes);
+                    this._index.Add(key, indexedNodes);
                 }
                 indexedNodes.Add(node.Clone());
             }
@@ -322,9 +316,9 @@ namespace LBi.LostDoc.Templating.XPath
         /// </summary>
         private class IndexManager
         {
-            private IDictionary<string, Index> indexes;
-            private XPathNavigator nav;
-            private bool indexed;
+            private IDictionary<string, Index> _indexes;
+            private XPathNavigator _nav;
+            private bool _indexed;
 
             /// <summary>
             /// Adds new key to the named index.
@@ -334,16 +328,16 @@ namespace LBi.LostDoc.Templating.XPath
             /// <param name="key">Key definition</param>
             public void AddKey(XPathNavigator nav, string indexName, KeyDef key)
             {
-                this.indexed = false;
-                this.nav = nav;
+                this._indexed = false;
+                this._nav = nav;
                 //Named indexes are stored in a hashtable.
-                if (indexes == null)
-                    indexes = new Dictionary<string, Index>();
+                if (this._indexes == null)
+                    this._indexes = new Dictionary<string, Index>();
                 Index index;
-                if (!indexes.TryGetValue(indexName, out index))
+                if (!this._indexes.TryGetValue(indexName, out index))
                 {
                     index = new Index();
-                    indexes.Add(indexName, index);
+                    this._indexes.Add(indexName, index);
                 }
                 index.AddKey(key);
             }
@@ -353,7 +347,11 @@ namespace LBi.LostDoc.Templating.XPath
             /// </summary>
             public void BuildIndexes()
             {
-                XPathNavigator doc = nav.Clone();
+                // TODO hack to prevent null ref exception in case there is no index specifications
+                if (this._nav == null)
+                    return;
+
+                XPathNavigator doc = this._nav.Clone();
                 //Walk through the all document nodes adding each one matching 
                 //'match' expression to the index.
                 doc.MoveToRoot();
@@ -367,7 +365,7 @@ namespace LBi.LostDoc.Templating.XPath
                         //Processs namespace nodes
                         for (bool go = tempNav.MoveToFirstNamespace(); go; go = tempNav.MoveToNextNamespace())
                         {
-                            foreach (Index index in indexes.Values)
+                            foreach (Index index in this._indexes.Values)
                                 index.MatchNode(tempNav);
                         }
                         //ni.Current.MoveToParent();
@@ -376,16 +374,16 @@ namespace LBi.LostDoc.Templating.XPath
                         //process attributes
                         for (bool go = tempNav.MoveToFirstAttribute(); go; go = tempNav.MoveToNextAttribute())
                         {
-                            foreach (Index index in indexes.Values)
+                            foreach (Index index in this._indexes.Values)
                                 index.MatchNode(tempNav);
                         }
                         //ni.Current.MoveToParent();
                     }
 
-                    foreach (Index index in indexes.Values)
+                    foreach (Index index in this._indexes.Values)
                         index.MatchNode(ni.Current);
                 }
-                indexed = true;
+                this._indexed = true;
             }
 
             /// <summary>
@@ -396,10 +394,10 @@ namespace LBi.LostDoc.Templating.XPath
             /// <returns>Indexed nodes</returns>
             public XPathNodeIterator GetNodes(string indexName, object value)
             {
-                if (!indexed)
+                if (!this._indexed)
                     BuildIndexes();
                 Index index;
-                indexes.TryGetValue(indexName, out index);
+                this._indexes.TryGetValue(indexName, out index);
                 return index == null ? null : index.GetNodes(value);
             }
         }
