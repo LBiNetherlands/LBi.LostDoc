@@ -143,8 +143,6 @@ namespace LBi.LostDoc.Templating
                                                          work.Length,
                                                          this.ResourceDirectives.Length + this.StylesheetsDirectives.Length);
 
-            ConcurrentBag<WorkUnitResult> results = new ConcurrentBag<WorkUnitResult>();
-
             // create context
             ITemplatingContext context = new TemplatingContext(settings.Cache,
                                                                settings.Catalog,
@@ -180,7 +178,6 @@ namespace LBi.LostDoc.Templating
                 Func<object, WorkUnitResult> func =
                     uow =>
                     {
-                        WorkUnitResult ret;
                         var ctx = context;
                         var unit = (UnitOfWork) uow;
                         FileReference outputRef;
@@ -188,9 +185,9 @@ namespace LBi.LostDoc.Templating
                             outputRef = ctx.Storage.Resolve(unit.Output);
                         else
                         {
-                            int delimiterPosition = unit.Output.OriginalString.IndexOf(Uri.SchemeDelimiter);
-                            string path = unit.Output.OriginalString.Substring(delimiterPosition);
-                            string uriSuffix = '/' + unit.Order.ToString(CultureInfo.InvariantCulture);
+                            // redirect intermediary output files to the temp:// provider
+                            string path = unit.Output.OriginalString.Substring(unit.Output.Scheme.Length);
+                            string uriSuffix = '.' + unit.Order.ToString(CultureInfo.InvariantCulture);
                             Uri tempOutput = new Uri(StorageSchemas.Temporary + path + uriSuffix);
                             outputRef = ctx.Storage.Resolve(tempOutput);
                         }
@@ -206,10 +203,25 @@ namespace LBi.LostDoc.Templating
                         }
                     };
                 Task<WorkUnitResult> task = new Task<WorkUnitResult>(func, unitOfWork);
-                //tasks.Add(task);
+                tasks.Add(task);
                 dependencyProvider.Add(unitOfWork.Output, unitOfWork.Order, task);
             }
 
+            
+
+            ParallelOptions parallelOptions = new ParallelOptions
+                                              {
+                                                  //MaxDegreeOfParallelism = 1
+                                                  CancellationToken = settings.CancellationToken
+                                              };
+
+            Parallel.ForEach(tasks,
+                             parallelOptions,
+                             t => t.Start());
+
+            Task.WaitAll(tasks.ToArray(), settings.CancellationToken);
+
+            List<WorkUnitResult> results = tasks.Select(t => t.Result).ToList();
        
       
             //int totalCount = work.Length;
@@ -270,146 +282,146 @@ namespace LBi.LostDoc.Templating
 
             Stopwatch statsTimer = new Stopwatch();
             // prepare stats
-            Dictionary<Type, WorkUnitResult[]> resultGroups =
-                results.GroupBy(ps => ps.WorkUnit.GetType()).ToDictionary(g => g.Key, g => g.ToArray());
 
+            Dictionary<Type, WorkUnitResult[]> resultGroups = results.GroupBy(ps => ps.WorkUnit.GetType()).ToDictionary(g => g.Key, g => g.ToArray());
 
+            if (resultGroups.ContainsKey(typeof(StylesheetApplication))) {
+                var stylesheetStats = resultGroups[typeof(StylesheetApplication)].GroupBy(r => ((StylesheetApplication)r.WorkUnit).Stylesheet);
 
-            var stylesheetStats =
-                resultGroups[typeof(StylesheetApplication)]
-                .GroupBy(r => ((StylesheetApplication)r.WorkUnit).StylesheetName);
-
-            foreach (var statGroup in stylesheetStats)
-            {
-                long min = statGroup.Min(ps => ps.Duration);
-                long max = statGroup.Max(ps => ps.Duration);
-                TraceSources.TemplateSource.TraceInformation("Applied stylesheet '{0}' {1:N0} times in {2:N0} ms (min: {3:N0}, mean {4:N0}, max {5:N0}, avg: {6:N0})",
-                                                             statGroup.Key,
-                                                             statGroup.Count(),
-                                                             statGroup.Sum(ps => ps.Duration) / 1000.0,
-                                                             min / 1000.0,
-                                                             statGroup.Skip(statGroup.Count() / 2).Take(1).Single().Duration / 1000.0,
-                                                             max / 1000.0,
-                                                             statGroup.Average(ps => ps.Duration) / 1000.0);
-
-
-                // TODO this is quick and dirty, should be cleaned up 
-                long[] buckets = new long[20];
-                int rows = 6;
-                /* 
-┌────────────────────┐ ◄ 230
-│█                  █│
-│█                  █│
-│█                  █│
-│█                  █│
-│█                  █│
-│█__________________█│
-└────────────────────┘ ◄ 0
-▲ 12ms               ▲ 12ms
-                 */
-                // this is a little hacky, but it will do for now
-                WorkUnitResult[] sortedResults = statGroup.OrderBy(r => r.Duration).ToArray();
-                double bucketSize = (max - min) / (double)buckets.Length;
-                int bucketNum = 0;
-                long bucketMax = 0;
-                foreach (WorkUnitResult result in sortedResults)
+                foreach (var statGroup in stylesheetStats)
                 {
-                    while ((result.Duration - min) > (bucketNum + 1) * bucketSize)
-                        bucketNum++;
+                    long min = statGroup.Min(ps => ps.Duration);
+                    long max = statGroup.Max(ps => ps.Duration);
+                    TraceSources.TemplateSource.TraceInformation("Applied stylesheet '{0}' {1:N0} times in {2:N0} ms (min: {3:N0}, mean {4:N0}, max {5:N0}, avg: {6:N0})",
+                                                                 statGroup.Key,
+                                                                 statGroup.Count(),
+                                                                 statGroup.Sum(ps => ps.Duration) / 1000.0,
+                                                                 min / 1000.0,
+                                                                 statGroup.Skip(statGroup.Count() / 2).Take(1).Single().Duration / 1000.0,
+                                                                 max / 1000.0,
+                                                                 statGroup.Average(ps => ps.Duration) / 1000.0);
 
-                    buckets[bucketNum] += 1;
-                    bucketMax = Math.Max(buckets[bucketNum], bucketMax);
-                }
 
-
-                double rowHeight = bucketMax / (double)rows;
-
-                StringBuilder graph = new StringBuilder();
-                graph.AppendLine("Graph:");
-                const int gutter = 2;
-                int columnWidth = graph.Length;
-                graph.Append('┌').Append('─', buckets.Length).Append('┐').Append('◄').Append(' ').Append(bucketMax.ToString("N0"));
-                int firstLineLength = graph.Length - columnWidth;
-                columnWidth = graph.Length - columnWidth + gutter;
-                StringBuilder lastLine = new StringBuilder();
-                lastLine.Append('▲').Append(' ').Append((min / 1000.0).ToString("N0")).Append("ms");
-                lastLine.Append(' ', (buckets.Length + 2) - lastLine.Length - 1);
-                lastLine.Append('▲').Append(' ').Append((max / 1000.0).ToString("N0")).Append("ms");
-                columnWidth = Math.Max(columnWidth, lastLine.Length + gutter);
-
-                if (columnWidth > firstLineLength)
-                    graph.Append(' ', columnWidth - firstLineLength);
-                graph.AppendLine("Percentage of the applications processed within a certain time (ms)");
-
-                for (int row = 0; row < rows; row++)
-                {
-                    // │┌┐└┘─
-                    graph.Append('│');
-                    for (int col = 0; col < buckets.Length; col++)
+                    // TODO this is quick and dirty, should be cleaned up 
+                    long[] buckets = new long[20];
+                    int rows = 6;
+                    /* 
+    ┌────────────────────┐ ◄ 230
+    │█                  █│
+    │█                  █│
+    │█                  █│
+    │█                  █│
+    │█                  █│
+    │█__________________█│
+    └────────────────────┘ ◄ 0
+    ▲ 12ms               ▲ 12ms
+                     */
+                    // this is a little hacky, but it will do for now
+                    WorkUnitResult[] sortedResults = statGroup.OrderBy(r => r.Duration).ToArray();
+                    double bucketSize = (max - min) / (double)buckets.Length;
+                    int bucketNum = 0;
+                    long bucketMax = 0;
+                    foreach (WorkUnitResult result in sortedResults)
                     {
-                        if (buckets[col] > (rowHeight * (rows - (row + 1)) + rowHeight / 2.0))
-                            graph.Append('█');
-                        else if (buckets[col] > rowHeight * (rows - (row + 1)))
-                            graph.Append('▄');
-                        else if (row == rows - 1)
-                            graph.Append('_');
-                        else
-                            graph.Append(' ');
-                    }
-                    graph.Append('│');
+                        while ((result.Duration - min) > (bucketNum + 1) * bucketSize)
+                            bucketNum++;
 
-                    graph.Append(' ', columnWidth - (buckets.Length + 2));
-                    switch (row)
-                    {
-                        case 0:
-                            graph.Append(" 100% ").Append((max / 1000.0).ToString("N0"));
-                            break;
-                        case 1:
-                            graph.Append("  95% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.95))].Duration / 1000.0).ToString("N0"));
-                            break;
-                        case 2:
-                            graph.Append("  90% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .9))].Duration / 1000.0).ToString("N0"));
-                            break;
-                        case 3:
-                            graph.Append("  80% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.8))].Duration / 1000.0).ToString("N0"));
-                            break;
-                        case 4:
-                            graph.Append("  70% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.7))].Duration / 1000.0).ToString("N0"));
-                            break;
-                        case 5:
-                            graph.Append("  50% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.5))].Duration / 1000.0).ToString("N0"));
-                            break;
+                        buckets[bucketNum] += 1;
+                        bucketMax = Math.Max(buckets[bucketNum], bucketMax);
                     }
+
+
+                    double rowHeight = bucketMax / (double)rows;
+
+                    StringBuilder graph = new StringBuilder();
+                    graph.AppendLine("Graph:");
+                    const int gutter = 2;
+                    int columnWidth = graph.Length;
+                    graph.Append('┌').Append('─', buckets.Length).Append('┐').Append('◄').Append(' ').Append(bucketMax.ToString("N0"));
+                    int firstLineLength = graph.Length - columnWidth;
+                    columnWidth = graph.Length - columnWidth + gutter;
+                    StringBuilder lastLine = new StringBuilder();
+                    lastLine.Append('▲').Append(' ').Append((min / 1000.0).ToString("N0")).Append("ms");
+                    lastLine.Append(' ', (buckets.Length + 2) - lastLine.Length - 1);
+                    lastLine.Append('▲').Append(' ').Append((max / 1000.0).ToString("N0")).Append("ms");
+                    columnWidth = Math.Max(columnWidth, lastLine.Length + gutter);
+
+                    if (columnWidth > firstLineLength)
+                        graph.Append(' ', columnWidth - firstLineLength);
+                    graph.AppendLine("Percentage of the applications processed within a certain time (ms)");
+
+                    for (int row = 0; row < rows; row++)
+                    {
+                        // │┌┐└┘─
+                        graph.Append('│');
+                        for (int col = 0; col < buckets.Length; col++)
+                        {
+                            if (buckets[col] > (rowHeight * (rows - (row + 1)) + rowHeight / 2.0))
+                                graph.Append('█');
+                            else if (buckets[col] > rowHeight * (rows - (row + 1)))
+                                graph.Append('▄');
+                            else if (row == rows - 1)
+                                graph.Append('_');
+                            else
+                                graph.Append(' ');
+                        }
+                        graph.Append('│');
+
+                        graph.Append(' ', columnWidth - (buckets.Length + 2));
+                        switch (row)
+                        {
+                            case 0:
+                                graph.Append(" 100% ").Append((max / 1000.0).ToString("N0"));
+                                break;
+                            case 1:
+                                graph.Append("  95% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.95))].Duration / 1000.0).ToString("N0"));
+                                break;
+                            case 2:
+                                graph.Append("  90% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .9))].Duration / 1000.0).ToString("N0"));
+                                break;
+                            case 3:
+                                graph.Append("  80% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.8))].Duration / 1000.0).ToString("N0"));
+                                break;
+                            case 4:
+                                graph.Append("  70% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.7))].Duration / 1000.0).ToString("N0"));
+                                break;
+                            case 5:
+                                graph.Append("  50% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * 0.5))].Duration / 1000.0).ToString("N0"));
+                                break;
+                        }
+
+                        graph.AppendLine();
+                    }
+                    int len = graph.Length;
+                    graph.Append('└').Append('─', buckets.Length).Append('┘').Append('◄').Append(" 0");
+                    len = graph.Length - len;
+                    if (columnWidth > len)
+                        graph.Append(' ', columnWidth - len);
+
+                    graph.Append("  10% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .1))].Duration / 1000.0).ToString("N0"));
 
                     graph.AppendLine();
+
+                    lastLine.Append(' ', columnWidth - lastLine.Length);
+                    lastLine.Append("   1% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .01))].Duration / 1000.0).ToString("N0"));
+                    graph.Append(lastLine.ToString());
+
+                    TraceSources.TemplateSource.TraceVerbose(graph.ToString());
+
                 }
-                int len = graph.Length;
-                graph.Append('└').Append('─', buckets.Length).Append('┘').Append('◄').Append(" 0");
-                len = graph.Length - len;
-                if (columnWidth > len)
-                    graph.Append(' ', columnWidth - len);
-
-                graph.Append("  10% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .1))].Duration / 1000.0).ToString("N0"));
-
-                graph.AppendLine();
-
-                lastLine.Append(' ', columnWidth - lastLine.Length);
-                lastLine.Append("   1% ").Append((sortedResults[((int)Math.Floor(sortedResults.Length * .01))].Duration / 1000.0).ToString("N0"));
-                graph.Append(lastLine.ToString());
-
-                TraceSources.TemplateSource.TraceVerbose(graph.ToString());
-
             }
 
-            var resourceStats = resultGroups[typeof(ResourceDeployment)];
-
-            foreach (var statGroup in resourceStats)
+            if (resultGroups.ContainsKey(typeof(ResourceDeployment)))
             {
-                TraceSources.TemplateSource.TraceInformation("Deployed resource '{0}' in {1:N0} ms",
-                                                             ((ResourceDeployment)statGroup.WorkUnit).Input,
-                                                             statGroup.Duration);
-            }
+                WorkUnitResult[] resourceStats = resultGroups[typeof(ResourceDeployment)];
 
+                foreach (var statGroup in resourceStats)
+                {
+                    TraceSources.TemplateSource.TraceInformation("Deployed resource '{0}' in {1:N0} ms",
+                                                                 ((ResourceDeployment)statGroup.WorkUnit).Input,
+                                                                 statGroup.Duration);
+                }
+            }
 
             TraceSources.TemplateSource.TraceInformation("Documentation generated in {0:N1} seconds (processing time: {1:N1} seconds)",
                                                          timer.Elapsed.TotalSeconds,
