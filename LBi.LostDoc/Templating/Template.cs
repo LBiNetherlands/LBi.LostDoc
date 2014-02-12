@@ -132,7 +132,6 @@ namespace LBi.LostDoc.Templating
             ITemplateContext templateContext = new TemplateContext(settings.Cache,
                                                                    inputDocument,
                                                                    xsltContext,
-                                                                   settings.UriFactory,
                                                                    settings.FileResolver,
                                                                    settings.Catalog,
                                                                    this.TemplateFileProvider);

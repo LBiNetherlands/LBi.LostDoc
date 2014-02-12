@@ -29,8 +29,6 @@ namespace LBi.LostDoc.Templating
 
         XDocument Document { get; }
 
-        void EnsureUniqueUri(ref Uri uri);
-
         void RegisterAssetUri(AssetIdentifier assetId, Uri uri);
     }
 }

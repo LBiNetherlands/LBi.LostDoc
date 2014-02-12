@@ -26,13 +26,11 @@ namespace LBi.LostDoc.Templating
 {
     public class TemplateContext : ITemplateContext
     {
-        private readonly IUniqueUriFactory _uniqueUriFactory;
         private readonly IFileResolver _fileResolver;
 
         public TemplateContext(ObjectCache cache,
                                XDocument document,
                                CustomXsltContext xsltContext,
-                               IUniqueUriFactory uniqueUriFactory,
                                IFileResolver fileResolver,
                                ComposablePartCatalog catalog,
                                IFileProvider templateFileProvider)
@@ -40,7 +38,6 @@ namespace LBi.LostDoc.Templating
             this.Cache = cache;
             this.XsltContext = xsltContext;
             this.Document = document;
-            this._uniqueUriFactory = uniqueUriFactory;
             this._fileResolver = fileResolver;
             this.TemplateFileProvider = templateFileProvider;
             this.Catalog = catalog;
@@ -54,11 +51,6 @@ namespace LBi.LostDoc.Templating
 
         public IFileProvider TemplateFileProvider { get; private set; }
         public CustomXsltContext XsltContext { get; private set; }
-        
-        public void EnsureUniqueUri(ref Uri uri)
-        {
-            this._uniqueUriFactory.EnsureUnique(ref uri);
-        }
 
         public void RegisterAssetUri(AssetIdentifier assetId, Uri uri)
         {

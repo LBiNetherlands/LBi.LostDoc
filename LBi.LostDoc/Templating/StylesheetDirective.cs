@@ -87,10 +87,6 @@ namespace LBi.LostDoc.Templating
                     continue;
                 }
 
-                // TODO can we get rid of this?
-                //// ensure url is unique
-                //context.EnsureUniqueUri(ref outputUri);
-
                 // asset identifiers
                 foreach (AssetRegistration assetRegistration in this.AssetRegistrations)
                 {

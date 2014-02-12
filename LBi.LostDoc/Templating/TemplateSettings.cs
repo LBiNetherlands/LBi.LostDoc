@@ -33,7 +33,6 @@ namespace LBi.LostDoc.Templating
             this.AssetRedirects = new AssetRedirectCollection();
             this.Arguments = new Dictionary<string, object>();
             this.Filter = null;
-            this.UriFactory = new DefaultUniqueUriFactory();
             this.Cache = new MemoryCache("LostDoc");
             this.FileResolver = new FileResolver(caseSensitiveFs: false);
             this.Catalog = new ApplicationCatalog();
@@ -48,7 +47,6 @@ namespace LBi.LostDoc.Templating
         public Dictionary<string, object> Arguments { get; set; }
         public IFileProvider OutputFileProvider { get; set; }
         public bool OverwriteExistingFiles { get; set; }
-        public IUniqueUriFactory UriFactory { get; set; }
         public ObjectCache Cache { get; set; }
         public IFileResolver FileResolver { get; set; }
         public ComposablePartCatalog Catalog { get; set; }

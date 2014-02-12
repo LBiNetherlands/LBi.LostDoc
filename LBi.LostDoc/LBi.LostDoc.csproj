@@ -140,7 +140,6 @@
     <Compile Include="Templating\AssetResolvers\IFileResolver.cs" />
     <Compile Include="Templating\AssetSection.cs" />
     <Compile Include="Templating\ConstantXPathVariable.cs" />
-    <Compile Include="Templating\DefaultUniqueUriFactory.cs" />
     <Compile Include="Templating\DependencyProvider.cs" />
     <Compile Include="Templating\ExportTransformAttribute.cs" />
     <Compile Include="Templating\ExpressionXPathVariable.cs" />
@@ -161,7 +160,6 @@
     <Compile Include="Templating\IResourceTransformMetadata.cs" />
     <Compile Include="Templating\ITemplateContext.cs" />
     <Compile Include="Templating\ITemplateDirective.cs" />
-    <Compile Include="Templating\IUniqueUriFactory.cs" />
     <Compile Include="Templating\MissingNodeException.cs" />
     <Compile Include="Templating\ParameterExport.cs" />
     <Compile Include="Templating\ResourceTransform.cs" />
