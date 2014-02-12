@@ -45,26 +45,22 @@ namespace LBi.LostDoc.Templating
 
         public bool TryGetDependency(Uri uri, int order, out Stream stream)
         {
+            stream = null;
             List<Tuple<int, Task<WorkUnitResult>>> versionList;
             if (this._tasks.TryGetValue(uri, out versionList))
             {
-                int index;
-
-                for (index = 0; index < versionList.Count && versionList[index].Item1 < order; index++);
-
-                if (index < versionList.Count)
+                foreach (Tuple<int, Task<WorkUnitResult>> tuple in versionList)
                 {
-                    Task<WorkUnitResult> task = versionList[index].Item2;
-                    if (!task.IsCompleted)
-                        task.Wait(this._cancellationToken);
+                    if (tuple.Item1 < order)
+                    {
+                        Task<WorkUnitResult> task = tuple.Item2;
+                        if (!task.IsCompleted)
+                            task.Wait(this._cancellationToken);
 
-                    stream = task.Result.GetStream();
+                        stream = task.Result.GetStream();
+                    }
                 }
-                else
-                    stream = null;
             }
-            else
-                stream = null;
 
             return stream != null;
         }
