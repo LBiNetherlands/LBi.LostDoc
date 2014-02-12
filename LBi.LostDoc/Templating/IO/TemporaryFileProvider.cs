@@ -43,7 +43,7 @@ namespace LBi.LostDoc.Templating.IO
 
         public void Delete()
         {
-            Directory.Delete(this.BasePath);
+            Directory.Delete(this.BasePath, true);
         }
     }
 }
