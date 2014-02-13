@@ -104,9 +104,11 @@ namespace LBi.LostDoc.Templating
 
             FileReference inputFileRef = storageResolver.Resolve(Storage.InputDocumentUri);
             using (Stream inputStream = inputFileRef.GetStream(FileMode.Create))
-            using (XmlWriter inputWriter = XmlWriter.Create(inputStream, new XmlWriterSettings { Encoding = Encoding.UTF8}))
+            using (XmlWriter inputWriter = XmlWriter.Create(inputStream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false}))
             {
                 inputDocument.Save(inputWriter);
+                inputWriter.Close();
+                inputStream.Close();
             }
 
             DependencyProvider dependencyProvider = new DependencyProvider(settings.CancellationToken);
@@ -405,7 +407,9 @@ namespace LBi.LostDoc.Templating
                             var ctx = context;
                             var unit = (UnitOfWork)uow;
                             FileReference outputRef;
-                            if (ctx.DependencyProvider.IsFinal(unit.Output, unit.Order))
+                            // TODO maybe InputDocumentUri needs to be random so we don't get this collision
+                            if (unit.Output != Storage.InputDocumentUri &&
+                                ctx.DependencyProvider.IsFinal(unit.Output, unit.Order))
                                 outputRef = ctx.StorageResolver.Resolve(unit.Output);
                             else
                             {
@@ -420,6 +424,7 @@ namespace LBi.LostDoc.Templating
                             {
                                 var ticks = Stopwatch.GetTimestamp();
                                 unit.Execute(context, outputStream);
+                                outputStream.Close();
                                 ticks = Stopwatch.GetTimestamp() - ticks;
                                 return new WorkUnitResult(outputRef,
                                                           unit,
