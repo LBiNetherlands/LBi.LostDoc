@@ -22,14 +22,13 @@ using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using LBi.LostDoc.Composition;
 using LBi.LostDoc.Extensibility;
 using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {
-    public class ResourceDirective : ITemplateDirective<ResourceDeployment>
+    public class ResourceDirective : ITemplateDirective
     {
         public ResourceDirective(int order,
                                  string conditional,
@@ -53,7 +52,7 @@ namespace LBi.LostDoc.Templating
         public XPathVariable[] Variables { get; private set; }
         public ResourceTransform[] Transforms { get; private set; }
 
-        public IEnumerable<ResourceDeployment> DiscoverWork(ITemplateContext context)
+        public IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context)
         {
             context.XsltContext.PushVariableScope(context.Document.Root, this.Variables);
 

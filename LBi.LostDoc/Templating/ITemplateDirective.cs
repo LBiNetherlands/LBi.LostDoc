@@ -20,23 +20,32 @@ using System.Diagnostics.Contracts;
 
 namespace LBi.LostDoc.Templating
 {
-    [ContractClass(typeof(ITemplateDirectiveContract<>))]
-    public interface ITemplateDirective<out TUnitOfWork> where TUnitOfWork : UnitOfWork
+    [ContractClass(typeof(ITemplateDirectiveContract))]
+    public interface ITemplateDirective
     {
-        IEnumerable<TUnitOfWork> DiscoverWork(ITemplateContext context);
+        int Order { get; }
+        IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context);
     }
 
     // ReSharper disable InconsistentNaming
-    [ContractClassFor(typeof(ITemplateDirective<>))]
-    internal class ITemplateDirectiveContract<T> : ITemplateDirective<T> where T : UnitOfWork
+    [ContractClassFor(typeof(ITemplateDirective))]
+    internal class ITemplateDirectiveContract : ITemplateDirective
     {
-        public IEnumerable<T> DiscoverWork(ITemplateContext context)
+        public int Order {
+            get
+            {
+                Contract.Ensures(Contract.Result<int>() >= 0);
+                return default(int);
+            }
+        }
+
+        public IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context)
         {
             Contract.Requires<ArgumentNullException>(context != null);
-            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
-            Contract.Ensures(Contract.ForAll<T>(Contract.Result<IEnumerable<T>>(), t => t != null));
+            Contract.Ensures(Contract.Result<IEnumerable<UnitOfWork>>() != null);
+            Contract.Ensures(Contract.ForAll<UnitOfWork>(Contract.Result<IEnumerable<UnitOfWork>>(), t => t != null));
 
-            return default(IEnumerable<T>);
+            return default(IEnumerable<UnitOfWork>);
         }
     }
     // ReSharper restore InconsistentNaming

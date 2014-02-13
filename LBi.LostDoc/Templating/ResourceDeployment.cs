@@ -40,7 +40,7 @@ namespace LBi.LostDoc.Templating
                                                          this.Input,
                                                          this.Output);
 
-            var inputFileRef = context.Storage.Resolve(this.Input);
+            var inputFileRef = context.StorageResolver.Resolve(this.Input);
 
             Stream streamSrc = inputFileRef.GetStream(FileMode.Open);
             Stream outStream = streamSrc;

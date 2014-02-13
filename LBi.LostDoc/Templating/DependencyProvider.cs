@@ -55,7 +55,12 @@ namespace LBi.LostDoc.Templating
                     {
                         Task<WorkUnitResult> task = tuple.Item2;
                         if (!task.IsCompleted)
-                            task.Wait(this._cancellationToken);
+                        {
+                            if (task.Status == TaskStatus.Created)
+                                task.RunSynchronously();
+                            else
+                                task.Wait(this._cancellationToken);
+                        }
 
                         stream = task.Result.GetStream();
                     }

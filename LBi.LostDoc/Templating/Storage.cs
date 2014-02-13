@@ -15,6 +15,8 @@
  */
 
 using System;
+using System.IO;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {
@@ -34,5 +36,27 @@ namespace LBi.LostDoc.Templating
         /// output://
         /// </summary>
         public static readonly string UriSchemeOutput = "output";
+
+        /// <summary>
+        /// temp://input.xml
+        /// </summary>
+        public static readonly Uri InputDocumentUri = new Uri(UriSchemeTemporary + Uri.SchemeDelimiter + "input.xml");
+
+        public static Stream GetStream(StorageResolver storage, IDependencyProvider dependencyProvider, Uri input, int order)
+        {
+            Stream ret;
+            if (dependencyProvider != null &&
+                dependencyProvider.TryGetDependency(input, order, out ret))
+            {
+                return ret;
+            }
+
+            FileReference fileRef = storage.Resolve(input);
+
+            if (fileRef.Exists)
+                return fileRef.GetStream(FileMode.Open);
+
+            throw new FileNotFoundException(string.Format("File not found: {0} ({1})", input, fileRef.Path), fileRef.Path);
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace LBi.LostDoc.Test.Templating
             var template = LoadTemplate("MultipleVersionsOfTempFile");
 
             TemporaryFileProvider tempFiles = new TemporaryFileProvider();
-            TemplateOutput output = template.Generate(new XDocument(),
+            TemplateOutput output = template.Generate(new XDocument(new XElement("root")),
                                                       new TemplateSettings
                                                       {
                                                           OutputFileProvider = tempFiles,
@@ -51,7 +51,7 @@ namespace LBi.LostDoc.Test.Templating
             var template = LoadTemplate("EnrichInputDocument");
 
             TemporaryFileProvider tempFiles = new TemporaryFileProvider();
-            TemplateOutput output = template.Generate(new XDocument(),
+            TemplateOutput output = template.Generate(new XDocument(new XElement("root")),
                                                       new TemplateSettings
                                                       {
                                                           OutputFileProvider = tempFiles,
@@ -69,9 +69,9 @@ namespace LBi.LostDoc.Test.Templating
         }
 
         [Fact]
-        public void AlternateInput()
+        public void AlternateStaticInput()
         {
-            var template = LoadTemplate("AlternateInput");
+            var template = LoadTemplate("AlternateStaticInput");
 
             TemporaryFileProvider tempFiles = new TemporaryFileProvider();
             TemplateOutput output = template.Generate(new XDocument(new XElement("input")),
@@ -90,6 +90,31 @@ namespace LBi.LostDoc.Test.Templating
 
             tempFiles.Delete();
         }
+
+        [Fact]
+        public void AlternateGeneratedInput()
+        {
+            var template = LoadTemplate("AlternateGeneratedInput");
+
+            TemporaryFileProvider tempFiles = new TemporaryFileProvider();
+            TemplateOutput output = template.Generate(new XDocument(new XElement("input")),
+                                                      new TemplateSettings
+                                                      {
+                                                          OutputFileProvider = tempFiles,
+                                                      });
+
+            Assert.Equal(1, tempFiles.GetFiles("").Count());
+            Assert.Contains("out.xml", tempFiles.GetFiles(""));
+
+            using (var file = tempFiles.OpenFile("out.xml", FileMode.Open))
+            {
+                Assert.Equal("input", XDocument.Load(file).Root.Name);
+            }
+
+            tempFiles.Delete();
+        }
+
+
         private static Template LoadTemplate(string name)
         {
             IFileProvider templateProvider = new ResourceFileProvider("LBi.LostDoc.Test.Templating",

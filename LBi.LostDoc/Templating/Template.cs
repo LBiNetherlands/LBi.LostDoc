@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Templating.IO;
@@ -81,23 +82,6 @@ namespace LBi.LostDoc.Templating
                 handler(this, new ProgressArgs(action, percent));
         }
 
-        protected virtual IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context)
-        {
-            var ret = Enumerable.Empty<UnitOfWork>();
-
-            this.OnProgress("Processing resource directives", 0);
-            for (int i = 0; i < this.ResourceDirectives.Length; i++)
-                ret = ret.Concat(this.ResourceDirectives[i].DiscoverWork(context));
-            this.OnProgress("Processing resource directives", 100);
-
-            this.OnProgress("Processing stylesheet directives", 0);
-            for (int i = 0; i < this.StylesheetsDirectives.Length; i++)
-                ret = ret.Concat(this.StylesheetsDirectives[i].DiscoverWork(context));
-            this.OnProgress("Processing stylesheet directives", 100);
-
-            return ret;
-        }
-
         /// <summary>
         /// Applies the loaded templates to <paramref name="settings"/>.
         /// </summary>
@@ -118,29 +102,19 @@ namespace LBi.LostDoc.Templating
             storageResolver.Add("http", new HttpFileProvider(), stripScheme: false);
             storageResolver.Add("https", new HttpFileProvider(), stripScheme: false);
 
+            FileReference inputFileRef = storageResolver.Resolve(Storage.InputDocumentUri);
+            using (Stream inputStream = inputFileRef.GetStream(FileMode.Create))
+            using (XmlWriter inputWriter = XmlWriter.Create(inputStream, new XmlWriterSettings { Encoding = Encoding.UTF8}))
+            {
+                inputDocument.Save(inputWriter);
+            }
 
             DependencyProvider dependencyProvider = new DependencyProvider(settings.CancellationToken);
+
             List<IAssetUriResolver> assetUriResolvers = new List<IAssetUriResolver>();
             assetUriResolvers.Add(settings.FileResolver);
             if (settings.UriResolvers != null)
                 assetUriResolvers.AddRange(settings.UriResolvers);
-
-            // collect all work that has to be done
-            CustomXsltContext xsltContext = CustomXsltContext.Create(settings.IgnoredVersionComponent);
-            xsltContext.PushVariableScope(inputDocument.Root, this.GetGlobalParameters(this.Parameters, settings.Arguments));
-
-            ITemplateContext templateContext = new TemplateContext(settings.Cache,
-                                                                   inputDocument,
-                                                                   xsltContext,
-                                                                   settings.FileResolver,
-                                                                   settings.Catalog,
-                                                                   this.TemplateFileProvider);
-
-            UnitOfWork[] work = this.DiscoverWork(templateContext).ToArray();
-
-            TraceSources.TemplateSource.TraceInformation("processing {0:N0} work units from {1:N0} directives.",
-                                                         work.Length,
-                                                         this.ResourceDirectives.Length + this.StylesheetsDirectives.Length);
 
             // create context
             ITemplatingContext context = new TemplatingContext(settings.Cache,
@@ -150,6 +124,9 @@ namespace LBi.LostDoc.Templating
                                                                assetUriResolvers,
                                                                storageResolver,
                                                                dependencyProvider);
+
+            // collect all work that has to be done
+            Task<WorkUnitResult>[] work = this.DiscoverWork(inputDocument, context).ToArray();
 
             // fill indices
             using (TraceSources.TemplateSource.TraceActivity("Indexing input document"))
@@ -169,69 +146,29 @@ namespace LBi.LostDoc.Templating
                 context.DocumentIndex.BuildIndexes();
             }
 
-            List<Task<WorkUnitResult>> tasks = new List<Task<WorkUnitResult>>();
-
-            // register all tasks in the dependency provider
-            foreach (UnitOfWork unitOfWork in work)
-            {
-                Func<object, WorkUnitResult> func =
-                    uow =>
-                    {
-                        var ctx = context;
-                        var unit = (UnitOfWork) uow;
-                        FileReference outputRef;
-                        if (ctx.DependencyProvider.IsFinal(unit.Output, unit.Order))
-                            outputRef = ctx.Storage.Resolve(unit.Output);
-                        else
-                        {
-                            // redirect intermediary output files to the temp:// provider
-                            string path = unit.Output.OriginalString.Substring(unit.Output.Scheme.Length);
-                            string uriSuffix = '.' + unit.Order.ToString(CultureInfo.InvariantCulture);
-                            Uri tempOutput = new Uri(Storage.UriSchemeTemporary + path + uriSuffix);
-                            outputRef = ctx.Storage.Resolve(tempOutput);
-                        }
-
-                        using (Stream outputStream = outputRef.GetStream(FileMode.Create))
-                        {
-                            var ticks = Stopwatch.GetTimestamp();
-                            unit.Execute(context, outputStream);
-                            ticks = Stopwatch.GetTimestamp() - ticks;
-                            return new WorkUnitResult(outputRef,
-                                                      unit,
-                                                      (long) Math.Round(ticks/(double) Stopwatch.Frequency*1000000));
-                        }
-                    };
-                Task<WorkUnitResult> task = new Task<WorkUnitResult>(func, unitOfWork);
-                tasks.Add(task);
-                dependencyProvider.Add(unitOfWork.Output, unitOfWork.Order, task);
-            }
-
-            
-
             ParallelOptions parallelOptions = new ParallelOptions
                                               {
                                                   //MaxDegreeOfParallelism = 1
                                                   CancellationToken = settings.CancellationToken
                                               };
 
-            Parallel.ForEach(tasks,
+            // TODO is this really the best way to execute the tasks?
+            Parallel.ForEach(work,
                              parallelOptions,
-                             t => t.Start());
+                             t =>
+                             {
+                                 if (t.Status == TaskStatus.Created)
+                                     t.Start();
+                             });
 
-            Task.WaitAll(tasks.ToArray(), settings.CancellationToken);
+            Task.WaitAll(work, settings.CancellationToken);
 
-            List<WorkUnitResult> results = tasks.Select(t => t.Result).ToList();
+            List<WorkUnitResult> results = work.Select(t => t.Result).ToList();
        
       
             //int totalCount = work.Length;
             //long lastProgress = Stopwatch.GetTimestamp();
             //int processed = 0;
-            //// process all units of work
-            //ParallelOptions parallelOptions = new ParallelOptions
-            //                                  {
-            //                                      //MaxDegreeOfParallelism = 1
-            //                                      CancellationToken = settings.CancellationToken
-            //                                  };
 
 
             //IEnumerable<UnitOfWork> unitsOfWork = work;
@@ -430,6 +367,73 @@ namespace LBi.LostDoc.Templating
                                                          statsTimer.Elapsed.TotalSeconds);
 
             return new TemplateOutput(results.ToArray());
+        }
+
+        private IEnumerable<Task<WorkUnitResult>> DiscoverWork(XDocument inputDocument, ITemplatingContext context)
+        {
+            CustomXsltContext xsltContext = CustomXsltContext.Create(context.Settings.IgnoredVersionComponent);
+            xsltContext.PushVariableScope(inputDocument.Root, this.GetGlobalParameters(this.Parameters, context.Settings.Arguments));
+
+            ITemplateContext templateContext = new TemplateContext(context.Cache,
+                                                                   inputDocument,
+                                                                   xsltContext,
+                                                                   context.Settings.FileResolver,
+                                                                   context.Settings.Catalog,
+                                                                   this.TemplateFileProvider,
+                                                                   context.StorageResolver, 
+                                                                   context.DependencyProvider);
+
+
+            // the directives _have_ to be processed in declaration order
+            IOrderedEnumerable<ITemplateDirective> directives = this.ResourceDirectives
+                                                                    .Cast<ITemplateDirective>()
+                                                                    .Concat(this.StylesheetsDirectives)
+                                                                    .OrderBy(dir => dir.Order);
+
+
+            this.OnProgress("Processing directives", 0);
+
+            foreach (var templateDirective in directives)
+            {
+                IEnumerable<UnitOfWork> work = templateDirective.DiscoverWork(templateContext);
+
+                foreach (UnitOfWork unitOfWork in work)
+                {
+                    Func<object, WorkUnitResult> func =
+                        uow =>
+                        {
+                            var ctx = context;
+                            var unit = (UnitOfWork)uow;
+                            FileReference outputRef;
+                            if (ctx.DependencyProvider.IsFinal(unit.Output, unit.Order))
+                                outputRef = ctx.StorageResolver.Resolve(unit.Output);
+                            else
+                            {
+                                // redirect intermediary output files to the temp:// provider
+                                string path = unit.Output.OriginalString.Substring(unit.Output.Scheme.Length);
+                                string uriSuffix = '.' + unit.Order.ToString(CultureInfo.InvariantCulture);
+                                Uri tempOutput = new Uri(Storage.UriSchemeTemporary + path + uriSuffix);
+                                outputRef = ctx.StorageResolver.Resolve(tempOutput);
+                            }
+
+                            using (Stream outputStream = outputRef.GetStream(FileMode.Create))
+                            {
+                                var ticks = Stopwatch.GetTimestamp();
+                                unit.Execute(context, outputStream);
+                                ticks = Stopwatch.GetTimestamp() - ticks;
+                                return new WorkUnitResult(outputRef,
+                                                          unit,
+                                                          (long)
+                                                          Math.Round(ticks / (double)Stopwatch.Frequency * 1000000));
+                            }
+                        };
+
+                    Task<WorkUnitResult> task = new Task<WorkUnitResult>(func, unitOfWork);
+                    context.DependencyProvider.Add(unitOfWork.Output, unitOfWork.Order, task);
+                    yield return task;
+                }
+            }
+            this.OnProgress("Processing directives", 100);
         }
 
         protected virtual List<XPathVariable> GetGlobalParameters(IEnumerable<TemplateParameterInfo> parameters, Dictionary<string, object> arguments)

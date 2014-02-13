@@ -19,8 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using System.Runtime.Caching;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
@@ -29,7 +27,7 @@ using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
-    public class StylesheetDirective : ITemplateDirective<StylesheetApplication>
+    public class StylesheetDirective : ITemplateDirective
     {
         public StylesheetDirective(int order)
         {
@@ -41,44 +39,91 @@ namespace LBi.LostDoc.Templating
         public int Order { get; private set; }
 
         public string ConditionExpression { get; set; }
+
         public string Name { get; set; }
+
+        /// <summary>
+        /// This gets evaluated against the <see cref="XDocument"/> resolved from <see cref="InputExpression"/>
+        /// </summary>
         public string SelectExpression { get; set; }
+
+        /// <summary>
+        /// This gets evaluated against the <see cref="ITemplateContext.Document"/>.
+        /// </summary>
         public string InputExpression { get; set; }
+
+        /// <summary>
+        /// This gets evaluated against the <see cref="XNode"/> resolved from <see cref="SelectExpression"/>
+        /// </summary>
         public string OutputExpression { get; set; }
+
+        /// <summary>
+        /// These gets evaluated against the <see cref="XNode"/> selected by the <see cref="SelectExpression"/>
+        /// </summary>
         public XPathVariable[] XsltParams { get; set; }
+
+        /// <summary>
+        /// These gets evaluated against the <see cref="XNode"/> selected by the <see cref="SelectExpression"/>
+        /// </summary>
         public XPathVariable[] Variables { get; set; }
+
         public SectionRegistration[] Sections { get; set; }
+
         public AssetRegistration[] AssetRegistrations { get; set; }
+
+        /// <summary>
+        /// This gets evaluated against the <see cref="XNode"/> selected by the <see cref="SelectExpression"/>
+        /// </summary>
         public string StylesheetExpression { get; set; }
 
-        public virtual IEnumerable<StylesheetApplication> DiscoverWork(ITemplateContext context)
+        public virtual IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context)
         {
             TraceSources.TemplateSource.TraceInformation("Processing stylesheet instructions: {0}", (object)this.Name);
 
-            IEnumerable<XNode> inputNodes = XPathServices.ToNodeSequence(context.Document.XPathEvaluate(this.SelectExpression, context.XsltContext));
+            Uri inputUri;
+            if (this.InputExpression != null)
+            {
+                string inputValue = context.Document.EvaluateValue(this.InputExpression, context.XsltContext);
+                inputUri = new Uri(inputValue, UriKind.RelativeOrAbsolute);
+                if (!inputUri.IsAbsoluteUri)
+                    inputUri = inputUri.AddScheme(Storage.UriSchemeTemplate);
+            }
+            else
+                inputUri = Storage.InputDocumentUri;
+
+
+            XDocument inputDocument = context.Cache.GetDocument(inputUri, this.Order);
+
+            if (inputDocument == null)
+            {
+                Stream inputStream = Storage.GetStream(context.Storage, context.DependencyProvider, inputUri, this.Order);
+                inputDocument = XDocument.Load(inputStream, LoadOptions.SetLineInfo);
+                context.Cache.AddDocument(inputUri, this.Order, inputDocument);
+            }
+
+            IEnumerable<XNode> inputNodes = XPathServices.ToNodeSequence(inputDocument.XPathEvaluate(this.SelectExpression, context.XsltContext));
 
             foreach (XNode inputNode in inputNodes)
             {
                 context.XsltContext.PushVariableScope(inputNode, this.Variables); // 1
 
-                Uri stylesheetUri = new Uri(context.Document.Root.EvaluateValue(this.StylesheetExpression, context.XsltContext), UriKind.RelativeOrAbsolute);
+                Uri stylesheetUri = new Uri(inputDocument.Root.EvaluateValue(this.StylesheetExpression, context.XsltContext), UriKind.RelativeOrAbsolute);
 
                 // set default storage scheme if none specified
                 if (!stylesheetUri.IsAbsoluteUri)
                     stylesheetUri = stylesheetUri.AddScheme(Storage.UriSchemeTemplate);
 
-                Uri inputUri = null;
-                if (this.InputExpression != null) { 
-                    inputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.InputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
-                    if (!inputUri.IsAbsoluteUri)
-                        inputUri = inputUri.AddScheme(Storage.UriSchemeTemplate);
-                }
-                Uri outputUri = null;
-                if (this.OutputExpression != null) { 
-                    outputUri = new Uri(XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext)), UriKind.RelativeOrAbsolute);
+                Uri outputUri;
+                if (this.OutputExpression != null)
+                {
+                    string outputValue = XPathServices.ResultToString(inputNode.XPathEvaluate(this.OutputExpression, context.XsltContext));
+                    outputUri = new Uri(outputValue, UriKind.RelativeOrAbsolute);
                     if (!outputUri.IsAbsoluteUri)
                         outputUri = outputUri.AddScheme(Storage.UriSchemeOutput);
                 }
+                else
+                    outputUri = Storage.InputDocumentUri;
+
                 List<AssetIdentifier> assetIdentifiers = new List<AssetIdentifier>();
                 List<AssetSection> sections = new List<AssetSection>();
 
@@ -105,7 +150,7 @@ namespace LBi.LostDoc.Templating
                         // eval condition
                         if (assetInputElement.EvaluateCondition(assetRegistration.ConditionExpression, context.XsltContext))
                         {
-                            
+
                             AssetIdentifier assetIdentifier = new AssetIdentifier(assetId, version);
                             context.RegisterAssetUri(assetIdentifier, outputUri);
                             assetIdentifiers.Add(assetIdentifier);
@@ -182,8 +227,7 @@ namespace LBi.LostDoc.Templating
                                                        inputNode,
                                                        xsltParams,
                                                        assetIdentifiers.ToArray(),
-                                                       sections,
-                                                       null);
+                                                       sections);
             }
         }
     }

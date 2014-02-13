@@ -19,10 +19,11 @@
 
 <template xmlns:var="urn:lostdoc:variable">
 
-  <apply-stylesheet input="'template://Static.xml'"
-                    select="/"
-                    output="'out.xml'"
-                    stylesheet="Copy.xslt">
-  </apply-stylesheet>
-  
+  <apply-stylesheet output="'temp://intermediary.xml'"
+                    stylesheet="Copy.xslt"/>
+
+  <apply-stylesheet input="temp://intermediary.xml"
+                    output="'output://out.xml'"
+                    stylesheet="Copy.xslt"/>
+
 </template>

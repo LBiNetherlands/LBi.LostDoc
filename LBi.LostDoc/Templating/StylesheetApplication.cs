@@ -24,6 +24,7 @@ using System.Runtime.Caching;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using System.Xml.Xsl;
 using LBi.LostDoc.Diagnostics;
 using LBi.LostDoc.Templating.IO;
@@ -40,8 +41,7 @@ namespace LBi.LostDoc.Templating
                                      XNode inputNode,
                                      IEnumerable<KeyValuePair<string, object>> xsltParams,
                                      IEnumerable<AssetIdentifier> assetIdentifiers,
-                                     IEnumerable<AssetSection> sections,
-                                     XmlResolver xmlResolver)
+                                     IEnumerable<AssetSection> sections)
             : base(output, order)
         {
             Contract.Requires<ArgumentNullException>(stylesheet != null);
@@ -59,7 +59,6 @@ namespace LBi.LostDoc.Templating
             this.StylesheetName = stylesheetName;
             this.Sections = sections.ToArray();
             this.Input = input;
-            this.XmlResolver = xmlResolver;
         }
 
         public KeyValuePair<string, object>[] XsltParams { get; protected set; }
@@ -75,8 +74,6 @@ namespace LBi.LostDoc.Templating
         public Uri Input { get; protected set; }
 
         public Uri Stylesheet { get; protected set; }
-
-        public XmlResolver XmlResolver { get; protected set; }
 
         public override void Execute(ITemplatingContext context, Stream outputStream)
         {
@@ -96,12 +93,21 @@ namespace LBi.LostDoc.Templating
 
                 var transform = this.LoadStylesheet(context);
 
-                transform.Transform(context.Document,
+                XPathDocument inputDocument = context.Cache.GetXPathDocument(this.Input, this.Order);
+
+                if (inputDocument == null)
+                {
+                    Stream inputStream = context.GetStream(this.Input, this.Order);
+                    inputDocument = new XPathDocument(inputStream);
+                    context.Cache.AddXPathDocument(this.Input, this.Order, inputDocument);
+                }
+
+                transform.Transform(inputDocument.CreateNavigator(),
                                     argList,
                                     writer,
-                                    new XmlFileProviderResolver(Storage.UriSchemeTemporary, context.Storage, context.DependencyProvider, this.Order));
+                                    new XmlFileProviderResolver(Storage.UriSchemeTemporary, context.StorageResolver, context.DependencyProvider, this.Order));
 
-                double duration = ((Stopwatch.GetTimestamp() - tickStart)/(double) Stopwatch.Frequency)*1000;
+                double duration = ((Stopwatch.GetTimestamp() - tickStart) / (double)Stopwatch.Frequency) * 1000;
 
                 TraceSources.TemplateSource.TraceVerbose("{0} ({1:N0} ms)", this.Output, duration);
 
@@ -117,12 +123,12 @@ namespace LBi.LostDoc.Templating
             if (ret == null)
             {
                 ret = new XslCompiledTransform(true);
-                FileReference stylesheet = context.Storage.Resolve(this.Stylesheet);
+                FileReference stylesheet = context.StorageResolver.Resolve(this.Stylesheet);
                 using (Stream str = stylesheet.GetStream())
                 {
                     XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                     XsltSettings settings = new XsltSettings(true, true);
-                    XmlResolver resolver = new XmlFileProviderResolver(Storage.UriSchemeTemplate, context.Storage, context.DependencyProvider, this.Order);
+                    XmlResolver resolver = new XmlFileProviderResolver(Storage.UriSchemeTemplate, context.StorageResolver, context.DependencyProvider, this.Order);
                     ret.Load(reader, settings, resolver);
                 }
 

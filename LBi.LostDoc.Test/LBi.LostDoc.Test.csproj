@@ -100,13 +100,15 @@
     <EmbeddedResource Include="Templating\EnrichInputDocument\Copy.xslt" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Templating\AlternateInput\Static.xml" />
+    <EmbeddedResource Include="Templating\AlternateGeneratedInput\Copy.xslt" />
+    <EmbeddedResource Include="Templating\AlternateGeneratedInput\template.xml" />
+    <EmbeddedResource Include="Templating\AlternateStaticInput\Static.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templating\AlternateInput\Copy.xslt" />
+    <EmbeddedResource Include="Templating\AlternateStaticInput\Copy.xslt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templating\AlternateInput\template.xml" />
+    <EmbeddedResource Include="Templating\AlternateStaticInput\template.xml" />
   </ItemGroup>
   <!--  manual edit, the build server needs to reference a dll rather than a project -->
   <Choose>

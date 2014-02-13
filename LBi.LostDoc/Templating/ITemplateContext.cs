@@ -23,6 +23,10 @@ namespace LBi.LostDoc.Templating
 {
     public interface ITemplateContext : IContextBase
     {
+        IDependencyProvider DependencyProvider { get; }
+
+        StorageResolver Storage { get; }
+
         IFileProvider TemplateFileProvider { get; }
 
         CustomXsltContext XsltContext { get; }

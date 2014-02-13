@@ -14,9 +14,11 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
+using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Xml.Linq;
@@ -40,7 +42,7 @@ namespace LBi.LostDoc.Templating
             this.Settings = settings;
             this.AssetUriResolvers = resolvers.ToArray();
             this.Cache = cache;
-            this.Storage = storageResolver;
+            this.StorageResolver = storageResolver;
             this.DependencyProvider = dependencyProvider;
 
             XPathDocument xpathDoc;
@@ -61,9 +63,14 @@ namespace LBi.LostDoc.Templating
 
         public IAssetUriResolver[] AssetUriResolvers { get; protected set; }
 
-        public StorageResolver Storage { get; protected set; }
+        public StorageResolver StorageResolver { get; protected set; }
 
         public IDependencyProvider DependencyProvider { get; protected set; }
+
+        public Stream GetStream(Uri input, int order)
+        {
+            return Storage.GetStream(this.StorageResolver, this.DependencyProvider, input, order);
+        }
 
         #endregion
 

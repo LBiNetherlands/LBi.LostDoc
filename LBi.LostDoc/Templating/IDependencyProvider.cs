@@ -16,11 +16,13 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace LBi.LostDoc.Templating
 {
     public interface IDependencyProvider
     {
+        void Add(Uri uri, int order, Task<WorkUnitResult> task);
         bool TryGetDependency(Uri uri, int order, out Stream stream);
         bool IsFinal(Uri uri, int order);
     }

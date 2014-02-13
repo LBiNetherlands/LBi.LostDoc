@@ -139,6 +139,7 @@
     <Compile Include="Templating\AssetRegistration.cs" />
     <Compile Include="Templating\AssetResolvers\IFileResolver.cs" />
     <Compile Include="Templating\AssetSection.cs" />
+    <Compile Include="Templating\Caching.cs" />
     <Compile Include="Templating\ConstantXPathVariable.cs" />
     <Compile Include="Templating\DependencyProvider.cs" />
     <Compile Include="Templating\ExportTransformAttribute.cs" />

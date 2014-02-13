@@ -33,14 +33,18 @@ namespace LBi.LostDoc.Templating
                                CustomXsltContext xsltContext,
                                IFileResolver fileResolver,
                                ComposablePartCatalog catalog,
-                               IFileProvider templateFileProvider)
+                               IFileProvider templateFileProvider,
+                               StorageResolver storage,
+                               IDependencyProvider dependencyProvider)
         {
             this.Cache = cache;
             this.XsltContext = xsltContext;
             this.Document = document;
             this._fileResolver = fileResolver;
+            this.DependencyProvider = dependencyProvider;
             this.TemplateFileProvider = templateFileProvider;
             this.Catalog = catalog;
+            this.Storage = storage;
         }
 
         public ObjectCache Cache { get; private set; }
@@ -49,7 +53,12 @@ namespace LBi.LostDoc.Templating
 
         public XDocument Document { get; private set; }
 
+        public IDependencyProvider DependencyProvider { get; private set; }
+
+        public StorageResolver Storage { get; private set; }
+
         public IFileProvider TemplateFileProvider { get; private set; }
+
         public CustomXsltContext XsltContext { get; private set; }
 
         public void RegisterAssetUri(AssetIdentifier assetId, Uri uri)
@@ -57,6 +66,6 @@ namespace LBi.LostDoc.Templating
             this._fileResolver.Add(assetId.AssetId, assetId.Version, uri);
         }
 
-        
+
     }
 }
