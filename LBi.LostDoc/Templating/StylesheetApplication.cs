@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
@@ -43,6 +44,14 @@ namespace LBi.LostDoc.Templating
                                      XmlResolver xmlResolver)
             : base(output, order)
         {
+            Contract.Requires<ArgumentNullException>(stylesheet != null);
+            Contract.Requires<ArgumentNullException>(input != null);
+            Contract.Requires<ArgumentNullException>(input.IsAbsoluteUri, "Input Uri must be absolute.");
+            Contract.Requires<ArgumentNullException>(inputNode != null);
+            Contract.Requires<ArgumentNullException>(xsltParams != null);
+            Contract.Requires<ArgumentNullException>(assetIdentifiers != null);
+            Contract.Requires<ArgumentNullException>(sections != null);
+
             this.Stylesheet = stylesheet;
             this.InputNode = inputNode;
             this.XsltParams = xsltParams.ToArray();

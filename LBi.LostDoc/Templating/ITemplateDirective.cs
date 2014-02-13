@@ -14,12 +14,30 @@
  * limitations under the License. 
  */
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace LBi.LostDoc.Templating
 {
+    [ContractClass(typeof(ITemplateDirectiveContract<>))]
     public interface ITemplateDirective<out TUnitOfWork> where TUnitOfWork : UnitOfWork
     {
         IEnumerable<TUnitOfWork> DiscoverWork(ITemplateContext context);
     }
+
+    // ReSharper disable InconsistentNaming
+    [ContractClassFor(typeof(ITemplateDirective<>))]
+    internal class ITemplateDirectiveContract<T> : ITemplateDirective<T> where T : UnitOfWork
+    {
+        public IEnumerable<T> DiscoverWork(ITemplateContext context)
+        {
+            Contract.Requires<ArgumentNullException>(context != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
+            Contract.Ensures(Contract.ForAll<T>(Contract.Result<IEnumerable<T>>(), t => t != null));
+
+            return default(IEnumerable<T>);
+        }
+    }
+    // ReSharper restore InconsistentNaming
 }

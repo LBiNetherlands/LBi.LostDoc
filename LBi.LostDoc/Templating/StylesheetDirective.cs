@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
@@ -32,6 +33,8 @@ namespace LBi.LostDoc.Templating
     {
         public StylesheetDirective(int order)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(order >= 0);
+
             this.Order = order;
         }
 
