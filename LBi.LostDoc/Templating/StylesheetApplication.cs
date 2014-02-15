@@ -118,6 +118,7 @@ namespace LBi.LostDoc.Templating
 
         protected virtual XslCompiledTransform LoadStylesheet(ITemplatingContext context)
         {
+            // TODO this key is probably not good enough
             XslCompiledTransform ret = context.Cache.Get(this.Stylesheet.ToString()) as XslCompiledTransform;
 
             if (ret == null)
