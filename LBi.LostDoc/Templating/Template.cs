@@ -139,9 +139,9 @@ namespace LBi.LostDoc.Templating
                 {
                     TraceSources.TemplateSource.TraceVerbose("Adding index {0} (match: '{1}', key: '{1}')",
                                                              index.Name,
-                                                             index.MatchExpr,
-                                                             index.KeyExpr);
-                    context.DocumentIndex.AddKey(index.Name, index.MatchExpr, index.KeyExpr, customXsltContext);
+                                                             index.MatchExpression,
+                                                             index.KeyExpression);
+                    context.DocumentIndex.AddKey(index.Name, index.MatchExpression, index.KeyExpression, customXsltContext);
                 }
 
                 TraceSources.TemplateSource.TraceInformation("Indexing...");
@@ -218,12 +218,14 @@ namespace LBi.LostDoc.Templating
 
             this.OnProgress("Generating", 100);
 
+            #region statistics (hack)
             Stopwatch statsTimer = new Stopwatch();
             // prepare stats
 
             Dictionary<Type, WorkUnitResult[]> resultGroups = results.GroupBy(ps => ps.WorkUnit.GetType()).ToDictionary(g => g.Key, g => g.ToArray());
 
-            if (resultGroups.ContainsKey(typeof(StylesheetApplication))) {
+            if (resultGroups.ContainsKey(typeof(StylesheetApplication)))
+            {
                 var stylesheetStats = resultGroups[typeof(StylesheetApplication)].GroupBy(r => ((StylesheetApplication)r.WorkUnit).Stylesheet);
 
                 foreach (var statGroup in stylesheetStats)
@@ -361,12 +363,15 @@ namespace LBi.LostDoc.Templating
                 }
             }
 
+            TraceSources.TemplateSource.TraceInformation("Statistics generated in {0:N1} seconds",
+                                             statsTimer.Elapsed.TotalSeconds);
+
+            #endregion
+
             TraceSources.TemplateSource.TraceInformation("Documentation generated in {0:N1} seconds (processing time: {1:N1} seconds)",
                                                          timer.Elapsed.TotalSeconds,
                                                          results.Sum(ps => ps.Duration) / 1000000.0);
 
-            TraceSources.TemplateSource.TraceInformation("Statistics generated in {0:N1} seconds",
-                                                         statsTimer.Elapsed.TotalSeconds);
 
             return new TemplateOutput(results.ToArray());
         }

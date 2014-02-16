@@ -201,12 +201,13 @@ namespace LBi.LostDoc.Templating
                         stylesheets.Add(this.ParseStylesheet(provider, elem, ordinal));
                         break;
                     case "index":
-                        indices.Add(this.ParseIndexDefinition(elem));
+                        indices.Add(this.ParseIndexDefinition(elem, ordinal));
                         break;
                     case "include-resource":
                         resources.Add(this.ParseResouceDefinition(provider, elem, ordinal));
                         break;
                     default:
+                        // TODO fix error handling
                         throw new Exception("Unknown element: " + elem.Name.LocalName);
                 }
                 ordinal++;
@@ -268,9 +269,11 @@ namespace LBi.LostDoc.Templating
             }
         }
 
-        protected virtual IndexDirective ParseIndexDefinition(XElement elem)
+        protected virtual IndexDirective ParseIndexDefinition(XElement elem, int ordinal)
         {
-            return new IndexDirective(elem.GetAttributeValue("name"),
+            return new IndexDirective(ordinal,
+                                      elem.GetAttributeValue("name"),
+                                      elem.GetAttributeValueOrDefault("input"),
                                       elem.GetAttributeValue("match"),
                                       elem.GetAttributeValue("key"));
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 DigitasLBi Netherlands B.V.
+ * Copyright 2013-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,23 @@ namespace LBi.LostDoc.Templating
 {
     public class IndexDirective
     {
-        public IndexDirective(string name, string matchExpr, string keyExpr)
+        public IndexDirective(int ordinal, string name, string inputExpression, string matchExpression, string keyExpression)
         {
+            this.Ordinal = ordinal;
             this.Name = name;
-            this.MatchExpr = matchExpr;
-            this.KeyExpr = keyExpr;
+            this.InputExpression = inputExpression;
+            this.MatchExpression = matchExpression;
+            this.KeyExpression = keyExpression;
         }
 
+        public int Ordinal { get; protected set; }
+
+        public string InputExpression { get; protected set; }
+
         public string Name { get; protected set; }
-        public string MatchExpr { get; protected set; }
-        public string KeyExpr { get; protected set; }
+
+        public string MatchExpression { get; protected set; }
+        
+        public string KeyExpression { get; protected set; }
     }
 }
