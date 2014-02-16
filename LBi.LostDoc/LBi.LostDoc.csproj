@@ -153,6 +153,7 @@
     <Compile Include="Templating\IO\IFileProvider.cs" />
     <Compile Include="Templating\IO\NullFileProvider.cs" />
     <Compile Include="Templating\IO\ResourceFileProvider.cs" />
+    <Compile Include="Templating\IO\ScopedFileProvider.cs" />
     <Compile Include="Templating\IO\StackedFileProvider.cs" />
     <Compile Include="Templating\IO\StorageResolver.cs" />
     <Compile Include="Templating\IO\TemporaryFileProvider.cs" />
@@ -164,7 +165,6 @@
     <Compile Include="Templating\MissingNodeException.cs" />
     <Compile Include="Templating\ParameterExport.cs" />
     <Compile Include="Templating\ResourceTransform.cs" />
-    <Compile Include="Templating\ScopedFileProvider.cs" />
     <Compile Include="Templating\IndexDirective.cs" />
     <Compile Include="Templating\Storage.cs" />
     <Compile Include="Templating\Template.cs" />

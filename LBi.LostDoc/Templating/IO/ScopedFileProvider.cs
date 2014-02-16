@@ -17,9 +17,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LBi.LostDoc.Templating.IO;
 
-namespace LBi.LostDoc.Templating
+namespace LBi.LostDoc.Templating.IO
 {
     public class ScopedFileProvider : IFileProvider
     {
