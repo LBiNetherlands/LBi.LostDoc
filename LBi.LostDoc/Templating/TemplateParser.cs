@@ -188,7 +188,7 @@ namespace LBi.LostDoc.Templating
             List<ResourceDirective> resources = new List<ResourceDirective>();
             List<IndexDirective> indices = new List<IndexDirective>();
 
-            int order = 0;
+            int ordinal = 0;
             foreach (XElement elem in workingDoc.Root.Elements())
             {
                 // we alread processed the parameters
@@ -198,18 +198,18 @@ namespace LBi.LostDoc.Templating
                 switch (elem.Name.LocalName)
                 {
                     case "apply-stylesheet":
-                        stylesheets.Add(this.ParseStylesheet(provider, elem, order));
+                        stylesheets.Add(this.ParseStylesheet(provider, elem, ordinal));
                         break;
                     case "index":
                         indices.Add(this.ParseIndexDefinition(elem));
                         break;
                     case "include-resource":
-                        resources.Add(this.ParseResouceDefinition(provider, elem, order));
+                        resources.Add(this.ParseResouceDefinition(provider, elem, ordinal));
                         break;
                     default:
                         throw new Exception("Unknown element: " + elem.Name.LocalName);
                 }
-                order++;
+                ordinal++;
             }
 
             return new Template(templateSource, provider, templateInfo.Parameters, resources, stylesheets, indices);
@@ -275,10 +275,10 @@ namespace LBi.LostDoc.Templating
                                       elem.GetAttributeValue("key"));
         }
 
-        protected virtual StylesheetDirective ParseStylesheet(IFileProvider provider, XElement elem, int order)
+        protected virtual StylesheetDirective ParseStylesheet(IFileProvider provider, XElement elem, int ordinal)
         {
             // TODO move this to ctor
-            var ret = new StylesheetDirective(order)
+            var ret = new StylesheetDirective(ordinal)
                       {
                           StylesheetExpression = elem.GetAttributeValue("stylesheet"),
                           SelectExpression = elem.GetAttributeValueOrDefault("select", "/"),
@@ -295,7 +295,7 @@ namespace LBi.LostDoc.Templating
             return ret;
         }
 
-        protected virtual ResourceDirective ParseResouceDefinition(IFileProvider provider, XElement elem, int order)
+        protected virtual ResourceDirective ParseResouceDefinition(IFileProvider provider, XElement elem, int ordinal)
         {
             string inputExpression = elem.GetAttributeValue("path");
             string outputExpression = elem.GetAttributeValueOrDefault("output", inputExpression);
@@ -312,7 +312,7 @@ namespace LBi.LostDoc.Templating
                 transforms.Add(new ResourceTransform(transformName, transformParams));
             }
 
-            var resource = new ResourceDirective(order,
+            var resource = new ResourceDirective(ordinal,
                                                  elem.GetAttributeValueOrDefault("condition"),
                                                  this.ParseVariables(elem).ToArray(),
                                                  inputExpression,

@@ -33,7 +33,7 @@ namespace LBi.LostDoc.Templating
 {
     public class StylesheetApplication : UnitOfWork
     {
-        public StylesheetApplication(int order,
+        public StylesheetApplication(int ordinal,
                                      string stylesheetName,
                                      Uri stylesheet,
                                      Uri input,
@@ -42,7 +42,7 @@ namespace LBi.LostDoc.Templating
                                      IEnumerable<KeyValuePair<string, object>> xsltParams,
                                      IEnumerable<AssetIdentifier> assetIdentifiers,
                                      IEnumerable<AssetSection> sections)
-            : base(output, order)
+            : base(output, ordinal)
         {
             Contract.Requires<ArgumentNullException>(stylesheet != null);
             Contract.Requires<ArgumentNullException>(input != null);
@@ -93,19 +93,19 @@ namespace LBi.LostDoc.Templating
 
                 var transform = this.LoadStylesheet(context);
 
-                XPathDocument inputDocument = context.Cache.GetXPathDocument(this.Input, this.Order);
+                XPathDocument inputDocument = context.Cache.GetXPathDocument(this.Input, this.Ordinal);
 
                 if (inputDocument == null)
                 {
-                    Stream inputStream = context.GetStream(this.Input, this.Order);
+                    Stream inputStream = context.GetStream(this.Input, this.Ordinal);
                     inputDocument = new XPathDocument(inputStream);
-                    context.Cache.AddXPathDocument(this.Input, this.Order, inputDocument);
+                    context.Cache.AddXPathDocument(this.Input, this.Ordinal, inputDocument);
                 }
 
                 transform.Transform(inputDocument.CreateNavigator(),
                                     argList,
                                     writer,
-                                    new XmlFileProviderResolver(Storage.UriSchemeTemporary, context.StorageResolver, context.DependencyProvider, this.Order));
+                                    new XmlFileProviderResolver(Storage.UriSchemeTemporary, context.StorageResolver, context.DependencyProvider, this.Ordinal));
 
                 double duration = ((Stopwatch.GetTimestamp() - tickStart) / (double)Stopwatch.Frequency) * 1000;
 
@@ -129,7 +129,7 @@ namespace LBi.LostDoc.Templating
                 {
                     XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
                     XsltSettings settings = new XsltSettings(true, true);
-                    XmlResolver resolver = new XmlFileProviderResolver(Storage.UriSchemeTemplate, context.StorageResolver, context.DependencyProvider, this.Order);
+                    XmlResolver resolver = new XmlFileProviderResolver(Storage.UriSchemeTemplate, context.StorageResolver, context.DependencyProvider, this.Ordinal);
                     ret.Load(reader, settings, resolver);
                 }
 

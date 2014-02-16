@@ -22,8 +22,8 @@ namespace LBi.LostDoc.Templating
 {
     public class ResourceDeployment : UnitOfWork
     {
-        public ResourceDeployment(Uri input, Uri output, int order, IResourceTransform[] transforms)
-            : base(output, order)
+        public ResourceDeployment(Uri input, Uri output, int ordinal, IResourceTransform[] transforms)
+            : base(output, ordinal)
         {
             this.Input = input;
             this.Transforms = transforms;

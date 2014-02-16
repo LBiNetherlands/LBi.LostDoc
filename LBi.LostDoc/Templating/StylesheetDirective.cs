@@ -29,14 +29,14 @@ namespace LBi.LostDoc.Templating
 {
     public class StylesheetDirective : ITemplateDirective
     {
-        public StylesheetDirective(int order)
+        public StylesheetDirective(int ordinal)
         {
-            Contract.Requires<ArgumentOutOfRangeException>(order >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(ordinal >= 0);
 
-            this.Order = order;
+            this.Ordinal = ordinal;
         }
 
-        public int Order { get; private set; }
+        public int Ordinal { get; private set; }
 
         public string ConditionExpression { get; set; }
 
@@ -92,13 +92,13 @@ namespace LBi.LostDoc.Templating
                 inputUri = Storage.InputDocumentUri;
 
 
-            XDocument inputDocument = context.Cache.GetDocument(inputUri, this.Order);
+            XDocument inputDocument = context.Cache.GetDocument(inputUri, this.Ordinal);
 
             if (inputDocument == null)
             {
-                Stream inputStream = Storage.GetStream(context.Storage, context.DependencyProvider, inputUri, this.Order);
+                Stream inputStream = Storage.GetStream(context.Storage, context.DependencyProvider, inputUri, this.Ordinal);
                 inputDocument = XDocument.Load(inputStream, LoadOptions.SetLineInfo);
-                context.Cache.AddDocument(inputUri, this.Order, inputDocument);
+                context.Cache.AddDocument(inputUri, this.Ordinal, inputDocument);
             }
 
             IEnumerable<XNode> inputNodes = XPathServices.ToNodeSequence(inputDocument.XPathEvaluate(this.SelectExpression, context.XsltContext));
@@ -219,7 +219,7 @@ namespace LBi.LostDoc.Templating
 
                 context.XsltContext.PopVariableScope(); // 1
 
-                yield return new StylesheetApplication(this.Order,
+                yield return new StylesheetApplication(this.Ordinal,
                                                        this.Name,
                                                        stylesheetUri,
                                                        inputUri,

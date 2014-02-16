@@ -67,9 +67,9 @@ namespace LBi.LostDoc.Templating
 
         public IDependencyProvider DependencyProvider { get; protected set; }
 
-        public Stream GetStream(Uri input, int order)
+        public Stream GetStream(Uri input, int ordinal)
         {
-            return Storage.GetStream(this.StorageResolver, this.DependencyProvider, input, order);
+            return Storage.GetStream(this.StorageResolver, this.DependencyProvider, input, ordinal);
         }
 
         #endregion

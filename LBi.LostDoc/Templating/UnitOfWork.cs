@@ -23,17 +23,17 @@ namespace LBi.LostDoc.Templating
     [ContractClass(typeof(UnitOfWorkContract))]
     public abstract class UnitOfWork
     {
-        protected UnitOfWork(Uri output, int order)
+        protected UnitOfWork(Uri output, int ordinal)
         {
             Contract.Requires<ArgumentNullException>(output != null);
             Contract.Requires<ArgumentNullException>(output.IsAbsoluteUri);
-            Contract.Requires<ArgumentNullException>(order >= 0);
+            Contract.Requires<ArgumentNullException>(ordinal >= 0);
 
             this.Output = output;
-            this.Order = order;
+            this.Ordinal = ordinal;
         }
 
-        public int Order { get; protected set; }
+        public int Ordinal { get; protected set; }
         public Uri Output { get; protected set; }
 
         public abstract void Execute(ITemplatingContext context, Stream outputStream);
@@ -42,7 +42,7 @@ namespace LBi.LostDoc.Templating
     [ContractClassFor(typeof(UnitOfWork))]
     internal abstract class UnitOfWorkContract : UnitOfWork
     {
-        protected UnitOfWorkContract(Uri output, int order) : base(output, order)
+        protected UnitOfWorkContract(Uri output, int ordinal) : base(output, ordinal)
         {
         }
 

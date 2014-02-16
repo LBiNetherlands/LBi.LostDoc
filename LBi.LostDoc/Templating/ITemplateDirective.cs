@@ -23,7 +23,7 @@ namespace LBi.LostDoc.Templating
     [ContractClass(typeof(ITemplateDirectiveContract))]
     public interface ITemplateDirective
     {
-        int Order { get; }
+        int Ordinal { get; }
         IEnumerable<UnitOfWork> DiscoverWork(ITemplateContext context);
     }
 
@@ -31,7 +31,7 @@ namespace LBi.LostDoc.Templating
     [ContractClassFor(typeof(ITemplateDirective))]
     internal class ITemplateDirectiveContract : ITemplateDirective
     {
-        public int Order {
+        public int Ordinal {
             get
             {
                 Contract.Ensures(Contract.Result<int>() >= 0);

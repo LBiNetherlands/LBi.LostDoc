@@ -42,11 +42,11 @@ namespace LBi.LostDoc.Templating
         /// </summary>
         public static readonly Uri InputDocumentUri = new Uri(UriSchemeTemporary + Uri.SchemeDelimiter + "input.xml");
 
-        public static Stream GetStream(StorageResolver storage, IDependencyProvider dependencyProvider, Uri input, int order)
+        public static Stream GetStream(StorageResolver storage, IDependencyProvider dependencyProvider, Uri input, int ordinal)
         {
             Stream ret;
             if (dependencyProvider != null &&
-                dependencyProvider.TryGetDependency(input, order, out ret))
+                dependencyProvider.TryGetDependency(input, ordinal, out ret))
             {
                 return ret;
             }

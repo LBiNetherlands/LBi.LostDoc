@@ -30,36 +30,36 @@ namespace LBi.LostDoc.Templating
 
         public static readonly string XPathDocumentPrefix = "XPD|";
 
-        public static string GetDocumentKey(Uri source, int order)
+        public static string GetDocumentKey(Uri source, int ordinal)
         {
-            return DocumentPrefx + source.OriginalString + '|' + order.ToString(CultureInfo.InvariantCulture);
+            return DocumentPrefx + source.OriginalString + '|' + ordinal.ToString(CultureInfo.InvariantCulture);
         }
 
-        private static string GetXPathDocumentKey(Uri source, int order)
+        private static string GetXPathDocumentKey(Uri source, int ordinal)
         {
-            return XPathDocumentPrefix + source.OriginalString + '|' + order.ToString(CultureInfo.InvariantCulture);
+            return XPathDocumentPrefix + source.OriginalString + '|' + ordinal.ToString(CultureInfo.InvariantCulture);
         }
 
-        public static void AddDocument(this ObjectCache cache, Uri docUri, int order, XDocument document)
+        public static void AddDocument(this ObjectCache cache, Uri docUri, int ordinal, XDocument document)
         {
-            string inputCacheKey = GetDocumentKey(docUri, order);
+            string inputCacheKey = GetDocumentKey(docUri, ordinal);
             cache.Add(inputCacheKey, document, new CacheItemPolicy());
         }
-        public static XDocument GetDocument(this ObjectCache cache, Uri docUri, int order)
+        public static XDocument GetDocument(this ObjectCache cache, Uri docUri, int ordinal)
         {
-            string documentKey = GetDocumentKey(docUri, order);
+            string documentKey = GetDocumentKey(docUri, ordinal);
             return cache.Get(documentKey) as XDocument;
         }
 
-        public static XPathDocument GetXPathDocument(this ObjectCache cache, Uri docUri, int order)
+        public static XPathDocument GetXPathDocument(this ObjectCache cache, Uri docUri, int ordinal)
         {
-            string documentKey = GetXPathDocumentKey(docUri, order);
+            string documentKey = GetXPathDocumentKey(docUri, ordinal);
             return cache.Get(documentKey) as XPathDocument;
         }
 
-        public static void AddXPathDocument(this ObjectCache cache, Uri docUri, int order, XPathDocument document)
+        public static void AddXPathDocument(this ObjectCache cache, Uri docUri, int ordinal, XPathDocument document)
         {
-            string inputCacheKey = GetXPathDocumentKey(docUri, order);
+            string inputCacheKey = GetXPathDocumentKey(docUri, ordinal);
             cache.Add(inputCacheKey, document, new CacheItemPolicy());
         }
 

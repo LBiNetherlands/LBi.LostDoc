@@ -390,7 +390,7 @@ namespace LBi.LostDoc.Templating
             IOrderedEnumerable<ITemplateDirective> directives = this.ResourceDirectives
                                                                     .Cast<ITemplateDirective>()
                                                                     .Concat(this.StylesheetsDirectives)
-                                                                    .OrderBy(dir => dir.Order);
+                                                                    .OrderBy(dir => dir.Ordinal);
 
 
             this.OnProgress("Processing directives", 0);
@@ -409,13 +409,13 @@ namespace LBi.LostDoc.Templating
                             FileReference outputRef;
                             // TODO maybe InputDocumentUri needs to be random so we don't get this collision
                             if (unit.Output != Storage.InputDocumentUri &&
-                                ctx.DependencyProvider.IsFinal(unit.Output, unit.Order))
+                                ctx.DependencyProvider.IsFinal(unit.Output, unit.Ordinal))
                                 outputRef = ctx.StorageResolver.Resolve(unit.Output);
                             else
                             {
                                 // redirect intermediary output files to the temp:// provider
                                 string path = unit.Output.OriginalString.Substring(unit.Output.Scheme.Length);
-                                string uriSuffix = '.' + unit.Order.ToString(CultureInfo.InvariantCulture);
+                                string uriSuffix = '.' + unit.Ordinal.ToString(CultureInfo.InvariantCulture);
                                 Uri tempOutput = new Uri(Storage.UriSchemeTemporary + path + uriSuffix);
                                 outputRef = ctx.StorageResolver.Resolve(tempOutput);
                             }
@@ -434,7 +434,7 @@ namespace LBi.LostDoc.Templating
                         };
 
                     Task<WorkUnitResult> task = new Task<WorkUnitResult>(func, unitOfWork);
-                    context.DependencyProvider.Add(unitOfWork.Output, unitOfWork.Order, task);
+                    context.DependencyProvider.Add(unitOfWork.Output, unitOfWork.Ordinal, task);
                     yield return task;
                 }
             }

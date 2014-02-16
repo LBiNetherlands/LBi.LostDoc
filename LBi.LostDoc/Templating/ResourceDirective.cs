@@ -30,14 +30,14 @@ namespace LBi.LostDoc.Templating
 {
     public class ResourceDirective : ITemplateDirective
     {
-        public ResourceDirective(int order,
+        public ResourceDirective(int ordinal,
                                  string conditional,
                                  XPathVariable[] variables,
                                  string inputExpression,
                                  string outputExpression,
                                  ResourceTransform[] transformers)
         {
-            this.Order = order;
+            this.Ordinal = ordinal;
             this.ConditionExpression = conditional;
             this.InputExpression = inputExpression;
             this.OutputExpression = outputExpression;
@@ -45,7 +45,7 @@ namespace LBi.LostDoc.Templating
             this.Transforms = transformers;
         }
 
-        public int Order { get; private set; }
+        public int Ordinal { get; private set; }
         public string ConditionExpression { get; private set; }
         public string InputExpression { get; private set; }
         public string OutputExpression { get; private set; }
@@ -117,7 +117,7 @@ namespace LBi.LostDoc.Templating
 
                 yield return new ResourceDeployment(expandedInput,
                                                     expandedOutput,
-                                                    this.Order,
+                                                    this.Ordinal,
                                                     transforms.ToArray());
             }
             context.XsltContext.PopVariableScope();
