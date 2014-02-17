@@ -97,7 +97,7 @@ namespace LBi.LostDoc.Templating
 
                 if (inputDocument == null)
                 {
-                    Stream inputStream = context.GetStream(this.Input, this.Ordinal);
+                    Stream inputStream = context.DependencyProvider.GetDependency(this.Input, this.Ordinal);
                     inputDocument = new XPathDocument(inputStream);
                     context.Cache.AddXPathDocument(this.Input, this.Ordinal, inputDocument);
                 }

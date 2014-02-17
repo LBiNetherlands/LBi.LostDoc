@@ -63,6 +63,7 @@
     <Compile Include="NamingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflection\ReflectionExplorerTests.cs" />
+    <Compile Include="Templating\OrdinalResolverTest.cs" />
     <Compile Include="Templating\TemplateTests.cs" />
     <Compile Include="UriTests.cs" />
   </ItemGroup>

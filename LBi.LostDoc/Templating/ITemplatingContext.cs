@@ -31,6 +31,5 @@ namespace LBi.LostDoc.Templating
         StorageResolver StorageResolver { get; }
         IDependencyProvider DependencyProvider { get; }
 
-        Stream GetStream(Uri input, int ordinal);
     }
 }

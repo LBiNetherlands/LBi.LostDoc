@@ -96,7 +96,7 @@ namespace LBi.LostDoc.Templating
 
             if (inputDocument == null)
             {
-                Stream inputStream = Storage.GetStream(context.Storage, context.DependencyProvider, inputUri, this.Ordinal);
+                Stream inputStream = context.DependencyProvider.GetDependency(inputUri, this.Ordinal);
                 inputDocument = XDocument.Load(inputStream, LoadOptions.SetLineInfo);
                 context.Cache.AddDocument(inputUri, this.Ordinal, inputDocument);
             }

@@ -82,7 +82,10 @@ namespace LBi.LostDoc.Templating
         /// </exception>
         public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
         {
-            return Storage.GetStream(this._storageResolver, this._dependencyProvider, absoluteUri, this._ordinal);
+            if (this._dependencyProvider != null)
+                return this._dependencyProvider.GetDependency(absoluteUri, this._ordinal);
+            
+            return this._storageResolver.Resolve(absoluteUri).GetStream(FileMode.Open);
         }
 
         public override Uri ResolveUri(Uri baseUri, string relativeUri)

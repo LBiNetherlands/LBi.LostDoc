@@ -23,7 +23,7 @@ namespace LBi.LostDoc.Templating
     public interface IDependencyProvider
     {
         void Add(Uri uri, int ordinal, Task<WorkUnitResult> task);
-        bool TryGetDependency(Uri uri, int ordinal, out Stream stream);
+        Stream GetDependency(Uri uri, int ordinal);
         bool IsFinal(Uri uri, int ordinal);
     }
 }

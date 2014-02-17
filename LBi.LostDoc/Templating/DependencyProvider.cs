@@ -19,64 +19,91 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using LBi.LostDoc.Templating.IO;
 
 namespace LBi.LostDoc.Templating
 {
     public class DependencyProvider : IDependencyProvider
     {
-        private readonly Dictionary<Uri, List<Tuple<int, Task<WorkUnitResult>>>> _tasks;
+        private readonly Dictionary<Uri, OrdinalResolver<FileReference>> _tasks;
         private readonly CancellationToken _cancellationToken;
+        private readonly StorageResolver _storageResolver;
 
-        public DependencyProvider(CancellationToken cancellationToken)
+        public DependencyProvider(StorageResolver storageResolver, CancellationToken cancellationToken)
         {
-            this._tasks = new Dictionary<Uri, List<Tuple<int, Task<WorkUnitResult>>>>();
+            this._storageResolver = storageResolver;
+            this._tasks = new Dictionary<Uri, OrdinalResolver<FileReference>>();
             this._cancellationToken = cancellationToken;
         }
 
 
         public void Add(Uri uri, int ordinal, Task<WorkUnitResult> task)
         {
-            List<Tuple<int, Task<WorkUnitResult>>> versionList;
-            if (!this._tasks.TryGetValue(uri, out versionList))
-                this._tasks.Add(uri, versionList = new List<Tuple<int, Task<WorkUnitResult>>>());
+            OrdinalResolver<FileReference> resolver;
+            if (!this._tasks.TryGetValue(uri, out resolver))
+                this._tasks.Add(uri, resolver = new OrdinalResolver<FileReference>(this.CreateFallbackEvaluator(uri)));
 
-            versionList.Add(Tuple.Create(ordinal, task));
+            resolver.Add(ordinal, this.CreateTaskEvaluator(task));
         }
 
-        public bool TryGetDependency(Uri uri, int ordinal, out Stream stream)
+
+
+        public Stream GetDependency(Uri uri, int ordinal)
         {
-            stream = null;
-            List<Tuple<int, Task<WorkUnitResult>>> versionList;
-            if (this._tasks.TryGetValue(uri, out versionList))
+            Stream ret = null;
+            OrdinalResolver<FileReference> resolver;
+            if (this._tasks.TryGetValue(uri, out resolver))
             {
-                foreach (Tuple<int, Task<WorkUnitResult>> tuple in versionList)
-                {
-                    if (tuple.Item1 < ordinal)
-                    {
-                        Task<WorkUnitResult> task = tuple.Item2;
-                        if (!task.IsCompleted)
-                        {
-                            if (task.Status == TaskStatus.Created)
-                                task.RunSynchronously();
-                            else
-                                task.Wait(this._cancellationToken);
-                        }
-
-                        stream = task.Result.GetStream();
-                    }
-                }
+                FileReference fileRef = resolver.Resolve(ordinal).Value;
+                ret = fileRef.GetStream(FileMode.Open);
             }
+            else
+                ret = this.GetFallback(uri).GetStream(FileMode.Open);
 
-            return stream != null;
+            return ret;
         }
 
         public bool IsFinal(Uri uri, int ordinal)
         {
-            List<Tuple<int, Task<WorkUnitResult>>> versionList;
-            if (this._tasks.TryGetValue(uri, out versionList))
-                return ordinal >= versionList[versionList.Count - 1].Item1;
+            OrdinalResolver<FileReference> resolver;
+            if (this._tasks.TryGetValue(uri, out resolver))
+                return resolver.IsFinal(ordinal);
 
             throw new KeyNotFoundException(uri.ToString());
+        }
+
+        private Lazy<FileReference> CreateTaskEvaluator(Task<WorkUnitResult> task)
+        {
+            return new Lazy<FileReference>(
+                () =>
+                {
+                    if (!task.IsCompleted)
+                    {
+                        if (task.Status == TaskStatus.Created)
+                            task.RunSynchronously();
+                        else
+                            task.Wait(this._cancellationToken);
+                    }
+
+                    return task.Result.FileReference;
+                },
+                LazyThreadSafetyMode.ExecutionAndPublication);
+        }
+
+        private Lazy<FileReference> CreateFallbackEvaluator(Uri uri)
+        {
+            return new Lazy<FileReference>(() => this.GetFallback(uri), LazyThreadSafetyMode.None);
+        }
+
+        private FileReference GetFallback(Uri uri)
+        {
+            FileReference fileRef = this._storageResolver.Resolve(uri);
+
+            if (!fileRef.Exists)
+                throw new FileNotFoundException(string.Format("File not found: {0} ({1})", uri, fileRef.Path),
+                                                fileRef.Path);
+
+            return fileRef;
         }
     }
 }

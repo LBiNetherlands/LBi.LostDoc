@@ -41,22 +41,5 @@ namespace LBi.LostDoc.Templating
         /// temp://input.xml
         /// </summary>
         public static readonly Uri InputDocumentUri = new Uri(UriSchemeTemporary + Uri.SchemeDelimiter + "input.xml");
-
-        public static Stream GetStream(StorageResolver storage, IDependencyProvider dependencyProvider, Uri input, int ordinal)
-        {
-            Stream ret;
-            if (dependencyProvider != null &&
-                dependencyProvider.TryGetDependency(input, ordinal, out ret))
-            {
-                return ret;
-            }
-
-            FileReference fileRef = storage.Resolve(input);
-
-            if (fileRef.Exists)
-                return fileRef.GetStream(FileMode.Open);
-
-            throw new FileNotFoundException(string.Format("File not found: {0} ({1})", input, fileRef.Path), fileRef.Path);
-        }
     }
 }

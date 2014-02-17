@@ -163,6 +163,7 @@
     <Compile Include="Templating\ITemplateContext.cs" />
     <Compile Include="Templating\ITemplateDirective.cs" />
     <Compile Include="Templating\MissingNodeException.cs" />
+    <Compile Include="Templating\OrdinalResolver.cs" />
     <Compile Include="Templating\ParameterExport.cs" />
     <Compile Include="Templating\ResourceTransform.cs" />
     <Compile Include="Templating\IndexDirective.cs" />

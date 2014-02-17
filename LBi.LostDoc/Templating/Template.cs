@@ -111,7 +111,7 @@ namespace LBi.LostDoc.Templating
                 inputStream.Close();
             }
 
-            DependencyProvider dependencyProvider = new DependencyProvider(settings.CancellationToken);
+            DependencyProvider dependencyProvider = new DependencyProvider(storageResolver, settings.CancellationToken);
 
             List<IAssetUriResolver> assetUriResolvers = new List<IAssetUriResolver>();
             assetUriResolvers.Add(settings.FileResolver);
