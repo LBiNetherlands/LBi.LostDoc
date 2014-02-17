@@ -15,14 +15,12 @@
  */
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -92,7 +90,7 @@ namespace LBi.LostDoc.Templating
         public virtual TemplateOutput Generate(XDocument inputDocument, TemplateSettings settings)
         {
             Stopwatch timer = Stopwatch.StartNew();
-            
+
             StorageResolver storageResolver = new StorageResolver();
             storageResolver.Add(Storage.UriSchemeTemporary, new TemporaryFileProvider(), stripScheme: true);
             storageResolver.Add(Storage.UriSchemeOutput, settings.OutputFileProvider, stripScheme: true);
@@ -104,7 +102,7 @@ namespace LBi.LostDoc.Templating
 
             FileReference inputFileRef = storageResolver.Resolve(Storage.InputDocumentUri);
             using (Stream inputStream = inputFileRef.GetStream(FileMode.Create))
-            using (XmlWriter inputWriter = XmlWriter.Create(inputStream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false}))
+            using (XmlWriter inputWriter = XmlWriter.Create(inputStream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false }))
             {
                 inputDocument.Save(inputWriter);
                 inputWriter.Close();
@@ -118,6 +116,39 @@ namespace LBi.LostDoc.Templating
             if (settings.UriResolvers != null)
                 assetUriResolvers.AddRange(settings.UriResolvers);
 
+            
+
+            //// fill indices
+
+            this.OnProgress("Registering index");
+            var customXsltContext = CustomXsltContext.Create(settings.IgnoredVersionComponent);
+
+            IIndexProvider indexProvider = new IndexProvider(dependencyProvider);
+            foreach (var index in this.IndexDirectives)
+            {
+                TraceSources.TemplateSource.TraceVerbose("Adding index {0} (match: '{1}', key: '{1}')",
+                                                         index.Name,
+                                                         index.MatchExpression,
+                                                         index.KeyExpression);
+
+                Uri inptUri;
+                if (index.InputExpression != null)
+                {
+                    inptUri = new Uri(inputDocument.EvaluateValue(index.InputExpression, customXsltContext), UriKind.RelativeOrAbsolute);
+                    if (!inptUri.IsAbsoluteUri)
+                        inptUri = inptUri.AddScheme(Storage.UriSchemeTemporary);
+                }
+                else
+                    inptUri = Storage.InputDocumentUri;
+
+                indexProvider.Add(index.Name, index.Ordinal, inptUri, index.MatchExpression, index.KeyExpression, customXsltContext);
+            }
+
+            TraceSources.TemplateSource.TraceInformation("Indexing...");
+            //context.DocumentIndex.BuildIndexes();
+
+
+
             // create context
             ITemplatingContext context = new TemplatingContext(settings.Cache,
                                                                settings.Catalog,
@@ -125,28 +156,11 @@ namespace LBi.LostDoc.Templating
                                                                inputDocument,
                                                                assetUriResolvers,
                                                                storageResolver,
-                                                               dependencyProvider);
+                                                               dependencyProvider,
+                                                               indexProvider);
 
             // collect all work that has to be done
             Task<WorkUnitResult>[] work = this.DiscoverWork(inputDocument, context).ToArray();
-
-            // fill indices
-            using (TraceSources.TemplateSource.TraceActivity("Indexing input document"))
-            {
-                this.OnProgress("Indexing input");
-                var customXsltContext = CustomXsltContext.Create(settings.IgnoredVersionComponent);
-                foreach (var index in this.IndexDirectives)
-                {
-                    TraceSources.TemplateSource.TraceVerbose("Adding index {0} (match: '{1}', key: '{1}')",
-                                                             index.Name,
-                                                             index.MatchExpression,
-                                                             index.KeyExpression);
-                    context.DocumentIndex.AddKey(index.Name, index.MatchExpression, index.KeyExpression, customXsltContext);
-                }
-
-                TraceSources.TemplateSource.TraceInformation("Indexing...");
-                context.DocumentIndex.BuildIndexes();
-            }
 
             ParallelOptions parallelOptions = new ParallelOptions
                                               {
@@ -166,8 +180,8 @@ namespace LBi.LostDoc.Templating
             Task.WaitAll(work, settings.CancellationToken);
 
             List<WorkUnitResult> results = work.Select(t => t.Result).ToList();
-       
-      
+
+
             //int totalCount = work.Length;
             //long lastProgress = Stopwatch.GetTimestamp();
             //int processed = 0;
@@ -387,7 +401,7 @@ namespace LBi.LostDoc.Templating
                                                                    context.Settings.FileResolver,
                                                                    context.Settings.Catalog,
                                                                    this.TemplateFileProvider,
-                                                                   context.StorageResolver, 
+                                                                   context.StorageResolver,
                                                                    context.DependencyProvider);
 
 

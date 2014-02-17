@@ -36,7 +36,8 @@ namespace LBi.LostDoc.Templating
                                  XDocument document,
                                  IEnumerable<IAssetUriResolver> resolvers,
                                  StorageResolver storageResolver,
-                                 IDependencyProvider dependencyProvider)
+                                 IDependencyProvider dependencyProvider,
+                                 IIndexProvider indexProvider)
         {
             this.Catalog = catalog;
             this.Settings = settings;
@@ -49,15 +50,13 @@ namespace LBi.LostDoc.Templating
             using (var reader = document.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
                 xpathDoc = new XPathDocument(reader);
             this.Document = xpathDoc.CreateNavigator();
-            this.DocumentIndex = new XPathNavigatorIndex(this.Document.Clone());
+            this.IndexProvider = indexProvider;
         }
 
 
         #region ITemplatingContext Members
 
         public TemplateSettings Settings { get; protected set; }
-
-        public XPathNavigatorIndex DocumentIndex { get; protected set; }
 
         public XPathNavigator Document { get; protected set; }
 
@@ -66,6 +65,8 @@ namespace LBi.LostDoc.Templating
         public StorageResolver StorageResolver { get; protected set; }
 
         public IDependencyProvider DependencyProvider { get; protected set; }
+        
+        public IIndexProvider IndexProvider { get; private set; }
 
         #endregion
 

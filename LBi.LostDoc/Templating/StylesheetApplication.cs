@@ -85,7 +85,7 @@ namespace LBi.LostDoc.Templating
             argList.XsltMessageEncountered += (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
 
             // and custom extensions
-            argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, this.Output));
+            argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, this.Output, this.Ordinal));
 
             using (XmlWriter writer = XmlWriter.Create(outputStream, new XmlWriterSettings { Encoding = Encoding.UTF8, CloseOutput = false }))
             {

@@ -30,11 +30,13 @@ namespace LBi.LostDoc.Templating
         private readonly ConcurrentDictionary<AssetIdentifier, string> _resolveCache;
         private readonly ITemplatingContext _context;
         private readonly Uri _currentUri;
+        private readonly int _ordinal;
 
-        public TemplateXsltExtensions(ITemplatingContext context, Uri currentUri)
+        public TemplateXsltExtensions(ITemplatingContext context, Uri currentUri, int ordinal)
         {
             this._context = context;
             this._currentUri = currentUri;
+            this._ordinal = ordinal;
 
             this._aidCache = new ConcurrentDictionary<string, AssetIdentifier>(StringComparer.Ordinal);
             this._resolveCache = new ConcurrentDictionary<AssetIdentifier, string>();
@@ -167,7 +169,7 @@ namespace LBi.LostDoc.Templating
         
         public XPathNodeIterator key(string keyName, object value)
         {
-            return this._context.DocumentIndex.Get(keyName, value);
+            return this._context.IndexProvider.Get(keyName, this._ordinal, value);
         }
 
         public bool cmpnover(string aid1, string aid2)

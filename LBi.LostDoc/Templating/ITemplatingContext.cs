@@ -18,18 +18,21 @@ using System;
 using System.IO;
 using System.Xml.XPath;
 using LBi.LostDoc.Templating.IO;
-using LBi.LostDoc.Templating.XPath;
 
 namespace LBi.LostDoc.Templating
 {
     public interface ITemplatingContext : IContextBase
     {        
         TemplateSettings Settings { get; }
-        XPathNavigatorIndex DocumentIndex { get; }
+        
         XPathNavigator Document { get; }
+        
         IAssetUriResolver[] AssetUriResolvers { get; }
+        
         StorageResolver StorageResolver { get; }
+        
         IDependencyProvider DependencyProvider { get; }
 
+        IIndexProvider IndexProvider { get; }
     }
 }

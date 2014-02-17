@@ -23,12 +23,14 @@ namespace LBi.LostDoc.Templating
     public class OrdinalResolver<T>
     {
         private int[] _redirects;
-        private Lazy<T>[] _values; 
+        private Lazy<T>[] _values;
 
         private readonly Lazy<T> _fallback;
 
         public OrdinalResolver(Lazy<T> fallback)
         {
+            Contract.Requires<ArgumentNullException>(fallback != null);
+
             this._fallback = fallback;
             this._redirects = new int[0];
             this._values = new Lazy<T>[0];
@@ -37,6 +39,7 @@ namespace LBi.LostDoc.Templating
         public void Add(int ordinal, Lazy<T> value)
         {
             Contract.Requires<ArgumentOutOfRangeException>(ordinal >= 0, "ordinal cannot be negative.");
+            Contract.Requires<ArgumentNullException>(value != null);
 
             int lastOrdinal;
             if (this._redirects.Length == 0)
@@ -88,6 +91,7 @@ namespace LBi.LostDoc.Templating
         public Lazy<T> Resolve(int ordinal)
         {
             Contract.Requires<ArgumentOutOfRangeException>(ordinal >= 0);
+            Contract.Ensures(Contract.Result<Lazy<T>>() != null);
 
             int realOrdinal = this.ResolveOrdinal(ordinal);
             if (realOrdinal == -1)
@@ -96,47 +100,5 @@ namespace LBi.LostDoc.Templating
             return this._values[realOrdinal];
         }
     }
-
-    //public class OrdinalResolver
-    //{
-    //    private int[] _redirects;
-
-    //    public OrdinalResolver()
-    //    {
-    //        this._redirects = new int[0];
-    //    }
-
-    //    public void Add(int ordinal)
-    //    {
-    //        Contract.Requires<ArgumentOutOfRangeException>(ordinal >= 0, "ordinal cannot be negative.");
-
-    //        int lastOrdinal;
-    //        if (this._redirects.Length == 0)
-    //            lastOrdinal = -1;
-    //        else
-    //            lastOrdinal = this._redirects[this._redirects.Length - 1];
-
-    //        if (ordinal <= lastOrdinal)
-    //            throw new ArgumentOutOfRangeException("ordinal", "Ordinals can only be added in order.");
-
-    //        Array.Resize(ref this._redirects, ordinal + 1);
-
-    //        for (int i = lastOrdinal + 1; i < ordinal; i++)
-    //            this._redirects[i] = lastOrdinal;
-
-    //        this._redirects[ordinal] = ordinal;
-
-    //    }
-
-    //    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //    public int Resolve(int ordinal)
-    //    {
-    //        Contract.Requires<ArgumentOutOfRangeException>(ordinal >= 0);
-    //        if (ordinal >= this._redirects.Length)
-    //            return this._redirects[this._redirects.Length - 1];
-
-    //        return this._redirects[ordinal];
-    //    }
-    //}
 
 }
