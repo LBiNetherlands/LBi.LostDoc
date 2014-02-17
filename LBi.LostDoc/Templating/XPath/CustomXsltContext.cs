@@ -23,7 +23,7 @@ using System.Xml.Xsl;
 
 namespace LBi.LostDoc.Templating.XPath
 {
-    public class CustomXsltContext : System.Xml.Xsl.XsltContext
+    public class CustomXsltContext : XsltContext
     {
         public static CustomXsltContext Create(VersionComponent? ignoredVersionComponent)
         {

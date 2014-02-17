@@ -20,6 +20,7 @@ using System.Diagnostics.Contracts;
 
 namespace LBi.LostDoc.Templating.IO
 {
+    // TODO extract an IStorageResolver (+ IStorageResolverContract)
     public class StorageResolver
     {
         private readonly Dictionary<string, Tuple<IFileProvider, bool>> _providers;
