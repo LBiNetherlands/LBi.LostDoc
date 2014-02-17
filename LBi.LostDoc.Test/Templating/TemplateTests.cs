@@ -114,6 +114,41 @@ namespace LBi.LostDoc.Test.Templating
             tempFiles.Delete();
         }
 
+        [Fact]
+        public void MultipleVersionsOfIndex()
+        {
+            var template = LoadTemplate("MultipleVersionsOfIndex");
+
+            TemporaryFileProvider tempFiles = new TemporaryFileProvider();
+            TemplateOutput output = template.Generate(new XDocument(new XElement("root")),
+                                                      new TemplateSettings
+                                                      {
+                                                          OutputFileProvider = tempFiles,
+                                                      });
+
+            Assert.Equal(3, tempFiles.GetFiles("").Count());
+            Assert.Contains("Test1.xml", tempFiles.GetFiles(""));
+            Assert.Contains("Test2.xml", tempFiles.GetFiles(""));
+            Assert.Contains("Test3.xml", tempFiles.GetFiles(""));
+
+            using (var file = tempFiles.OpenFile("Test1.xml", FileMode.Open))
+            {
+                Assert.Equal("one", XDocument.Load(file).Root.Value);
+            }
+
+            using (var file = tempFiles.OpenFile("Test2.xml", FileMode.Open))
+            {
+                Assert.Equal("two", XDocument.Load(file).Root.Value);
+            }
+
+            using (var file = tempFiles.OpenFile("Test3.xml", FileMode.Open))
+            {
+                Assert.Equal("three", XDocument.Load(file).Root.Value);
+            }
+
+            tempFiles.Delete();
+        }
+
 
         private static Template LoadTemplate(string name)
         {

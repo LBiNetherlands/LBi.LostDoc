@@ -8,7 +8,19 @@ namespace LBi.LostDoc.Templating
 {
     public class IndexProvider : IIndexProvider
     {
+        private class Definition
+        {
+            public string Name { get; set; }
+            public int Ordinal { get; set; }
+            public Uri InputUri { get; set; }
+            public string MatchExpression { get; set; }
+            public string KeyExpression { get; set; }
+            public XsltContext Context { get; set; }
+        }
+
+
         private readonly IDependencyProvider _dependencyProvider;
+
         private readonly Dictionary<string, OrdinalResolver<XPathNavigatorIndex>> _indices;
 
         public IndexProvider(IDependencyProvider dependencyProvider)
@@ -24,12 +36,34 @@ namespace LBi.LostDoc.Templating
                         string keyExpression,
                         XsltContext xsltContext = null)
         {
-            throw new NotImplementedException();
+            this._indices.Add(name, new OrdinalResolver<XPathNavigatorIndex>(this.CreateFallbackEvaluator(name)));
         }
 
         public XPathNodeIterator Get(string name, int ordinal, object value)
         {
-            throw new System.NotImplementedException();
+            OrdinalResolver<XPathNavigatorIndex> resolver;
+            if (this._indices.TryGetValue(name, out resolver))
+            {
+                var index = resolver.Resolve(ordinal).Value;
+                index.Get()
+
+            }
+            else
+                throw new KeyNotFoundException(string.Format("No index with name: '{0}'", name));
+        }
+
+        private Lazy<XPathNavigatorIndex> CreateFallbackEvaluator(string name)
+        {
+            throw new KeyNotFoundException("No index added");
+        }
+
+        private Lazy<XPathNavigatorIndex> CreateIndexEvaluator(string name, Uri inputUri, string matchExpression, string keyExpression, XsltContext xsltContext)
+        {
+            return new Lazy<XPathNavigatorIndex>(
+                () =>
+                {
+                    
+                });
         }
     }
 }

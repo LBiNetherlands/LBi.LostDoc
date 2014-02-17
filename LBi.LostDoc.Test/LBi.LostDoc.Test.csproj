@@ -111,6 +111,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Templating\AlternateStaticInput\template.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\MultipleVersionsOfIndex\Echo.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\MultipleVersionsOfIndex\IncludeIndex.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templating\MultipleVersionsOfIndex\template.xml" />
+  </ItemGroup>
   <!--  manual edit, the build server needs to reference a dll rather than a project -->
   <Choose>
     <When Condition=" '$(AlternateReferenceLocation)' != '' ">

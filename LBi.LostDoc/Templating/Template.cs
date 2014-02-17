@@ -116,11 +116,9 @@ namespace LBi.LostDoc.Templating
             if (settings.UriResolvers != null)
                 assetUriResolvers.AddRange(settings.UriResolvers);
 
-            
 
-            //// fill indices
-
-            this.OnProgress("Registering index");
+            // fill indices
+            this.OnProgress("Registering index directives");
             var customXsltContext = CustomXsltContext.Create(settings.IgnoredVersionComponent);
 
             IIndexProvider indexProvider = new IndexProvider(dependencyProvider);
@@ -143,11 +141,6 @@ namespace LBi.LostDoc.Templating
 
                 indexProvider.Add(index.Name, index.Ordinal, inptUri, index.MatchExpression, index.KeyExpression, customXsltContext);
             }
-
-            TraceSources.TemplateSource.TraceInformation("Indexing...");
-            //context.DocumentIndex.BuildIndexes();
-
-
 
             // create context
             ITemplatingContext context = new TemplatingContext(settings.Cache,
