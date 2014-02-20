@@ -65,6 +65,7 @@
     <Compile Include="Reflection\ReflectionExplorerTests.cs" />
     <Compile Include="Templating\OrdinalResolverTest.cs" />
     <Compile Include="Templating\TemplateTests.cs" />
+    <Compile Include="Templating\XPathNavigatorIndexTests.cs" />
     <Compile Include="UriTests.cs" />
   </ItemGroup>
   <ItemGroup>

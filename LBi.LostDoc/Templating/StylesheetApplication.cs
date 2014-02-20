@@ -127,7 +127,7 @@ namespace LBi.LostDoc.Templating
                 FileReference stylesheet = context.StorageResolver.Resolve(this.Stylesheet);
                 using (Stream str = stylesheet.GetStream())
                 {
-                    XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true, });
+                    XmlReader reader = XmlReader.Create(str, new XmlReaderSettings { CloseInput = true });
                     XsltSettings settings = new XsltSettings(true, true);
                     XmlResolver resolver = new XmlFileProviderResolver(Storage.UriSchemeTemplate, context.StorageResolver, context.DependencyProvider, this.Ordinal);
                     ret.Load(reader, settings, resolver);

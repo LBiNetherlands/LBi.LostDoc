@@ -191,7 +191,7 @@
     <Compile Include="Templating\WorkUnitResult.cs" />
     <Compile Include="Templating\XDomExtensions.cs" />
     <Compile Include="Templating\XPathVariable.cs" />
-    <Compile Include="Templating\XPath\XPathNavigatorIterator.cs" />
+    <Compile Include="Templating\XPath\XPathNavigatorIndex.cs" />
     <Compile Include="Templating\XPath\CustomXsltContext.cs" />
     <Compile Include="Templating\ITemplatingContext.cs" />
     <Compile Include="Templating\TemplateParser.cs" />
@@ -199,7 +199,6 @@
     <Compile Include="Templating\TemplatingContext.cs" />
     <Compile Include="Templating\IAssetUriResolver.cs" />
     <Compile Include="ProcessingContext.cs" />
-    <Compile Include="Templating\XPath\XPathNavigatorIndex.cs" />
     <Compile Include="Templating\XPath\XPathServices.cs" />
     <Compile Include="Templating\XPath\XsltContextAssetGetter.cs" />
     <Compile Include="Templating\XPath\XsltContextSubstringAfterLastFunction.cs" />
