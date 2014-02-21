@@ -275,7 +275,8 @@ namespace LBi.LostDoc.Templating
                                       elem.GetAttributeValue("name"),
                                       elem.GetAttributeValueOrDefault("input"),
                                       elem.GetAttributeValue("match"),
-                                      elem.GetAttributeValue("key"));
+                                      elem.GetAttributeValue("key"),
+                                      elem.GetAttributeValueOrDefault("select", "."));
         }
 
         protected virtual StylesheetDirective ParseStylesheet(IFileProvider provider, XElement elem, int ordinal)

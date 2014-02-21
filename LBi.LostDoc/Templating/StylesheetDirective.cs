@@ -150,7 +150,6 @@ namespace LBi.LostDoc.Templating
                         // eval condition
                         if (assetInputElement.EvaluateCondition(assetRegistration.ConditionExpression, context.XsltContext))
                         {
-
                             AssetIdentifier assetIdentifier = new AssetIdentifier(assetId, version);
                             context.RegisterAssetUri(assetIdentifier, outputUri);
                             assetIdentifiers.Add(assetIdentifier);
@@ -185,7 +184,7 @@ namespace LBi.LostDoc.Templating
                         // eval condition
                         if (sectionInputElement.EvaluateCondition(section.ConditionExpression, context.XsltContext))
                         {
-                            Uri sectionUri = new Uri(outputUri + "#" + sectionName, UriKind.Relative);
+                            Uri sectionUri = new Uri(outputUri.OriginalString + "#" + sectionName, UriKind.Absolute);
                             AssetIdentifier assetIdentifier = new AssetIdentifier(sectionAssetId, sectionVersion);
                             context.RegisterAssetUri(assetIdentifier, sectionUri);
                             TraceSources.TemplateSource.TraceVerbose("{0}, {1}, (Section: {2}) => {3}",

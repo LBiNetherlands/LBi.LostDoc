@@ -82,7 +82,7 @@ namespace LBi.LostDoc.Templating
             foreach (KeyValuePair<string, object> kvp in this.XsltParams)
                 argList.AddParam(kvp.Key, string.Empty, kvp.Value);
 
-            argList.XsltMessageEncountered += (s, e) => TraceSources.TemplateSource.TraceInformation("Message: {0}.", e.Message);
+            argList.XsltMessageEncountered += (s, e) => TraceSources.TemplateSource.TraceInformation("/{1:00} Message: {0}.", e.Message, this.Ordinal);
 
             // and custom extensions
             argList.AddExtensionObject(Namespaces.Template, new TemplateXsltExtensions(context, this.Output, this.Ordinal));
@@ -109,7 +109,7 @@ namespace LBi.LostDoc.Templating
 
                 double duration = ((Stopwatch.GetTimestamp() - tickStart) / (double)Stopwatch.Frequency) * 1000;
 
-                TraceSources.TemplateSource.TraceVerbose("{0} ({1:N0} ms)", this.Output, duration);
+                TraceSources.TemplateSource.TraceVerbose("/{2:00} {0} ({1:N0} ms)", this.Output, duration, this.Ordinal);
 
                 writer.Close();
                 outputStream.Close();

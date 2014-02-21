@@ -127,6 +127,12 @@
     <xsl:apply-templates select="." mode="nounSingular"/>
   </xsl:template>
 
+  <xsl:template match="method | property" mode="overload-title">
+    <xsl:value-of select="@name"/>
+    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="." mode="nounPlural"/>
+  </xsl:template>
+
   <xsl:template match="operator[@name = 'op_Implicit' or @name = 'op_Explicit']" mode="title">
     <xsl:apply-templates select="." mode="displayText"/>
   </xsl:template>

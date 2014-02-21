@@ -43,7 +43,9 @@ namespace LBi.LostDoc.Templating
         {
             Contract.Requires<ArgumentNullException>(context != null);
             Contract.Ensures(Contract.Result<IEnumerable<UnitOfWork>>() != null);
-            Contract.Ensures(Contract.ForAll<UnitOfWork>(Contract.Result<IEnumerable<UnitOfWork>>(), t => t != null));
+            // this causes the function to be evaluated twice, change interface to return arary?
+            //Contract.Ensures(Contract.ForAll<UnitOfWork>(Contract.Result<IEnumerable<UnitOfWork>>(), t => t != null));
+            
 
             return default(IEnumerable<UnitOfWork>);
         }

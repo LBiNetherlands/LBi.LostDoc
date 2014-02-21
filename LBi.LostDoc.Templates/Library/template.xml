@@ -23,7 +23,7 @@
 
   <!-- indexed nodes, accessible through ld:key('indexName', value) -->
   <index name="aid" match="*[@assetId]" key="@assetId"/>
-  <index name="aidNoVer" match="*[@assetId]" key="get-id(@assetId)"/>
+  <!--<index name="aidNoVer" match="*[@assetId]" key="get-id(@assetId)"/>
   <index name="aidInherits" match="*[@assetId and inherits/@type]" key="inherits/@type"/>
 
   <include-resource path="less\style.less" output="css\style.css">
@@ -37,39 +37,63 @@
 
   <include-resource path="{$LogoUrl}"
                     output="{concat('images/logo.', substring-after-last($LogoUrl, '.'))}">
-    <!--<transform name="scale">
+    -->
+  <!--<transform name="scale">
       <with-param name="mode" select="'Bound'"/>
       <with-param name="width" select="200"/>
       <with-param name="height" select="75"/>
     </transform>-->
-  </include-resource>
+  <!--
+  </include-resource>-->
 
   <!-- inject [with-param/@name='logoUri'] element in all 'apply-stylesheet' directives found. -->
   <!-- TODO look into how GlobalParameter.xslt handles it's 'value' -->
-  <meta-template stylesheet="GlobalParameter.xslt">
+  <!--<meta-template stylesheet="GlobalParameter.xslt">
     <with-param name="name" value="logoUri"/>
     <with-param name="value" value="concat('images/logo.', substring-after-last($LogoUrl, '.'))"/>
-  </meta-template>
+  </meta-template>-->
 
-  <apply-stylesheet stylesheet="EnrichNaming.xslt" />
+  <!--<apply-stylesheet stylesheet="EnrichNaming.xslt" />-->
 
-  <apply-stylesheet name="Navigation"
-                    select="/"
-                    output="'temp://navigation.xml'"
-                    stylesheet="Navigation.xslt"/>
-
-  <apply-stylesheet name="Library"
+  <!--<apply-stylesheet name="Library"
                     select="/bundle"
                     output="'Library.html'"
                     stylesheet="Library.xslt">
 
     <register-asset assetId="'*:*'"
                     version="'0.0.0.0'" />
+  </apply-stylesheet>-->
 
-    <with-param name="assetId" select="@assetId" />
-  </apply-stylesheet>
-<!--
-  <apply-stylesheet name="Assembly summary"
+  <apply-stylesheet name="Master"
+                    output="'output://master.xml'"
+                    stylesheet="Master.xslt"/>
+
+  <!--<index name="name"
+         input="output://master.xml"
+         match="asset[@assetId]"
+         key="@assetId"
+         select="name/text()" />
+
+  <index name="title"
+         input="output://master.xml"
+         match="asset[@assetId]"
+         key="@assetId"
+         select="title/text()" />-->
+
+  <!--<apply-stylesheet name="Navigation"
+                    select="/"
+                    output="'output://navigation.xml'"
+                    stylesheet="Navigation.xslt"/>-->
+
+  <!--<index name="nav"
+         input="output://navigation.xml"
+         match="*[@assetId]"
+         key="@assetId" />-->
+
+  <!--<apply-stylesheet stylesheet="RewriteNaming.xslt" />-->
+
+
+  <!--<apply-stylesheet name="Assembly summary"
                     select="/bundle/assembly[@phase = '0']"
                     output="concat(@filename, '/', get-significant-version(@assetId), '.html')"
                     stylesheet="Assembly.xslt">

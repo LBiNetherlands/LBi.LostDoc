@@ -91,10 +91,13 @@
     <EmbeddedResource Include="Library\images\lostdoc.svg" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Library\Navigation.xslt" />
+    <EmbeddedResource Include="Library\Master.xslt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Library\EnrichNaming.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Library\_Master.xslt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

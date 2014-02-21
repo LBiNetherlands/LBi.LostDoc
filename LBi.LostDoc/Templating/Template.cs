@@ -16,11 +16,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -139,7 +141,7 @@ namespace LBi.LostDoc.Templating
                 else
                     inptUri = Storage.InputDocumentUri;
 
-                indexProvider.Add(index.Name, index.Ordinal, inptUri, index.MatchExpression, index.KeyExpression, customXsltContext);
+                indexProvider.Add(index.Name, index.Ordinal, inptUri, index.MatchExpression, index.KeyExpression, index.SelectExpression, customXsltContext);
             }
 
             // create context
@@ -161,13 +163,39 @@ namespace LBi.LostDoc.Templating
                                                   CancellationToken = settings.CancellationToken
                                               };
 
+            int totalCount = work.Length;
+            long lastProgress = Stopwatch.GetTimestamp();
+            int processed = 0;
+
             // TODO is this really the best way to execute the tasks?
             Parallel.ForEach(work,
                              parallelOptions,
                              t =>
                              {
                                  if (t.Status == TaskStatus.Created)
+                                 {
+                                     t.ContinueWith(u =>
+                                                    {
+                                                        int c = Interlocked.Increment(ref processed);
+                                                        long lp = Interlocked.Read(ref lastProgress);
+                                                        if ((Stopwatch.GetTimestamp() - lp) / (double)Stopwatch.Frequency > 5.0)
+                                                        {
+                                                            if (Interlocked.CompareExchange(ref lastProgress,
+                                                                                            Stopwatch.GetTimestamp(),
+                                                                                            lp) == lp)
+                                                            {
+                                                                double percent = c / (double)totalCount;
+                                                                this.OnProgress("Generating", (int)Math.Round(percent));
+                                                                TraceSources.TemplateSource.TraceInformation("Progress: {0:P1} ({1:N0}/{2:N0})",
+                                                                                                             percent,
+                                                                                                             c,
+                                                                                                             totalCount);
+                                                            }
+                                                        }
+                                                    });
+
                                      t.Start();
+                                 }
                              });
 
             Task.WaitAll(work, settings.CancellationToken);
@@ -227,8 +255,9 @@ namespace LBi.LostDoc.Templating
 
             #region statistics (hack)
             Stopwatch statsTimer = new Stopwatch();
-            // prepare stats
 
+            // prepare stats
+            // TODO this needs to go away
             Dictionary<Type, WorkUnitResult[]> resultGroups = results.GroupBy(ps => ps.WorkUnit.GetType()).ToDictionary(g => g.Key, g => g.ToArray());
 
             if (resultGroups.ContainsKey(typeof(StylesheetApplication)))
@@ -240,7 +269,7 @@ namespace LBi.LostDoc.Templating
                     long min = statGroup.Min(ps => ps.Duration);
                     long max = statGroup.Max(ps => ps.Duration);
                     TraceSources.TemplateSource.TraceInformation("Applied stylesheet '{0}' {1:N0} times in {2:N0} ms (min: {3:N0}, mean {4:N0}, max {5:N0}, avg: {6:N0})",
-                                                                 statGroup.Key,
+                                                                 statGroup.Key.OriginalString,
                                                                  statGroup.Count(),
                                                                  statGroup.Sum(ps => ps.Duration) / 1000.0,
                                                                  min / 1000.0,
@@ -365,7 +394,7 @@ namespace LBi.LostDoc.Templating
                 foreach (var statGroup in resourceStats)
                 {
                     TraceSources.TemplateSource.TraceInformation("Deployed resource '{0}' in {1:N0} ms",
-                                                                 ((ResourceDeployment)statGroup.WorkUnit).Input,
+                                                                 ((ResourceDeployment)statGroup.WorkUnit).Input.OriginalString,
                                                                  statGroup.Duration);
                 }
             }
@@ -410,9 +439,15 @@ namespace LBi.LostDoc.Templating
             foreach (var templateDirective in directives)
             {
                 IEnumerable<UnitOfWork> work = templateDirective.DiscoverWork(templateContext);
-
+                HashSet<Uri> workUris = new HashSet<Uri>();
                 foreach (UnitOfWork unitOfWork in work)
                 {
+                    if (!workUris.Add(unitOfWork.Output))
+                    {
+                        TraceSources.TemplateSource.TraceError("Duplicate output generated by template directive: " + unitOfWork.Output.OriginalString); 
+                        continue;
+                    }
+
                     Func<object, WorkUnitResult> func =
                         uow =>
                         {

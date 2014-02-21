@@ -18,13 +18,14 @@ namespace LBi.LostDoc.Templating
 {
     public class IndexDirective
     {
-        public IndexDirective(int ordinal, string name, string inputExpression, string matchExpression, string keyExpression)
+        public IndexDirective(int ordinal, string name, string inputExpression, string matchExpression, string keyExpression, string selectExpression)
         {
             this.Ordinal = ordinal;
             this.Name = name;
             this.InputExpression = inputExpression;
             this.MatchExpression = matchExpression;
             this.KeyExpression = keyExpression;
+            this.SelectExpression = selectExpression;
         }
 
         public int Ordinal { get; protected set; }
@@ -36,5 +37,7 @@ namespace LBi.LostDoc.Templating
         public string MatchExpression { get; protected set; }
         
         public string KeyExpression { get; protected set; }
+
+        public string SelectExpression { get; protected set; }
     }
 }

@@ -29,13 +29,14 @@ namespace LBi.LostDoc.Templating
     {
         private class Definition
         {
-            public Definition(string name, int ordinal, Uri inputUri, string matchExpression, string keyExpression, XsltContext xsltContext)
+            public Definition(string name, int ordinal, Uri inputUri, string matchExpression, string keyExpression, string selectExpression, XsltContext xsltContext)
             {
                 this.Name = name;
                 this.Ordinal = ordinal;
                 this.InputUri = inputUri;
                 this.MatchExpression = matchExpression;
                 this.KeyExpression = keyExpression;
+                this.SelectExpression = selectExpression;
                 this.Context = xsltContext;
             }
 
@@ -44,6 +45,7 @@ namespace LBi.LostDoc.Templating
             public Uri InputUri { get; set; }
             public string MatchExpression { get; set; }
             public string KeyExpression { get; set; }
+            public string SelectExpression { get; set; }
             public XsltContext Context { get; set; }
 
             public XPathNavigatorIndex Evaluate(IDependencyProvider dependencyProvider)
@@ -53,7 +55,7 @@ namespace LBi.LostDoc.Templating
                 {
                     XPathDocument doc = new XPathDocument(stream);
                     XPathNavigator navigator = doc.CreateNavigator();
-                    return XPathNavigatorIndex.Create(navigator, this.MatchExpression, this.KeyExpression, this.Context);
+                    return XPathNavigatorIndex.Create(navigator, this.MatchExpression, this.KeyExpression, this.SelectExpression, this.Context);
                 }
             }
         }
@@ -75,6 +77,7 @@ namespace LBi.LostDoc.Templating
                         Uri inputUri,
                         string matchExpression,
                         string keyExpression,
+                        string selectExpression,
                         XsltContext xsltContext = null)
         {
             List<Definition> definitions;
@@ -87,7 +90,7 @@ namespace LBi.LostDoc.Templating
             else
                 resolver = this._indices[name];
 
-            definitions.Add(new Definition(name, ordinal, inputUri, matchExpression, keyExpression, xsltContext));
+            definitions.Add(new Definition(name, ordinal, inputUri, matchExpression, keyExpression, selectExpression, xsltContext));
 
             resolver.Add(ordinal, this.CreateIndexEvaluator(definitions));
 

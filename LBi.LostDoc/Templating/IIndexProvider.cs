@@ -13,6 +13,7 @@ namespace LBi.LostDoc.Templating
                  Uri inputUri,
                  string matchExpression,
                  string keyExpression,
+                 string selectExpression,
                  XsltContext xsltContext = null);
 
         XPathNodeIterator Get(string name, int ordinal, object value);
@@ -23,13 +24,14 @@ namespace LBi.LostDoc.Templating
     internal class IIndexProviderContract : IIndexProvider
     // ReSharper restore InconsistentNaming
     {
-        public void Add(string name, int ordinal, Uri inputUri, string matchExpression, string keyExpression, XsltContext xsltContext)
+        public void Add(string name, int ordinal, Uri inputUri, string matchExpression, string keyExpression, string selectExpression, XsltContext xsltContext)
         {
             Contract.Requires<ArgumentNullException>(name != null, "name cannot be null.");
             Contract.Requires<ArgumentOutOfRangeException>(ordinal >= 0, "ordinal cannot be negative.");
             Contract.Requires<ArgumentNullException>(inputUri != null, "inputUri cannot be null.");
             Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(matchExpression), "matchExpression cannot be null or empty.");
             Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(keyExpression), "keyExpression cannot be null or empty.");
+            Contract.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(selectExpression), "selectExpression cannot be null or empty.");
         }
 
         public XPathNodeIterator Get(string name, int ordinal, object value)

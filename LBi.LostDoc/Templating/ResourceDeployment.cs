@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 DigitasLBi Netherlands B.V.
+ * Copyright 2012-2014 DigitasLBi Netherlands B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,10 @@ namespace LBi.LostDoc.Templating
         public override void Execute(ITemplatingContext context, Stream outputStream)
         {
             // copy resources to output dir
-            TraceSources.TemplateSource.TraceInformation("Copying resource: {0} => {1}",
-                                                         this.Input,
-                                                         this.Output);
+            TraceSources.TemplateSource.TraceInformation("/{2:00} Deploying resource: {0} => {1}",
+                                                         this.Input.OriginalString,
+                                                         this.Output.OriginalString,
+                                                         this.Ordinal);
 
             var inputFileRef = context.StorageResolver.Resolve(this.Input);
 
@@ -46,9 +47,10 @@ namespace LBi.LostDoc.Templating
             Stream outStream = streamSrc;
             for (int i = 0; i < this.Transforms.Length; i++)
             {
-                TraceSources.TemplateSource.TraceInformation("Applying '{0}' to resource: {1}",
+                TraceSources.TemplateSource.TraceInformation("/{2:00} Applying '{0}' to resource: {1}",
                                                              this.Transforms[i].GetType().Name,
-                                                             this.Input);
+                                                             this.Input.OriginalString,
+                                                             this.Ordinal);
                 Stream oldStream = outStream;
                 outStream = this.Transforms[i].Transform(outStream);
                 oldStream.Dispose();

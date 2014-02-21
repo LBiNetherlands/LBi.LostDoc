@@ -106,16 +106,18 @@ namespace LBi.LostDoc.Templating.XPath
             return ret;
         }
 
-        public static XPathNavigatorIndex Create(XPathNavigator navigator, string matchExpression, string keyExpression, XsltContext context)
+        public static XPathNavigatorIndex Create(XPathNavigator navigator, string matchExpression, string keyExpression, string selectExpression, XsltContext context)
         {
             XPathNavigatorIndex ret = new XPathNavigatorIndex();
 
             XPathExpression matchExpr = navigator.Compile(matchExpression);
             XPathExpression keyExpr = navigator.Compile(keyExpression);
+            XPathExpression selectExpr = navigator.Compile(selectExpression);
             if (context != null)
             {
                 matchExpr.SetContext(context);
                 keyExpr.SetContext(context);
+                selectExpr.SetContext(context);
             }
 
             XPathNodeIterator nodeIterator = navigator.SelectDescendants(XPathNodeType.All, true);
@@ -127,20 +129,20 @@ namespace LBi.LostDoc.Templating.XPath
                 {
                     XPathNavigator temp = currentNode.Clone();
                     for (bool hasMore = temp.MoveToFirstNamespace(); hasMore; hasMore = temp.MoveToNextNamespace())
-                        IndexNode(ret, temp, matchExpr, keyExpr);
+                        IndexNode(ret, temp, matchExpr, keyExpr, selectExpr);
 
                     temp = currentNode.Clone();
                     for (bool hasMore = temp.MoveToFirstAttribute(); hasMore; hasMore = temp.MoveToNextAttribute())
-                        IndexNode(ret, temp, matchExpr, keyExpr);
+                        IndexNode(ret, temp, matchExpr, keyExpr, selectExpr);
                 }
 
-                IndexNode(ret, currentNode, matchExpr, keyExpr);
+                IndexNode(ret, currentNode, matchExpr, keyExpr, selectExpr);
             }
 
             return ret;
         }
 
-        private static void IndexNode(XPathNavigatorIndex ret, XPathNavigator currentNode, XPathExpression matchExpr, XPathExpression keyExpr)
+        private static void IndexNode(XPathNavigatorIndex ret, XPathNavigator currentNode, XPathExpression matchExpr, XPathExpression keyExpr, XPathExpression selectExpr)
         {
             if (currentNode.Matches(matchExpr))
             {
@@ -150,12 +152,16 @@ namespace LBi.LostDoc.Templating.XPath
                 {
                     while (keyIterator.MoveNext())
                     {
-                        ret.RegisterNode(keyIterator.Current.Value, currentNode.Clone());
+                        XPathNodeIterator nodeIterator = currentNode.Select(selectExpr);
+                        while (nodeIterator.MoveNext())
+                            ret.RegisterNode(keyIterator.Current.Value, nodeIterator.Current.Clone());
                     }
                 }
                 else if (key != null)
                 {
-                    ret.RegisterNode(key.ToString(), currentNode.Clone());
+                    XPathNodeIterator nodeIterator = currentNode.Select(selectExpr);
+                    while (nodeIterator.MoveNext())
+                        ret.RegisterNode(key.ToString(), nodeIterator.Current.Clone());
                 }
             }
         }

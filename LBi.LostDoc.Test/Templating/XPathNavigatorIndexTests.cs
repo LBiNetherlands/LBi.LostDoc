@@ -34,7 +34,7 @@ namespace LBi.LostDoc.Test.Templating
                                                            new XElement("data", new XAttribute("id", 2)),
                                                            new XElement("data", new XAttribute("id", 3))));
 
-                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "*[@id]", "@id", null);
+                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "*[@id]", "@id", ".", null);
 
                 for (int i = 0; i < 4; i++)
                 {
@@ -54,7 +54,7 @@ namespace LBi.LostDoc.Test.Templating
                                                            new XElement("data", new XAttribute("id", 2)),
                                                            new XElement("data", new XAttribute("id", 3))));
 
-                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "@id", ".", null);
+                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "@id", ".", ".", null);
 
                 for (int i = 0; i < 4; i++)
                 {
@@ -74,7 +74,7 @@ namespace LBi.LostDoc.Test.Templating
                                                            new XElement("data", new XAttribute("id", 0), 2),
                                                            new XElement("data", new XAttribute("id", 0), 3)));
 
-                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "*[@id]", "@id", null);
+                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "*[@id]", "@id", ".", null);
 
                 XPathNodeIterator result = index.Get(0);
                 for (int i = 0; i < 4; i++)
@@ -99,7 +99,7 @@ namespace LBi.LostDoc.Test.Templating
                                                            new XElement("data", new XAttribute("id", 0), 2),
                                                            new XElement("data", new XAttribute("id", 0), 3)));
 
-                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "*[@id]", "@id", null);
+                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "*[@id]", "@id", ".", null);
 
                 XPathNodeIterator result = index.Get(0);
                 XPathNodeIterator result2 = index.Get(0);
@@ -114,7 +114,7 @@ namespace LBi.LostDoc.Test.Templating
                 }
 
                 Assert.False(result.MoveNext());
-                Assert.False(result2.MoveNext());                
+                Assert.False(result2.MoveNext());
             }
 
             [Fact]
@@ -126,7 +126,7 @@ namespace LBi.LostDoc.Test.Templating
                                                            new XElement("data", new XAttribute("id", 0), 2),
                                                            new XElement("data", new XAttribute("id", 0), 3)));
 
-                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "*[@id]", "@id", null);
+                XPathNavigatorIndex index = XPathNavigatorIndex.Create(doc.CreateNavigator(), "*[@id]", "@id", ".", null);
 
                 XPathNodeIterator result = index.Get(0);
                 XPathNodeIterator result2 = result.Clone();
