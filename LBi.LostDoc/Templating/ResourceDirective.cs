@@ -84,7 +84,7 @@ namespace LBi.LostDoc.Templating
                                            CreationPolicy.Shared);
 
                         CompositionBatch batch = new CompositionBatch();
-                        string dirName = Path.GetDirectoryName(expandedInput.ToString());
+                        string dirName = Path.GetDirectoryName(expandedInput.OriginalString.Substring(expandedInput.Scheme.Length + Uri.SchemeDelimiter.Length));
                         batch.AddExport(new Export(ContractNames.ResourceFileProvider,
                                                    exportMetadata,
                                                    () => new ScopedFileProvider(context.TemplateFileProvider, dirName)));
